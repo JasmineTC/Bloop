@@ -76,6 +76,12 @@ class EffectivePotential:
         ## TODO scalars
 
         return MassSquared(mWsq=mWsq, mZsq=mZsq)
+    
+
+    def calcAngles(self, fields: list[float]):
+        ## TODO
+        None
+
 
     ## Evaluate Veff(fields, T) using current set of model parameters
     def evaluate(self, fields: list[float], loopOrder: int = 2) -> complex:

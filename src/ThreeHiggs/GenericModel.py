@@ -60,7 +60,7 @@ class GenericModel():
     Here the optional arguments are:
         bDarkDemocracyLimit=True if we set various phi1, phi2 specific couplings equal to each other as defined in the draft.
     """ 
-    def calculateRenormalizedParameters(self, inputParams, RGScale: float, bDarkDemocracyLimit=True) -> dict[str, float]:
+    def calculateRenormalizedParameters(self, inputParams: dict[str, float], RGScale: float, bDarkDemocracyLimit=True) -> dict[str, float]:
 
         v = self.v
 
