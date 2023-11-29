@@ -7,8 +7,8 @@ from dataclasses import dataclass
 import Integrals
 
 
-""" Helper "struct", just holds mass eigenvalues squared. This is convenient to have for storing both scalar and gauge masses in one place, 
-while still having names for each mass. Not very model independent though. (Would a dict be better??) 
+""" Helper "struct", just holds mass eigenvalues squared. This is convenient to have for storing both scalar and gauge masses 
+in one place, while still having names for each mass. Not very model independent though. (Would a dict be better??) 
 """  
 @dataclass 
 class MassSquared:
@@ -111,11 +111,12 @@ class EffectivePotential:
 
 
         ## Minimize real part only:
-        wrapper = lambda fields: np.real ( self.evaluate(fields) )
+        VeffWrapper = lambda fields: np.real ( self.evaluate(fields) )
 
-        guesses = np.array( [initialGuess] * len(self.mu1sq) )
+        res = scipy.optimize.minimize(VeffWrapper, initialGuess)
 
-        location, value = scipy.optimize.minimize(wrapper, guesses)
+        ## res.x = location, res.fun = value, res.success = flag for determining if the algorithm finished successfully
+        location = res.x
 
         ## evaluate once more to get the possible imag parts
         value = self.evaluate(location)

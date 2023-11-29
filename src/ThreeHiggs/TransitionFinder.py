@@ -32,22 +32,45 @@ class TransitionFinder:
 
         ## TODO would probs be good to move this part inside DimensionalReduction class
 
-        ## Put T in the dict. I assume that the DR routines below work with T-array input
-        paramsForMatching["T"] = TRange
+
+        """ 
+        Now for the temperature loop. I see two options:
+            1. Give the TRange array directly to EFT routines and the Veff => DR results dict of arrays of len(TRange).
+            This way numpy vectorization would be automatic. HOWEVER, minimization with scipy.optimize.minimize is not 
+            directly possible because Veff(x) would be an array of len(TRange), and scipy requires a scalar value.
+            So this does not work currently.
+
+            2. Do an ordinary loop over values in TRange. This is necessarily slow in Python but works. Good thing here is that
+            we can break the T-loop at any point, eg. when we find a transition of interest.
+
+        Going with option 2. 
+        """
 
         EulerGamma = 0.5772156649
-        ## And T-dependent logs too. Not a particularly nice solution...
-        Lb = 2. * np.log(matchingScale / TRange) - 2.*(np.log(4.*np.pi) - EulerGamma)
-        paramsForMatching["Lb"] = Lb
-        paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
 
-        params3D = self.model.dimensionalReduction.getSoftScaleParams(renormalizedParams)
-        
-        ## params3D should now be a dict of np.arrays of len(TRange)
+        ## This will contain minimization results in form: 
+        ## [ [T, Veff(min), field1, field2, ...], ... ]
+        minimizationResults = []
+        for T in TRange:
 
-        self.model.effectivePotential.setModelParameters(params3D)
+            ## T needs to be in the dict
+            paramsForMatching["T"] = T
 
-        self.model.effectivePotential.findGlobalMinimum()
+            ## Put T-dependent logs in the dict too. Not a particularly nice solution...
+            Lb = 2. * np.log(matchingScale / T) - 2.*(np.log(4.*np.pi) - EulerGamma)
+            paramsForMatching["Lb"] = Lb
+            paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
 
+            params3D = self.model.dimensionalReduction.getSoftScaleParams(renormalizedParams)
+
+            self.model.effectivePotential.setModelParameters(params3D)
+
+            minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
+
+            minimizationResults.append( [T, valueVeff, *minimum] )
+
+        minimizationResults = np.array(minimizationResults)
+        print( minimizationResults )
+        np.savetxt("results_test.txt", minimizationResults)
 
 
