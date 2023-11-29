@@ -1,18 +1,25 @@
 import numpy as np
 import numpy.typing as npt
+from typing import Tuple
 
 from EffectivePotential import EffectivePotential
+from DimensionalReduction import DimensionalReduction
 
 ## Could be an ABC, but just implementing for 3HDM for now
-class Model():
+class GenericModel():
 
-    EffectivePotential: EffectivePotential
+    """ Control variables """
+    # Set to true if the input dict contains 3HDM mass splittings (in GeV) instead of masses directly.
+    bMassSplittingInput: bool = True
+
+    dimensionalReduction: DimensionalReduction
+    effectivePotential: EffectivePotential
 
     ## This is the "physical" input 
     inputParams: dict[str, float]
 
-    ## Define some constants that are inputs too, but we won't scan over these
-
+    """ Define some constants that are inputs too, but we won't scan over these. 
+    """
     ## "Higgs VEV". Consider using Fermi constant instead
     v = 246.22
     ## Higgs mass
@@ -28,21 +35,46 @@ class Model():
 
     def __init__(self):
         self.inputParams = {}
-        self.EffectivePotential = EffectivePotential()
+        self.dimensionalReduction = DimensionalReduction()
+        ## 3D potential:
+        self.effectivePotential = EffectivePotential()
 
     
-    ## This goes from whatever "physical" input to parameters in the actions.
-    ## With tree-level matching the renormalization scale does not directly show up in the expressions, but
-    ## needs to be specified for later loop calculations. 
+    def setInputParams(self, inputParams):
+        self.inputParams = inputParams
+
+    ## Convert Venus' mass splitting (deltas) input to mass values. Returns mS2, mSpm1, mSpm2 (pm meaning plus/minus; the charged masses)
+    @staticmethod
+    def massSplittingsToMasses(mS1: float, delta12: float, delta1c: float, deltac: float) -> Tuple[float, float, float]:
+
+        mS2 = delta12 + mS1
+        mSpm1 = delta1c + mS1
+        mSpm2 = deltac + mSpm1
+        return mS2, mSpm1, mSpm2
+
+
+    """This goes from whatever "physical" input to parameters in the actions.
+    With tree-level matching the renormalization scale does not directly show up in the expressions, but
+    needs to be specified for later loop calculations.
+
+    Here the optional arguments are:
+        bDarkDemocracyLimit=True if we set various phi1, phi2 specific couplings equal to each other as defined in the draft.
+    """ 
     def calculateRenormalizedParameters(self, inputParams, RGScale: float, bDarkDemocracyLimit=True) -> dict[str, float]:
 
         v = self.v
 
         mS1 = inputParams["mS1"]
-        mS2 = inputParams["mS2"]
-        ## Charged masses:
-        mSpm1 = inputParams["mSpm1"]
-        mSpm2 = inputParams["mSpm2"]
+
+        if (self.bMassSplittingInput):
+
+            mS2, mSpm1, mSpm2 = self.massSplittingsToMasses(mS1, inputParams["delta12"], inputParams["delta1c"], inputParams["deltac"])
+
+        else:
+            mS2 = inputParams["mS2"]
+            ## Charged masses:
+            mSpm1 = inputParams["mSpm1"]
+            mSpm2 = inputParams["mSpm2"]
 
         ## This is the complex phase of lambda_2
         thetaCPV = inputParams["thetaCPV"]
@@ -51,8 +83,15 @@ class Model():
         sinTheta = np.sin(thetaCPV)
         cosTheta = np.cos(thetaCPV)
 
-
         res = {}
+
+        ## First copy action params that were given as direct inputs
+        res["lam1Re"] = inputParams["lam1Re"]
+        res["lam1Im"] = inputParams["lam1Im"]
+        res["lam11"] = inputParams["lam11"]
+        res["lam22"] = inputParams["lam22"]
+        res["lam12"] = inputParams["lam12"]
+        res["lam12p"] = inputParams["lam12p"]
 
         ## Yukawas (not squared! would it be better to store y^2?)
         res["yt3"] = np.sqrt(2.) * self.Mt / v 

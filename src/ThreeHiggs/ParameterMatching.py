@@ -80,22 +80,7 @@ class ParameterMatching:
         self.matchingRelations["lam11"] = self._exprToFunction(self.__parsedMatchingRelations["lam113d"], argumentSymbols)
         self.matchingRelations["lam22"] = self._exprToFunction(self.__parsedMatchingRelations["lam223d"], argumentSymbols)
         self.matchingRelations["lam33"] = self._exprToFunction(self.__parsedMatchingRelations["lam333d"], argumentSymbols)
-
-        self.matchingRelations["lam12"] = self._exprToFunction(self.__parsedMatchingRelations["lam123d"], argumentSymbols)
-        self.matchingRelations["lam23"] = self._exprToFunction(self.__parsedMatchingRelations["lam233d"], argumentSymbols)
-        self.matchingRelations["lam31"] = self._exprToFunction(self.__parsedMatchingRelations["lam313d"], argumentSymbols)
-
-        self.matchingRelations["lam12p"] = self._exprToFunction(self.__parsedMatchingRelations["lam12p3d"], argumentSymbols)
-        self.matchingRelations["lam23p"] = self._exprToFunction(self.__parsedMatchingRelations["lam23p3d"], argumentSymbols)
-        self.matchingRelations["lam31p"] = self._exprToFunction(self.__parsedMatchingRelations["lam31p3d"], argumentSymbols)
-
-        self.matchingRelations["lam1Re"] = self._exprToFunction(self.__parsedMatchingRelations["lam1Re3d"], argumentSymbols)
-        self.matchingRelations["lam2Re"] = self._exprToFunction(self.__parsedMatchingRelations["lam2Re3d"], argumentSymbols)
-        self.matchingRelations["lam3Re"] = self._exprToFunction(self.__parsedMatchingRelations["lam3Re3d"], argumentSymbols)
-
-        self.matchingRelations["lam3Re"] = self._exprToFunction(self.__parsedMatchingRelations["lam3Re3d"], argumentSymbols)
-        self.matchingRelations["lam3Re"] = self._exprToFunction(self.__parsedMatchingRelations["lam3Re3d"], argumentSymbols)
-        self.matchingRelations["lam3Re"] = self._exprToFunction(self.__parsedMatchingRelations["lam3Re3d"], argumentSymbols)
+        # etc
         """
 
 
@@ -109,7 +94,6 @@ class ParameterMatching:
         for i in range(len(outList)):
             outList[i] = params[ self.parameterNames[i] ]
 
-        
         return outList
 
 

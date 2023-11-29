@@ -15,7 +15,6 @@ def getPackagedDataPath(relativeModulePath: str, fileName: str) -> str:
 
 def replaceGreekSymbols(string: str) -> str:
 
-
     ## Unicode magic, this is definitely not ideal
 
     lowerCaseMu = u"\u03BC"

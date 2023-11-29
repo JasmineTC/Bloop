@@ -1,9 +1,10 @@
+import numpy as np
 import pathlib
 
 from ParameterMatching import ParameterMatching
 from DimensionalReduction import DimensionalReduction
-from Model import Model
-
+from GenericModel import GenericModel
+from TransitionFinder import TransitionFinder
 
 ## hack file path, not a good solution if making this into a proper package
 pathToCurrentFile = pathlib.Path(__file__).parent.resolve()
@@ -13,45 +14,47 @@ hardToSoftFile = str(pathToCurrentFile) + "/Data/softScaleParams.txt"
 #softToUltrasoftFile = str(pathToCurrentFile) + ...
 
 
-## Setup DR relations
-dimensionalReduction = DimensionalReduction()
-dimensionalReduction.setupHardToSoftMatching(hardToSoftFile)
+## Model object setup + load matching relations
+model3HDM = GenericModel()
+model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile)
 
+## Input at Z pole
+inputScale = model3HDM.MZ
 
+## This is Venus' first benchmark point in table 1 of draft
 inputParams = {
-    'T' : 100,
-    'Lb' : 1,
-    'Lf' : 2,
-    'g1' : 0.3,
-    'g2' : 0.6,
-    'g3' : 1.5,
-    'yt3' : 0.98,
-    ##
-    'lam11' : 1,
-    'lam22' : 2,
-    'lam33' : 3,
-    'lam12' : 12,
-    'lam23' : 23,
-    'lam31' : 31,
-    'lam12p' : 12,
-    'lam23p' : 23,
-    'lam31p' : 31,
-    'lam1Re' : 11,
-    'lam1Im' : 11,
-    'lam2Re' : 22,
-    'lam2Im' : 22,
-    'lam3Re' : 33,
-    'lam3Im' : 33
+    ## Renormalization scale is also an input since we're inputting some action parameters directly
+    "RGScale" : inputScale,
+
+    ## "Physical" input in the scalar sector
+    "mS1" : 67,
+    ## Mass splittings. If you want to input masses directly instead of these deltas, set model.bMassSplittingInput = False
+    "delta12" : 4.,
+    "delta1c" : 50.,
+    "deltac" : 1.,
+
+    "thetaCPV" : 2.*np.pi/3.,
+    "ghDM" : 0.0,
+
+    ## Input these dark sector parameters directly. Set to 0.1 because otherwise things become untractable
+    "lam1Re" : 0.1,
+    "lam1Im" : 0.0,
+    "lam11" : 0.1,
+    "lam22" : 0.1,
+    "lam12" : 0.1,
+    "lam12p" : 0.1
 }
 
+transitionFinder = TransitionFinder(model=model3HDM)
 
-matchedParams = dimensionalReduction.getSoftScaleParams(inputParams)
+## Scanning loops would start here
 
-print(matchedParams)
+print("Start finite-T stuff")
+model3HDM.setInputParams(inputParams)
+
+transitionFinder.traceFreeEnergyMinimum()
 
 
-model3HDM = Model()
 
-RGScale = 
-model3HDM.calculateRenormalizedParameters()
+
 
