@@ -123,11 +123,11 @@ class EffectivePotential:
         return location, value
     
 
-    """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
-    Generally will not work very well if no candidates minima are given. 
-    Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
-    """
     def findGlobalMinimum(self, minimumCandidates: list[list[float]] = None) -> Tuple[list[float], complex]:
+        """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
+        Generally will not work very well if no candidates minima are given. 
+        Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
+        """
         
         if (minimumCandidates == None or len(minimumCandidates) == 0):
             ## Just search "symmetric" and "broken" in the phi3 direction

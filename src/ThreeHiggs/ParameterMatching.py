@@ -5,6 +5,7 @@ from sympy.parsing.mathematica import parse_mathematica
 
 from typing import Callable, Tuple
 
+from ParsedExpression import ParsedExpression
 from CommonUtils import getPackagedDataPath
 from CommonUtils import replaceGreekSymbols
 
@@ -23,7 +24,7 @@ class ParameterMatching:
 
     ## This list specifies names for parameters that enter the matching relations. 
     # Needs to match symbol names in the file that defines matching relations except that:
-    # 1. "Unicode" symbols like λ are automatically converted to ANSI according to rules in CommonUtils.replaceGreekSymbols(). For ex. λ -> lam  
+    # 1. "Unicode" symbols like λ are automatically converted to ANSI according to rules in CommonUtils.replaceGreekSymbols(). For example λ -> lam  
     # 2. You can include extra symbols that do not appear explicitly in the matching relations. Eg. "RGScale" 
     #parameterNames = [ 'T', 'Lb', 'Lf', 'g1', 'g2', 'g3',  ]  
     ## LN: not used currently since the symbols are read automatically from .txt
@@ -42,8 +43,8 @@ class ParameterMatching:
 
         matchedParams = {}
 
-        for key, value in self.matchingRelations.items():
-            matchedParams[key] = value(*inParamList) ## Unpack because the lambdas don't take lists
+        for key, expr in self.matchingRelations.items():
+            matchedParams[key] = expr(inParamList) ## Unpack because the lambdas don't take lists
 
         return matchedParams
 
@@ -57,11 +58,10 @@ class ParameterMatching:
             symbolNames, parsedMatchingRelations = self.parseMatchingRelations(fileToRead)
 
             print("List of symbols in the matching relations:\n", symbolNames)
-            self.__defineSymbols(symbolNames)
             
             ## I'll just have all matching relations take the same list of args
             self.parameterNames = symbolNames
-            self.matchingRelations = self.lambdifyParsedExpressions(parsedMatchingRelations, self.parameterNames)
+            self.matchingRelations = self.lambdifyMatchingRelations(parsedMatchingRelations, self.parameterNames)
 
 
         ## No input file so use the manual matching implementation
@@ -75,11 +75,6 @@ class ParameterMatching:
         """
         self.matchingRelations["g1sq"] = self._exprToFunction(self.__parsedMatchingRelations['g13d^2'], argumentSymbols)
         self.matchingRelations["g2sq"] = self._exprToFunction(self.__parsedMatchingRelations['g23d^2'], argumentSymbols)
-        self.matchingRelations["g3sq"] = self._exprToFunction(self.__parsedMatchingRelations['g33d^2'], argumentSymbols)
-
-        self.matchingRelations["lam11"] = self._exprToFunction(self.__parsedMatchingRelations["lam113d"], argumentSymbols)
-        self.matchingRelations["lam22"] = self._exprToFunction(self.__parsedMatchingRelations["lam223d"], argumentSymbols)
-        self.matchingRelations["lam33"] = self._exprToFunction(self.__parsedMatchingRelations["lam333d"], argumentSymbols)
         # etc
         """
 
@@ -97,17 +92,8 @@ class ParameterMatching:
         return outList
 
 
-    def __defineSymbols(self, symbolList: list[str]) -> None:
 
-        self.symbols = {}
-
-        ## TODO How to clear sympy definitions?!?!
-
-        for s in symbolList:
-            self.symbols[s] = sympy.Symbol(s)
-
-
-    def parseMatchingRelations(self, filePath: str) -> Tuple[list[str], dict[str, sympy.Expr]]:
+    def parseMatchingRelations(self, filePath: str) -> Tuple[list[str], dict[str, ParsedExpression]]:
         
         ## Use this if changing this code to a proper package:
         #filePath = getPackagedDataPath("ThreeHiggs.Data", "softScaleParams.txt")
@@ -117,6 +103,7 @@ class ParameterMatching:
         with open(filePath, "r") as file:
             expressions = file.readlines()
 
+        ## Dict for storing ParsedExpression objects
         parsedExpressions = {}
         parsedSymbols = [] ## Automatically find all symbols that appear in matching relations
 
@@ -124,13 +111,13 @@ class ParameterMatching:
             try:
                 lhs, rhs = map(str.strip, line.split("->"))
 
-                ## Parsed right-hand side with Greek symbols replaced with ANSI text
-                expr = parse_mathematica( replaceGreekSymbols(rhs) )
+                expr = ParsedExpression(rhs, bReplaceGreekSymbols=True)
 
+                ## Replace Greeks also on the LHS and store in dict as LHS : parsedRHS
                 parsedExpressions[ replaceGreekSymbols(lhs) ] = expr
 
                 ## find symbols but store as string, not the sympy type  
-                for symbol in expr.free_symbols:
+                for symbol in expr.symbols:
                     ## NOTE this conversion will cause issues with pathological symbols like "A B" 
                     # https://stackoverflow.com/questions/59401738/convert-sympy-symbol-to-string-such-that-it-can-always-be-parsed
                     symbol_str = str(symbol)
@@ -145,26 +132,15 @@ class ParameterMatching:
         return parsedSymbols, parsedExpressions
     
 
-    ## Convert dict of sympy expressions to dict of lambdas, same keys. argumentNames (list of strings) 
-    ## specifies what arguments the lambda function needs 
-    def lambdifyParsedExpressions(self, parsedExpressions: dict, argumentNames: list[str]) -> dict[Callable]:
+    def lambdifyMatchingRelations(self, parsedExpressions: dict[str, ParsedExpression], argumentNames: list[str]) -> dict[str, Callable]:
+        """Convert dict of ParsedExpressions to a dict of lambdas, same keys. argumentNames (list of strings)
+        specifies what arguments the lambda functions need 
+        """
 
         convertedExpressions = {}
         
         for key, expr in parsedExpressions.items():
-            convertedExpressions[key] = self._exprToFunction(expr, argumentNames)
+            expr.makeCallable(argumentNames)
+            convertedExpressions[key] = expr
 
         return convertedExpressions
-
-
-
-    ## argumentSymbols specifies which symbols the function depends on. Give strings, we convert internally to sympy symbols.
-    # In principle you can include parameters that the function actually doesn't depend on
-    def _exprToFunction(self, parsedExpression, argumentSymbols: list[str]) -> Callable:
-
-        ## Find sympy symbols corresponding to user str input
-        sympySymbols = []
-        for s in argumentSymbols:
-            sympySymbols.append(self.symbols[s])
-
-        return sympy.lambdify(sympySymbols, parsedExpression, modules='numpy')
