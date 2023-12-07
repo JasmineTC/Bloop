@@ -5,7 +5,7 @@ from sympy.parsing.mathematica import parse_mathematica
 
 from typing import Callable, Tuple
 
-from CommonUtils import replaceGreekSymbols
+from CommonUtils import replaceGreekSymbols, dictToOrderedList
 
 
 class ParsedExpression:
@@ -142,33 +142,36 @@ class ParsedExpression:
     
 
 
-""" class SystemOfParsedEquations -- Describes system of eqs [eq1, eq2, ...] which we interpret as eq1 == 0, eq2 == 0, etc"""
-class ParsedSystemOfEquations:
+""" class ParsedExpressionSystem -- Describes a collection of ParsedExpressions that are to be evaluated simultaneously with same input.
+"""
+class ParsedExpressionSystem:
 
-    parsedEquations: list[ParsedExpression]
+    parsedExpressions: list[ParsedExpression]
     """Arguments needed to evaluate our lambda equations, in correct order."""
     functionArguments: list[str]
 
     def __init__(self, fileName: str = None):
         if (fileName):
-            self.parseEquations(fileName)
+            self.parseExpressions(fileName)
+
+        ## TODO should maybe check that all expressions use the same input ordering. Currently this is automatic, 
+        ## but things will go horribly wrong if the order ever changes by some reason
 
 
-
-    def parseEquations(self, fileName: str) -> Tuple:
-        """Read system of expressions from file, one per line. We interpret these as LHS == 0 where LHS are the read expressions.
-        The LHS will become functions of all symbols that appear 
+    def parseExpressions(self, fileName: str) -> Tuple:
+        """Read system of expressions from file, one per line.
+        The expressions will become functions of all symbols that appear. 
         """
         with open(fileName, "r") as file:
             expressions = file.readlines()
         
         parsedSymbols = []
-        parsedExpressions: list[ParsedExpression] = []
+        self.parsedExpressions = []
         for line in expressions:
             try:
                 expr = ParsedExpression(line, bReplaceGreekSymbols=True)
 
-                parsedExpressions.append(expr)
+                self.parsedExpressions.append(expr)
 
                 ## find symbols but store as string, not the sympy type  
                 for symbol in expr.symbols:
@@ -178,11 +181,98 @@ class ParsedSystemOfEquations:
                     if symbol_str not in parsedSymbols:
                         parsedSymbols.append(symbol_str)
                         
-
             except ValueError:
                 print(f"Error parsing file {fileName}, line: {line}")
 
-        self.functionArguments = parsedSymbols
-        for expr in parsedExpressions:
-            expr.makeCallable(parsedSymbols)
+        self._lambdifyExpressions(parsedSymbols)
+
+
+    def evaluateSystemWithDict(self, inputDict: dict[str, float]) -> list[float]:
+        """
+        """
+        ## Collect inputs from the dict and put them in correct order. I do this by taking the right order from our first expression.
+        ## This is fine since all our expressions use the same input list. 
+        inputList = self.parsedExpressions[0]._paramDictToOrderedList(inputDict)
+
+        outList = [None] * len(self.parsedExpressions)
+        for i in len(outList):
+            outList[i] = self.parsedExpressions[i](inputList)
         
+
+    def evaluateSystem(self, arguments: list[float]) -> Tuple:
+        """Evaluates the system of expressions at given input and returns a tuple of floats.
+        """
+        return tuple( [expr(arguments) for expr in self.parsedExpressions] )
+
+
+    def __call__(self, arguments: list[float]) -> Tuple:
+        """Just calls evaluateSystem()"""
+        return self.evaluateSystem(arguments)
+
+
+
+    def _lambdifyExpressions(self, arguments: list[str]) -> None:
+        """
+        """
+        self.functionArguments = arguments
+        for expr in self.parsedExpressions:
+            expr.makeCallable(arguments)
+
+
+
+"""Class SystemOfEquations -- System of parsed expression that we interpret as a set of equation. 
+Each expression is interpreted as an equation of form ``expr == 0``. We also distinguish between symbols 
+that describe the unknowns versus symbols that are known inputs to the expressions.
+"""
+class SystemOfEquations(ParsedExpressionSystem):
+
+    ## what we solve for
+    unknownVariables: list[str]
+    ## "known" inputs
+    otherVariables: list[str]
+
+    def __init__(self, fileName: str, unknownVariables: list[str]):
+        
+        ## Call parent constructor
+        super().__init__(fileName)
+
+        self.unknownVariables = unknownVariables
+
+        ## Check that we have same number of eqs as unknowns 
+        assert len(unknownVariables) == len(self.parsedExpressions)
+
+               
+        ## Check that the eqs actually contain our unknowns
+        for s in unknownVariables:
+            assert s in self.functionArguments
+
+        self._rearrangeSymbols()
+
+    def getOtherVariablesFromDict(self, otherVariablesDict: dict[str, float]) -> list[float]:
+        """Puts numbers from dict in correct order for our lambda evaluation, does not look for our unknown variables.
+        """
+        return dictToOrderedList(otherVariablesDict, self.otherVariables)
+
+
+    def _rearrangeSymbols(self) -> None:
+        """This rearranges our internal symbol list and expression lambdas so that the unknown variables come before other variables.
+        For internal use only.
+        """
+        ## First create a filtered list that contains all non-unknowns. With a crazy oneliner of course
+        filteredArguments = [ item for item in self.functionArguments if item not in self.unknownVariables ]
+        rearrangedArguments = self.unknownVariables + filteredArguments
+
+        self.otherVariables = filteredArguments
+
+        ## And create new lambdas
+        self._lambdifyExpressions(rearrangedArguments)
+
+
+    def getEquations(self) -> list[Callable]:
+        """Returns a list of our lambdas.
+        """
+        eqs = [None] * len(self.parsedExpressions)
+        for i in range(len(eqs)):
+            eqs[i] = self.parsedExpressions[i].lambdaExpression
+
+        return eqs

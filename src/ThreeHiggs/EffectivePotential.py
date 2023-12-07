@@ -8,7 +8,77 @@ import pathlib ## for hacking
 
 import Integrals
 
-from ParsedExpression import ParsedSystemOfEquations
+from ParsedExpression import ParsedExpressionSystem, SystemOfEquations
+
+
+"""This is just a SystemOfEquations but we add a common solve() routine that can be configured for solving sines of angles, 
+and then returning the angles."""
+class MixingAngleEquations(SystemOfEquations):
+    def __init__(self, fileName: str, unknownVariables: list[str]):
+        super().__init__(fileName, unknownVariables)
+
+
+    def solve(self, knownVariables: dict[str, float]) -> list[float]:
+
+        ## Get list of "extra" variables in correct order
+        otherArgs = tuple( self.getOtherVariablesFromDict(knownVariables) )
+
+        ## Initial guesses for the sines
+        initialGuess = 0.1, 0.2, 0.3, 0.4, 0.5, 0.6
+
+        ## function signature needs to be f(x, *args) if x are the unknowns.
+        ## This is now a very stupid implementation, too much list <-> tuple <-> numpy array etc conversions. TODO need to clean this up
+        def evaluateWrapper(x: npt.ArrayLike, *args):
+            return self.evaluateSystem( x.tolist() + list(args) )
+
+        res = scipy.optimize.fsolve(evaluateWrapper, initialGuess, args=(otherArgs))
+
+        ## The solver can throw warnings if it tries to evaluate the eqs outside sine's value range. So TODO change this to some algorithm that can limit the search range 
+
+        ## return list, not numpy array for now
+        return res.tolist()
+
+
+
+
+## everything we need to evaluate the potential. this is very WIP
+class VeffParams:
+
+    fields: dict[str, float]
+    actionParams: dict[str, float]
+    angles: dict[str, float]
+    masses: dict[str, float]
+
+    ## TODO export these from mathematica and read in here
+    fieldNames: list[str] = ["v3"]
+
+    """Equations that need to be solved numerically to guarantee diagonal mass matrix (at tree level).
+    We allow there to be many independent systems of equations.
+    """
+    diagonalizationConditions: list[MixingAngleEquations]
+
+    def __init__(self):
+        self.initDiagonalizationConditions()
+
+    def initDiagonalizationConditions(self):
+
+        self.diagonalizationConditions = []
+
+        ## TODO read these paths from a config or something. This is a hack
+        pathToCurrentFile = pathlib.Path(__file__).parent.resolve()
+        neutralAngleFile = str(pathToCurrentFile) + "/Data/EffectivePotential/neutralDiagonalizationAnglesEquations.txt"
+        chargedAngleFile = str(pathToCurrentFile) + "/Data/EffectivePotential/chargedDiagonalizationAnglesEquations.txt"
+
+        ## Currently we have to explicitly list the unknown variables by name:
+
+        self.diagonalizationConditions.append( MixingAngleEquations(neutralAngleFile, ['S1Ne', 'S2Ne', 'S3Ne', 'S4Ne', 'S5Ne', 'S6Ne']) )
+        #print("-- Parsed neutral scalar angle equations, symbols:")
+        #print(self.neutralDiagonalizationEquations.functionArguments)
+
+        self.diagonalizationConditions.append( MixingAngleEquations(chargedAngleFile, ['S1Ch', 'S2Ch', 'S3Ch', 'S4Ch', 'S5Ch', 'S6Ch']) )
+        #print("-- Parsed charged scalar angle equations, symbols:")
+        #print(self.chargedDiagonalizationEquations.functionArguments)
+
 
 """ Helper "struct", just holds mass eigenvalues squared. This is convenient to have for storing both scalar and gauge masses 
 in one place, while still having names for each mass. Not very model independent though. (Would a dict be better??) 
@@ -27,24 +97,21 @@ This is assumed to be using 3D EFT, so the params are temperature dependent.
 """
 class EffectivePotential:
 
-    ## Defining equations for field-dependent mixing angles
-    neutralDiagonalizationEquations: ParsedSystemOfEquations
-    chargedDiagonalizationEquations: ParsedSystemOfEquations
-
 
     def __init__(self, initialModelParameters: dict = None):
         
+        self.params = VeffParams()
+        
         if (initialModelParameters):
             self.setModelParameters(initialModelParameters)
-
-        ## Initialize diagonalization equations etc
-        self._initAngleEquations()
-        
+ 
 
 
     def setModelParameters(self, modelParameters: dict) -> None:
         """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate 
         """
+
+        self.params.actionParams = modelParameters
 
         self.g1sq = modelParameters["g1sq"]
         self.g2sq = modelParameters["g2sq"]
@@ -92,13 +159,23 @@ class EffectivePotential:
         return MassSquared(mWsq=mWsq, mZsq=mZsq)
     
 
-    def calcAngles(self, fields: list[float]):
-        ## TODO. do something like:
-        #sin1, sin2, sin3, sin4, sin5, sin6 = solveEquationSystem( [eq1, eq2, eq3, eq4, eq5, eq6], fields, initialGuessList)
-        # angle1 = ...
+    def calcAngles(self, fields: list[float]) -> list[float]:
 
+        ## To make this work nicely we need to put the field in same dict as our other inputs, so hack it here (will need optimization)
+        _, _, v3 = fields
+        knownParamsDict = self.params.actionParams.copy()
+        knownParamsDict["v3"] = v3
+
+        ## Resulting angles go here. We have two separate 4x4 matrices to diagonalize, so two sets of angle eqs
+        angles = []
+        for eqSystem in self.params.diagonalizationConditions:
+            angleList = eqSystem.solve(knownParamsDict)
+            angles += angleList
+
+        print("Solved angles:")
+        print(angles)
         
-        return 1, 2, 3, 4, 5, 6
+        return angles
 
 
     ## Evaluate Veff(fields, T) using current set of model parameters
@@ -182,21 +259,6 @@ class EffectivePotential:
         res = -0.5*self.mu3sq * v3**2 + 0.25*self.lam33*v3**4
         return res
     
-
-    def _initAngleEquations(self) -> None:
-
-        ## TODO read these paths from a config or something. This is a hack
-        pathToCurrentFile = pathlib.Path(__file__).parent.resolve()
-        neutralAngleFile = str(pathToCurrentFile) + "/Data/EffectivePotential/neutralDiagonalizationAnglesEquations.txt"
-        chargedAngleFile = str(pathToCurrentFile) + "/Data/EffectivePotential/chargedDiagonalizationAnglesEquations.txt"
-
-        self.neutralDiagonalizationEquations = ParsedSystemOfEquations(neutralAngleFile)
-        print("-- Parsed neutral scalar angle equations, symbols:")
-        print(self.neutralDiagonalizationEquations.functionArguments)
-
-        self.chargedDiagonalizationEquations = ParsedSystemOfEquations(chargedAngleFile)
-        print("-- Parsed charged scalar angle equations, symbols:")
-        print(self.chargedDiagonalizationEquations.functionArguments)
 
 
     ## This is for putting things in correct order for angle equation lambdas. But very ugly and WIP 

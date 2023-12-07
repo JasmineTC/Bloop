@@ -26,3 +26,14 @@ def replaceGreekSymbols(string: str) -> str:
     newString = newString.replace(lowerCaseMu, "mu")
 
     return newString
+
+
+def dictToOrderedList(inDict: dict[any, any], keyOrder: list[any]):
+    """ Picks values from a dict and puts them in a list with specified order.
+    Currently this performs no checks on whether keys are found or not
+    """
+    outList = [None] * len(keyOrder)
+    for i in range(len(outList)):
+        outList[i] = inDict[ keyOrder[i] ]
+
+    return outList
