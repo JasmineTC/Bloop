@@ -22,6 +22,9 @@ class ParameterMatching:
     ## stores lambdas for evaluating params in the soft scale theory
     matchingRelations: dict[str, Callable]
 
+    ## List of arguments needed to evaluate the matching relations
+    parameterNames: list[str]
+
     ## This list specifies names for parameters that enter the matching relations. 
     # Needs to match symbol names in the file that defines matching relations except that:
     # 1. "Unicode" symbols like λ are automatically converted to ANSI according to rules in CommonUtils.replaceGreekSymbols(). For example λ -> lam  
@@ -47,6 +50,12 @@ class ParameterMatching:
             matchedParams[key] = expr(inParamList) ## Unpack because the lambdas don't take lists
 
         return matchedParams
+    
+
+    def __call__(self, inputParams: dict[str, float]) -> dict[str, float]:
+        """This just calls getMatchedParams(inputParams)
+        """
+        return self.getMatchedParams(inputParams)
 
 
     def createMatchingRelations(self, fileToRead: str = None) -> None:
@@ -57,7 +66,7 @@ class ParameterMatching:
         if (fileToRead != None):
             symbolNames, parsedMatchingRelations = self.parseMatchingRelations(fileToRead)
 
-            print("List of symbols in the matching relations:\n", symbolNames)
+            #print("List of symbols in the matching relations:\n", symbolNames)
             
             ## I'll just have all matching relations take the same list of args
             self.parameterNames = symbolNames
@@ -79,11 +88,12 @@ class ParameterMatching:
         """
 
 
-    ## Convert a dict of input params to list that has same ordering as that defined in defineMatchingRelations().
-    ## This is needed because the functions produced by sympy lambdify do not take dicts as argument 
     def _paramDictToOrderedList(self, params: dict[str, float]) -> list[float]:
+        """Convert a dict of input params to list that has same ordering as that defined in defineMatchingRelations().
+        This is needed because the functions produced by sympy lambdify do not take dicts as argument.
+        """ 
 
-        ## TODO would be much better to have a "params" class that handles all parameter stuff
+        ## TODO would be much better to have a dedicated "params" class that handles all parameter stuff
         outList = [None] * len(self.parameterNames)
         
         for i in range(len(outList)):
@@ -94,11 +104,6 @@ class ParameterMatching:
 
 
     def parseMatchingRelations(self, filePath: str) -> Tuple[list[str], dict[str, ParsedExpression]]:
-        
-        ## Use this if changing this code to a proper package:
-        #filePath = getPackagedDataPath("ThreeHiggs.Data", "softScaleParams.txt")
-        
-        #filePath = "Data/softScaleParams.txt"
 
         with open(filePath, "r") as file:
             expressions = file.readlines()

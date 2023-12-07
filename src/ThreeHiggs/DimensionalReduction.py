@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.typing as npt
+from typing import Callable
 
 from ParameterMatching import ParameterMatching
 
@@ -15,37 +16,77 @@ class DimensionalReduction():
         self.matchToUltrasoft = ParameterMatching()
 
 
-
     def setupHardToSoftMatching(self, hardToSoftFile: str) -> None:
         
         self.matchToSoft.createMatchingRelations(hardToSoftFile)
         self.matchToSoft.matchingRelations = self.__remove3dSuffices(self.matchToSoft.matchingRelations)
 
+        print("Setup Hard -> Soft matching relations.")
+        print("-- Inputs:")
+        print(self.matchToSoft.parameterNames)
+        print("-- Outputs:")
+        print( list(self.matchToSoft.matchingRelations.keys()) )
+        print("")
 
     def setupSoftToUltrasoftMatching(self, softToUltrasoftFile: str) -> None:
         
         self.matchToUltrasoft.createMatchingRelations(softToUltrasoftFile)
+        self.matchToUltrasoft.matchingRelations = self.__remove3dSuffices(self.matchToUltrasoft.matchingRelations, bRemoveSuffixUS=True)
+
+        print("Setup Soft -> Ultrasoft matching relations.")
+        print("-- Inputs:")
+        print(self.matchToUltrasoft.parameterNames)
+        print("-- Outputs:")
+        print( list(self.matchToUltrasoft.matchingRelations.keys()) )
+        print("")
 
 
-    ## T should be in the dict
+    def getEFTParams(self, paramsForMatching: dict[str, float]) -> dict[str, float]:
+        """This goes from input hard scale parameters to whatever the final EFT is.
+        """
+        softScaleParams = self.matchToSoft.getMatchedParams(paramsForMatching)
+        #ultrasoftScaleParams = self.matchToUltrasoft.getMatchedParams(softScaleParams)
+
+        ultrasoftScaleParams = softScaleParams
+
+        return ultrasoftScaleParams
+
+
+
+    ## NB: T should be in the input dict
     def getSoftScaleParams(self, paramsForMatching: dict[str, float]) -> dict[str, float]:
-
+        """Match hard scale --> soft scale theory
+        """
         return self.matchToSoft.getMatchedParams(paramsForMatching)
     
-    ## Modifies notation in matching relations so that the matched param dict does not use the "3d" suffix (comes from DRalgo by default)
+
+    def getUltrasoftScaleParams(self, softScaleParams: dict[str, float]) -> dict[str, float]:
+        """Match soft scale --> ultrasoft scale theory
+        """
+        return self.matchToUltrasoft.getMatchedParams(softScaleParams)
+    
+
+    
     @staticmethod
-    def __remove3dSuffices(matchingRelations: dict[str, float]) -> dict[str, float]:
+    def __remove3dSuffices(matchingRelations: dict[str, any], bRemoveSuffixUS=False) -> dict[str, any]:
+        """Modifies notation in matching relations so that the matched param dict does not use the "3d" suffix (comes from DRalgo by default)
+        """
 
         newDict = matchingRelations
+
+
         # DRalgo also gives gauge couplings as "g13d^2" etc, which is terrible => change to g1sq.
-        # Crazy oneliner, creates a new dict where just the key names are different
+        # Crazy oneliner, creates a new dict where just the key names are different:
         newDict = { key.replace("^2", "sq") : value for key, value in newDict.items() }
 
-        """ # this didn't work for g13d^2 etc so commented out
         ## Remove "3d" suffix with even crazier oneliner (suffix meaning that it's removed only from end of the string)
         newDict = { key[:-len("3d")] if key.endswith("3d") else key : value for key, value in newDict.items() }
-        """
-        ## Remove '3d' substrings
-        newDict = { key.replace('3d', '') : value for key, value in newDict.items() }
+        ## Gauge couplings are originally of form g3d^2 so account for that too 
+        newDict = { key.replace("3dsq", "sq") if key.endswith("3dsq") else key : value for key, value in newDict.items() }
+    
+        if (bRemoveSuffixUS):
+            """ For ultrasoft theory DRalgo appends "US" => remove that too. Gauge couplings again need special treatment"""
+            newDict = { key[:-len("US")] if key.endswith("US") else key : value for key, value in newDict.items() }
+            newDict = { key.replace("USsq", "sq") if key.endswith("USsq") else key : value for key, value in newDict.items() }
 
         return newDict

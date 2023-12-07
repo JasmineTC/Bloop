@@ -9,14 +9,14 @@ from TransitionFinder import TransitionFinder
 ## hack file path, not a good solution if making this into a proper package
 pathToCurrentFile = pathlib.Path(__file__).parent.resolve()
 
-hardToSoftFile = str(pathToCurrentFile) + "/Data/softScaleParams.txt"
-# TODO
-#softToUltrasoftFile = str(pathToCurrentFile) + ...
+hardToSoftFile = str(pathToCurrentFile) + "/Data/HardToSoft/softScaleParams_NLO.txt"
+softToUltrasoftFile = str(pathToCurrentFile) + "/Data/SoftToUltrasoft/ultrasoftScaleParams_NLO.txt"
 
 
 ## Model object setup + load matching relations
 model3HDM = GenericModel()
 model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile)
+model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
 ## Input at Z pole
 inputScale = model3HDM.MZ
@@ -48,6 +48,10 @@ inputParams = {
 transitionFinder = TransitionFinder(model=model3HDM)
 
 ## Scanning loops would start here
+
+print("!!!")
+print("Currently not matching soft --> ultrasoft, this is WIP. Also: 2-loop masses lack some log terms")
+print("!!!")
 
 print("Start finite-T stuff")
 model3HDM.setInputParams(inputParams)

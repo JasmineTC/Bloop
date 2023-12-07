@@ -61,7 +61,7 @@ class TransitionFinder:
             paramsForMatching["Lb"] = Lb
             paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
 
-            params3D = self.model.dimensionalReduction.getSoftScaleParams(renormalizedParams)
+            params3D = self.model.dimensionalReduction.getEFTParams(renormalizedParams)
 
             self.model.effectivePotential.setModelParameters(params3D)
 

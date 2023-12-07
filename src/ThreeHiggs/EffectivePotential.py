@@ -4,8 +4,11 @@ from typing import Tuple
 import scipy.optimize
 from dataclasses import dataclass
 
+import pathlib ## for hacking
+
 import Integrals
 
+from ParsedExpression import ParsedSystemOfEquations
 
 """ Helper "struct", just holds mass eigenvalues squared. This is convenient to have for storing both scalar and gauge masses 
 in one place, while still having names for each mass. Not very model independent though. (Would a dict be better??) 
@@ -24,10 +27,19 @@ This is assumed to be using 3D EFT, so the params are temperature dependent.
 """
 class EffectivePotential:
 
+    ## Defining equations for field-dependent mixing angles
+    neutralDiagonalizationEquations: ParsedSystemOfEquations
+    chargedDiagonalizationEquations: ParsedSystemOfEquations
+
+
     def __init__(self, initialModelParameters: dict = None):
         
         if (initialModelParameters):
             self.setModelParameters(initialModelParameters)
+
+        ## Initialize diagonalization equations etc
+        self._initAngleEquations()
+        
 
 
     def setModelParameters(self, modelParameters: dict) -> None:
@@ -62,6 +74,8 @@ class EffectivePotential:
         self.lam3Re = modelParameters["lam3Re"]
         self.lam3Im = modelParameters["lam3Im"]
 
+        self.modelParameter = modelParameters ## Dunno if we want to have this tbh, but store for now
+
 
     def calcMassEigenvalues(self, fields: list[float]) -> None:
 
@@ -79,8 +93,12 @@ class EffectivePotential:
     
 
     def calcAngles(self, fields: list[float]):
-        ## TODO
-        None
+        ## TODO. do something like:
+        #sin1, sin2, sin3, sin4, sin5, sin6 = solveEquationSystem( [eq1, eq2, eq3, eq4, eq5, eq6], fields, initialGuessList)
+        # angle1 = ...
+
+        
+        return 1, 2, 3, 4, 5, 6
 
 
     ## Evaluate Veff(fields, T) using current set of model parameters
@@ -90,12 +108,17 @@ class EffectivePotential:
 
         if (loopOrder > 0):
 
+            
+            angles = self.calcAngles(fields)
+            
             massSquared: MassSquared = self.calcMassEigenvalues(fields)
 
             ## 3D Coleman-Weinberg correction in Landau gauge. Gauge fields get overall (d-1) = 2
             V1 = 4. * Integrals.J3(massSquared.mWsq) + 2* Integrals.J3(massSquared.mZsq)
 
             ## TODO scalars, vectorize with numpy if using a loop
+
+       
 
         ## TODO 2-loop
 
@@ -158,3 +181,34 @@ class EffectivePotential:
 
         res = -0.5*self.mu3sq * v3**2 + 0.25*self.lam33*v3**4
         return res
+    
+
+    def _initAngleEquations(self) -> None:
+
+        ## TODO read these paths from a config or something. This is a hack
+        pathToCurrentFile = pathlib.Path(__file__).parent.resolve()
+        neutralAngleFile = str(pathToCurrentFile) + "/Data/EffectivePotential/neutralDiagonalizationAnglesEquations.txt"
+        chargedAngleFile = str(pathToCurrentFile) + "/Data/EffectivePotential/chargedDiagonalizationAnglesEquations.txt"
+
+        self.neutralDiagonalizationEquations = ParsedSystemOfEquations(neutralAngleFile)
+        print("-- Parsed neutral scalar angle equations, symbols:")
+        print(self.neutralDiagonalizationEquations.functionArguments)
+
+        self.chargedDiagonalizationEquations = ParsedSystemOfEquations(chargedAngleFile)
+        print("-- Parsed charged scalar angle equations, symbols:")
+        print(self.chargedDiagonalizationEquations.functionArguments)
+
+
+    ## This is for putting things in correct order for angle equation lambdas. But very ugly and WIP 
+    def _wrapAngleEquations(self, unknownNames: list[str], fields: list[float], params: dict[str, float]) -> None:
+
+        ## Hack this for now. This is probably not very efficient
+        _, _, v3 = fields
+        newDict = params.copy() 
+        newDict["v3"] = v3
+        
+        def wrapper(s1, s2, s3, s4, s5, s6):
+
+            tempList = [s1, s2, s3, s4, s5, s6]
+            ## .....
+

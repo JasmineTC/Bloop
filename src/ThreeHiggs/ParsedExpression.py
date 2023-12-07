@@ -22,8 +22,9 @@ class ParsedExpression:
     ## sympy symbols that our expression depends on 
     symbols: list[sympy.Symbol] = []
 
+
     """List of arguments needed to evaluate self.lambdaExpression, in correct order.
-    This is user-specified. Names should match sympy symbol names. 
+    This needs to be specified from outside. Names should match sympy symbol names. 
     """ 
     functionArguments: list[str] = []
 
@@ -56,7 +57,7 @@ class ParsedExpression:
         this can be useful for eg. collections of complicated expressions 
         """
 
-        ## TODO should have some sanity checks here to ensure symbol match the given argument list
+        ## TODO should have some sanity checks here to ensure symbols match the given argument list
 
         ## Convert to evaluatable function of form f(functionArguments)
         self.lambdaExpression = self.exprToFunction(self.sympyExpression, functionArguments)
@@ -71,17 +72,39 @@ class ParsedExpression:
 
         ## Unpack the list to make it work with our lambda
         return self.lambdaExpression(*functionArguments)
+    
+
+    ## TODO some redundancy since a similar function is also defined in ParameterMatching, so cleanup
+    def _paramDictToOrderedList(self, paramDict: dict[str, float]) -> list[float]:
+        """Put input dict to correct order for our lambda function. 
+        """
+        outList = [None] * len(self.functionArguments)
+        
+        ## Fill the list in correct order, if a key is not found we put the corresponding element to None
+        for i in range(len(outList)):
+            if (self.functionArguments[i] in paramDict):
+                outList[i] = paramDict[ self.functionArguments[i] ]
+            else:
+                outList[i] = None
+
+        return outList
 
 
     @staticmethod
-    def _parseMathematicaExpression(expression: str) -> Tuple[sympy.Expr, list[sympy.Symbol]]:
+    def _parseMathematicaExpression(expression: str, bSubstituteConstants: bool = True) -> Tuple[sympy.Expr, list[sympy.Symbol]]:
         """ Parses a string exported from Mathematica.
+        bSubstituteConstants specifies if we replace numerical constants like Glaisher with their numerical values
         -----------
         Returns a tuple of sympy objects:
         expression, symbols.
         """
 
+        sympyExpr: sympy.Expr 
         sympyExpr = parse_mathematica(expression)
+        
+        if (bSubstituteConstants):
+            ## Do this here to prevent things like Glaisher from appearing in list of free symbols
+            sympyExpr = ParsedExpression._substNumericalConstants(sympyExpr)
 
         ## find symbols in the expression
         symbols = sympyExpr.free_symbols
@@ -102,3 +125,64 @@ class ParsedExpression:
             argumentSymbols.append(sympy.Symbol(s))
 
         return sympy.lambdify(argumentSymbols, sympyExpression, modules='numpy')
+    
+    
+    @staticmethod
+    def _substNumericalConstants(sympyExpression: sympy.Expr) -> sympy.Expr:
+        """Replaces symbols corresponding to mathematical constants 
+        with their numerical values. You have to manually define the relevant constants here.
+        Does not modify the original expression in-place.
+        """
+
+        newExpr = sympyExpression
+
+        newExpr = newExpr.subs('Glaisher', 1.28242712910062)
+
+        return newExpr
+    
+
+
+""" class SystemOfParsedEquations -- Describes system of eqs [eq1, eq2, ...] which we interpret as eq1 == 0, eq2 == 0, etc"""
+class ParsedSystemOfEquations:
+
+    parsedEquations: list[ParsedExpression]
+    """Arguments needed to evaluate our lambda equations, in correct order."""
+    functionArguments: list[str]
+
+    def __init__(self, fileName: str = None):
+        if (fileName):
+            self.parseEquations(fileName)
+
+
+
+    def parseEquations(self, fileName: str) -> Tuple:
+        """Read system of expressions from file, one per line. We interpret these as LHS == 0 where LHS are the read expressions.
+        The LHS will become functions of all symbols that appear 
+        """
+        with open(fileName, "r") as file:
+            expressions = file.readlines()
+        
+        parsedSymbols = []
+        parsedExpressions: list[ParsedExpression] = []
+        for line in expressions:
+            try:
+                expr = ParsedExpression(line, bReplaceGreekSymbols=True)
+
+                parsedExpressions.append(expr)
+
+                ## find symbols but store as string, not the sympy type  
+                for symbol in expr.symbols:
+                    ## NOTE this conversion will cause issues with pathological symbols like "A B" 
+                    # https://stackoverflow.com/questions/59401738/convert-sympy-symbol-to-string-such-that-it-can-always-be-parsed
+                    symbol_str = str(symbol)
+                    if symbol_str not in parsedSymbols:
+                        parsedSymbols.append(symbol_str)
+                        
+
+            except ValueError:
+                print(f"Error parsing file {fileName}, line: {line}")
+
+        self.functionArguments = parsedSymbols
+        for expr in parsedExpressions:
+            expr.makeCallable(parsedSymbols)
+        
