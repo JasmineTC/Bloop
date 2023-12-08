@@ -35,8 +35,11 @@ class MixingAngleEquations(SystemOfEquations):
 
         ## The solver can throw warnings if it tries to evaluate the eqs outside sine's value range. So TODO change this to some algorithm that can limit the search range 
 
+        ## well this actually solves sines, so we'd have to invert those to get the angles 
+        angles = np.arcsin(res) # gives angles in range [-pi/2, pi/2] which is correct in this case, since we assumed cosx >= 0
+
         ## return list, not numpy array for now
-        return res.tolist()
+        return angles.tolist()
 
 
 
@@ -172,6 +175,7 @@ class EffectivePotential:
             angleList = eqSystem.solve(knownParamsDict)
             angles += angleList
 
+
         print("Solved angles:")
         print(angles)
         
@@ -258,19 +262,3 @@ class EffectivePotential:
 
         res = -0.5*self.mu3sq * v3**2 + 0.25*self.lam33*v3**4
         return res
-    
-
-
-    ## This is for putting things in correct order for angle equation lambdas. But very ugly and WIP 
-    def _wrapAngleEquations(self, unknownNames: list[str], fields: list[float], params: dict[str, float]) -> None:
-
-        ## Hack this for now. This is probably not very efficient
-        _, _, v3 = fields
-        newDict = params.copy() 
-        newDict["v3"] = v3
-        
-        def wrapper(s1, s2, s3, s4, s5, s6):
-
-            tempList = [s1, s2, s3, s4, s5, s6]
-            ## .....
-
