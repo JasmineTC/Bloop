@@ -1,0 +1,3 @@
+mVsq0 -> (g2sq*v3^2)/4
+mVsq1 -> (g2sq*v3^2)/4
+mVsq2 -> ((g1sq + g2sq)*v3^2)/4

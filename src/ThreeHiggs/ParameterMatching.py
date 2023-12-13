@@ -14,6 +14,7 @@ Suppose you give DRalgo a model with a parameter called lam123. By default the p
 ie. DRalgo appends a '3d'. I don't want the '3d' part, but this is easy to remove after reading the file in a dict.  
 """
 
+## TODO replace this with ParsedExpressionSystem. It does almost the same things already.
 
 ## This would make a good abstract class
 class ParameterMatching:
@@ -105,7 +106,7 @@ class ParameterMatching:
 
     def parseMatchingRelations(self, filePath: str) -> Tuple[list[str], dict[str, ParsedExpression]]:
 
-        with open(filePath, "r") as file:
+        with open(filePath, "r", encoding="utf-8") as file:
             expressions = file.readlines()
 
         ## Dict for storing ParsedExpression objects
