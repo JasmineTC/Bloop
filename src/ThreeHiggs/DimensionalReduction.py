@@ -41,10 +41,10 @@ class DimensionalReduction():
         print("")
 
 
-    def getEFTParams(self, paramsForMatching: dict[str, float]) -> dict[str, float]:
+    def getEFTParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
         """This goes from input hard scale parameters to whatever the final EFT is.
         """
-        softScaleParams = self.matchToSoft.getMatchedParams(paramsForMatching)
+        softScaleParams = self.getSoftScaleParams(paramsForMatching, goalRGScale)
         #ultrasoftScaleParams = self.matchToUltrasoft.getMatchedParams(softScaleParams)
 
         ultrasoftScaleParams = softScaleParams
@@ -54,16 +54,24 @@ class DimensionalReduction():
 
 
     ## NB: T should be in the input dict
-    def getSoftScaleParams(self, paramsForMatching: dict[str, float]) -> dict[str, float]:
+    def getSoftScaleParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
         """Match hard scale --> soft scale theory
         """
-        return self.matchToSoft.getMatchedParams(paramsForMatching)
-    
+        outParams = self.matchToSoft.getMatchedParams(paramsForMatching)
+        ## TODO RG running. For now just plug in the goal scale manually as the Veff will need it.
+        ## Also TODO change the name. This is a HACK: Veff needs mu3US but for now I'm skipping the US step
+        mu3 = goalRGScale
+        outParams["mu3US"] = goalRGScale    
+        return outParams
 
-    def getUltrasoftScaleParams(self, softScaleParams: dict[str, float]) -> dict[str, float]:
+    def getUltrasoftScaleParams(self, softScaleParams: dict[str, float], goalRGScale: float) -> dict[str, float]:
         """Match soft scale --> ultrasoft scale theory
         """
-        return self.matchToUltrasoft.getMatchedParams(softScaleParams)
+        outParams = self.matchToUltrasoft.getMatchedParams(softScaleParams)
+        ## TODO RG running 
+
+        return outParams
+
     
 
     

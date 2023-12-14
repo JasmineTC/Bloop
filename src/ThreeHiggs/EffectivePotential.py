@@ -218,8 +218,6 @@ class EffectivePotential:
 
         
 
-        
-
 
     def setModelParameters(self, modelParameters: dict) -> None:
         """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate 
@@ -287,7 +285,6 @@ class EffectivePotential:
 
         self.expressions = ParsedExpressionSystem(tempFileName)
 
-
     def evaluate(self, fields: list[float]) -> complex:
         """Evaluate Veff at specified field values. Uses the currently set model parameters.
         """
@@ -318,10 +315,16 @@ class EffectivePotential:
         res = scipy.optimize.minimize(VeffWrapper, initialGuess)
 
         ## res.x = location, res.fun = value, res.success = flag for determining if the algorithm finished successfully
-        location = res.x
+        location = res.x # this is np.array valued
 
-        ## evaluate once more to get the possible imag parts
-        value = self.evaluate(location)
+        if np.any(np.isnan(location)):
+            location  = [np.nan] * len[initialGuess]
+            location = np.asarray(location)
+            value = np.nan
+        else:
+            ## evaluate once more to get the possible imag parts
+            value = self.evaluate(location)
+
         return location, value
     
 
@@ -336,7 +339,7 @@ class EffectivePotential:
             minimumCandidates = [ [0., 0., 1e-4], [0., 0., 20.] ]
 
         deepest = np.inf
-        res = np.nan, np.inf
+        res = [np.nan]*3, np.inf
 
         ## Should we vectorize??
         for candidate in minimumCandidates:

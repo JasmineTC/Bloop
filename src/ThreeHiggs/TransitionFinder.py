@@ -53,6 +53,8 @@ class TransitionFinder:
         minimizationResults = []
         for T in TRange:
 
+
+            goalRGScale =  T
             ## T needs to be in the dict
             paramsForMatching["T"] = T
 
@@ -61,7 +63,7 @@ class TransitionFinder:
             paramsForMatching["Lb"] = Lb
             paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
 
-            params3D = self.model.dimensionalReduction.getEFTParams(renormalizedParams)
+            params3D = self.model.dimensionalReduction.getEFTParams(renormalizedParams, goalRGScale)
 
             self.model.effectivePotential.setModelParameters(params3D)
 
@@ -69,7 +71,8 @@ class TransitionFinder:
 
             minimizationResults.append( [T, valueVeff, *minimum] )
 
-        minimizationResults = np.array(minimizationResults)
+
+        minimizationResults = np.asanyarray(minimizationResults)
         print( minimizationResults )
         np.savetxt("results_test.txt", minimizationResults)
 
