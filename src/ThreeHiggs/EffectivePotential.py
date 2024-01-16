@@ -4,6 +4,8 @@ from typing import Tuple
 import scipy.optimize
 from dataclasses import dataclass
 
+from scipy.optimize import least_squares
+
 import pathlib ## for hacking
 
 import Integrals
@@ -26,14 +28,16 @@ class MixingAngleEquations(SystemOfEquations):
         otherArgs = tuple( self.getOtherVariablesFromDict(knownVariables) )
 
         ## Initial guesses for the sines
-        initialGuess = 0.1, 0.2, 0.3, 0.4, 0.5, 0.6
+        initialGuess = 0., 0., 0., 0., 0., 0.
 
         ## function signature needs to be f(x, *args) if x are the unknowns.
         ## This is now a very stupid implementation, too much list <-> tuple <-> numpy array etc conversions. TODO need to clean this up
         def evaluateWrapper(x: npt.ArrayLike, *args):
             return self.evaluateSystem( x.tolist() + list(args) )
-
-        res = scipy.optimize.fsolve(evaluateWrapper, initialGuess, args=(otherArgs))
+        
+        #fsolve method produces sin_i >1, cannot tell fsolve that sin_i is bounded, use least squares instead
+        #res = scipy.optimize.fsolve(evaluateWrapper, initialGuess, args=(otherArgs))
+        res = (least_squares(evaluateWrapper, initialGuess, bounds=(-1,1), args=(otherArgs))).x
 
         ## The solver can throw warnings if it tries to evaluate the eqs outside sine's value range. So TODO change this to some algorithm that can limit the search range 
 
@@ -129,10 +133,16 @@ class VeffParams:
     
 
     def evaluateScalarMasses(self, knownParams: dict[str, float]) -> dict[str, float]:
-        return self.scalarMassesSquared.evaluateSystemWithDict(knownParams, bReturnDict=True)
+        scalarMassesSquaredDict =  self.scalarMassesSquared.evaluateSystemWithDict(knownParams, bReturnDict=True)
+        for key in scalarMassesSquaredDict:
+            scalarMassesSquaredDict[key] = abs(scalarMassesSquaredDict[key])
+        return scalarMassesSquaredDict
 
     def evaluateVectorMasses(self, knownParams: dict[str, float]) -> dict[str, float]:
-        return self.vectorMassesSquared.evaluateSystemWithDict(knownParams, bReturnDict=True)
+        vectorMassesSquaredDict = self.vectorMassesSquared.evaluateSystemWithDict(knownParams, bReturnDict=True)
+        for key in vectorMassesSquaredDict:
+            vectorMassesSquaredDict[key] = abs(vectorMassesSquaredDict[key])
+        return vectorMassesSquaredDict
 
     def evaluateMasses(self, knownParams: dict[str, float]) -> dict[str, float]:
         return combineDicts( self.evaluateScalarMasses(knownParams), self.evaluateVectorMasses(knownParams) )

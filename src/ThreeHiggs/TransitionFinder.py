@@ -22,7 +22,8 @@ class TransitionFinder:
 
 
     ## This is a way too big routine 
-    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 1.)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
+    ##Test change increased step size in T from 1 to 2,5
+    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 2.5)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
 
         renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams,  self.model.inputParams["RGScale"])
 
@@ -70,7 +71,8 @@ class TransitionFinder:
             minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
 
             minimizationResults.append( [T, valueVeff, *minimum] )
-
+            #Test run
+            print (T)
 
         minimizationResults = np.asanyarray(minimizationResults)
         print( minimizationResults )
