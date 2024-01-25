@@ -16,8 +16,11 @@ BetaFunctions4DFile = str(pathToCurrentFile) + "/Data/BetaFunctions4D/BetaFuncti
 """
 class BetaFunctions4D():
     
-    def __init__(self, InitialConditions):
-        self.HardCodeBetaFunction(self, InitialConditions)
+    def __init__(self):
+        ## Let's not require initial conditions here. So just empty constructor
+        #self.HardCodeBetaFunction(self, InitialConditions) # <- This doesn't seem to do anything relevant
+        None
+
 
     
     def HardCodeBetaFunction(self, InitialConditions: dict[str, float], mubar: float):
@@ -79,7 +82,7 @@ class BetaFunctions4D():
                 dlam31, dlam33, dlam3Im, dlam3Re, dyt3, dmu12sqIm, dmu12sqRe, dmu1sq, dmu2sq, dmu3sq]
 
     def SolveBetaFunction(self, renormalizedParams,  muRange: npt.ArrayLike = np.arange(91.1876, 700., 2.)) -> dict[str, float]:##what type is a scipy spline?
-        ##muRange used to run the energy scale from the Z mass to aroud 700 in steps of 2 
+        ##muRange used to run the energy scale from the Z mass to around 700 in steps of 2 
         ##TODO Call this from TransitionFinder
         InitialConditions = renormalizedParams
         ##TODO Does anything need to be done with the RG scale in Initital conditions?
@@ -114,6 +117,9 @@ class BetaFunctions4D():
         dmu3sq_interp = CubicSpline(muRange, Solution_trans[23], extrapolate=False)
         ##Hardcode a dictionary that has the beta function for each paramter, 
         ##Running_coupling_interp_dict["coupling"](mu) evaluates the interpllated beta function at the point mu
+
+        """TODO let's not put these in dict directly. Instead, store interpolations internally
+        and make a function that evaluates them at some RG scale and puts them in a dict"""
         Running_coupling_interp_dict = {
             "dg1": dg1_interp,
             "dg2": dg2_interp,
