@@ -72,8 +72,8 @@ class TransitionFinder:
 
             ## Fill in a new param dict that contains 4D params at the matching scale
             paramsForMatching = {}
-            for key, val in interpolatedParams:
-                paramsForMatching[key] = interpolatedParams[key](matchingScale)
+            for key, interpolatedFunction in interpolatedParams.items():
+                paramsForMatching[key] = interpolatedFunction(matchingScale)
 
             ## T needs to be in the dict
             paramsForMatching["T"] = T

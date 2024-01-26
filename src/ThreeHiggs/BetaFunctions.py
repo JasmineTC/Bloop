@@ -3,7 +3,7 @@ import numpy.typing as npt
 from typing import Tuple
 import pathlib
 from math import pi as Pi
-from scipy.integrate import odeint
+import scipy.integrate
 from scipy.interpolate import CubicSpline
 
 
@@ -17,46 +17,45 @@ BetaFunctions4DFile = str(pathToCurrentFile) + "/Data/BetaFunctions4D/BetaFuncti
 class BetaFunctions4D():
     
     def __init__(self):
-        ## Let's not require initial conditions here. So just empty constructor
-        #self.HardCodeBetaFunction(self, InitialConditions) # <- This doesn't seem to do anything relevant
         None
 
 
-    
-    def HardCodeBetaFunction(self, InitialConditions: dict[str, float], mubar: float):
-        ##InitialConditions is a dictionary, need to unpack by giving the key, order doesn't matter
-        ## TODO work out how to deal with the fact that SU(3) is here, even though we don't want it
-        g1 = InitialConditions["g1"] #initial[key]
-        g2 = InitialConditions["g2"]
-        g3 = InitialConditions["g3"]
-        lam11 = InitialConditions["lam11"]
-        lam12p = InitialConditions["lam12p"]
-        lam12 = InitialConditions["lam12"]
-        lam1Im = InitialConditions["lam1Im"]
-        lam1Re = InitialConditions["lam1Re"]
-        lam22 = InitialConditions["lam22"]
-        lam23p = InitialConditions["lam23p"]
-        lam23 = InitialConditions["lam23"]
-        lam2Im = InitialConditions["lam2Im"]
-        lam2Re = InitialConditions["lam2Re"]
-        lam31p = InitialConditions["lam31p"]
-        lam31 = InitialConditions["lam31"]
-        lam33 = InitialConditions["lam33"]
-        lam3Im = InitialConditions["lam3Im"]
-        lam3Re = InitialConditions["lam3Re"]
-        yt3 = InitialConditions["yt3"]
-        mu12sqIm = InitialConditions["mu12sqIm"]
-        mu12sqRe = InitialConditions["mu12sqRe"]
-        mu1sq = InitialConditions["mu1sq"]
-        mu2sq = InitialConditions["mu2sq"]
-        mu3sq = InitialConditions["mu3sq"]
+    def HardCodeBetaFunction(self, InitialConditions: np.ndarray, mubar: float) -> np.ndarray:
+        ## Let's run SU3 coupling too because why not
+
+        ## Pick params from the input array since they are appear as hardcoded symbols below
+
+        g1 = InitialConditions[ self._indexMapping["g1"] ]
+        g2 = InitialConditions[ self._indexMapping["g2"] ]
+        g3 = InitialConditions[ self._indexMapping["g3"] ]
+        lam11 = InitialConditions[ self._indexMapping["lam11"] ]
+        lam12p = InitialConditions[ self._indexMapping["lam12p"] ]
+        lam12 = InitialConditions[ self._indexMapping["lam12"] ]
+        lam1Im = InitialConditions[ self._indexMapping["lam1Im"] ]
+        lam1Re = InitialConditions[ self._indexMapping["lam1Re"] ]
+        lam22 = InitialConditions[ self._indexMapping["lam22"] ]
+        lam23p = InitialConditions[ self._indexMapping["lam23p"] ]
+        lam23 = InitialConditions[ self._indexMapping["lam23"] ]
+        lam2Im = InitialConditions[ self._indexMapping["lam2Im"] ]
+        lam2Re = InitialConditions[ self._indexMapping["lam2Re"] ]
+        lam31p = InitialConditions[ self._indexMapping["lam31p"] ]
+        lam31 = InitialConditions[ self._indexMapping["lam31"] ]
+        lam33 = InitialConditions[ self._indexMapping["lam33"] ]
+        lam3Im = InitialConditions[ self._indexMapping["lam3Im"] ]
+        lam3Re = InitialConditions[ self._indexMapping["lam3Re"] ]
+        yt3 = InitialConditions[ self._indexMapping["yt3"] ]
+        mu12sqIm = InitialConditions[ self._indexMapping["mu12sqIm"] ]
+        mu12sqRe = InitialConditions[ self._indexMapping["mu12sqRe"] ]
+        mu1sq = InitialConditions[ self._indexMapping["mu1sq"] ]
+        mu2sq = InitialConditions[ self._indexMapping["mu2sq"] ]
+        mu3sq = InitialConditions[ self._indexMapping["mu3sq"] ]
         
         ##Each differential equation is copy and pasted from the DRalgo file BetaFunctions4D[]//FortranForm,
         ## Except for the gauge couplings which need to be divided by 2 g as DRalgo gives the beta function as dg^2/dmu and odeint assumes dg/dmu
         ##TODO Is it better to work with g^2?
-        dg1 = ((43*g1**4)/(48.*Pi**2))/(2*g1)
-        dg2 = ((-17*g2**4)/(48.*Pi**2))/(2*g2)
-        dg3 = ((-7*g3**4)/(8.*Pi**2))/(2*g3)
+        dg1 = ((43*g1**3)/(48.*Pi**2)) / 2.
+        dg2 = ((-17*g2**3)/(48.*Pi**2)) / 2.
+        dg3 = ((-7*g3**3)/(8.*Pi**2)) / 2.
         dlam11 = (3*g1**2*(g2**2 - lam12p) - 9*g2**2*lam12p + 32*(lam1Im**2 + lam1Re**2) + 4*lam12p*(lam11 + 2*lam12 + lam12p + lam22) + 2*lam23p*lam31p)/(16.*Pi**2)
         dlam12p = (3*g1**2*(g2**2 - lam12p) - 9*g2**2*lam12p + 32*(lam1Im**2 + lam1Re**2) + 4*lam12p*(lam11 + 2*lam12 + lam12p + lam22) + 2*lam23p*lam31p)/(16.*Pi**2)
         dlam12 = (3*g1**4 + 9*g2**4 - 36*g2**2*lam12 - 6*g1**2*(g2**2 + 2*lam12) + 8*(6*lam11*lam12 + 2*lam12**2 + 2*lam11*lam12p + lam12p**2 + 4*lam1Im**2 + 4*lam1Re**2 + 6*lam12*lam22 + 2*lam12p*lam22 + 2*lam23*lam31 + lam23p*lam31 + lam23*lam31p))/(64.*Pi**2)
@@ -78,17 +77,23 @@ class BetaFunctions4D():
         dmu1sq = (-3*(g1**2 + 3*g2**2 - 8*lam11)*mu1sq + 8*lam12*mu2sq + 4*lam12p*mu2sq + 4*(2*lam31 + lam31p)*mu3sq)/(32.*Pi**2)
         dmu2sq = (8*lam12*mu1sq + 4*lam12p*mu1sq - 3*(g1**2 + 3*g2**2 - 8*lam22)*mu2sq + 4*(2*lam23 + lam23p)*mu3sq)/(32.*Pi**2)
         dmu3sq = (8*lam31*mu1sq + 4*lam31p*mu1sq + 4*(2*lam23 + lam23p)*mu2sq - 3*(g1**2 + 3*g2**2 - 4*yt3**2 - 8*lam33)*mu3sq)/(32.*Pi**2)
-        return [dg1,dg2, dg3, dlam11, dlam12p, dlam12, dlam1Im, dlam1Re, dlam22, dlam23p, dlam23, dlam2Im, dlam2Re, dlam31p, 
-                dlam31, dlam33, dlam3Im, dlam3Re, dyt3, dmu12sqIm, dmu12sqRe, dmu1sq, dmu2sq, dmu3sq]
 
-    def SolveBetaFunction(self, renormalizedParams,  muRange: npt.ArrayLike = np.arange(91.1876, 700., 2.)) -> dict[str, float]:##what type is a scipy spline?
+        ## Probably should use the index mapping here too to avoid errors
+        
+        return np.asanyarray([dg1, dg2, dg3, dlam11, dlam12p, dlam12, dlam1Im, dlam1Re, dlam22, dlam23p, dlam23, dlam2Im, dlam2Re, dlam31p, 
+                dlam31, dlam33, dlam3Im, dlam3Re, dyt3, dmu12sqIm, dmu12sqRe, dmu1sq, dmu2sq, dmu3sq])
+
+    def SolveBetaFunction(self, initialParams: dict[str, float],  muRange: npt.ArrayLike = np.arange(91.1876, 700., 2.)) -> dict[str, float]:##what type is a scipy spline?
         ##muRange used to run the energy scale from the Z mass to around 700 in steps of 2 
-        ##TODO Call this from TransitionFinder
-        InitialConditions = renormalizedParams
+
         ##TODO Does anything need to be done with the RG scale in Initital conditions?
         ##taking the log so that we can work with mubar in the derivative
         muBarRange = np.log(muRange)
-        Solution = odeint(self.HardCodeBetaFunction, InitialConditions, muBarRange)
+
+        ## Need to unpack the param dict for odeint
+        paramsList = self._unpackParamDict(initialParams)
+        
+        Solution = scipy.integrate.odeint(self.HardCodeBetaFunction, paramsList, muBarRange)
         ##To make solution slightly nicer to work with we take the transpose so that each coupling is inside its own array
         Solution_trans = np.transpose(Solution)
         dg1_interp = CubicSpline(muRange, Solution_trans[0], extrapolate=False)
@@ -147,3 +152,21 @@ class BetaFunctions4D():
             "dmu3sq": dmu3sq_interp,
             }
         return Running_coupling_interp_dict
+    
+
+    def _unpackParamDict(self, params: dict[str, float]) -> np.ndarray:
+        """Puts a 3HDM parameter dict in array format that odeint understands.
+        Also produces a name <-> index mapping for easier access to the params in beta function expressions."""
+
+        indexMapping = {}
+
+        paramsList = np.asanyarray( len(params) * [None], dtype=float)
+
+        idx = 0
+        for key, val in params.items():
+            paramsList[idx] = val
+            indexMapping[key] = idx
+            idx += 1
+
+        self._indexMapping = indexMapping
+        return paramsList
