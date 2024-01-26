@@ -40,9 +40,10 @@ class TransitionFinder:
 
         ## TODO Is this safe if endScale is smaller than startScale?
 
-        betas = BetaFunctions4D()
-        ## Dict of interpolated functions (TODO change)
-        interpolatedParams = betas.SolveBetaFunction(renormalizedParams, muRange)
+        betas = BetaFunctions4D(renormalizedParams, muRange)
+
+        interpolatedParams = betas.RunCoupling(150)
+        print (interpolatedParams)
 
         ## TODO would probs be good to move this part inside DimensionalReduction class
         """ 
@@ -72,10 +73,11 @@ class TransitionFinder:
 
             ## Fill in a new param dict that contains 4D params at the matching scale
             paramsForMatching = {}
-            for key, val in interpolatedParams:
-                paramsForMatching[key] = interpolatedParams[key](matchingScale)
+            for key, interpolatedFunction in interpolatedParams.items():
+                paramsForMatching[key] = interpolatedFunction(matchingScale)
 
-            ## T needs to be in the dict
+            ## These need to be in the dict
+            paramsForMatching["RGScale"] = matchingScale
             paramsForMatching["T"] = T
 
             ## Put T-dependent logs in the dict too. Not a particularly nice solution...
@@ -83,7 +85,7 @@ class TransitionFinder:
             paramsForMatching["Lb"] = Lb
             paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
 
-            params3D = self.model.dimensionalReduction.getEFTParams(renormalizedParams, goalRGScale)
+            params3D = self.model.dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
 
             self.model.effectivePotential.setModelParameters(params3D)
 
@@ -96,5 +98,3 @@ class TransitionFinder:
         minimizationResults = np.asanyarray(minimizationResults)
         print( minimizationResults )
         np.savetxt("results_test.txt", minimizationResults)
-
-

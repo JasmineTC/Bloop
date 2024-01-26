@@ -4,134 +4,129 @@ from math import pi as Pi
 from scipy.integrate import odeint
 from scipy.interpolate import CubicSpline
 
+renormalizedParams = {'lam1Re': 0.1, 'lam1Im': 0.0, 'lam11': 0.1, 'lam22': 0.1, 'lam12': 0.1, 'lam12p': 0.1, 'yt3': 0.9922814354462509, 
+                      'g1': 0.3498206230347181, 'g2': 0.6528876614409878, 'g3': 1.2192627459570353, 
+                      'mu3sq': 7812.5, 'lam33': 0.12886749199352251, 'mu12sqRe': 117.5, 'mu12sqIm': 0.0, 'lam2Re': -0.0005734361980235576, 
+                      'lam2Im': 0.00099322062987593, 'mu2sq': -4710.528856347395, 'lam23': 0.30007679706315876, 'lam23p': -0.29827978978801506, 
+                      'mu1sq': -4710.528856347395, 'lam3Re': -0.0005734361980235576, 'lam3Im': 0.00099322062987593, 'lam31': 0.30007679706315876, 
+                      'lam31p': -0.29827978978801506, 'RGScale': 91.1876}
+VenusBenchMark = np.zeros(24)
+del renormalizedParams['RGScale']
+for i, value in enumerate(renormalizedParams.values()):
+    VenusBenchMark[i] = value
+
 def beta_functions(coupling, mu):
     #Unpacking the coupling array, to reduce lines could be done with g1, g2,...Mu3sq = coupling[:]
-    g1 = coupling[0] #initial[key,value]
-    g2 = coupling[1]
-    g3 = coupling[2]
-    lambda11 = coupling[3]
-    lambda12p = coupling[4]
-    lambda12 = coupling[5]
-    lambda1Im = coupling[6]
-    lambda1Re = coupling[7]
-    lambda22 = coupling[8]
-    lambda23p = coupling[9]
-    lambda23 = coupling[10]
-    lambda2Im = coupling[11]
-    lambda2Re = coupling[12]
-    lambda31p = coupling[13]
-    lambda31 = coupling[14]
-    lambda33 = coupling[15]
-    lambda3Im = coupling[16]
-    lambda3Re = coupling[17]
-    yt3 = coupling[18]
-    Mu12sqIm = coupling[19]
-    Mu12sqRe = coupling[20]
-    Mu1sq = coupling[21]
-    Mu2sq = coupling[22]
-    Mu3sq = coupling[23]
-    
+    lam1Re = coupling[0] #initial[key,value]
+    lam1Im = coupling[1]
+    lam11 = coupling[2]
+    lam22 = coupling[3]
+    lam12 = coupling[4]
+    lam12p = coupling[5]
+    yt3 = coupling[6]
+    g1 = coupling[7]
+    g2 = coupling[8]
+    g3 = coupling[9]
+    mu3sq = coupling[10]
+    lam33 = coupling[11]
+    mu12sqRe = coupling[12]
+    mu12sqIm = coupling[13]
+    lam2Re = coupling[14]
+    lam2Im = coupling[15]
+    mu2sq = coupling[16]
+    lam23 = coupling[17]
+    lam23p = coupling[18]
+    mu1sq = coupling[19]
+    lam3Re = coupling[20]
+    lam3Im = coupling[21]
+    lam31 = coupling[22]
+    lam31p = coupling[23]
+       
     #Each differential equation is copy and pasted from the DRalgo file BetaFunctions4D[]//FortranForm 
     dg1 = ((43*g1**4)/(48.*Pi**2))/(2*g1)
     dg2 = ((-17*g2**4)/(48.*Pi**2))/(2*g2)
     dg3 = ((-7*g3**4)/(8.*Pi**2))/(2*g3)
-    dlambda11 = (3*g1**2*(g2**2 - lambda12p) - 9*g2**2*lambda12p + 32*(lambda1Im**2 + lambda1Re**2) + 4*lambda12p*(lambda11 + 2*lambda12 + lambda12p + lambda22) + 2*lambda23p*lambda31p)/(16.*Pi**2)
-    dlambda12p = (3*g1**2*(g2**2 - lambda12p) - 9*g2**2*lambda12p + 32*(lambda1Im**2 + lambda1Re**2) + 4*lambda12p*(lambda11 + 2*lambda12 + lambda12p + lambda22) + 2*lambda23p*lambda31p)/(16.*Pi**2)
-    dlambda12 = (3*g1**4 + 9*g2**4 - 36*g2**2*lambda12 - 6*g1**2*(g2**2 + 2*lambda12) + 8*(6*lambda11*lambda12 + 2*lambda12**2 + 2*lambda11*lambda12p + lambda12p**2 + 4*lambda1Im**2 + 4*lambda1Re**2 + 6*lambda12*lambda22 + 2*lambda12p*lambda22 + 2*lambda23*lambda31 + lambda23p*lambda31 + lambda23*lambda31p))/(64.*Pi**2)
-    dlambda1Im = -0.0625*(3*g1**2*lambda1Im + 9*g2**2*lambda1Im - 4*lambda1Im*(lambda11 + 2*lambda12 + 3*lambda12p + lambda22) + 4*lambda2Re*lambda3Im + 4*lambda2Im*lambda3Re)/Pi**2
-    dlambda1Re = (-3*g1**2*lambda1Re - 9*g2**2*lambda1Re + 4*lambda1Re*(lambda11 + 2*lambda12 + 3*lambda12p + lambda22) - 4*lambda2Im*lambda3Im + 4*lambda2Re*lambda3Re)/(16.*Pi**2)
-    dlambda22 = (3*g1**4 + 9*g2**4 + 6*g1**2*(g2**2 - 4*lambda22) - 72*g2**2*lambda22 + 8*(2*lambda12**2 + 2*lambda12*lambda12p + lambda12p**2 + 4*lambda1Im**2 + 4*lambda1Re**2 + 24*lambda22**2 + 2*lambda23**2 + 2*lambda23*lambda23p + lambda23p**2 + 4*(lambda2Im**2 + lambda2Re**2)))/(128.*Pi**2)
-    dlambda23p = (3*g1**2*(g2**2 - lambda23p) - 9*g2**2*lambda23p + 6*yt3**2*lambda23p + 32*(lambda2Im**2 + lambda2Re**2) + 2*lambda12p*lambda31p + 4*lambda23p*(lambda22 + 2*lambda23 + lambda23p + lambda33))/(16.*Pi**2)
-    dlambda23 = (3*g1**4 + 9*g2**4 - 36*g2**2*lambda23 - 6*g1**2*(g2**2 + 2*lambda23) + 8*(3*yt3**2*lambda23 + 6*lambda22*lambda23 + 2*lambda23**2 + 2*lambda22*lambda23p + lambda23p**2 + 4*lambda2Im**2 + 4*lambda2Re**2 + 2*lambda12*lambda31 + lambda12p*lambda31 + lambda12*lambda31p + 6*lambda23*lambda33 + 2*lambda23p*lambda33))/(64.*Pi**2)
-    dlambda2Im = (lambda2Im*(-3*g1**2 - 9*g2**2 + 6*yt3**2 + 4*(lambda22 + 2*lambda23 + 3*lambda23p + lambda33)) - 4*(lambda1Re*lambda3Im + lambda1Im*lambda3Re))/(16.*Pi**2)
-    dlambda2Re = (lambda2Re*(-3*g1**2 - 9*g2**2 + 6*yt3**2 + 4*(lambda22 + 2*lambda23 + 3*lambda23p + lambda33)) - 4*lambda1Im*lambda3Im + 4*lambda1Re*lambda3Re)/(16.*Pi**2)
-    dlambda31p = (2*lambda12p*lambda23p + 3*g1**2*(g2**2 - lambda31p) + lambda31p*(-9*g2**2 + 6*yt3**2 + 4*(lambda11 + 2*lambda31 + lambda31p + lambda33)) + 32*(lambda3Im**2 + lambda3Re**2))/(16.*Pi**2)
-    dlambda31 = (3*g1**4 + 9*g2**4 - 36*g2**2*lambda31 - 6*g1**2*(g2**2 + 2*lambda31) + 8*(2*lambda12*lambda23 + lambda12p*lambda23 + lambda12*lambda23p + 3*yt3**2*lambda31 + 6*lambda11*lambda31 + 2*lambda31**2 + 2*lambda11*lambda31p + lambda31p**2 + 6*lambda31*lambda33 + 2*lambda31p*lambda33 + 4*(lambda3Im**2 + lambda3Re**2)))/(64.*Pi**2)
-    dlambda33 = (3*g1**4 + 9*g2**4 + 6*g1**2*(g2**2 - 4*lambda33) - 72*g2**2*lambda33 + 96*lambda33*(yt3**2 + 2*lambda33) + 8*(-6*yt3**4 + 2*lambda23**2 + 2*lambda23*lambda23p + lambda23p**2 + 4*lambda2Im**2 + 4*lambda2Re**2 + 2*lambda31**2 + 2*lambda31*lambda31p + lambda31p**2 + 4*(lambda3Im**2 + lambda3Re**2)))/(128.*Pi**2)
-    dlambda3Im = (-4*lambda1Re*lambda2Im - 4*lambda1Im*lambda2Re + (-3*g1**2 - 9*g2**2 + 6*yt3**2 + 4*(lambda11 + 2*lambda31 + 3*lambda31p + lambda33))*lambda3Im)/(16.*Pi**2)
-    dlambda3Re = (-4*lambda1Im*lambda2Im + 4*lambda1Re*lambda2Re + (-3*g1**2 - 9*g2**2 + 6*yt3**2 + 4*(lambda11 + 2*lambda31 + 3*lambda31p + lambda33))*lambda3Re)/(16.*Pi**2)
+    dlam11 = (3*g1**2*(g2**2 - lam12p) - 9*g2**2*lam12p + 32*(lam1Im**2 + lam1Re**2) + 4*lam12p*(lam11 + 2*lam12 + lam12p + lam22) + 2*lam23p*lam31p)/(16.*Pi**2)
+    dlam12p = (3*g1**2*(g2**2 - lam12p) - 9*g2**2*lam12p + 32*(lam1Im**2 + lam1Re**2) + 4*lam12p*(lam11 + 2*lam12 + lam12p + lam22) + 2*lam23p*lam31p)/(16.*Pi**2)
+    dlam12 = (3*g1**4 + 9*g2**4 - 36*g2**2*lam12 - 6*g1**2*(g2**2 + 2*lam12) + 8*(6*lam11*lam12 + 2*lam12**2 + 2*lam11*lam12p + lam12p**2 + 4*lam1Im**2 + 4*lam1Re**2 + 6*lam12*lam22 + 2*lam12p*lam22 + 2*lam23*lam31 + lam23p*lam31 + lam23*lam31p))/(64.*Pi**2)
+    dlam1Im = -0.0625*(3*g1**2*lam1Im + 9*g2**2*lam1Im - 4*lam1Im*(lam11 + 2*lam12 + 3*lam12p + lam22) + 4*lam2Re*lam3Im + 4*lam2Im*lam3Re)/Pi**2
+    dlam1Re = (-3*g1**2*lam1Re - 9*g2**2*lam1Re + 4*lam1Re*(lam11 + 2*lam12 + 3*lam12p + lam22) - 4*lam2Im*lam3Im + 4*lam2Re*lam3Re)/(16.*Pi**2)
+    dlam22 = (3*g1**4 + 9*g2**4 + 6*g1**2*(g2**2 - 4*lam22) - 72*g2**2*lam22 + 8*(2*lam12**2 + 2*lam12*lam12p + lam12p**2 + 4*lam1Im**2 + 4*lam1Re**2 + 24*lam22**2 + 2*lam23**2 + 2*lam23*lam23p + lam23p**2 + 4*(lam2Im**2 + lam2Re**2)))/(128.*Pi**2)
+    dlam23p = (3*g1**2*(g2**2 - lam23p) - 9*g2**2*lam23p + 6*yt3**2*lam23p + 32*(lam2Im**2 + lam2Re**2) + 2*lam12p*lam31p + 4*lam23p*(lam22 + 2*lam23 + lam23p + lam33))/(16.*Pi**2)
+    dlam23 = (3*g1**4 + 9*g2**4 - 36*g2**2*lam23 - 6*g1**2*(g2**2 + 2*lam23) + 8*(3*yt3**2*lam23 + 6*lam22*lam23 + 2*lam23**2 + 2*lam22*lam23p + lam23p**2 + 4*lam2Im**2 + 4*lam2Re**2 + 2*lam12*lam31 + lam12p*lam31 + lam12*lam31p + 6*lam23*lam33 + 2*lam23p*lam33))/(64.*Pi**2)
+    dlam2Im = (lam2Im*(-3*g1**2 - 9*g2**2 + 6*yt3**2 + 4*(lam22 + 2*lam23 + 3*lam23p + lam33)) - 4*(lam1Re*lam3Im + lam1Im*lam3Re))/(16.*Pi**2)
+    dlam2Re = (lam2Re*(-3*g1**2 - 9*g2**2 + 6*yt3**2 + 4*(lam22 + 2*lam23 + 3*lam23p + lam33)) - 4*lam1Im*lam3Im + 4*lam1Re*lam3Re)/(16.*Pi**2)
+    dlam31p = (2*lam12p*lam23p + 3*g1**2*(g2**2 - lam31p) + lam31p*(-9*g2**2 + 6*yt3**2 + 4*(lam11 + 2*lam31 + lam31p + lam33)) + 32*(lam3Im**2 + lam3Re**2))/(16.*Pi**2)
+    dlam31 = (3*g1**4 + 9*g2**4 - 36*g2**2*lam31 - 6*g1**2*(g2**2 + 2*lam31) + 8*(2*lam12*lam23 + lam12p*lam23 + lam12*lam23p + 3*yt3**2*lam31 + 6*lam11*lam31 + 2*lam31**2 + 2*lam11*lam31p + lam31p**2 + 6*lam31*lam33 + 2*lam31p*lam33 + 4*(lam3Im**2 + lam3Re**2)))/(64.*Pi**2)
+    dlam33 = (3*g1**4 + 9*g2**4 + 6*g1**2*(g2**2 - 4*lam33) - 72*g2**2*lam33 + 96*lam33*(yt3**2 + 2*lam33) + 8*(-6*yt3**4 + 2*lam23**2 + 2*lam23*lam23p + lam23p**2 + 4*lam2Im**2 + 4*lam2Re**2 + 2*lam31**2 + 2*lam31*lam31p + lam31p**2 + 4*(lam3Im**2 + lam3Re**2)))/(128.*Pi**2)
+    dlam3Im = (-4*lam1Re*lam2Im - 4*lam1Im*lam2Re + (-3*g1**2 - 9*g2**2 + 6*yt3**2 + 4*(lam11 + 2*lam31 + 3*lam31p + lam33))*lam3Im)/(16.*Pi**2)
+    dlam3Re = (-4*lam1Im*lam2Im + 4*lam1Re*lam2Re + (-3*g1**2 - 9*g2**2 + 6*yt3**2 + 4*(lam11 + 2*lam31 + 3*lam31p + lam33))*lam3Re)/(16.*Pi**2)
     dyt3 = (yt3*(-17*g1**2 - 27*g2**2 - 96*g3**2 + 54*yt3**2))/(192.*Pi**2)
-    dmu12SqIm = (-3*g1**2*Mu12sqIm - 9*g2**2*Mu12sqIm + 4*(lambda12 + 2*lambda12p - 6*lambda1Re)*Mu12sqIm + 24*lambda1Im*Mu12sqRe)/(32.*Pi**2)
-    dmu12SqRe = (24*lambda1Im*Mu12sqIm + (-3*g1**2 - 9*g2**2 + 4*lambda12 + 8*lambda12p + 24*lambda1Re)*Mu12sqRe)/(32.*Pi**2)
-    dmu1Sq = (-3*(g1**2 + 3*g2**2 - 8*lambda11)*Mu1sq + 8*lambda12*Mu2sq + 4*lambda12p*Mu2sq + 4*(2*lambda31 + lambda31p)*Mu3sq)/(32.*Pi**2)
-    dmu2Sq = (8*lambda12*Mu1sq + 4*lambda12p*Mu1sq - 3*(g1**2 + 3*g2**2 - 8*lambda22)*Mu2sq + 4*(2*lambda23 + lambda23p)*Mu3sq)/(32.*Pi**2)
-    dmu3Sq = (8*lambda31*Mu1sq + 4*lambda31p*Mu1sq + 4*(2*lambda23 + lambda23p)*Mu2sq - 3*(g1**2 + 3*g2**2 - 4*yt3**2 - 8*lambda33)*Mu3sq)/(32.*Pi**2)
+    dmu12sqIm = (-3*g1**2*mu12sqIm - 9*g2**2*mu12sqIm + 4*(lam12 + 2*lam12p - 6*lam1Re)*mu12sqIm + 24*lam1Im*mu12sqRe)/(32.*Pi**2)
+    dmu12sqRe = (24*lam1Im*mu12sqIm + (-3*g1**2 - 9*g2**2 + 4*lam12 + 8*lam12p + 24*lam1Re)*mu12sqRe)/(32.*Pi**2)
+    dmu1sq = (-3*(g1**2 + 3*g2**2 - 8*lam11)*mu1sq + 8*lam12*mu2sq + 4*lam12p*mu2sq + 4*(2*lam31 + lam31p)*mu3sq)/(32.*Pi**2)
+    dmu2sq = (8*lam12*mu1sq + 4*lam12p*mu1sq - 3*(g1**2 + 3*g2**2 - 8*lam22)*mu2sq + 4*(2*lam23 + lam23p)*mu3sq)/(32.*Pi**2)
+    dmu3sq = (8*lam31*mu1sq + 4*lam31p*mu1sq + 4*(2*lam23 + lam23p)*mu2sq - 3*(g1**2 + 3*g2**2 - 4*yt3**2 - 8*lam33)*mu3sq)/(32.*Pi**2)
     
-    return [dg1,dg2, dg3, dlambda11, dlambda12p, dlambda12, dlambda1Im, dlambda1Re, dlambda22, dlambda23p, dlambda23, dlambda2Im, dlambda2Re, dlambda31p, 
-            dlambda31, dlambda33, dlambda3Im, dlambda3Re, dyt3, dmu12SqIm, dmu12SqRe, dmu1Sq, dmu2Sq, dmu3Sq]
+    return  [dlam1Re, dlam1Im, dlam11, dlam22, dlam12, dlam12p, dyt3, dg1, dg2, dg3, dmu3sq, dlam33,
+     dmu12sqRe, dmu12sqIm, dlam2Re, dlam2Im, dmu2sq, dlam23, dlam23p, dmu1sq, dlam3Re, dlam3Im, dlam31, dlam31p]   
 
 
 #[dg1,dg2, g3, lambda11, lambda12p, lambda12, lambda1Im, lambda1Re, lambda22, dlambda23p, dlambda23, dlambda2Im, dlambda2Re, dlambda31p, dlambda31, dlambda33, dlambda3Im, dlambda3Re, dyt3, dmu12SqIm, dmu12SqRe, dmu1Sq, dmu2Sq, dmu3Sq]
-mu_initital = [np.sqrt(0.15), np.sqrt(0.4), np.sqrt(1.9), 0.1, 0.1, 0.1, 0.0, 0.1, 0.1, 1, 1.1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.61, 0.71, 1.0, 0.91, 1.01, 0.92, 0.82, 0.75]
+InitialConditions = [np.sqrt(0.15), np.sqrt(0.4), np.sqrt(1.9), 0.1, 0.1, 0.1, 0.0, 0.1, 0.1, 1, 1.1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.61, 0.71, 1.0, 0.91, 1.01, 0.92, 0.82, 0.75]
 
 muRange = np.linspace(90, 700, 300)
 mubarRange = np.log(muRange)
 
-solution = odeint(beta_functions, mu_initital, mubarRange)
-Solution_trans = np.transpose(solution)
-test1 = CubicSpline(mubarRange, Solution_trans[0], extrapolate=False)
+solution = odeint(beta_functions, VenusBenchMark, mubarRange)
+solution = np.transpose(solution)
+#test1 = CubicSpline(mubarRange, Solution_trans[0], extrapolate=False)
 
-plt.plot(mubarRange, Solution_trans[0], label ='U(1)')
-plt.plot(mubarRange, test1(mubarRange), label ='U(1) spline')
-#plt.plot(mubar_array, solution_trans[1], label = 'SU(2)')
-#plt.plot(mubar_array, solution_trans[2], label = 'SU(3)')
-#plt.plot(mubar_array, solution_trans[18], label = 'yt')
-#plt.legend(loc ='best')
-#plt.title("Running of the gauge couplings and top yukawa")
-#plt.xlabel('$log(\mu)$')
-#plt.ylabel('coupling')
+plt.plot(mubarRange, solution[6], label ='yt')
+#plt.plot(mubarRange, test1(mubarRange), label ='U(1) spline')
+plt.plot(mubarRange, solution[7], label = 'U(1)')
+plt.plot(mubarRange, solution[8], label = 'SU(2)')
+plt.plot(mubarRange, solution[9], label = 'SU(3)')
+plt.legend(loc ='best')
+plt.title("Running of the gauge couplings and top yukawa")
+plt.xlabel('$log(\mu)$')
+plt.ylabel('coupling')
 plt.show()
 
-dg1_interp = CubicSpline(muRange, Solution_trans[0], extrapolate=False)
-dg2_interp = CubicSpline(muRange, Solution_trans[1], extrapolate=False)
-dg3_interp = CubicSpline(muRange, Solution_trans[2], extrapolate=False)
-dlam11_interp = CubicSpline(muRange, Solution_trans[3], extrapolate=False)
-dlam12p_interp = CubicSpline(muRange, Solution_trans[4], extrapolate=False)
-dlam12_interp = CubicSpline(muRange, Solution_trans[5], extrapolate=False)
-dlam1Im_interp = CubicSpline(muRange, Solution_trans[6], extrapolate=False)
-dlam1Re_interp = CubicSpline(muRange, Solution_trans[7], extrapolate=False)
-dlam22_interp = CubicSpline(muRange, Solution_trans[8], extrapolate=False)
-dlam23p_interp = CubicSpline(muRange, Solution_trans[9], extrapolate=False)
-dlam23_interp = CubicSpline(muRange, Solution_trans[10], extrapolate=False)
-dlam2Im_interp = CubicSpline(muRange, Solution_trans[11], extrapolate=False)
-dlam2Re_interp = CubicSpline(muRange, Solution_trans[12], extrapolate=False)
-dlam31p_interp = CubicSpline(muRange, Solution_trans[13], extrapolate=False)
-dlam31_interp = CubicSpline(muRange, Solution_trans[14], extrapolate=False)
-dlam33_interp = CubicSpline(muRange, Solution_trans[15], extrapolate=False)
-dlam3Im_interp = CubicSpline(muRange, Solution_trans[16], extrapolate=False)
-dlam3Re_interp = CubicSpline(muRange, Solution_trans[17], extrapolate=False)
-dyt3_interp = CubicSpline(muRange, Solution_trans[18], extrapolate=False)
-dmu12sqIm_interp = CubicSpline(muRange, Solution_trans[19], extrapolate=False)
-dmu12sqRe_interp = CubicSpline(muRange, Solution_trans[20], extrapolate=False)
-dmu1sq_interp = CubicSpline(muRange, Solution_trans[21], extrapolate=False)
-dmu2sq_interp = CubicSpline(muRange, Solution_trans[22], extrapolate=False)
-dmu3sq_interp = CubicSpline(muRange, Solution_trans[23], extrapolate=False)
+def InterpolateBetaFunction():     
+    dlam1Re = CubicSpline(muRange, solution[0], extrapolate=False)
+    dlam1Im = CubicSpline(muRange, solution[1], extrapolate=False)
+    dlam11 = CubicSpline(muRange, solution[2], extrapolate=False)
+    dlam22 = CubicSpline(muRange, solution[3], extrapolate=False)
+    dlam12 = CubicSpline(muRange, solution[4], extrapolate=False)
+    dlam12p = CubicSpline(muRange, solution[5], extrapolate=False)
+    dyt3 = CubicSpline(muRange, solution[6], extrapolate=False)
+    dg1 = CubicSpline(muRange, solution[7], extrapolate=False)
+    dg2 = CubicSpline(muRange, solution[8], extrapolate=False)
+    dg3 = CubicSpline(muRange, solution[9], extrapolate=False)
+    dmu3sq = CubicSpline(muRange, solution[10], extrapolate=False)
+    dlam33 = CubicSpline(muRange, solution[11], extrapolate=False)
+    dmu12sqRe = CubicSpline(muRange, solution[12], extrapolate=False)
+    dmu12sqIm = CubicSpline(muRange, solution[13], extrapolate=False)
+    dlam2Re = CubicSpline(muRange, solution[14], extrapolate=False)
+    dlam2Im = CubicSpline(muRange, solution[15], extrapolate=False)
+    dmu2sq = CubicSpline(muRange, solution[16], extrapolate=False)
+    dlam23 = CubicSpline(muRange, solution[17], extrapolate=False)
+    dlam23p = CubicSpline(muRange, solution[18], extrapolate=False)
+    dmu1sq = CubicSpline(muRange, solution[19], extrapolate=False)
+    dlam3Re = CubicSpline(muRange, solution[20], extrapolate=False)
+    dlam3Im = CubicSpline(muRange, solution[21], extrapolate=False)
+    dlam31 = CubicSpline(muRange, solution[22], extrapolate=False)
+    dlam31p = CubicSpline(muRange, solution[23], extrapolate=False)
+        
+    return [dlam1Re, dlam1Im, dlam11, dlam22, dlam12, dlam12p, dyt3, dg1, dg2, dg3, dmu3sq, dlam33,
+                dmu12sqRe, dmu12sqIm, dlam2Re, dlam2Im, dmu2sq, dlam23, dlam23p, dmu1sq, dlam3Re, dlam3Im, dlam31, dlam31p]  
+array = np.zeros(24)
+interp = InterpolateBetaFunction()
 
-Running_coupling_interp_dict = {
-    "dg1": dg1_interp,
-    "dg2": dg2_interp,
-    "dg3": dg3_interp,
-    "dlam11": dlam11_interp,
-    "dlam12p": dlam12p_interp,
-    "dlam12": dlam12_interp,
-    "dlam1Im": dlam1Im_interp,
-    "dlam1Re": dlam1Re_interp,
-    "dlam22": dlam22_interp,
-    "dlam23p": dlam23p_interp,
-    "dlam23": dlam23_interp,
-    "dlam2Im": dlam2Im_interp,
-    "dlam2Re": dlam2Re_interp,
-    "dlam31p": dlam31p_interp,
-    "dlam31": dlam31_interp,
-    "dlam33": dlam33_interp,
-    "dlam3Im": dlam3Im_interp,
-    "dlam3Re": dlam3Re_interp,
-    "dyt3": dyt3_interp,
-    "dmu12sqIm": dmu12sqIm_interp,
-    "dmu12sqRe": dmu12sqRe_interp,
-    "dmu1Sq":dmu1sq_interp ,
-    "dmu2sq": dmu2sq_interp,
-    "dmu3sq": dmu3sq_interp,
-    }
-
-print (Running_coupling_interp_dict["dg1"](150))
+# for i, (key, value) in enumerate (renormalizedParams.items()):
+#     array[i] = dlam1Re(200)
+#     #EvalulateCoupling[key] = BetaFunctionsInterp[i](muEvaulate)
+# print (array)
+#print (interp[0](150))
+print (   type( np.ndarray.item(interp[0](150))  )   )

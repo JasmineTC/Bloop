@@ -16,40 +16,67 @@ BetaFunctions4DFile = str(pathToCurrentFile) + "/Data/BetaFunctions4D/BetaFuncti
 """
 class BetaFunctions4D():
     
-    def __init__(self):
-        ## Let's not require initial conditions here. So just empty constructor
-        #self.HardCodeBetaFunction(self, InitialConditions) # <- This doesn't seem to do anything relevant
-        None
-
-
+    def __init__(self, renormalizedParams: dict[str, float], muRange: npt.ArrayLike):
+        self.renormalizedParams = renormalizedParams
+        self.muRange =  muRange
+        
+    ##odeint needs an array to work properly, so we need to unpack the renormalized param dict
+    ##This coould be done with a for loop easily, but this is safer (with for loop would be best to delete the last element (RGscale) from the dict)
+    def UnpackRenormalizedParams(self):
+        unpacked = np.zeros(24)
+        unpacked[0] = self.renormalizedParams["lam1Re"] 
+        unpacked[1]  = self.renormalizedParams["lam1Im"]
+        unpacked[2]  = self.renormalizedParams["lam11"]
+        unpacked[3]  = self.renormalizedParams["lam22"]
+        unpacked[4]  = self.renormalizedParams["lam12"]
+        unpacked[5]  = self.renormalizedParams["lam12p"]
+        unpacked[6]  = self.renormalizedParams["yt3"]
+        unpacked[7]  = self.renormalizedParams["g1"]
+        unpacked[8]  = self.renormalizedParams["g2"]
+        unpacked[9]  = self.renormalizedParams["g3"]
+        unpacked[10]  = self.renormalizedParams["mu3sq"]
+        unpacked[11]  = self.renormalizedParams["lam33"]
+        unpacked[12]  = self.renormalizedParams["mu12sqRe"]
+        unpacked[13]  = self.renormalizedParams["mu12sqIm"]
+        unpacked[14]  = self.renormalizedParams["lam2Re"]
+        unpacked[15]  = self.renormalizedParams["lam2Im"]
+        unpacked[16]  = self.renormalizedParams["mu2sq"]
+        unpacked[17]  = self.renormalizedParams["lam23"]
+        unpacked[18]  = self.renormalizedParams["lam23p"]
+        unpacked[19]  = self.renormalizedParams["mu1sq"]
+        unpacked[20]  = self.renormalizedParams["lam3Re"]
+        unpacked[21]  = self.renormalizedParams["lam3Im"]
+        unpacked[22]  = self.renormalizedParams["lam31"]
+        unpacked[23]  = self.renormalizedParams["lam31p"]
+        return unpacked
     
-    def HardCodeBetaFunction(self, InitialConditions: dict[str, float], mubar: float):
-        ##InitialConditions is a dictionary, need to unpack by giving the key, order doesn't matter
-        ## TODO work out how to deal with the fact that SU(3) is here, even though we don't want it
-        g1 = InitialConditions["g1"] #initial[key]
-        g2 = InitialConditions["g2"]
-        g3 = InitialConditions["g3"]
-        lam11 = InitialConditions["lam11"]
-        lam12p = InitialConditions["lam12p"]
-        lam12 = InitialConditions["lam12"]
-        lam1Im = InitialConditions["lam1Im"]
-        lam1Re = InitialConditions["lam1Re"]
-        lam22 = InitialConditions["lam22"]
-        lam23p = InitialConditions["lam23p"]
-        lam23 = InitialConditions["lam23"]
-        lam2Im = InitialConditions["lam2Im"]
-        lam2Re = InitialConditions["lam2Re"]
-        lam31p = InitialConditions["lam31p"]
-        lam31 = InitialConditions["lam31"]
-        lam33 = InitialConditions["lam33"]
-        lam3Im = InitialConditions["lam3Im"]
-        lam3Re = InitialConditions["lam3Re"]
-        yt3 = InitialConditions["yt3"]
-        mu12sqIm = InitialConditions["mu12sqIm"]
-        mu12sqRe = InitialConditions["mu12sqRe"]
-        mu1sq = InitialConditions["mu1sq"]
-        mu2sq = InitialConditions["mu2sq"]
-        mu3sq = InitialConditions["mu3sq"]
+    ##Takes the initial condition array, unpacks it into the parameters then computes the beta functions for that initial condition
+    ##and returns the resulting array calculated points (to be feed into itself again by odeint)
+    def HardCodeBetaFunction(self, initialConditions: dict[str, float], mubar: float):
+        lam1Re = initialConditions[0] 
+        lam1Im = initialConditions[1]
+        lam11 = initialConditions[2]
+        lam22 = initialConditions[3]
+        lam12 = initialConditions[4]
+        lam12p = initialConditions[5]
+        yt3 = initialConditions[6]
+        g1 = initialConditions[7]
+        g2 = initialConditions[8]
+        g3 = initialConditions[9]
+        mu3sq = initialConditions[10]
+        lam33 = initialConditions[11]
+        mu12sqRe = initialConditions[12]
+        mu12sqIm = initialConditions[13]
+        lam2Re = initialConditions[14]
+        lam2Im = initialConditions[15]
+        mu2sq = initialConditions[16]
+        lam23 = initialConditions[17]
+        lam23p = initialConditions[18]
+        mu1sq = initialConditions[19]
+        lam3Re = initialConditions[20]
+        lam3Im = initialConditions[21]
+        lam31 = initialConditions[22]
+        lam31p = initialConditions[23]
         
         ##Each differential equation is copy and pasted from the DRalgo file BetaFunctions4D[]//FortranForm,
         ## Except for the gauge couplings which need to be divided by 2 g as DRalgo gives the beta function as dg^2/dmu and odeint assumes dg/dmu
@@ -78,72 +105,63 @@ class BetaFunctions4D():
         dmu1sq = (-3*(g1**2 + 3*g2**2 - 8*lam11)*mu1sq + 8*lam12*mu2sq + 4*lam12p*mu2sq + 4*(2*lam31 + lam31p)*mu3sq)/(32.*Pi**2)
         dmu2sq = (8*lam12*mu1sq + 4*lam12p*mu1sq - 3*(g1**2 + 3*g2**2 - 8*lam22)*mu2sq + 4*(2*lam23 + lam23p)*mu3sq)/(32.*Pi**2)
         dmu3sq = (8*lam31*mu1sq + 4*lam31p*mu1sq + 4*(2*lam23 + lam23p)*mu2sq - 3*(g1**2 + 3*g2**2 - 4*yt3**2 - 8*lam33)*mu3sq)/(32.*Pi**2)
-        return [dg1,dg2, dg3, dlam11, dlam12p, dlam12, dlam1Im, dlam1Re, dlam22, dlam23p, dlam23, dlam2Im, dlam2Re, dlam31p, 
-                dlam31, dlam33, dlam3Im, dlam3Re, dyt3, dmu12sqIm, dmu12sqRe, dmu1sq, dmu2sq, dmu3sq]
+        return [dlam1Re, dlam1Im, dlam11, dlam22, dlam12, dlam12p, dyt3, dg1, dg2, dg3, dmu3sq, dlam33,
+                dmu12sqRe, dmu12sqIm, dlam2Re, dlam2Im, dmu2sq, dlam23, dlam23p, dmu1sq, dlam3Re, dlam3Im, dlam31, dlam31p]  
 
-    def SolveBetaFunction(self, renormalizedParams,  muRange: npt.ArrayLike = np.arange(91.1876, 700., 2.)) -> dict[str, float]:##what type is a scipy spline?
-        ##muRange used to run the energy scale from the Z mass to around 700 in steps of 2 
-        ##TODO Call this from TransitionFinder
-        InitialConditions = renormalizedParams
-        ##TODO Does anything need to be done with the RG scale in Initital conditions?
+    def SolveBetaFunction(self):
+        ##Initial conditions used to store the value in renormalizedParams, len -1 to remove the renorm scale in renormalizedParams
+        initialConditions = self.UnpackRenormalizedParams() 
+        
         ##taking the log so that we can work with mubar in the derivative
-        muBarRange = np.log(muRange)
-        Solution = odeint(self.HardCodeBetaFunction, InitialConditions, muBarRange)
+        muBarRange = np.log(self.muRange)
+        
+        solution = odeint(self.HardCodeBetaFunction, initialConditions, muBarRange)
         ##To make solution slightly nicer to work with we take the transpose so that each coupling is inside its own array
-        Solution_trans = np.transpose(Solution)
-        dg1_interp = CubicSpline(muRange, Solution_trans[0], extrapolate=False)
-        dg2_interp = CubicSpline(muRange, Solution_trans[1], extrapolate=False)
-        dg3_interp = CubicSpline(muRange, Solution_trans[2], extrapolate=False)
-        dlam11_interp = CubicSpline(muRange, Solution_trans[3], extrapolate=False)
-        dlam12p_interp = CubicSpline(muRange, Solution_trans[4], extrapolate=False)
-        dlam12_interp = CubicSpline(muRange, Solution_trans[5], extrapolate=False)
-        dlam1Im_interp = CubicSpline(muRange, Solution_trans[6], extrapolate=False)
-        dlam1Re_interp = CubicSpline(muRange, Solution_trans[7], extrapolate=False)
-        dlam22_interp = CubicSpline(muRange, Solution_trans[8], extrapolate=False)
-        dlam23p_interp = CubicSpline(muRange, Solution_trans[9], extrapolate=False)
-        dlam23_interp = CubicSpline(muRange, Solution_trans[10], extrapolate=False)
-        dlam2Im_interp = CubicSpline(muRange, Solution_trans[11], extrapolate=False)
-        dlam2Re_interp = CubicSpline(muRange, Solution_trans[12], extrapolate=False)
-        dlam31p_interp = CubicSpline(muRange, Solution_trans[13], extrapolate=False)
-        dlam31_interp = CubicSpline(muRange, Solution_trans[14], extrapolate=False)
-        dlam33_interp = CubicSpline(muRange, Solution_trans[15], extrapolate=False)
-        dlam3Im_interp = CubicSpline(muRange, Solution_trans[16], extrapolate=False)
-        dlam3Re_interp = CubicSpline(muRange, Solution_trans[17], extrapolate=False)
-        dyt3_interp = CubicSpline(muRange, Solution_trans[18], extrapolate=False)
-        dmu12sqIm_interp = CubicSpline(muRange, Solution_trans[19], extrapolate=False)
-        dmu12sqRe_interp = CubicSpline(muRange, Solution_trans[20], extrapolate=False)
-        dmu1sq_interp = CubicSpline(muRange, Solution_trans[21], extrapolate=False)
-        dmu2sq_interp = CubicSpline(muRange, Solution_trans[22], extrapolate=False)
-        dmu3sq_interp = CubicSpline(muRange, Solution_trans[23], extrapolate=False)
-        ##Hardcode a dictionary that has the beta function for each paramter, 
-        ##Running_coupling_interp_dict["coupling"](mu) evaluates the interpllated beta function at the point mu
+        solution = np.transpose(solution)
 
-        """TODO let's not put these in dict directly. Instead, store interpolations internally
-        and make a function that evaluates them at some RG scale and puts them in a dict"""
-        Running_coupling_interp_dict = {
-            "dg1": dg1_interp,
-            "dg2": dg2_interp,
-            "dg3": dg3_interp,
-            "dlam11": dlam11_interp,
-            "dlam12p": dlam12p_interp,
-            "dlam12": dlam12_interp,
-            "dlam1Im": dlam1Im_interp,
-            "dlam1Re": dlam1Re_interp,
-            "dlam22": dlam22_interp,
-            "dlam23p": dlam23p_interp,
-            "dlam23": dlam23_interp,
-            "dlam2Im": dlam2Im_interp,
-            "dlam2Re": dlam2Re_interp,
-            "dlam31p": dlam31p_interp,
-            "dlam31": dlam31_interp,
-            "dlam33": dlam33_interp,
-            "dlam3Im": dlam3Im_interp,
-            "dlam3Re": dlam3Re_interp,
-            "dyt3": dyt3_interp,
-            "dmu12sqIm": dmu12sqIm_interp,
-            "dmu12sqRe": dmu12sqRe_interp,
-            "dmu1Sq":dmu1sq_interp ,
-            "dmu2sq": dmu2sq_interp,
-            "dmu3sq": dmu3sq_interp,
-            }
-        return Running_coupling_interp_dict
+        return solution
+    
+    def InterpolateBetaFunction(self):
+        solution = self.SolveBetaFunction()
+        
+        dlam1Re = CubicSpline(self.muRange, solution[0], extrapolate=False)
+        dlam1Im = CubicSpline(self.muRange, solution[1], extrapolate=False)
+        dlam11 = CubicSpline(self.muRange, solution[2], extrapolate=False)
+        dlam22 = CubicSpline(self.muRange, solution[3], extrapolate=False)
+        dlam12 = CubicSpline(self.muRange, solution[4], extrapolate=False)
+        dlam12p = CubicSpline(self.muRange, solution[5], extrapolate=False)
+        dyt3 = CubicSpline(self.muRange, solution[6], extrapolate=False)
+        dg1 = CubicSpline(self.muRange, solution[7], extrapolate=False)
+        dg2 = CubicSpline(self.muRange, solution[8], extrapolate=False)
+        dg3 = CubicSpline(self.muRange, solution[9], extrapolate=False)
+        dmu3sq = CubicSpline(self.muRange, solution[10], extrapolate=False)
+        dlam33 = CubicSpline(self.muRange, solution[11], extrapolate=False)
+        dmu12sqRe = CubicSpline(self.muRange, solution[12], extrapolate=False)
+        dmu12sqIm = CubicSpline(self.muRange, solution[13], extrapolate=False)
+        dlam2Re = CubicSpline(self.muRange, solution[14], extrapolate=False)
+        dlam2Im = CubicSpline(self.muRange, solution[15], extrapolate=False)
+        dmu2sq = CubicSpline(self.muRange, solution[16], extrapolate=False)
+        dlam23 = CubicSpline(self.muRange, solution[17], extrapolate=False)
+        dlam23p = CubicSpline(self.muRange, solution[18], extrapolate=False)
+        dmu1sq = CubicSpline(self.muRange, solution[19], extrapolate=False)
+        dlam3Re = CubicSpline(self.muRange, solution[20], extrapolate=False)
+        dlam3Im = CubicSpline(self.muRange, solution[21], extrapolate=False)
+        dlam31 = CubicSpline(self.muRange, solution[22], extrapolate=False)
+        dlam31p = CubicSpline(self.muRange, solution[23], extrapolate=False)
+        
+        return [dlam1Re, dlam1Im, dlam11, dlam22, dlam12, dlam12p, dyt3, dg1, dg2, dg3, dmu3sq, dlam33,
+                dmu12sqRe, dmu12sqIm, dlam2Re, dlam2Im, dmu2sq, dlam23, dlam23p, dmu1sq, dlam3Re, dlam3Im, dlam31, dlam31p]  
+        
+    def RunCoupling(self, muEvaulate: float):
+        BetaFunctionsInterp = self.InterpolateBetaFunction()
+        
+        ##Easily generates the dict to return, just need to modify the value for each key
+        Coupling = self.renormalizedParams
+        ##When we unpacked the renormalizedParams we ignored the RGScale in the dict, this has come to bite us, 
+        ##so delete it so the dict has the right length
+        del Coupling["RGScale"]
+        
+        ##Evaluating the interp functions gives a single float in an array, so use np.ndarray to convert to float
+        for i, key in enumerate (Coupling):
+            Coupling[key] = np.ndarray.item(BetaFunctionsInterp[i](muEvaulate))
+        return Coupling
