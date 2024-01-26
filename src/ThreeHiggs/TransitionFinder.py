@@ -75,7 +75,8 @@ class TransitionFinder:
             for key, interpolatedFunction in interpolatedParams.items():
                 paramsForMatching[key] = interpolatedFunction(matchingScale)
 
-            ## T needs to be in the dict
+            ## These need to be in the dict
+            paramsForMatching["RGScale"] = matchingScale
             paramsForMatching["T"] = T
 
             ## Put T-dependent logs in the dict too. Not a particularly nice solution...
@@ -83,7 +84,7 @@ class TransitionFinder:
             paramsForMatching["Lb"] = Lb
             paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
 
-            params3D = self.model.dimensionalReduction.getEFTParams(renormalizedParams, goalRGScale)
+            params3D = self.model.dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
 
             self.model.effectivePotential.setModelParameters(params3D)
 

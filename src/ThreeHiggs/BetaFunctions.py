@@ -79,7 +79,7 @@ class BetaFunctions4D():
         dmu3sq = (8*lam31*mu1sq + 4*lam31p*mu1sq + 4*(2*lam23 + lam23p)*mu2sq - 3*(g1**2 + 3*g2**2 - 4*yt3**2 - 8*lam33)*mu3sq)/(32.*Pi**2)
 
         ## Probably should use the index mapping here too to avoid errors
-        
+
         return np.asanyarray([dg1, dg2, dg3, dlam11, dlam12p, dlam12, dlam1Im, dlam1Re, dlam22, dlam23p, dlam23, dlam2Im, dlam2Re, dlam31p, 
                 dlam31, dlam33, dlam3Im, dlam3Re, dyt3, dmu12sqIm, dmu12sqRe, dmu1sq, dmu2sq, dmu3sq])
 
@@ -126,30 +126,30 @@ class BetaFunctions4D():
         """TODO let's not put these in dict directly. Instead, store interpolations internally
         and make a function that evaluates them at some RG scale and puts them in a dict"""
         Running_coupling_interp_dict = {
-            "dg1": dg1_interp,
-            "dg2": dg2_interp,
-            "dg3": dg3_interp,
-            "dlam11": dlam11_interp,
-            "dlam12p": dlam12p_interp,
-            "dlam12": dlam12_interp,
-            "dlam1Im": dlam1Im_interp,
-            "dlam1Re": dlam1Re_interp,
-            "dlam22": dlam22_interp,
-            "dlam23p": dlam23p_interp,
-            "dlam23": dlam23_interp,
-            "dlam2Im": dlam2Im_interp,
-            "dlam2Re": dlam2Re_interp,
-            "dlam31p": dlam31p_interp,
-            "dlam31": dlam31_interp,
-            "dlam33": dlam33_interp,
-            "dlam3Im": dlam3Im_interp,
-            "dlam3Re": dlam3Re_interp,
-            "dyt3": dyt3_interp,
-            "dmu12sqIm": dmu12sqIm_interp,
-            "dmu12sqRe": dmu12sqRe_interp,
-            "dmu1Sq":dmu1sq_interp ,
-            "dmu2sq": dmu2sq_interp,
-            "dmu3sq": dmu3sq_interp,
+            "g1": dg1_interp,
+            "g2": dg2_interp,
+            "g3": dg3_interp,
+            "lam11": dlam11_interp,
+            "lam12p": dlam12p_interp,
+            "lam12": dlam12_interp,
+            "lam1Im": dlam1Im_interp,
+            "lam1Re": dlam1Re_interp,
+            "lam22": dlam22_interp,
+            "lam23p": dlam23p_interp,
+            "lam23": dlam23_interp,
+            "lam2Im": dlam2Im_interp,
+            "lam2Re": dlam2Re_interp,
+            "lam31p": dlam31p_interp,
+            "lam31": dlam31_interp,
+            "lam33": dlam33_interp,
+            "lam3Im": dlam3Im_interp,
+            "lam3Re": dlam3Re_interp,
+            "yt3": dyt3_interp,
+            "mu12sqIm": dmu12sqIm_interp,
+            "mu12sqRe": dmu12sqRe_interp,
+            "mu1sq":dmu1sq_interp ,
+            "mu2sq": dmu2sq_interp,
+            "mu3sq": dmu3sq_interp,
             }
         return Running_coupling_interp_dict
     
@@ -159,14 +159,19 @@ class BetaFunctions4D():
         Also produces a name <-> index mapping for easier access to the params in beta function expressions."""
 
         indexMapping = {}
-
-        paramsList = np.asanyarray( len(params) * [None], dtype=float)
+        paramsList = []
 
         idx = 0
         for key, val in params.items():
-            paramsList[idx] = val
+            ## Do NOT include the RG scale in this
+            if (key == "RGScale"): 
+                continue
+
+            paramsList.append(val)
             indexMapping[key] = idx
             idx += 1
+
+        paramsList = np.asanyarray(paramsList, dtype=float)
 
         self._indexMapping = indexMapping
         return paramsList
