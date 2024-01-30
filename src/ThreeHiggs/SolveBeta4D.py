@@ -4,20 +4,45 @@ from math import pi as Pi
 from scipy.integrate import odeint
 from scipy.interpolate import CubicSpline
 
-renormalizedParams = {'lam1Re': 0.1, 'lam1Im': 0.0, 'lam11': 0.1, 'lam22': 0.1, 'lam12': 0.1, 'lam12p': 0.1, 'yt3': 0.9922814354462509, 
-                      'g1': 0.3498206230347181, 'g2': 0.6528876614409878, 'g3': 1.2192627459570353, 
-                      'mu3sq': 7812.5, 'lam33': 0.12886749199352251, 'mu12sqRe': 117.5, 'mu12sqIm': 0.0, 'lam2Re': -0.0005734361980235576, 
+renormalizedParams = {'lam1Re': 0.1, 'lam1Im': 0.0, 'lam11': 0.1, 'lam22': 0.1, 'lam12': 0.1, 'lam12p': 0.1, 'yt3': 0.9922814354462509,
+                      'g1': 0.3498206230347181, 'g2': 0.6528876614409878, 'g3': 1.2192627459570353, 'mu3sq': 7812.5, 
+                      'lam33': 0.12886749199352251, 'mu12sqRe': 117.5, 'mu12sqIm': 0.0, 'lam2Re': -0.0005734361980235576, 
                       'lam2Im': 0.00099322062987593, 'mu2sq': -4710.528856347395, 'lam23': 0.30007679706315876, 'lam23p': -0.29827978978801506, 
                       'mu1sq': -4710.528856347395, 'lam3Re': -0.0005734361980235576, 'lam3Im': 0.00099322062987593, 'lam31': 0.30007679706315876, 
-                      'lam31p': -0.29827978978801506, 'RGScale': 91.1876}
-VenusBenchMark = np.zeros(24)
-del renormalizedParams['RGScale']
-for i, value in enumerate(renormalizedParams.values()):
-    VenusBenchMark[i] = value
+                      'lam31p': -0.29827978978801506}
+
+def Unpack(dictionary):
+    unpacked = np.zeros(24)
+    unpacked[0] = dictionary["lam1Re"] 
+    unpacked[1]  = dictionary["lam1Im"]
+    unpacked[2]  = dictionary["lam11"]
+    unpacked[3]  = dictionary["lam22"]
+    unpacked[4]  = dictionary["lam12"]
+    unpacked[5]  = dictionary["lam12p"]
+    unpacked[6]  = dictionary["yt3"]
+    unpacked[7]  = dictionary["g1"]
+    unpacked[8]  = dictionary["g2"]
+    unpacked[9]  = dictionary["g3"]
+    unpacked[10]  = dictionary["mu3sq"]
+    unpacked[11]  = dictionary["lam33"]
+    unpacked[12]  = dictionary["mu12sqRe"]
+    unpacked[13]  = dictionary["mu12sqIm"]
+    unpacked[14]  = dictionary["lam2Re"]
+    unpacked[15]  = dictionary["lam2Im"]
+    unpacked[16]  = dictionary["mu2sq"]
+    unpacked[17]  = dictionary["lam23"]
+    unpacked[18]  = dictionary["lam23p"]
+    unpacked[19]  = dictionary["mu1sq"]
+    unpacked[20]  = dictionary["lam3Re"]
+    unpacked[21]  = dictionary["lam3Im"]
+    unpacked[22]  = dictionary["lam31"]
+    unpacked[23]  = dictionary["lam31p"]
+    return unpacked
+
 
 def beta_functions(coupling, mu):
     #Unpacking the coupling array, to reduce lines could be done with g1, g2,...Mu3sq = coupling[:]
-    lam1Re = coupling[0] #initial[key,value]
+    lam1Re = coupling[0]
     lam1Im = coupling[1]
     lam11 = coupling[2]
     lam22 = coupling[3]
@@ -42,11 +67,12 @@ def beta_functions(coupling, mu):
     lam31 = coupling[22]
     lam31p = coupling[23]
        
-    #Each differential equation is copy and pasted from the DRalgo file BetaFunctions4D[]//FortranForm 
+    #Each differential equation is copy and pasted from the DRalgo file BetaFunctions4D[]//FortranForm
+    #Except for the gauge couplings which are given as dg**2 and are converted to dg by dividing the rhs by 2g
     dg1 = ((43*g1**4)/(48.*Pi**2))/(2*g1)
     dg2 = ((-17*g2**4)/(48.*Pi**2))/(2*g2)
     dg3 = ((-7*g3**4)/(8.*Pi**2))/(2*g3)
-    dlam11 = (3*g1**2*(g2**2 - lam12p) - 9*g2**2*lam12p + 32*(lam1Im**2 + lam1Re**2) + 4*lam12p*(lam11 + 2*lam12 + lam12p + lam22) + 2*lam23p*lam31p)/(16.*Pi**2)
+    dlam11 = (3*g1**4 + 9*g2**4 + 6*g1**2*(g2**2 - 4*lam11) - 72*g2**2*lam11 + 8*(24*lam11**2 + 2*lam12**2 + 2*lam12*lam12p + lam12p**2 + 4*lam1Im**2 + 4*lam1Re**2 + 2*lam31**2 + 2*lam31*lam31p + lam31p**2 + 4*(lam3Im**2 + lam3Re**2)))/(128.*Pi**2)
     dlam12p = (3*g1**2*(g2**2 - lam12p) - 9*g2**2*lam12p + 32*(lam1Im**2 + lam1Re**2) + 4*lam12p*(lam11 + 2*lam12 + lam12p + lam22) + 2*lam23p*lam31p)/(16.*Pi**2)
     dlam12 = (3*g1**4 + 9*g2**4 - 36*g2**2*lam12 - 6*g1**2*(g2**2 + 2*lam12) + 8*(6*lam11*lam12 + 2*lam12**2 + 2*lam11*lam12p + lam12p**2 + 4*lam1Im**2 + 4*lam1Re**2 + 6*lam12*lam22 + 2*lam12p*lam22 + 2*lam23*lam31 + lam23p*lam31 + lam23*lam31p))/(64.*Pi**2)
     dlam1Im = -0.0625*(3*g1**2*lam1Im + 9*g2**2*lam1Im - 4*lam1Im*(lam11 + 2*lam12 + 3*lam12p + lam22) + 4*lam2Re*lam3Im + 4*lam2Im*lam3Re)/Pi**2
@@ -68,25 +94,24 @@ def beta_functions(coupling, mu):
     dmu2sq = (8*lam12*mu1sq + 4*lam12p*mu1sq - 3*(g1**2 + 3*g2**2 - 8*lam22)*mu2sq + 4*(2*lam23 + lam23p)*mu3sq)/(32.*Pi**2)
     dmu3sq = (8*lam31*mu1sq + 4*lam31p*mu1sq + 4*(2*lam23 + lam23p)*mu2sq - 3*(g1**2 + 3*g2**2 - 4*yt3**2 - 8*lam33)*mu3sq)/(32.*Pi**2)
     
-    return  [dlam1Re, dlam1Im, dlam11, dlam22, dlam12, dlam12p, dyt3, dg1, dg2, dg3, dmu3sq, dlam33,
-     dmu12sqRe, dmu12sqIm, dlam2Re, dlam2Im, dmu2sq, dlam23, dlam23p, dmu1sq, dlam3Re, dlam3Im, dlam31, dlam31p]   
+    #Final result is divided so don't have to integrate with respect to log(mu)
+    return  np.array([dlam1Re, dlam1Im, dlam11, dlam22, dlam12, dlam12p, dyt3, dg1, dg2, dg3, dmu3sq, dlam33,
+     dmu12sqRe, dmu12sqIm, dlam2Re, dlam2Im, dmu2sq, dlam23, dlam23p, dmu1sq, dlam3Re, dlam3Im, dlam31, dlam31p])/mu
 
-
-#[dg1,dg2, g3, lambda11, lambda12p, lambda12, lambda1Im, lambda1Re, lambda22, dlambda23p, dlambda23, dlambda2Im, dlambda2Re, dlambda31p, dlambda31, dlambda33, dlambda3Im, dlambda3Re, dyt3, dmu12SqIm, dmu12SqRe, dmu1Sq, dmu2Sq, dmu3Sq]
-InitialConditions = [np.sqrt(0.15), np.sqrt(0.4), np.sqrt(1.9), 0.1, 0.1, 0.1, 0.0, 0.1, 0.1, 1, 1.1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.61, 0.71, 1.0, 0.91, 1.01, 0.92, 0.82, 0.75]
 
 muRange = np.linspace(90, 700, 300)
-mubarRange = np.log(muRange)
 
-solution = odeint(beta_functions, VenusBenchMark, mubarRange)
+initial_conditions = Unpack(renormalizedParams)
+
+solution = odeint(beta_functions, initial_conditions, muRange)
 solution = np.transpose(solution)
 #test1 = CubicSpline(mubarRange, Solution_trans[0], extrapolate=False)
 
-plt.plot(mubarRange, solution[6], label ='yt')
+plt.plot(muRange, solution[6], label ='yt')
 #plt.plot(mubarRange, test1(mubarRange), label ='U(1) spline')
-plt.plot(mubarRange, solution[7], label = 'U(1)')
-plt.plot(mubarRange, solution[8], label = 'SU(2)')
-plt.plot(mubarRange, solution[9], label = 'SU(3)')
+plt.plot(muRange, solution[7], label = 'U(1)')
+plt.plot(muRange, solution[8], label = 'SU(2)')
+plt.plot(muRange, solution[9], label = 'SU(3)')
 plt.legend(loc ='best')
 plt.title("Running of the gauge couplings and top yukawa")
 plt.xlabel('$log(\mu)$')
@@ -120,13 +145,35 @@ def InterpolateBetaFunction():
     dlam31p = CubicSpline(muRange, solution[23], extrapolate=False)
         
     return [dlam1Re, dlam1Im, dlam11, dlam22, dlam12, dlam12p, dyt3, dg1, dg2, dg3, dmu3sq, dlam33,
-                dmu12sqRe, dmu12sqIm, dlam2Re, dlam2Im, dmu2sq, dlam23, dlam23p, dmu1sq, dlam3Re, dlam3Im, dlam31, dlam31p]  
-array = np.zeros(24)
-interp = InterpolateBetaFunction()
+                dmu12sqRe, dmu12sqIm, dlam2Re, dlam2Im, dmu2sq, dlam23, dlam23p, dmu1sq, dlam3Re, dlam3Im, dlam31, dlam31p]
 
-# for i, (key, value) in enumerate (renormalizedParams.items()):
-#     array[i] = dlam1Re(200)
-#     #EvalulateCoupling[key] = BetaFunctionsInterp[i](muEvaulate)
-# print (array)
-#print (interp[0](150))
-print (   type( np.ndarray.item(interp[0](150))  )   )
+# dlam1Re = CubicSpline(muRange, solution[0], extrapolate=False)
+# print (dlam1Re(120))
+ 
+interpBeta = InterpolateBetaFunction()
+# print (dlam1Re)
+# print (interpBeta(120))
+muRange = np.linspace(110, 690, 100)
+plt.plot(muRange, interpBeta[6](muRange), label ='yt')
+#plt.plot(mubarRange, test1(mubarRange), label ='U(1) spline')
+plt.plot(muRange, interpBeta[7](muRange), label = 'U(1)')
+plt.plot(muRange, interpBeta[8](muRange), label = 'SU(2)')
+plt.plot(muRange, interpBeta[9](muRange), label = 'SU(3)')
+plt.legend(loc ='best')
+plt.title("Running of the gauge couplings and top yukawa")
+plt.xlabel('$log(\mu)$')
+plt.ylabel('coupling')
+plt.show()
+
+# for i, (key, value) in enumerate(renormalizedParams.items()):
+#     print (i, key, value)
+# print()
+# print()
+# for i, (key) in enumerate(renormalizedParams.keys()):
+#     print (i, key)
+interp_dict = renormalizedParams
+for i, key in enumerate(renormalizedParams.keys()):
+#     interp_dict[key] = CubicSpline(muRange, interpBeta[i], extrapolate=False)
+    interp_dict[key] = interpBeta[i](200)
+    
+print (interp_dict)

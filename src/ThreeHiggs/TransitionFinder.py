@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 from typing import Tuple
+import matplotlib.pylab as plt
 
 from GenericModel import GenericModel
 from BetaFunctions import BetaFunctions4D
@@ -40,11 +41,33 @@ class TransitionFinder:
 
         ## TODO Is this safe if endScale is smaller than startScale?
 
-        betas = BetaFunctions4D(renormalizedParams, muRange)
+        betas = BetaFunctions4D(muRange)
 
-        interpolatedParams = betas.RunCoupling(150)
-        print (interpolatedParams)
-
+        # print(betas.SolveBetaFunction(renormalizedParams))
+        betas.SolveBetaFunction(renormalizedParams)
+        points = 100
+        storeyt3 = np.zeros(points)
+        storeg1 = np.zeros(points)
+        storeg2 = np.zeros(points)
+        storeg3 = np.zeros(points)
+        
+        testmu = np.linspace(100, 700, points)
+        for i, value in enumerate(testmu):
+            storeyt3[i] =  betas.RunCoupling(value)["yt3"]
+            storeg1[i] =  betas.RunCoupling(value)["g1"]
+            storeg2[i] =  betas.RunCoupling(value)["g2"]
+            storeg3[i] =  betas.RunCoupling(value)["g3"]
+            
+        plt.plot(testmu, storeyt3, label ='yt')
+        #plt.plot(mubarRange, test1(mubarRange), label ='U(1) spline')
+        plt.plot(testmu, storeg1, label = 'U(1)')
+        plt.plot(testmu, storeg2, label = 'SU(2)')
+        plt.plot(testmu, storeg3, label = 'SU(3)')
+        plt.legend(loc ='best')
+        plt.title("Running of the gauge couplings and top yukawa from splines")
+        plt.xlabel('$\mu$')
+        plt.ylabel('coupling')
+        plt.show()
         ## TODO would probs be good to move this part inside DimensionalReduction class
         """ 
         Now for the temperature loop. I see two options:
@@ -58,43 +81,43 @@ class TransitionFinder:
 
         Going with option 2. 
         """
+        ##TODO recomment
+        # EulerGamma = 0.5772156649
 
-        EulerGamma = 0.5772156649
+        # ## This will contain minimization results in form: 
+        # ## [ [T, Veff(min), field1, field2, ...], ... ]
+        # minimizationResults = []
+        # for T in TRange:
 
-        ## This will contain minimization results in form: 
-        ## [ [T, Veff(min), field1, field2, ...], ... ]
-        minimizationResults = []
-        for T in TRange:
+        #     ## Final scale in 3D
+        #     goalRGScale =  T
 
-            ## Final scale in 3D
-            goalRGScale =  T
+        #     matchingScale = 7.055 * T
 
-            matchingScale = 7.055 * T
+        #     ## Fill in a new param dict that contains 4D params at the matching scale
+        #     paramsForMatching = {}
+        #     for key, interpolatedFunction in interpolatedParams.items():
+        #         paramsForMatching[key] = interpolatedFunction(matchingScale)
 
-            ## Fill in a new param dict that contains 4D params at the matching scale
-            paramsForMatching = {}
-            for key, interpolatedFunction in interpolatedParams.items():
-                paramsForMatching[key] = interpolatedFunction(matchingScale)
+        #     ## These need to be in the dict
+        #     paramsForMatching["RGScale"] = matchingScale
+        #     paramsForMatching["T"] = T
 
-            ## These need to be in the dict
-            paramsForMatching["RGScale"] = matchingScale
-            paramsForMatching["T"] = T
+        #     ## Put T-dependent logs in the dict too. Not a particularly nice solution...
+        #     Lb = 2. * np.log(matchingScale / T) - 2.*(np.log(4.*np.pi) - EulerGamma)
+        #     paramsForMatching["Lb"] = Lb
+        #     paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
 
-            ## Put T-dependent logs in the dict too. Not a particularly nice solution...
-            Lb = 2. * np.log(matchingScale / T) - 2.*(np.log(4.*np.pi) - EulerGamma)
-            paramsForMatching["Lb"] = Lb
-            paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
+        #     params3D = self.model.dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
 
-            params3D = self.model.dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
+        #     self.model.effectivePotential.setModelParameters(params3D)
 
-            self.model.effectivePotential.setModelParameters(params3D)
+        #     minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
 
-            minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
+        #     minimizationResults.append( [T, valueVeff, *minimum] )
+        #     #Test run
+        #     print (T)
 
-            minimizationResults.append( [T, valueVeff, *minimum] )
-            #Test run
-            print (T)
-
-        minimizationResults = np.asanyarray(minimizationResults)
-        print( minimizationResults )
-        np.savetxt("results_test.txt", minimizationResults)
+        # minimizationResults = np.asanyarray(minimizationResults)
+        # print( minimizationResults )
+        # np.savetxt("results_test.txt", minimizationResults)
