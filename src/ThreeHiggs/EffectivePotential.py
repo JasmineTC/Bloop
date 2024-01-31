@@ -134,12 +134,14 @@ class VeffParams:
 
     def evaluateScalarMasses(self, knownParams: dict[str, float]) -> dict[str, float]:
         scalarMassesSquaredDict =  self.scalarMassesSquared.evaluateSystemWithDict(knownParams, bReturnDict=True)
+        ## Take abs. TODO handle better
         for key in scalarMassesSquaredDict:
             scalarMassesSquaredDict[key] = abs(scalarMassesSquaredDict[key])
         return scalarMassesSquaredDict
 
     def evaluateVectorMasses(self, knownParams: dict[str, float]) -> dict[str, float]:
         vectorMassesSquaredDict = self.vectorMassesSquared.evaluateSystemWithDict(knownParams, bReturnDict=True)
+        ## Take abs. TODO handle better
         for key in vectorMassesSquaredDict:
             vectorMassesSquaredDict[key] = abs(vectorMassesSquaredDict[key])
         return vectorMassesSquaredDict
