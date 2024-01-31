@@ -4,7 +4,7 @@ from math import pi as Pi
 import scipy.integrate
 from scipy.interpolate import CubicSpline
 
-"""Solve beta function
+"""...
 """
 class BetaFunctions4D():
     
@@ -16,17 +16,20 @@ class BetaFunctions4D():
         Also produces a name <-> index mapping for easier access to the params in beta function expressions."""
 
         indexMapping = {}
-        paramsList = np.zeros(24, dtype= float)
+        keyMapping = []
+        paramsList = []
             
         for idx, (key, val) in enumerate(params.items()):
             ## Do NOT include the RG scale in this
             if (key == "RGScale"): 
                 continue
 
-            paramsList[idx] = val
+            paramsList.append(val)
             indexMapping[key] = idx
+            keyMapping.append(key)
 
         self._indexMapping = indexMapping
+        self._keyMapping = keyMapping
         return paramsList    
         
     def HardCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float) -> np.ndarray:
@@ -87,34 +90,34 @@ class BetaFunctions4D():
         dmu3sq = (8*lam31*mu1sq + 4*lam31p*mu1sq + 4*(2*lam23 + lam23p)*mu2sq - 3*(g1**2 + 3*g2**2 - 4*yt3**2 - 8*lam33)*mu3sq)/(32.*Pi**2)
         
         
-        betaArray = np.zeros(24)
+        betaArray = np.zeros(len(InitialConditions))
         ##Return an array of the beta function, divided by mu as the beta function is mu dg/dmu and this seemed easier than working with log(mu)
-        betaArray[ self._indexMapping["g1"] ] = dg1/mu
-        betaArray[ self._indexMapping["g2"] ] = dg2/mu
-        betaArray[ self._indexMapping["g3"] ] = dg3/mu
-        betaArray[ self._indexMapping["lam11"] ] = dlam11/mu
-        betaArray[ self._indexMapping["lam12p"] ] = dlam12p/mu
-        betaArray[ self._indexMapping["lam12"] ] = dlam12/mu
-        betaArray[ self._indexMapping["lam1Im"] ] = dlam1Im/mu
-        betaArray[ self._indexMapping["lam1Re"] ] = dlam1Re/mu
-        betaArray[ self._indexMapping["lam22"] ] = dlam22/mu
-        betaArray[ self._indexMapping["lam23p"] ] = dlam23p/mu
-        betaArray[ self._indexMapping["lam23"] ] = dlam23/mu
-        betaArray[ self._indexMapping["lam2Im"] ] = dlam2Im/mu
-        betaArray[ self._indexMapping["lam2Re"] ] = dlam2Re/mu
-        betaArray[ self._indexMapping["lam31p"] ] = dlam31p/mu
-        betaArray[ self._indexMapping["lam31"] ] = dlam31/mu
-        betaArray[ self._indexMapping["lam33"] ] = dlam33/mu
-        betaArray[ self._indexMapping["lam3Im"] ] = dlam3Im/mu
-        betaArray[ self._indexMapping["lam3Re"] ] = dlam3Re/mu
-        betaArray[ self._indexMapping["yt3"] ] = dyt3/mu
-        betaArray[ self._indexMapping["mu12sqIm"] ] = dmu12sqIm/mu
-        betaArray[ self._indexMapping["mu12sqRe"] ] = dmu12sqRe/mu
-        betaArray[ self._indexMapping["mu1sq"] ] = dmu1sq/mu
-        betaArray[ self._indexMapping["mu2sq"] ] = dmu2sq/mu
-        betaArray[ self._indexMapping["mu3sq"] ] = dmu3sq/mu
+        betaArray[ self._indexMapping["g1"] ] = dg1
+        betaArray[ self._indexMapping["g2"] ] = dg2
+        betaArray[ self._indexMapping["g3"] ] = dg3
+        betaArray[ self._indexMapping["lam11"] ] = dlam11
+        betaArray[ self._indexMapping["lam12p"] ] = dlam12p
+        betaArray[ self._indexMapping["lam12"] ] = dlam12
+        betaArray[ self._indexMapping["lam1Im"] ] = dlam1Im
+        betaArray[ self._indexMapping["lam1Re"] ] = dlam1Re
+        betaArray[ self._indexMapping["lam22"] ] = dlam22
+        betaArray[ self._indexMapping["lam23p"] ] = dlam23p
+        betaArray[ self._indexMapping["lam23"] ] = dlam23
+        betaArray[ self._indexMapping["lam2Im"] ] = dlam2Im
+        betaArray[ self._indexMapping["lam2Re"] ] = dlam2Re
+        betaArray[ self._indexMapping["lam31p"] ] = dlam31p
+        betaArray[ self._indexMapping["lam31"] ] = dlam31
+        betaArray[ self._indexMapping["lam33"] ] = dlam33
+        betaArray[ self._indexMapping["lam3Im"] ] = dlam3Im
+        betaArray[ self._indexMapping["lam3Re"] ] = dlam3Re
+        betaArray[ self._indexMapping["yt3"] ] = dyt3
+        betaArray[ self._indexMapping["mu12sqIm"] ] = dmu12sqIm
+        betaArray[ self._indexMapping["mu12sqRe"] ] = dmu12sqRe
+        betaArray[ self._indexMapping["mu1sq"] ] = dmu1sq
+        betaArray[ self._indexMapping["mu2sq"] ] = dmu2sq
+        betaArray[ self._indexMapping["mu3sq"] ] = dmu3sq
         
-        return betaArray
+        return betaArray/mu
 
     def SolveBetaFunction(self, initialParams: dict[str, float]) -> dict[str, float]:
 
@@ -126,25 +129,18 @@ class BetaFunctions4D():
         ##as oppossed to each mu step being its own array
         solution = np.transpose(solution)
         
-        ##Steal the dictionary stucture from initialParams, this annoyingly comes with RGScale
-        interpDict = initialParams
-        ##We've taken care to make sure the solution stays in the same order as the initialParams, so can for loop instead of hard coding again
-        for i, key in enumerate(interpDict.keys()):
-            if (key == "RGScale"): 
-                continue
-            interpDict[key] = CubicSpline(self.muRange, solution[i], extrapolate = False)
+        ##Construct a dict for the splines of the beta functions
+        interpDict = {}
+        for i, key in enumerate(self._keyMapping):
+            interpDict[key] =  CubicSpline(self.muRange, solution[i], extrapolate = False)
         
-        ##Stores a dict with param name and an interplolation of its beta function
         self.interpDict = interpDict
     
     def RunCoupling(self, muEvaulate: float):
-        ##Steal dict structure from interpDict, dicts are muttable objects so take the dict of the dict to get an independent dict
-        ##(python will overwrite interpDIct otheriwise)
-        runCoupling = dict(self.interpDict)
+        
+        runCoupling = {}
         ##Loop over the dict, for each key compute the spline at muEvaulate, ignore the RGScale in the dict
-        for i, key in enumerate(runCoupling.keys()):
-            if (key == "RGScale"): 
-                continue
+        for key in self._keyMapping:
             ##RHS is an array of a single number, so add item() to extract that single number
-            runCoupling[key] = runCoupling[key](muEvaulate).item()
+            runCoupling[key] = self.interpDict[key](muEvaulate).item()
         return runCoupling

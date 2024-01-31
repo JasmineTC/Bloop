@@ -44,6 +44,8 @@ class TransitionFinder:
         betas = BetaFunctions4D(muRange)
 
         betas.SolveBetaFunction(renormalizedParams)
+        print (betas.RunCoupling(200))
+        print (betas.RunCoupling(210))
         
         ## TODO would probs be good to move this part inside DimensionalReduction class
         """ 
@@ -58,39 +60,39 @@ class TransitionFinder:
 
         Going with option 2. 
         """
-        EulerGamma = 0.5772156649
+        # EulerGamma = 0.5772156649
 
-        ## This will contain minimization results in form: 
-        ## [ [T, Veff(min), field1, field2, ...], ... ]
-        minimizationResults = []
-        for T in TRange:
+        # ## This will contain minimization results in form: 
+        # ## [ [T, Veff(min), field1, field2, ...], ... ]
+        # minimizationResults = []
+        # for T in TRange:
 
-            ## Final scale in 3D
-            goalRGScale =  T
+        #     ## Final scale in 3D
+        #     goalRGScale =  T
 
-            matchingScale = 7.055 * T
+        #     matchingScale = 7.055 * T
             
-            paramsForMatching = betas.RunCoupling(matchingScale)
-            ## These need to be in the dict
-            paramsForMatching["RGScale"] = matchingScale
-            paramsForMatching["T"] = T
+        #     paramsForMatching = betas.RunCoupling(matchingScale)
+        #     ## These need to be in the dict
+        #     paramsForMatching["RGScale"] = matchingScale
+        #     paramsForMatching["T"] = T
 
-            ## Put T-dependent logs in the dict too. Not a particularly nice solution...
-            Lb = 2. * np.log(matchingScale / T) - 2.*(np.log(4.*np.pi) - EulerGamma)
-            paramsForMatching["Lb"] = Lb
-            paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
+        #     ## Put T-dependent logs in the dict too. Not a particularly nice solution...
+        #     Lb = 2. * np.log(matchingScale / T) - 2.*(np.log(4.*np.pi) - EulerGamma)
+        #     paramsForMatching["Lb"] = Lb
+        #     paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
 
-            ##This has every coupling needed to compute the EP, computed at the matching scale (I think)
-            params3D = self.model.dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
+        #     ##This has every coupling needed to compute the EP, computed at the matching scale (I think)
+        #     params3D = self.model.dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
 
-            self.model.effectivePotential.setModelParameters(params3D)
+        #     self.model.effectivePotential.setModelParameters(params3D)
 
-            minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
+        #     minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
 
-            minimizationResults.append( [T, valueVeff, *minimum] )
-            #Lets you know when one run in the for loop is complete
-            print (T)
+        #     minimizationResults.append( [T, valueVeff, *minimum] )
+        #     #Lets you know when one run in the for loop is complete
+        #     print (T)
 
-        minimizationResults = np.asanyarray(minimizationResults)
-        print( minimizationResults )
-        np.savetxt("results_test.txt", minimizationResults)
+        # minimizationResults = np.asanyarray(minimizationResults)
+        # print( minimizationResults )
+        # np.savetxt("results_test.txt", minimizationResults)
