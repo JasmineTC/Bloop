@@ -39,13 +39,12 @@ class TransitionFinder:
         endScale = 7.3 * TRange[-1] ## largest T in our range is T[-1] 
         muRange = np.linspace( startScale, endScale, TRange.size*10 )
 
-        ## TODO Is this safe if endScale is smaller than startScale?
+        ## TODO Are the beta function routines safe if endScale is smaller than startScale?
 
         betas = BetaFunctions4D(muRange)
 
         betas.SolveBetaFunction(renormalizedParams)
         
-        ## TODO would probs be good to move this part inside DimensionalReduction class
         """ 
         Now for the temperature loop. I see two options:
             1. Give the TRange array directly to EFT routines and the Veff => DR results dict of arrays of len(TRange).
@@ -58,7 +57,8 @@ class TransitionFinder:
 
         Going with option 2. 
         """
-        # EulerGamma = 0.5772156649
+
+        EulerGamma = 0.5772156649
 
         ## This will contain minimization results in form: 
         ## [ [T, Veff(min), field1, field2, ...], ... ]
@@ -68,7 +68,7 @@ class TransitionFinder:
             ## Final scale in 3D
             goalRGScale =  T
 
-            matchingScale = 7.055 * T
+            matchingScale = 4.0*np.pi*np.exp(-EulerGamma) * T
             
             paramsForMatching = betas.RunCoupling(matchingScale)
             ## These need to be in the dict
@@ -88,8 +88,10 @@ class TransitionFinder:
             minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
 
             minimizationResults.append( [T, valueVeff, *minimum] )
-            #Lets you know when one run in the for loop is complete
-            print (T)
+
+            # temp
+            print (f"{[T, minimum, valueVeff]=}")
+
 
         minimizationResults = np.asanyarray(minimizationResults)
         print( minimizationResults )
