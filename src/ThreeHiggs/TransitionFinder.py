@@ -57,7 +57,7 @@ class TransitionFinder:
 
         Going with option 2. 
         """
-
+        
         EulerGamma = 0.5772156649
 
         ## This will contain minimization results in form: 
