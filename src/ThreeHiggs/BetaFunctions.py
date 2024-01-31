@@ -1,6 +1,6 @@
 import numpy as np
-import numpy.typing as npt
 from math import pi as Pi
+
 import scipy.integrate
 from scipy.interpolate import CubicSpline
 
@@ -11,11 +11,28 @@ class BetaFunctions4D():
     def __init__(self, muRange):
         self.muRange = muRange
         
+    def UnpackParamDict(self, params: dict[str, float]) -> np.ndarray:
+        """Puts a 3HDM parameter dict in array format that odeint understands.
+        Also produces a name <-> index mapping for easier access to the params in beta function expressions."""
+
+        indexMapping = {}
+        paramsList = np.zeros(24, dtype= float)
+            
+        for idx, (key, val) in enumerate(params.items()):
+            ## Do NOT include the RG scale in this
+            if (key == "RGScale"): 
+                continue
+
+            paramsList[idx] = val
+            indexMapping[key] = idx
+
+        self._indexMapping = indexMapping
+        return paramsList    
+        
     def HardCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float) -> np.ndarray:
         ## Let's run SU3 coupling too because why not
 
         ## Pick params from the input array since they are appear as hardcoded symbols below
-
         g1 = InitialConditions[ self._indexMapping["g1"] ]
         g2 = InitialConditions[ self._indexMapping["g2"] ]
         g3 = InitialConditions[ self._indexMapping["g3"] ]
@@ -41,7 +58,7 @@ class BetaFunctions4D():
         mu2sq = InitialConditions[ self._indexMapping["mu2sq"] ]
         mu3sq = InitialConditions[ self._indexMapping["mu3sq"] ]
         
-        ##Each differential equation is copy and pasted from the DRalgo file BetaFunctions4D[]//FortranForm,
+        ##Each differential equation is copy and pasted from the DRalgo file - BetaFunctions4D[]//FortranForm,
         ## Except for the gauge couplings which need to be divided by 2 g as DRalgo gives the beta function as dg^2/dmu and odeint assumes dg/dmu
         ##TODO Is it better to work with g^2?
         dg1 = ((43*g1**4)/(48.*Pi**2))/(2*g1)
@@ -68,10 +85,10 @@ class BetaFunctions4D():
         dmu1sq = (-3*(g1**2 + 3*g2**2 - 8*lam11)*mu1sq + 8*lam12*mu2sq + 4*lam12p*mu2sq + 4*(2*lam31 + lam31p)*mu3sq)/(32.*Pi**2)
         dmu2sq = (8*lam12*mu1sq + 4*lam12p*mu1sq - 3*(g1**2 + 3*g2**2 - 8*lam22)*mu2sq + 4*(2*lam23 + lam23p)*mu3sq)/(32.*Pi**2)
         dmu3sq = (8*lam31*mu1sq + 4*lam31p*mu1sq + 4*(2*lam23 + lam23p)*mu2sq - 3*(g1**2 + 3*g2**2 - 4*yt3**2 - 8*lam33)*mu3sq)/(32.*Pi**2)
-        ## Probably should use the index mapping here too to avoid errors
+        
         
         betaArray = np.zeros(24)
-        
+        ##Return an array of the beta function, divided by mu as the beta function is mu dg/dmu and this seemed easier than working with log(mu)
         betaArray[ self._indexMapping["g1"] ] = dg1/mu
         betaArray[ self._indexMapping["g2"] ] = dg2/mu
         betaArray[ self._indexMapping["g3"] ] = dg3/mu
@@ -97,7 +114,6 @@ class BetaFunctions4D():
         betaArray[ self._indexMapping["mu2sq"] ] = dmu2sq/mu
         betaArray[ self._indexMapping["mu3sq"] ] = dmu3sq/mu
         
-
         return betaArray
 
     def SolveBetaFunction(self, initialParams: dict[str, float]) -> dict[str, float]:
@@ -106,7 +122,8 @@ class BetaFunctions4D():
         paramsList = self.UnpackParamDict(initialParams)
         
         solution = scipy.integrate.odeint(self.HardCodeBetaFunction, paramsList, self.muRange)
-        ##To make solution slightly nicer to work with we take the transpose so that each coupling is inside its own array
+        ##To make solution slightly nicer to work with we take the transpose so that each coupling is inside its own array,
+        ##as oppossed to each mu step being its own array
         solution = np.transpose(solution)
         
         ##Steal the dictionary stucture from initialParams, this annoyingly comes with RGScale
@@ -119,38 +136,15 @@ class BetaFunctions4D():
         
         ##Stores a dict with param name and an interplolation of its beta function
         self.interpDict = interpDict
-        #return interpDict
     
-
-    def UnpackParamDict(self, params: dict[str, float]) -> np.ndarray:
-        """Puts a 3HDM parameter dict in array format that odeint understands.
-        Also produces a name <-> index mapping for easier access to the params in beta function expressions."""
-
-        indexMapping = {}
-        paramsList = np.zeros(24, dtype= float)
-            
-        for idx, (key, val) in enumerate(params.items()):
-            ## Do NOT include the RG scale in this
-            if (key == "RGScale"): 
-                continue
-
-            paramsList[idx] = val
-            indexMapping[key] = idx
-
-        self._indexMapping = indexMapping
-        return paramsList
-    
-
-
-
     def RunCoupling(self, muEvaulate: float):
-        ##Steal dict structure from interpDict, because python is dogshit, you have to dict the dict,
-        ##otherwise it overwrites the orginal dict which fucks the code, why???
+        ##Steal dict structure from interpDict, dicts are muttable objects so take the dict of the dict to get an independent dict
+        ##(python will overwrite interpDIct otheriwise)
         runCoupling = dict(self.interpDict)
         ##Loop over the dict, for each key compute the spline at muEvaulate, ignore the RGScale in the dict
         for i, key in enumerate(runCoupling.keys()):
             if (key == "RGScale"): 
                 continue
-            ##This returns an array of a single number, so add item() to extract that single number
+            ##RHS is an array of a single number, so add item() to extract that single number
             runCoupling[key] = runCoupling[key](muEvaulate).item()
         return runCoupling
