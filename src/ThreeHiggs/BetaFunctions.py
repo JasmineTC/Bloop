@@ -1,5 +1,5 @@
 import numpy as np
-from math import pi as Pi
+from numpy import pi as Pi
 
 import scipy.integrate
 from scipy.interpolate import CubicSpline
@@ -64,9 +64,9 @@ class BetaFunctions4D():
         ##Each differential equation is copy and pasted from the DRalgo file - BetaFunctions4D[]//FortranForm,
         ## Except for the gauge couplings which need to be divided by 2 g as DRalgo gives the beta function as dg^2/dmu and odeint assumes dg/dmu
         ##TODO Is it better to work with g^2?
-        dg1 = ((43*g1**4)/(48.*Pi**2))/(2*g1)
-        dg2 = ((-17*g2**4)/(48.*Pi**2))/(2*g2)
-        dg3 = ((-7*g3**4)/(8.*Pi**2))/(2*g3)
+        dg1 = 0.5*((43*g1**3)/(48.*Pi**2))
+        dg2 = 0.5*((-17*g2**3)/(48.*Pi**2))
+        dg3 = 0.5*((-7*g3**3)/(8.*Pi**2))
         dlam11 = (3*g1**4 + 9*g2**4 + 6*g1**2*(g2**2 - 4*lam11) - 72*g2**2*lam11 + 8*(24*lam11**2 + 2*lam12**2 + 2*lam12*lam12p + lam12p**2 + 4*lam1Im**2 + 4*lam1Re**2 + 2*lam31**2 + 2*lam31*lam31p + lam31p**2 + 4*(lam3Im**2 + lam3Re**2)))/(128.*Pi**2)
         dlam12p = (3*g1**2*(g2**2 - lam12p) - 9*g2**2*lam12p + 32*(lam1Im**2 + lam1Re**2) + 4*lam12p*(lam11 + 2*lam12 + lam12p + lam22) + 2*lam23p*lam31p)/(16.*Pi**2)
         dlam12 = (3*g1**4 + 9*g2**4 - 36*g2**2*lam12 - 6*g1**2*(g2**2 + 2*lam12) + 8*(6*lam11*lam12 + 2*lam12**2 + 2*lam11*lam12p + lam12p**2 + 4*lam1Im**2 + 4*lam1Re**2 + 6*lam12*lam22 + 2*lam12p*lam22 + 2*lam23*lam31 + lam23p*lam31 + lam23*lam31p))/(64.*Pi**2)
