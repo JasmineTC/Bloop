@@ -62,6 +62,11 @@ class GenericModel():
     """ 
     def calculateRenormalizedParameters(self, inputParams: dict[str, float], RGScale: float, bDarkDemocracyLimit=True) -> dict[str, float]:
 
+        ## See sect 2.2.4 in 1909.09234 and eq (38) for mass splittings
+
+        ## Avoid 1/0 in expression for alpha (at least)
+        SMALL_NUMBER = 1e-100
+
         v = self.v
 
         mS1 = inputParams["mS1"]
@@ -122,7 +127,7 @@ class GenericModel():
         ## eq (13)
         LambdaMinus = np.sqrt( mu12sq**2 + v**4*lam2Abs**2 - 2.*v**2*mu12sq*lam2Abs*cosTheta)
         ## eq (12)
-        alpha = (-mu12sq + v**2*lam2Abs*cosTheta - LambdaMinus) / (v**2*lam2Abs*sinTheta)
+        alpha = (-mu12sq + v**2*lam2Abs*cosTheta - LambdaMinus) / ( (v**2*lam2Abs*sinTheta) + SMALL_NUMBER)
 
         mu2sq = v**2/2. * ghDM - v**2 / (alpha**2 + 1.) * (2.*alpha* sinTheta + (alpha**2 - 1.)*cosTheta) * lam2Abs - 0.5*(mS2**2 + mS1**2)
 
