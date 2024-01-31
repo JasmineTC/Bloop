@@ -1,7 +1,6 @@
 import numpy as np
 import numpy.typing as npt
 from typing import Tuple
-import matplotlib.pylab as plt
 
 from GenericModel import GenericModel
 from BetaFunctions import BetaFunctions4D

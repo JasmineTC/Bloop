@@ -4,9 +4,19 @@ from math import pi as Pi
 import scipy.integrate
 from scipy.interpolate import CubicSpline
 
-"""...
-"""
+
 class BetaFunctions4D():
+    """ Currently called by TransitionFinder to compute the couplings at the matching scale: 
+    """
+
+    """ Order of computations:
+        1. Call SolveBetaFunction given a dictionary containing the coupling name and initial condition (the value of the coupling at 0T at the z mass)
+        2. Call UnpackParamDict to generate an array of initial conditions (needed for odeint), also stores a mapping for coupling <-> index
+           so that dictionaries/arrays can be generated with a consistent order
+        3. SolveBetaFunction takes the initial condition list from UnpackParamDict gives it to odeint to solve the beta function up to some scale
+        4. Interpolations of the odeint data are made and stored
+        5. Call RunCoupling to evaluate the interpolations and return a dict
+    """
     
     def __init__(self, muRange):
         self.muRange = muRange
