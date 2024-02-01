@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 from typing import Tuple
+import matplotlib.pylab as plt
 
 from GenericModel import GenericModel
 from BetaFunctions import BetaFunctions4D
@@ -62,8 +63,10 @@ class TransitionFinder:
         ## This will contain minimization results in form: 
         ## [ [T, Veff(min), field1, field2, ...], ... ]
         minimizationResults = []
+ 
+        
         for T in TRange:
-
+            print ('Start of T =%s' %T)
             ## Final scale in 3D
             goalRGScale =  T
 
@@ -81,16 +84,14 @@ class TransitionFinder:
 
             ##This has every coupling needed to compute the EP, computed at the matching scale (I think)
             params3D = self.model.dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
-
+            
             self.model.effectivePotential.setModelParameters(params3D)
 
             minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
 
             minimizationResults.append( [T, valueVeff, *minimum] )
 
-            # temp
-            print (f"{[T, minimum, valueVeff]=}")
-
+            
 
         minimizationResults = np.asanyarray(minimizationResults)
         print( minimizationResults )

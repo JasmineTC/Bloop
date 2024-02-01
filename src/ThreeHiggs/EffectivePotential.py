@@ -3,6 +3,7 @@ import numpy.typing as npt
 from typing import Tuple
 import scipy.optimize
 from dataclasses import dataclass
+import matplotlib.pylab as plt
 
 from scipy.optimize import least_squares
 
@@ -35,9 +36,11 @@ class MixingAngleEquations(SystemOfEquations):
         def evaluateWrapper(x: npt.ArrayLike, *args):
             return self.evaluateSystem( x.tolist() + list(args) )
         
-        #fsolve method produces sin_i >1, cannot tell fsolve that sin_i is bounded, use least squares instead
-        #res = scipy.optimize.fsolve(evaluateWrapper, initialGuess, args=(otherArgs))
-        res = (least_squares(evaluateWrapper, initialGuess, bounds=(-1,1), args=(otherArgs))).x
+        ##Least squares will minimise a function given an initial guess and some bounds (needed so abs(S_i) <= 1)
+        ##ftol controls the difference in function evalution, xtol how small the change in arguement can be, gtol how much the gradient changes
+        ##the default tol of 1e-8 was not sufficient for outputs to agree on different machines
+        ##Changed the jacobian calculation to use 3 point method, twice as many computations but should be more accurate
+        res = (least_squares(evaluateWrapper, initialGuess, bounds=(-1,1), args=(otherArgs), ftol = 1e-9, xtol=1e-9, gtol=1e-9, jac='3-point')).x
 
         ## The solver can throw warnings if it tries to evaluate the eqs outside sine's value range. So TODO change this to some algorithm that can limit the search range 
 
@@ -305,6 +308,8 @@ class EffectivePotential:
     
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
         paramDict = self.params.evaluateAll(fields, bNeedsDiagonalization=self.bNeedsDiagonalization)
+        
+        #print(f"{paramDict=}") 
 
         ## summing works because the result is a list [V0, V1, ...]
         res = sum( self.expressions.evaluateSystemWithDict(paramDict) )
@@ -323,8 +328,12 @@ class EffectivePotential:
 
         ## Minimize real part only:
         VeffWrapper = lambda fields: np.real ( self.evaluate(fields) )
-
-        res = scipy.optimize.minimize(VeffWrapper, initialGuess)
+        
+        ##Added bounds to minimize to reduce the IR senstivity coming from low mass modes
+        ##Added tol
+        bnds = ((0, 1e3), (0, 1e3), (1e-4, 1e3))
+        res = scipy.optimize.minimize(VeffWrapper, initialGuess, tol = 1e-4, bounds=bnds)
+        
 
         ## res.x = location, res.fun = value, res.success = flag for determining if the algorithm finished successfully
         location = res.x # this is np.array valued

@@ -19,8 +19,8 @@ model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile)
 model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
 
-#inputParams = Benchmarks.Benchmarks_3HDM.BM1
-inputParams = Benchmarks.Benchmarks_3HDM.BM_SM_like
+inputParams = Benchmarks.Benchmarks_3HDM.BM1
+#inputParams = Benchmarks.Benchmarks_3HDM.BM_SM_like
 
 transitionFinder = TransitionFinder(model=model3HDM)
 
