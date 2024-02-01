@@ -358,6 +358,7 @@ class EffectivePotential:
             location, value = self.findLocalMinimum(candidate)
             if (np.real(value) < deepest):
                 res = location, value
+                deepest = np.real(value)
 
         return res
 
