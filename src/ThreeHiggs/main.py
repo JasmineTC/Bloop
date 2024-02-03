@@ -1,4 +1,5 @@
 import pathlib
+import sys
 import numpy as np
 from GenericModel import GenericModel
 from TransitionFinder import TransitionFinder
@@ -20,29 +21,36 @@ model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 #inputParams = Benchmarks.Benchmarks_3HDM.BM1
 #inputParams = Benchmarks.Benchmarks_3HDM.BM_SM_like
 
+# minimizationResults = transitionFinder.traceFreeEnergyMinimum()
+# np.savetxt("results.txt", minimizationResults)
+
 transitionFinder = TransitionFinder(model=model3HDM)
 
-print("!!!")
-print("Currently not matching soft --> ultrasoft, this is WIP. Also: 2-loop masses lack some log terms")
-print("!!!")
+print("!!! \n Currently not matching soft --> ultrasoft, this is WIP. Also: 2-loop masses lack some log terms  \n !!!")
 
 print("Start finite-T stuff")
 
+# pull in the whole list from edited data file
+BM_list = Benchmarks.Benchmarks_3HDM.BM_list
 
-BM_list = [Benchmarks.Benchmarks_3HDM.BM1, Benchmarks.Benchmarks_3HDM.BM2, Benchmarks.Benchmarks_3HDM.BM3,
-           Benchmarks.Benchmarks_3HDM.BM4, Benchmarks.Benchmarks_3HDM.BM5, Benchmarks.Benchmarks_3HDM.BM6,
-           Benchmarks.Benchmarks_3HDM.BM7, Benchmarks.Benchmarks_3HDM.BM8, Benchmarks.Benchmarks_3HDM.BM9]
-for i, inputParams in enumerate(BM_list):
+# we will either supply the string "all" as cmd arg or some integers
+if sys.argv[1] == "all":
+    BM_list_desired = BM_list
+    bmIndex_list = list(range(0, len(BM_list)))
+else:
+    # casting arguments to actually be integers                
+    bmIndex_list = [int(bmIndex) for bmIndex in sys.argv[1:]]
+    # filter the list into a desired list by checking indexes against integer arguments
+    BM_list_desired = [bm for ind, bm in enumerate(BM_list) if ind in bmIndex_list]
 
+# just changed this to now operate on BM_list_desired
+for i, inputParams in enumerate(BM_list_desired):
+    print ("Now running bench mark %s" %bmIndex_list[i])
     ## Scanning loops would start here
     model3HDM.setInputParams(inputParams)
 
     minimizationResults = transitionFinder.traceFreeEnergyMinimum()
-    
-    fileName =  str(pathToCurrentFile) + "/Data/Results/BM" + str(i+1) + ".txt"
+   
+    fileName =  str(pathToCurrentFile) + "/Data/Results2/BM" + str(bmIndex_list[i]) + ".txt"
     
     np.savetxt(fileName, minimizationResults)
-    
-# minimizationResults = transitionFinder.traceFreeEnergyMinimum()
-
-# np.savetxt("results.txt", minimizationResults)

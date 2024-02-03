@@ -5,7 +5,8 @@ import numpy as np
 __MZ = 91.1876
 
 ##These are benchmarks taken from the draft in table 1
-BM1 = {
+BM_list = [
+{
     ## Renormalization scale is also an input since we're inputting some action parameters directly
     "RGScale" : __MZ,
 
@@ -26,9 +27,8 @@ BM1 = {
     "lam22" : 0.1,
     "lam12" : 0.1,
     "lam12p" : 0.1
-}
-
-BM2 = {
+},
+{
     ## Renormalization scale is also an input since we're inputting some action parameters directly
     "RGScale" : __MZ,
 
@@ -49,9 +49,8 @@ BM2 = {
     "lam22" : 0.1,
     "lam12" : 0.1,
     "lam12p" : 0.1
-}
-
-BM3 = {
+},
+{
     ## Renormalization scale is also an input since we're inputting some action parameters directly
     "RGScale" : __MZ,
 
@@ -72,9 +71,8 @@ BM3 = {
     "lam22" : 0.1,
     "lam12" : 0.1,
     "lam12p" : 0.1
-}
-
-BM4 = {
+},
+{
     ## Renormalization scale is also an input since we're inputting some action parameters directly
     "RGScale" : __MZ,
 
@@ -95,9 +93,8 @@ BM4 = {
     "lam22" : 0.1,
     "lam12" : 0.1,
     "lam12p" : 0.1
-}
-
-BM5 = {
+},
+{
     ## Renormalization scale is also an input since we're inputting some action parameters directly
     "RGScale" : __MZ,
 
@@ -118,9 +115,8 @@ BM5 = {
     "lam22" : 0.1,
     "lam12" : 0.1,
     "lam12p" : 0.1
-}
-
-BM6 = {
+},
+{
     ## Renormalization scale is also an input since we're inputting some action parameters directly
     "RGScale" : __MZ,
 
@@ -141,9 +137,8 @@ BM6 = {
     "lam22" : 0.1,
     "lam12" : 0.1,
     "lam12p" : 0.1
-}
-
-BM7 = {
+},
+{
     ## Renormalization scale is also an input since we're inputting some action parameters directly
     "RGScale" : __MZ,
 
@@ -164,9 +159,8 @@ BM7 = {
     "lam22" : 0.1,
     "lam12" : 0.1,
     "lam12p" : 0.1
-}
-
-BM8 = {
+},
+{
     ## Renormalization scale is also an input since we're inputting some action parameters directly
     "RGScale" : __MZ,
 
@@ -187,9 +181,8 @@ BM8 = {
     "lam22" : 0.1,
     "lam12" : 0.1,
     "lam12p" : 0.1
-}
-
-BM9 = {
+},
+{
     ## Renormalization scale is also an input since we're inputting some action parameters directly
     "RGScale" : __MZ,
 
@@ -211,6 +204,7 @@ BM9 = {
     "lam12" : 0.1,
     "lam12p" : 0.1
 }
+]
 
 
 ## Tries to be close to the SM limit, full decoupling of extra Higgses is not possible though because of the gauge sector.
