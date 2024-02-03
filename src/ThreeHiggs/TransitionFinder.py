@@ -25,7 +25,7 @@ class TransitionFinder:
 
     ## This is a way too big routine 
     ##TODO Change step size in T back to 1 when done testing
-    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 2.5)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
+    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 1)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
 
         TRange = np.asanyarray(TRange)
 
@@ -95,4 +95,4 @@ class TransitionFinder:
 
         minimizationResults = np.asanyarray(minimizationResults)
         print( minimizationResults )
-        np.savetxt("results_test.txt", minimizationResults)
+        return (minimizationResults)

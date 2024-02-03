@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import matplotlib.pylab as plt
 
 from scipy.optimize import least_squares
+from scipy.interpolate import CubicSpline
 
 import pathlib ## for hacking
 
@@ -40,8 +41,8 @@ class MixingAngleEquations(SystemOfEquations):
         ##ftol controls the difference in function evalution, xtol how small the change in arguement can be, gtol how much the gradient changes
         ##the default tol of 1e-8 was not sufficient for outputs to agree on different machines
         ##Changed the jacobian calculation to use 3 point method, twice as many computations but should be more accurate
-        res = (least_squares(evaluateWrapper, initialGuess, bounds=(-1,1), args=(otherArgs), ftol = 1e-9, xtol=1e-9, gtol=1e-9, jac='3-point')).x
-
+        #res = (least_squares(evaluateWrapper, initialGuess, bounds=(-1,1), args=(otherArgs), ftol = 1e-9, xtol=1e-9, gtol=1e-9, jac='3-point')).x
+        res = (least_squares(evaluateWrapper, initialGuess, bounds=(-1,1), args=(otherArgs))).x
         ## The solver can throw warnings if it tries to evaluate the eqs outside sine's value range. So TODO change this to some algorithm that can limit the search range 
 
         ## We solved sines, not angles, but this is OK for now at least. So just return the sines.
@@ -112,6 +113,7 @@ class VeffParams:
         """
         ## To make this work nicely we need to put the field in same dict as our other inputs, so hack it here (will need optimization)
         _, _, v3 = fields
+        #v3 = fields
         knownParamsDict = self.actionParams.copy()
         knownParamsDict["v3"] = v3
         
@@ -328,12 +330,11 @@ class EffectivePotential:
 
         ## Minimize real part only:
         VeffWrapper = lambda fields: np.real ( self.evaluate(fields) )
-        
+
         ##Added bounds to minimize to reduce the IR senstivity coming from low mass modes
         ##Added tol
-        bnds = ((0, 1e3), (0, 1e3), (1e-4, 1e3))
-        res = scipy.optimize.minimize(VeffWrapper, initialGuess, tol = 1e-4, bounds=bnds)
-        
+        bnds = ((0, 1e3), (0, 1e3), (0, 1e3))
+        res = scipy.optimize.minimize(VeffWrapper, initialGuess, tol = 1e-8, bounds=bnds)
 
         ## res.x = location, res.fun = value, res.success = flag for determining if the algorithm finished successfully
         location = res.x # this is np.array valued
@@ -357,7 +358,7 @@ class EffectivePotential:
         
         if (minimumCandidates == None or len(minimumCandidates) == 0):
             ## Just search "symmetric" and "broken" in the phi3 direction
-            minimumCandidates = [ [0., 0., 1e-4], [0., 0., 100.] ]
+            minimumCandidates = [ [0., 0., 1e-4], [0., 0., 30.] ]
 
         deepest = np.inf
         res = [np.nan]*3, np.inf

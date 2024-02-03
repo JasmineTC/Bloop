@@ -4,7 +4,7 @@ import numpy as np
 
 __MZ = 91.1876
 
-## This is Venus' first benchmark point in table 1 of draft
+##These are benchmarks taken from the draft in table 1
 BM1 = {
     ## Renormalization scale is also an input since we're inputting some action parameters directly
     "RGScale" : __MZ,
@@ -15,6 +15,190 @@ BM1 = {
     "delta12" : 4.,
     "delta1c" : 50.,
     "deltac" : 1.,
+
+    "thetaCPV" : 2.*np.pi/3.,
+    "ghDM" : 0.0,
+
+    ## Input these dark sector parameters directly. Set to 0.1 because otherwise things become untractable
+    "lam1Re" : 0.1,
+    "lam1Im" : 0.0,
+    "lam11" : 0.1,
+    "lam22" : 0.1,
+    "lam12" : 0.1,
+    "lam12p" : 0.1
+}
+
+BM2 = {
+    ## Renormalization scale is also an input since we're inputting some action parameters directly
+    "RGScale" : __MZ,
+
+    ## "Physical" input in the scalar sector
+    "mS1" : 57,
+    ## Mass splittings. If you want to input masses directly instead of these deltas, set model.bMassSplittingInput = False
+    "delta12" : 8.,
+    "delta1c" : 50.,
+    "deltac" : 1.,
+
+    "thetaCPV" : 2.*np.pi/3.,
+    "ghDM" : 0.0,
+
+    ## Input these dark sector parameters directly. Set to 0.1 because otherwise things become untractable
+    "lam1Re" : 0.1,
+    "lam1Im" : 0.0,
+    "lam11" : 0.1,
+    "lam22" : 0.1,
+    "lam12" : 0.1,
+    "lam12p" : 0.1
+}
+
+BM3 = {
+    ## Renormalization scale is also an input since we're inputting some action parameters directly
+    "RGScale" : __MZ,
+
+    ## "Physical" input in the scalar sector
+    "mS1" : 70,
+    ## Mass splittings. If you want to input masses directly instead of these deltas, set model.bMassSplittingInput = False
+    "delta12" : 12.,
+    "delta1c" : 50.,
+    "deltac" : 1.,
+
+    "thetaCPV" : 2.*np.pi/3.,
+    "ghDM" : 0.0,
+
+    ## Input these dark sector parameters directly. Set to 0.1 because otherwise things become untractable
+    "lam1Re" : 0.1,
+    "lam1Im" : 0.0,
+    "lam11" : 0.1,
+    "lam22" : 0.1,
+    "lam12" : 0.1,
+    "lam12p" : 0.1
+}
+
+BM4 = {
+    ## Renormalization scale is also an input since we're inputting some action parameters directly
+    "RGScale" : __MZ,
+
+    ## "Physical" input in the scalar sector
+    "mS1" : 48,
+    ## Mass splittings. If you want to input masses directly instead of these deltas, set model.bMassSplittingInput = False
+    "delta12" : 20.,
+    "delta1c" : 50.,
+    "deltac" : 1.,
+
+    "thetaCPV" : 5.*np.pi/6.,
+    "ghDM" : 0.0,
+
+    ## Input these dark sector parameters directly. Set to 0.1 because otherwise things become untractable
+    "lam1Re" : 0.1,
+    "lam1Im" : 0.0,
+    "lam11" : 0.1,
+    "lam22" : 0.1,
+    "lam12" : 0.1,
+    "lam12p" : 0.1
+}
+
+BM5 = {
+    ## Renormalization scale is also an input since we're inputting some action parameters directly
+    "RGScale" : __MZ,
+
+    ## "Physical" input in the scalar sector
+    "mS1" : 75,
+    ## Mass splittings. If you want to input masses directly instead of these deltas, set model.bMassSplittingInput = False
+    "delta12" : 55.,
+    "delta1c" : 50.,
+    "deltac" : 1.,
+
+    "thetaCPV" : 2.*np.pi/3.,
+    "ghDM" : 0.0,
+
+    ## Input these dark sector parameters directly. Set to 0.1 because otherwise things become untractable
+    "lam1Re" : 0.1,
+    "lam1Im" : 0.0,
+    "lam11" : 0.1,
+    "lam22" : 0.1,
+    "lam12" : 0.1,
+    "lam12p" : 0.1
+}
+
+BM6 = {
+    ## Renormalization scale is also an input since we're inputting some action parameters directly
+    "RGScale" : __MZ,
+
+    ## "Physical" input in the scalar sector
+    "mS1" : 74,
+    ## Mass splittings. If you want to input masses directly instead of these deltas, set model.bMassSplittingInput = False
+    "delta12" : 55.,
+    "delta1c" : 50.,
+    "deltac" : 15.,
+
+    "thetaCPV" : 2.*np.pi/3.,
+    "ghDM" : 0.0,
+
+    ## Input these dark sector parameters directly. Set to 0.1 because otherwise things become untractable
+    "lam1Re" : 0.1,
+    "lam1Im" : 0.0,
+    "lam11" : 0.1,
+    "lam22" : 0.1,
+    "lam12" : 0.1,
+    "lam12p" : 0.1
+}
+
+BM7 = {
+    ## Renormalization scale is also an input since we're inputting some action parameters directly
+    "RGScale" : __MZ,
+
+    ## "Physical" input in the scalar sector
+    "mS1" : 90,
+    ## Mass splittings. If you want to input masses directly instead of these deltas, set model.bMassSplittingInput = False
+    "delta12" : 5.,
+    "delta1c" : 1.,
+    "deltac" : 1.,
+
+    "thetaCPV" : 2.*np.pi/3.,
+    "ghDM" : 0.0,
+
+    ## Input these dark sector parameters directly. Set to 0.1 because otherwise things become untractable
+    "lam1Re" : 0.1,
+    "lam1Im" : 0.0,
+    "lam11" : 0.1,
+    "lam22" : 0.1,
+    "lam12" : 0.1,
+    "lam12p" : 0.1
+}
+
+BM8 = {
+    ## Renormalization scale is also an input since we're inputting some action parameters directly
+    "RGScale" : __MZ,
+
+    ## "Physical" input in the scalar sector
+    "mS1" : 90,
+    ## Mass splittings. If you want to input masses directly instead of these deltas, set model.bMassSplittingInput = False
+    "delta12" : 55.,
+    "delta1c" : 1.,
+    "deltac" : 1.,
+
+    "thetaCPV" : 2.*np.pi/3.,
+    "ghDM" : 0.0,
+
+    ## Input these dark sector parameters directly. Set to 0.1 because otherwise things become untractable
+    "lam1Re" : 0.1,
+    "lam1Im" : 0.0,
+    "lam11" : 0.1,
+    "lam22" : 0.1,
+    "lam12" : 0.1,
+    "lam12p" : 0.1
+}
+
+BM9 = {
+    ## Renormalization scale is also an input since we're inputting some action parameters directly
+    "RGScale" : __MZ,
+
+    ## "Physical" input in the scalar sector
+    "mS1" : 90,
+    ## Mass splittings. If you want to input masses directly instead of these deltas, set model.bMassSplittingInput = False
+    "delta12" : 55.,
+    "delta1c" : 1.,
+    "deltac" : 22.,
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.0,
