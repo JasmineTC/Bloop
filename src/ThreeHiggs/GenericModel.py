@@ -29,15 +29,17 @@ class GenericModel():
     MZ = 91.1876
     ## Top quark mass 
     Mt = 172.76
+    ##TODO we now run this, needs adjusting
     ## SU(3) coupling, we neglect it's running. This is the value at Z pole
     g3 = np.sqrt(0.1183 * 4.0 * np.pi)
 
 
-    def __init__(self):
+    def __init__(self, loopOrder = 1):
+        
         self.inputParams = {}
         self.dimensionalReduction = DimensionalReduction()
         ## 3D potential:
-        self.effectivePotential = EffectivePotential(loopOrder=1)
+        self.effectivePotential = EffectivePotential(loopOrder=loopOrder)
 
     
     def setInputParams(self, inputParams):
@@ -155,7 +157,4 @@ class GenericModel():
         res["RGScale"] = RGScale
 
         return res
-
-        
-
     
