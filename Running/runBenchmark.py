@@ -7,6 +7,7 @@ from ThreeHiggs import GenericModel
 from ThreeHiggs import TransitionFinder
 
 import Benchmarks.Benchmarks_3HDM
+from PlotResult import PlotResult
 
 userinput = ThreeHiggs.UserInput()
 args = userinput.parse()
@@ -32,7 +33,7 @@ transitionFinder = TransitionFinder(model=model3HDM)
 model3HDM.setInputParams(inputParams)
 minimizationResults = transitionFinder.traceFreeEnergyMinimum()
 
-filename = "Data/Results/bm" + str(args.benchMarkNumber) + ".txt"
+filename = "Results/bm" + str(args.benchMarkNumber) + ".txt"
 np.savetxt(filename, minimizationResults)
 if args.plot == True:
     PlotResult.PlotData(minimizationResults, args.benchMarkNumber)
