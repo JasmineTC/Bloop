@@ -8,7 +8,7 @@ from ThreeHiggs import TransitionFinder
 
 import Benchmarks.Benchmarks_3HDM
 
-userinput = ThreeHiggs.Userinput()
+userinput = ThreeHiggs.UserInput()
 args = userinput.parse()
 
 hardToSoftFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleParams_NLO.txt")
