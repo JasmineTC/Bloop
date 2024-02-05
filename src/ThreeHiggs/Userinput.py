@@ -1,6 +1,5 @@
 import argparse
-import os
-import sys
+##May not be needed depending on how this is done in parallel
 import multiprocessing
 
 
@@ -9,19 +8,25 @@ class Userinput(argparse.ArgumentParser):
     def __init__(self):
         
         super().__init__()
+        ##Takes user arguement to define what loop order to calculate the effective potential to
+        ##TODO make safe by checking if int given actually has a bm point
+        ##something like if benchMarkNumber > len(bm list) then exit
+        self.add_argument('-n', action = 'store', default = 0, dest = 'benchMarkNumber', type = int,
+                          help = "Used to specify a particular bench mark point in the list to run")
+        ##Takes user arguement to define what loop order to calculate the effective potential to
+        self.add_argument('-l', action = 'store', default = 1, dest = 'loopOrder', type = int, choices = [1, 2],
+                          help = "Used to specify if the effective potential should be calculated to one or two loop")
+        ##Takes user bool to decide if plots should be made after saving results
+        self.add_argument('-p', action = 'store_true', default=False, dest = 'plot',  
+                          help = "Used to specify if a plot of minimium vs temp should be made")
+        ##Takes user arguement to define how many cores to run the benchmarks on
+        ##multiprocessing.cpu_count gets from the the system how many cores are avaviable, +1 needed because of how range works
+        self.add_argument('-c', action = 'store', default = 1, dest = 'cores', type = int, choices = list(range(1, multiprocessing.cpu_count() + 1)),
+                          help = "Used to specify how many cores to run the bench mark list on")
         
-        self.add_argument('-b', action = 'append', default = ['Benchmarks/Benchmarks_3HDM.py'], dest = 'bench_marks')
-        self.add_argument('-l', action = 'store', default = 1, dest = 'loop_order', type = int, choices = [1, 2])
-        self.add_argument('-c', action = 'store', default = 1, dest = 'cores', type = int, choices = list(range(1, multiprocessing.cpu_count() + 1)))
-    
-        
+    ##Used to check userinputs are valid, mostly done with the choice keyword above now though
     def parse(self):
         
         args = super().parse_args()
         
-        for benchmarkFile in args.bench_marks:
-            if not os.path.isfile(benchmarkFile):
-                print(f"File {benchmarkFile} could not be found, gg.")
-                sys.exit(-1)
-            
-        return args
+        return args 
