@@ -1,5 +1,4 @@
 import numpy as np
-import pathlib
 
 import ThreeHiggs
 
@@ -33,7 +32,7 @@ transitionFinder = TransitionFinder(model=model3HDM)
 model3HDM.setInputParams(inputParams)
 minimizationResults = transitionFinder.traceFreeEnergyMinimum()
 
-filename = "Results/bm" + str(args.benchMarkNumber) + ".txt"
+filename = "Results/BM" + str(args.benchMarkNumber) + ".txt"
 np.savetxt(filename, minimizationResults)
 if args.plot == True:
     PlotResult.PlotData(minimizationResults, args.benchMarkNumber)
