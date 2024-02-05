@@ -5,9 +5,8 @@ from sympy.parsing.mathematica import parse_mathematica
 
 from typing import Callable, Tuple
 
-from ParsedExpression import ParsedExpression
-from CommonUtils import getPackagedDataPath
-from CommonUtils import replaceGreekSymbols
+from .ParsedExpression import ParsedExpression
+from .CommonUtils import replaceGreekSymbols
 
 """ Notes.
 Suppose you give DRalgo a model with a parameter called lam123. By default the parameter name after integrating out hard modes is then lam1233d, 

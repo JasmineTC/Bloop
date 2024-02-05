@@ -1,16 +1,15 @@
 import numpy as np
 import pathlib
 
-from GenericModel import GenericModel
-from TransitionFinder import TransitionFinder
+import ThreeHiggs
+
+from ThreeHiggs import GenericModel
+from ThreeHiggs import TransitionFinder
 
 import Benchmarks.Benchmarks_3HDM
 
-## hack file path, not a good solution if making this into a proper package
-pathToCurrentFile = pathlib.Path(__file__).parent.resolve()
-
-hardToSoftFile = str(pathToCurrentFile) + "/Data/HardToSoft/softScaleParams_NLO.txt"
-softToUltrasoftFile = str(pathToCurrentFile) + "/Data/SoftToUltrasoft/ultrasoftScaleParams_NLO.txt"
+hardToSoftFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleParams_NLO.txt")
+softToUltrasoftFile = ThreeHiggs.getResourcePath("Data/SoftToUltrasoft/ultrasoftScaleParams_NLO.txt")
 
 
 ## Model object setup + load matching relations
@@ -34,8 +33,3 @@ print("Start finite-T stuff")
 model3HDM.setInputParams(inputParams)
 
 transitionFinder.traceFreeEnergyMinimum()
-
-
-
-
-
