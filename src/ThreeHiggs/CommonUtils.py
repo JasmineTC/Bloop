@@ -1,16 +1,18 @@
 import importlib.resources
 #import unicodedata
 
-def getPackagedDataPath(relativeModulePath: str, fileName: str) -> str:
-    """ Common routine for accessing packaged data files within a package, using modern importlib practices.
-        Usage: if the file is <packageName>/Data/Something/example.txt, 
-        call this as getPackagedDataPath("<packageName>.Data.Something", "example.txt").
-
-        Returns
-        -------
-        Path to the resource file: str.
+def getSafePathToResource(relativePathToResource: str) -> str:
+    """ Gives a safe path to a packaged resource.
+    
+    Returns
+    -------
+    Path to the resource file: str.
     """
-    return str( importlib.resources.files(relativeModulePath).joinpath(fileName) )
+
+    ## fallback to hardcoded package name if the __package__ call fails
+    packageName = __package__ or "ThreeHiggs"
+
+    return importlib.resources.files(packageName) / relativePathToResource
 
 
 def replaceGreekSymbols(string: str) -> str:

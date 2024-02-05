@@ -10,10 +10,10 @@ from scipy.interpolate import CubicSpline
 
 import pathlib ## for hacking
 
-import Integrals
+from .Integrals import J3
 
-from ParsedExpression import ParsedExpressionSystem, SystemOfEquations, ParsedExpression
-from CommonUtils import combineDicts
+from .ParsedExpression import ParsedExpressionSystem, SystemOfEquations, ParsedExpression
+from .CommonUtils import combineDicts
 
 
 class MixingAngleEquations(SystemOfEquations):
