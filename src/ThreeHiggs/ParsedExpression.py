@@ -5,7 +5,7 @@ from sympy.parsing.mathematica import parse_mathematica
 
 from typing import Callable, Tuple
 
-from CommonUtils import replaceGreekSymbols, dictToOrderedList
+from .CommonUtils import replaceGreekSymbols, dictToOrderedList
 
 
 class ParsedExpression:

@@ -2,8 +2,8 @@ import numpy as np
 import numpy.typing as npt
 from typing import Tuple
 
-from EffectivePotential import EffectivePotential
-from DimensionalReduction import DimensionalReduction
+from .EffectivePotential import EffectivePotential
+from .DimensionalReduction import DimensionalReduction
 
 ## Could be an ABC, but just implementing for 3HDM for now
 class GenericModel():

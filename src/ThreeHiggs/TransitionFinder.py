@@ -2,8 +2,8 @@ import numpy as np
 import numpy.typing as npt
 from typing import Tuple
 
-from GenericModel import GenericModel
-from BetaFunctions import BetaFunctions4D
+from .GenericModel import GenericModel
+from .BetaFunctions import BetaFunctions4D
 
 
 """Class TransitionFinder -- This handles all logic for tracking the temperature dependence of a model,
