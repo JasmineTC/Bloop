@@ -15,6 +15,7 @@ from .Integrals import J3
 from .ParsedExpression import ParsedExpressionSystem, SystemOfEquations, ParsedExpression
 from .CommonUtils import combineDicts
 
+from .VeffMinimizer import VeffMinimizer
 
 class MixingAngleEquations(SystemOfEquations):
     """This is just a SystemOfEquations but we add a common solve() routine that can be configured for solving sines of angles, 
@@ -216,6 +217,8 @@ class EffectivePotential:
     ## One expression for each loop order
     expressions: ParsedExpressionSystem
 
+    minimizer: VeffMinimizer
+
     def __init__(self, loopOrder, initialModelParameters: dict = None):
         """loopOrder specifies how many perturbative orders we take. 
         This CANNOT be changed at runtime, you will have to make a new object instead.
@@ -232,6 +235,8 @@ class EffectivePotential:
         
         if (initialModelParameters):
             self.setModelParameters(initialModelParameters)
+
+        self.minimizer = VeffMinimizer(3) # currently the numVariables is not used by minimizer
 
         
 
@@ -332,12 +337,11 @@ class EffectivePotential:
         VeffWrapper = lambda fields: np.real ( self.evaluate(fields) )
 
         ##Added bounds to minimize to reduce the IR senstivity coming from low mass modes
-        ##Added tol
-        bnds = ((0, 1e3), (0, 1e3), (0, 1e3))
-        res = scipy.optimize.minimize(VeffWrapper, initialGuess, tol = 1e-8, bounds=bnds)
+        bounds = ((0, 1e3), (0, 1e3), (0, 1e3))
+        #res = scipy.optimize.minimize(VeffWrapper, initialGuess, tol = 1e-8, bounds=bnds)
+        
+        location, value = self.minimizer.minimize(VeffWrapper, initialGuess, bounds)
 
-        ## res.x = location, res.fun = value, res.success = flag for determining if the algorithm finished successfully
-        location = res.x # this is np.array valued
 
         if np.any(np.isnan(location)):
             location  = [np.nan] * len[initialGuess]
