@@ -9,6 +9,8 @@ from ThreeHiggs import TransitionFinder
 import Benchmarks.Benchmarks_3HDM
 from PlotResult import PlotResult
 
+from ThreeHiggs import MinimizationAlgos
+
 userinput = ThreeHiggs.UserInput()
 args = userinput.parse()
 
@@ -20,6 +22,9 @@ softToUltrasoftFile = ThreeHiggs.getResourcePath("Data/SoftToUltrasoft/ultrasoft
 model3HDM = GenericModel(loopOrder = args.loopOrder)
 model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile)
 model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
+
+## Set algorithm to use for Veff minimization
+model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eScipy)
 
 
 print("!!!")
