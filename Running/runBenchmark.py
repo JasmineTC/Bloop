@@ -23,7 +23,7 @@ model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile)
 model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
 ## Set algorithm to use for Veff minimization
-model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eScipy)
+model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eDIRECT)
 
 
 print("!!!")
@@ -37,7 +37,7 @@ transitionFinder = TransitionFinder(model=model3HDM)
 model3HDM.setInputParams(inputParams)
 minimizationResults = transitionFinder.traceFreeEnergyMinimum()
 
-filename = "Results/BM" + str(args.benchMarkNumber) + ".txt"
+filename = "Results/bm" + str(args.benchMarkNumber) + ".txt"
 np.savetxt(filename, minimizationResults)
 if args.plot == True:
     PlotResult.PlotData(minimizationResults, args.benchMarkNumber)
