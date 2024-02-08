@@ -316,11 +316,11 @@ class EffectivePotential:
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
         paramDict = self.params.evaluateAll(fields, bNeedsDiagonalization=self.bNeedsDiagonalization)
         
-        #print(f"{paramDict=}") 
+        #print(f"{paramDict=}")
+        #input()
 
         ## summing works because the result is a list [V0, V1, ...]
         res = sum( self.expressions.evaluateSystemWithDict(paramDict) )
-
         return res
 
 
@@ -332,15 +332,14 @@ class EffectivePotential:
         ## Then self.evaluate would return a numpy array which scipy doesn't know how to work with. 
         ## Here I make an array of lambda functions and minimize those separately
 
-
         ## Minimize real part only:
         VeffWrapper = lambda fields: np.real ( self.evaluate(fields) )
 
         ##Added bounds to minimize to reduce the IR senstivity coming from low mass modes
-        bounds = ((0, 1e3), (0, 1e3), (0, 1e3))
+        bounds = ((1e-6, 1e-6), (1e-6, 1e-6), (1e-6, 1e3))
         #res = scipy.optimize.minimize(VeffWrapper, initialGuess, tol = 1e-8, bounds=bnds)
-        
         location, value = self.minimizer.minimize(VeffWrapper, initialGuess, bounds)
+        #print (f"for an initial guess of {initialGuess} the local minimum found is {location}")
 
 
         if np.any(np.isnan(location)):

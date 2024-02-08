@@ -25,7 +25,7 @@ class TransitionFinder:
 
     ## This is a way too big routine 
     ##TODO Change step size in T back to 1 when done testing
-    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 50)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
+    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 2)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
 
         TRange = np.asanyarray(TRange)
 
@@ -66,7 +66,7 @@ class TransitionFinder:
  
         
         for T in TRange:
-            print ('Start of T =%s' %T)
+            print (f'Start of temp = {T} loop')
             ## Final scale in 3D
             goalRGScale =  T
 
