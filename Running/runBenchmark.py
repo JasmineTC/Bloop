@@ -1,4 +1,7 @@
 import numpy as np
+from datetime import date
+
+today = date.today()
 
 import ThreeHiggs
 
@@ -23,7 +26,7 @@ model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile)
 model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
 ## Set algorithm to use for Veff minimization
-model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eDIRECT)
+model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eDIRECTGLOBAL)
 
 
 print("!!!")
@@ -37,7 +40,7 @@ transitionFinder = TransitionFinder(model=model3HDM)
 model3HDM.setInputParams(inputParams)
 minimizationResults = transitionFinder.traceFreeEnergyMinimum()
 
-filename = "Results/bm" + str(args.benchMarkNumber) + ".txt"
-np.savetxt(filename, minimizationResults)
+filename = f"Results/{date.today()}-BM-{args.benchMarkNumber}-LoopOrder{args.loopOrder}"
+np.savetxt(filename + ".txt", minimizationResults)
 if args.plot == True:
-    PlotResult.PlotData(minimizationResults, args.benchMarkNumber)
+    PlotResult.PlotData(minimizationResults, args.benchMarkNumber, filename)
