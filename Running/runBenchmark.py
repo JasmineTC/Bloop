@@ -9,12 +9,13 @@ from ThreeHiggs import TransitionFinder
 import Benchmarks.Benchmarks_3HDM
 
 hardToSoftFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleParams_NLO.txt")
+softScaleRGEFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleRGE.txt")
 softToUltrasoftFile = ThreeHiggs.getResourcePath("Data/SoftToUltrasoft/ultrasoftScaleParams_NLO.txt")
 
 
 ## Model object setup + load matching relations
 model3HDM = GenericModel()
-model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile)
+model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
 model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
 
