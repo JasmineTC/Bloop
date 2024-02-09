@@ -24,7 +24,7 @@ class TransitionFinder:
 
 
     ## This is a way too big routine
-    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 1)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
+    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50, 200, 1)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
 
         TRange = np.asanyarray(TRange)
 

@@ -1,6 +1,6 @@
-import numpy as np
 import numpy.typing as npt
 from typing import Tuple
+import numpy as np
 
 from .EffectivePotential import EffectivePotential
 from .DimensionalReduction import DimensionalReduction

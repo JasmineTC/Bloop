@@ -35,8 +35,17 @@ class VeffMinimizer:
 
     def setAlgorithm(self, algo: MinimizationAlgos) -> None:
         self.__algo = algo
+        
     def setNumVariables(self, numVariables: int) -> None:
-        self.numVariables = numVariables    
+        self.numVariables = numVariables
+        
+    def setTolerances(self, globalAbs : float, globalRel : float, localAbs : float, localRel : float) -> None:
+        self.globalAbs = globalAbs
+        self.globalRel = globalRel
+        
+        self.localAbs = localAbs
+        self.localRel = localRel
+        
     def minimize(self, function: Callable, initialGuess: np.ndarray, bounds) -> Tuple[np.ndarray, float]:
     #def minimize(self, function: Callable, initialGuess: ndarray, bounds) -> Tuple[ndarray, float]:
         """Give bounds in format ((min1, max1), (min2, max2)) etc, one pair for each variable.
@@ -51,7 +60,7 @@ class VeffMinimizer:
         match(self.__algo):
 
             case MinimizationAlgos.eScipy:
-                minimizationResult = scipy.optimize.minimize(function, initialGuess, bounds=bounds, tol=1e-6)
+                minimizationResult = scipy.optimize.minimize(function, initialGuess, bounds=bounds, tol = 1e-6)
                 #print (f"number of interations = {minimizationResult.nit}")
                 print (minimizationResult)
                 
@@ -71,8 +80,8 @@ class VeffMinimizer:
                 ##Set upper bound variables on the minimisation varables  to an array of length number of variables filled with 100
                 opt.set_upper_bounds((1e-6, 1e-6, 100))
                 ##Set abs and rel tol on background field value
-                opt.set_xtol_abs(0.1)
-                opt.set_xtol_rel(0.1)
+                opt.set_xtol_abs(self.globalAbs)
+                opt.set_xtol_rel(self.globalRel)
                 location = opt.optimize(initialGuess)
                 #print (f"For an initial guess of {initialGuess} the global minimum is found to be {location}")
                 
@@ -84,11 +93,23 @@ class VeffMinimizer:
                 ##Set upper bound variables on the minimisation varables  to an array of length number of variables filled with 100
                 opt2.set_upper_bounds((1e-6, 1e-6, 100))
                 ##Set abs and rel tol on background field value
-                opt2.set_xtol_abs(0.0001)
-                opt2.set_xtol_rel(0.0001)
+                opt2.set_xtol_abs(self.localRel)
+                opt2.set_xtol_rel(self.localRel)
                 
                 location, value = opt2.optimize(location),  opt2.last_optimum_value()
-                
+                ##For testing how well minimiser does
+                # points = 120
+                # xMax = max(1, location[2]) 
+                # xList = np.linspace(1e-4, xMax*1.15, points)
+                # yList = np.zeros(points)
+                # for i, value in enumerate(xList):
+                #     yList[i] = function( (0, 0, value) )
+                # yList = yList - yList[0]
+                # plt.plot(xList, yList, '.')
+                # plt.xlabel('v3')
+                # plt.ylabel('V')
+                # plt.vlines(location[2], min(yList), max(yList))
+                # plt.show()
                 
             case MinimizationAlgos.eNelderMead:
                 opt = nlopt.opt(nlopt.LN_NELDERMEAD, 3)
@@ -100,8 +121,8 @@ class VeffMinimizer:
                 ##Set upper bound variables on the minimisation varables  to an array of length number of variables filled with 100
                 opt.set_upper_bounds((1e-6, 1e-6, 100))
                 ##Set abs and rel tol on background field value
-                opt.set_xtol_abs(0.0001)
-                opt.set_xtol_rel(0.001)
+                opt.set_xtol_abs(self.localAbs)
+                opt.set_xtol_rel(self.localRel)
                 
                 location, value = opt.optimize(initialGuess),  opt.last_optimum_value()
                 print (f"For an initial guess of {initialGuess} the local minimum is found to be {location}")
@@ -115,8 +136,8 @@ class VeffMinimizer:
                     ##Set upper bound variables on the minimisation varables  to an array of length number of variables filled with 100
                     opt.set_upper_bounds((1e-6, 1e-6, 100))
                     ##Set abs and rel tol on background field value
-                    opt.set_xtol_abs(0.0001)
-                    opt.set_xtol_rel(0.001)
+                    opt.set_xtol_abs(self.localAbs)
+                    opt.set_xtol_rel(self.localRel)
                     
                     location, value = opt.optimize(initialGuess),  opt.last_optimum_value()
                     print (f"For an initial guess of {initialGuess} the local minimum is found to be {location}")   
