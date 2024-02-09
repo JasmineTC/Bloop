@@ -37,7 +37,7 @@ class GenericModel():
         self.inputParams = {}
         self.dimensionalReduction = DimensionalReduction()
         ## 3D potential:
-        self.effectivePotential = EffectivePotential(loopOrder=1)
+        self.effectivePotential = EffectivePotential(loopOrder=2)
 
     
     def setInputParams(self, inputParams):

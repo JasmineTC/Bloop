@@ -30,5 +30,5 @@ rS28 -> S3Ne
 rS29 -> C3Ne*C5Ne*S6Ne
 rS30 -> C3Ne*S5Ne
 rS31 -> C3Ne*C5Ne*C6Ne
-stW -> Sqrt[g1sq]/Sqrt[g1sq + g2sq]
-ctW -> Sqrt[g2sq]/Sqrt[g1sq + g2sq]
+stW -> g1/Sqrt[g1^2 + g2^2]
+ctW -> g2/Sqrt[g1^2 + g2^2]

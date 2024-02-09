@@ -19,16 +19,12 @@ model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScale
 model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
 
-#inputParams = Benchmarks.Benchmarks_3HDM.BM1
-inputParams = Benchmarks.Benchmarks_3HDM.BM_SM_like
+inputParams = Benchmarks.Benchmarks_3HDM.BM1
+#inputParams = Benchmarks.Benchmarks_3HDM.BM_SM_like
 
 transitionFinder = TransitionFinder(model=model3HDM)
 
 ## Scanning loops would start here
-
-print("!!!")
-print("Currently not matching soft --> ultrasoft, this is WIP. Also: 2-loop masses lack some log terms")
-print("!!!")
 
 print("Start finite-T stuff")
 model3HDM.setInputParams(inputParams)

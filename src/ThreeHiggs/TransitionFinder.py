@@ -81,7 +81,7 @@ class TransitionFinder:
 
             ##This has every coupling needed to compute the EP, computed at the matching scale (I think)
             params3D = self.model.dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
-
+            
             self.model.effectivePotential.setModelParameters(params3D)
 
             minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()

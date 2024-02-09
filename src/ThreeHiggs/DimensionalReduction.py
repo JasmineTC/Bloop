@@ -34,19 +34,14 @@ class DimensionalReduction():
 
         if (softScaleRGEFile):
             self.bDoSoftScaleRGE = True
-            ## Using ParameterMatching for these because we want to remove 3d suffices etc
             self.softScaleRGE = ParameterMatching()
             self.softScaleRGE.createMatchingRelations(softScaleRGEFile)
             #self.softScaleRGE.matchingRelations = self.__remove3dSuffices(self.softScaleRGE.matchingRelations)
-            print("Soft scale RGE")
-            print("-- Inputs:")
-            print(self.softScaleRGE.parameterNames)
-            print("-- Outputs:")
-            print( list(self.softScaleRGE.matchingRelations.keys()) )
 
 
-    def setupSoftToUltrasoftMatching(self, softToUltrasoftFile: str) -> None:
+    def setupSoftToUltrasoftMatching(self, softToUltrasoftFile: str, ultrasoftScaleRGEFile: str = None) -> None:
         
+        ## At US scale let's remove the 3d and US suffices from resulting params. That way they work with directly Veff
         self.matchToUltrasoft.createMatchingRelations(softToUltrasoftFile)
         self.matchToUltrasoft.matchingRelations = self.__remove3dSuffices(self.matchToUltrasoft.matchingRelations, bRemoveSuffixUS=True)
 
@@ -62,10 +57,7 @@ class DimensionalReduction():
         """This goes from input hard scale parameters to whatever the final EFT is.
         """
         softScaleParams = self.getSoftScaleParams(paramsForMatching, goalRGScale)
-        #ultrasoftScaleParams = self.matchToUltrasoft.getMatchedParams(softScaleParams)
-
-        ultrasoftScaleParams = softScaleParams
-
+        ultrasoftScaleParams = self.matchToUltrasoft.getMatchedParams(softScaleParams)
 
         ## HACK this is the RG scale name in Veff
         ultrasoftScaleParams["mu3US"] = goalRGScale
@@ -91,16 +83,6 @@ class DimensionalReduction():
 
         return outParams
     
-
-    def getUltrasoftScaleParams(self, softScaleParams: dict[str, float], goalRGScale: float) -> dict[str, float]:
-        """Match soft scale --> ultrasoft scale theory
-        """
-        outParams = self.matchToUltrasoft.getMatchedParams(softScaleParams)
-        ## TODO RG running 
-
-        return outParams
-
-    
     def solveSoftScaleRGE(self, initialParams: dict[str, float], goalScale: float) -> dict[str, float]:
         """Evolves parameters in soft scale EFT to goalScale. Starting scale is read from initialParams["RGScale"].
         This modifies the input dict in place!
@@ -116,27 +98,35 @@ class DimensionalReduction():
         initialParams["RGScale"] = goalScale
         return initialParams
 
+    def getUltrasoftScaleParams(self, softScaleParams: dict[str, float], goalRGScale: float) -> dict[str, float]:
+        """Match soft scale --> ultrasoft scale theory
+        """
+        outParams = self.matchToUltrasoft.getMatchedParams(softScaleParams)
+        ## TODO RG running. But we for now we don't need it tbh
+
+        return outParams
 
     
+
     @staticmethod
     def __remove3dSuffices(matchingRelations: dict[str, any], bRemoveSuffixUS=False) -> dict[str, any]:
         """Modifies notation in matching relations so that the matched param dict does not use the "3d" suffix (comes from DRalgo by default)
         """
 
-        newDict = deepcopy(matchingRelations)
+        newDict = matchingRelations
 
         # DRalgo also gives gauge couplings as "g13d^2" etc, which is terrible => change to g1sq.
         # Crazy oneliner, creates a new dict where just the key names are different:
         newDict = { key.replace("^2", "sq") : value for key, value in newDict.items() }
+
+        if (bRemoveSuffixUS):
+            """ For ultrasoft theory DRalgo appends "US" => remove that too. Gauge couplings again need special treatment."""
+            newDict = { key[:-len("US")] if key.endswith("US") else key : value for key, value in newDict.items() }
+            newDict = { key.replace("USsq", "sq") if key.endswith("USsq") else key : value for key, value in newDict.items() }
 
         ## Remove "3d" suffix with even crazier oneliner (suffix meaning that it's removed only from end of the string)
         newDict = { key[:-len("3d")] if key.endswith("3d") else key : value for key, value in newDict.items() }
         ## Gauge couplings are originally of form g3d^2 so account for that too 
         newDict = { key.replace("3dsq", "sq") if key.endswith("3dsq") else key : value for key, value in newDict.items() }
     
-        if (bRemoveSuffixUS):
-            """ For ultrasoft theory DRalgo appends "US" => remove that too. Gauge couplings again need special treatment"""
-            newDict = { key[:-len("US")] if key.endswith("US") else key : value for key, value in newDict.items() }
-            newDict = { key.replace("USsq", "sq") if key.endswith("USsq") else key : value for key, value in newDict.items() }
-
         return newDict
