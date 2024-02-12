@@ -17,16 +17,20 @@ userinput = ThreeHiggs.UserInput()
 args = userinput.parse()
 
 hardToSoftFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleParams_NLO.txt")
+softScaleRGEFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleRGE.txt")
 softToUltrasoftFile = ThreeHiggs.getResourcePath("Data/SoftToUltrasoft/ultrasoftScaleParams_NLO.txt")
 
 
 ## Model object setup + load matching relations
 model3HDM = GenericModel(loopOrder = args.loopOrder)
-model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile)
+model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
 model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
 ## Set algorithm to use for Veff minimization
 model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eDIRECTGLOBAL)
+## Set tolerances used by global and local methods in Veff minimization
+## Order is global abs, global rel, local abs, local rel
+model3HDM.effectivePotential.minimizer.setTolerances(1e-1, 1e-1, 1e-5, 1e-5)
 
 
 print("!!!")

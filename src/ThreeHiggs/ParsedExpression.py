@@ -28,7 +28,6 @@ class ParsedExpression:
     ## sympy symbols that our expression depends on 
     symbols: list[sympy.Symbol] = []
 
-
     """List of arguments needed to evaluate self.lambdaExpression, in correct order.
     This needs to be specified from outside. Names should match sympy symbol names. 
     """ 
