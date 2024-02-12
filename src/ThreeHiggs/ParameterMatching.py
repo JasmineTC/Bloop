@@ -1,7 +1,4 @@
 import numpy as np
-import sympy
-from sympy import pi
-from sympy.parsing.mathematica import parse_mathematica
 
 from typing import Callable, Tuple
 
@@ -32,12 +29,10 @@ class ParameterMatching:
     #parameterNames = [ 'T', 'Lb', 'Lf', 'g1', 'g2', 'g3',  ]  
     ## LN: not used currently since the symbols are read automatically from .txt
 
-
     def __init__(self):
         
         self.matchingRelations = {}
         
-
 
     def getMatchedParams(self, inputParams: dict[str, float]) -> dict[str, float]:
 
