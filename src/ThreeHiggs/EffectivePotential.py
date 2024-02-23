@@ -291,7 +291,8 @@ class EffectivePotential:
         if (self.loopOrder >= 1):
             veffFiles.append( pathToCurrentFile / "Data/EffectivePotential/Veff_NLO.txt")
         if (self.loopOrder >= 2):
-            veffFiles.append( pathToCurrentFile / "Data/EffectivePotential/Veff_NNLO.txt")
+            ##TODO Change back when done bugfixing
+            veffFiles.append( pathToCurrentFile / "Data/EffectivePotential/Veff_NNLO_SS_Off.txt")
 
 
         ## Hack: combine these into a one file so that ParsedExpressionSystem understand it
@@ -326,7 +327,7 @@ class EffectivePotential:
 
 
     ## Return value is location, value
-    def findLocalMinimum(self, initialGuess: list[float]) -> Tuple[list[float], complex]:
+    def findLocalMinimum(self, initialGuess: list[float], T) -> Tuple[list[float], complex]:
         
         ## I think we need to manually vectorize here if our parameters are arrays (ie. got multiple temperature inputs).
         ## Then self.evaluate would return a numpy array which scipy doesn't know how to work with. 
@@ -338,7 +339,7 @@ class EffectivePotential:
         ##Added bounds to minimize to reduce the IR senstivity coming from low mass modes
         bounds = ((1e-6, 1e-6), (1e-6, 1e-6), (1e-6, 1e3))
         #res = scipy.optimize.minimize(VeffWrapper, initialGuess, tol = 1e-8, bounds=bnds)
-        location, value = self.minimizer.minimize(VeffWrapper, initialGuess, bounds)
+        location, value = self.minimizer.minimize(VeffWrapper, initialGuess, bounds, T)
         #print (f"for an initial guess of {initialGuess} the local minimum found is {location}")
 
 
@@ -353,7 +354,7 @@ class EffectivePotential:
         return location, value
     
 
-    def findGlobalMinimum(self, minimumCandidates: list[list[float]] = None) -> Tuple[list[float], complex]:
+    def findGlobalMinimum(self, T, minimumCandidates: list[list[float]] = None) -> Tuple[list[float], complex]:
         """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
         Generally will not work very well if no candidates minima are given. 
         Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
@@ -368,7 +369,7 @@ class EffectivePotential:
 
         ## Should we vectorize??
         for candidate in minimumCandidates:
-            location, value = self.findLocalMinimum(candidate)
+            location, value = self.findLocalMinimum(candidate, T)
             if (np.real(value) < deepest):
                 res = location, value
                 deepest = np.real(value)

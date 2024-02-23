@@ -1,13 +1,9 @@
 from enum import Enum
 import nlopt
 import numpy as np
-#from numpy import *
 import scipy.optimize
 from typing import Callable, Tuple
-import matplotlib.pylab as plt
-
-##TODO, once global min is found, use as initial guess to find local min
-##This is because global min methods focus on scanning parameter space and aren't as accurate as local min routines
+import matplotlib.pylab as plt ## Just used for plotting potential in testing phase
 
 class MinimizationAlgos(Enum):
     ##Enums work by setting the LHS, some important name you want to refer to later and keep fixed, to some unique number you don't care about
@@ -36,6 +32,13 @@ class VeffMinimizer:
     def setAlgorithm(self, algo: MinimizationAlgos) -> None:
         self.__algo = algo
         
+    def setTemp(self, temp: float) -> None:
+        self.temp = temp
+        print ("set temp called")
+        
+    def setgHDM(self, ghdm: float) -> None:
+        self.ghdm = ghdm
+        
     def setNumVariables(self, numVariables: int) -> None:
         self.numVariables = numVariables
         
@@ -46,7 +49,10 @@ class VeffMinimizer:
         self.localAbs = localAbs
         self.localRel = localRel
         
-    def minimize(self, function: Callable, initialGuess: np.ndarray, bounds) -> Tuple[np.ndarray, float]:
+    def setBmNumber(self, bmNumber : int) -> None:
+        self.bmNumber = bmNumber
+        
+    def minimize(self, function: Callable, initialGuess: np.ndarray, bounds, T) -> Tuple[np.ndarray, float]:
     #def minimize(self, function: Callable, initialGuess: ndarray, bounds) -> Tuple[ndarray, float]:
         """Give bounds in format ((min1, max1), (min2, max2)) etc, one pair for each variable.
         Returns: 
@@ -98,18 +104,20 @@ class VeffMinimizer:
                 
                 location, value = opt2.optimize(location),  opt2.last_optimum_value()
                 ##For testing how well minimiser does
-                # points = 120
-                # xMax = max(1, location[2]) 
-                # xList = np.linspace(1e-4, xMax*1.15, points)
-                # yList = np.zeros(points)
-                # for i, value in enumerate(xList):
-                #     yList[i] = function( (0, 0, value) )
-                # yList = yList - yList[0]
-                # plt.plot(xList, yList, '.')
-                # plt.xlabel('v3')
-                # plt.ylabel('V')
-                # plt.vlines(location[2], min(yList), max(yList))
-                # plt.show()
+                points = 150
+                xMax = max(2, location[2]) 
+                xList = np.linspace(1e-4, xMax*1.4, points)
+                yList = np.zeros(points)
+                for i, value in enumerate(xList):
+                    yList[i] = function( (0, 0, value) )
+                yList = yList - yList[0]
+                plt.plot(xList, yList, '.')
+                plt.xlabel('v3')
+                plt.ylabel('V')
+                plt.vlines(location[2], min(yList), max(yList))
+                plt.title(f'Benchmark {self.bmNumber} - gHDM {self.ghdm}, T {T} 1loop')
+                plt.savefig(f"Results/Debug/g_01/1loop/BM_{self.bmNumber}_gHDM_{self.ghdm}_T_{T}_1loop.png")
+                plt.close()
                 
             case MinimizationAlgos.eNelderMead:
                 opt = nlopt.opt(nlopt.LN_NELDERMEAD, 3)

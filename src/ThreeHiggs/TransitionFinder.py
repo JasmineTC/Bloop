@@ -1,10 +1,10 @@
 import numpy as np
 import numpy.typing as npt
 from typing import Tuple
-import matplotlib.pylab as plt
 
 from .GenericModel import GenericModel
 from .BetaFunctions import BetaFunctions4D
+from .VeffMinimizer import VeffMinimizer
 
 
 """Class TransitionFinder -- This handles all logic for tracking the temperature dependence of a model,
@@ -24,7 +24,7 @@ class TransitionFinder:
 
 
     ## This is a way too big routine
-    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50, 200, 1)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
+    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 1.)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
 
         TRange = np.asanyarray(TRange)
 
@@ -63,9 +63,12 @@ class TransitionFinder:
         ## [ [T, Veff(min), field1, field2, ...], ... ]
         minimizationResults = []
  
-        
+        counter = 0
+        #dog = VeffMinimizer(1)
         for T in TRange:
             print (f'Start of temp = {T} loop')
+            
+            #dog.setTemp(T)            
             ## Final scale in 3D
             goalRGScale =  T
 
@@ -86,12 +89,17 @@ class TransitionFinder:
             
             self.model.effectivePotential.setModelParameters(params3D)
 
-            minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
-
+            minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum(T)
+            
             minimizationResults.append( [T, valueVeff, *minimum] )
+            if minimum[2] < 1e-3:
+                print (f"Symmetric phase found at temp {T}")
+                if counter == 3:
+                    break
+                counter += 1
 
             
 
         minimizationResults = np.asanyarray(minimizationResults)
-        print( minimizationResults )
+        ## print( minimizationResults )
         return (minimizationResults)
