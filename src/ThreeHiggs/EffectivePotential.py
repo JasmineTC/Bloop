@@ -1,18 +1,13 @@
 import numpy as np
 import numpy.typing as npt
 from typing import Tuple
-import scipy.optimize
-from dataclasses import dataclass
-import matplotlib.pylab as plt
 
 from scipy.optimize import least_squares
-from scipy.interpolate import CubicSpline
 
 import pathlib ## for hacking
 
-from .Integrals import J3
 
-from .ParsedExpression import ParsedExpressionSystem, SystemOfEquations, ParsedExpression
+from .ParsedExpression import ParsedExpressionSystem, SystemOfEquations
 from .CommonUtils import combineDicts
 
 from .VeffMinimizer import VeffMinimizer
@@ -291,7 +286,6 @@ class EffectivePotential:
         if (self.loopOrder >= 1):
             veffFiles.append( pathToCurrentFile / "Data/EffectivePotential/Veff_NLO.txt")
         if (self.loopOrder >= 2):
-            ##TODO Change back when done bugfixing
             veffFiles.append( pathToCurrentFile / "Data/EffectivePotential/Veff_NNLO.txt")
 
 
@@ -316,9 +310,6 @@ class EffectivePotential:
     
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
         paramDict = self.params.evaluateAll(fields, bNeedsDiagonalization=self.bNeedsDiagonalization)
-        
-        #print(f"{paramDict=}")
-        #input()
 
         ## summing works because the result is a list [V0, V1, ...]
         res = sum( self.expressions.evaluateSystemWithDict(paramDict) )
@@ -327,7 +318,7 @@ class EffectivePotential:
 
 
     ## Return value is location, value
-    def findLocalMinimum(self, initialGuess: list[float], T) -> Tuple[list[float], complex]:
+    def findLocalMinimum(self, initialGuess: list[float]) -> Tuple[list[float], complex]:
         
         ## I think we need to manually vectorize here if our parameters are arrays (ie. got multiple temperature inputs).
         ## Then self.evaluate would return a numpy array which scipy doesn't know how to work with. 
@@ -338,9 +329,8 @@ class EffectivePotential:
 
         ##Added bounds to minimize to reduce the IR senstivity coming from low mass modes
         bounds = ((1e-6, 1e-6), (1e-6, 1e-6), (1e-6, 1e3))
-        #res = scipy.optimize.minimize(VeffWrapper, initialGuess, tol = 1e-8, bounds=bnds)
-        location, value = self.minimizer.minimize(VeffWrapper, initialGuess, bounds, T)
-        #print (f"for an initial guess of {initialGuess} the local minimum found is {location}")
+
+        location, value = self.minimizer.minimize(VeffWrapper, initialGuess, bounds)
 
 
         if np.any(np.isnan(location)):
@@ -354,7 +344,7 @@ class EffectivePotential:
         return location, value
     
 
-    def findGlobalMinimum(self, T, minimumCandidates: list[list[float]] = None) -> Tuple[list[float], complex]:
+    def findGlobalMinimum(self, minimumCandidates: list[list[float]] = None) -> Tuple[list[float], complex]:
         """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
         Generally will not work very well if no candidates minima are given. 
         Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
@@ -369,7 +359,7 @@ class EffectivePotential:
 
         ## Should we vectorize??
         for candidate in minimumCandidates:
-            location, value = self.findLocalMinimum(candidate, T)
+            location, value = self.findLocalMinimum(candidate)
             if (np.real(value) < deepest):
                 res = location, value
                 deepest = np.real(value)

@@ -57,9 +57,9 @@ class GenericModel():
     @staticmethod
     ##One massive if statement (than many if statements because of memory checks) to check if indiviual couplings are less than 4 pi
     ##This is not a sufficient check! Need to find the combinations of couplings that appear in all diagrams to be sure
-    def checkSingleCoupling(param : dict[str, float]) -> None:
+    def checkPerturbativity(param : dict[str, float]) -> None:
         #print ("checkSingleCoupling called")
-        if abs(param["lam11"]) > 0.666*np.pi or abs(param["lam12"]) > 0.666*np.pi or abs(param["lam12p"]) > 0.666*np.pi or abs(param["lam1Im"]) > 0.666*np.pi or abs(param["lam1Re"]) > 0.666*np.pi or abs(param["lam22"]) > 0.666*np.pi or abs(param["lam23"]) > 0.666*np.pi or abs(param["lam23p"]) > 0.666*np.pi or abs(param["lam2Im"]) > 0.666*np.pi or abs(param["lam2Re"]) > 0.666*np.pi or abs(param["lam31"]) > 0.666*np.pi or abs(param["lam31p"]) > 0.666*np.pi or abs(param["lam33"]) > 0.666*np.pi or abs(param["lam3Im"]) > 0.666*np.pi or abs(param["lam3Re"]) > 0.666*np.pi or abs(param["g1"]) > 0.666*np.pi or abs(param["g2"]) > 0.666*np.pi or abs(param["g3"]) > 0.666*np.pi:
+        if abs(param["lam11"]) > 4*np.pi or abs(param["lam12"]) > 4*np.pi or abs(param["lam12p"]) > 4*np.pi or abs(param["lam1Im"]) > 4*np.pi or abs(param["lam1Re"]) > 4*np.pi or abs(param["lam22"]) > 4*np.pi or abs(param["lam23"]) > 4*np.pi or abs(param["lam23p"]) > 4*np.pi or abs(param["lam2Im"]) > 4*np.pi or abs(param["lam2Re"]) > 4*np.pi or abs(param["lam31"]) > 4*np.pi or abs(param["lam31p"]) > 4*np.pi or abs(param["lam33"]) > 4*np.pi or abs(param["lam3Im"]) > 4*np.pi or abs(param["lam3Re"]) > 4*np.pi or abs(param["g1"]) > 4*np.pi or abs(param["g2"]) > 4*np.pi or abs(param["g3"]) > 4*np.pi:
             print ("Model is at risk of being non-pert")
 
     """This goes from whatever "physical" input to parameters in the actions.

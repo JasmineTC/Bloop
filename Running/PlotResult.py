@@ -13,7 +13,7 @@ class PlotResult():
         return minimumList
 
     @staticmethod
-    def PlotData(result : list, index : int): #->png
+    def PlotData(result : list, index : int, loopOrder : int, filename : str): #->png
 
         result = result.transpose()
 
@@ -23,9 +23,7 @@ class PlotResult():
         minimumList = PlotResult.RenormTemp(tempList, minimumList)
 
         plt.plot(tempList, minimumList, '.')
-        plt.title(f"Results of bench mark {index}")
+        plt.title(f"Results of bench mark {index} at loop order {loopOrder}")
         plt.ylabel("Minimum")
         plt.xlabel("T")
-        plt.savefig(f"Results/bm{index}.png")
-
-        result.transpose()
+        plt.savefig(f"{filename}.png")

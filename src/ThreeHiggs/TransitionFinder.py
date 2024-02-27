@@ -92,7 +92,7 @@ class TransitionFinder:
             
             self.model.effectivePotential.setModelParameters(params3D)
 
-            minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum(T)
+            minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
             
             minimizationResults.append( [T, valueVeff, *minimum] )
             if minimum[2] < 1e-3:
