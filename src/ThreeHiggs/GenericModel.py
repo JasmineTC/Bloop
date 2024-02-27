@@ -53,7 +53,14 @@ class GenericModel():
         mSpm1 = delta1c + mS1
         mSpm2 = deltac + mSpm1
         return mS2, mSpm1, mSpm2
-
+    
+    @staticmethod
+    ##One massive if statement (than many if statements because of memory checks) to check if indiviual couplings are less than 4 pi
+    ##This is not a sufficient check! Need to find the combinations of couplings that appear in all diagrams to be sure
+    def checkSingleCoupling(param : dict[str, float]) -> None:
+        #print ("checkSingleCoupling called")
+        if abs(param["lam11"]) > 0.666*np.pi or abs(param["lam12"]) > 0.666*np.pi or abs(param["lam12p"]) > 0.666*np.pi or abs(param["lam1Im"]) > 0.666*np.pi or abs(param["lam1Re"]) > 0.666*np.pi or abs(param["lam22"]) > 0.666*np.pi or abs(param["lam23"]) > 0.666*np.pi or abs(param["lam23p"]) > 0.666*np.pi or abs(param["lam2Im"]) > 0.666*np.pi or abs(param["lam2Re"]) > 0.666*np.pi or abs(param["lam31"]) > 0.666*np.pi or abs(param["lam31p"]) > 0.666*np.pi or abs(param["lam33"]) > 0.666*np.pi or abs(param["lam3Im"]) > 0.666*np.pi or abs(param["lam3Re"]) > 0.666*np.pi or abs(param["g1"]) > 0.666*np.pi or abs(param["g2"]) > 0.666*np.pi or abs(param["g3"]) > 0.666*np.pi:
+            print ("Model is at risk of being non-pert")
 
     """This goes from whatever "physical" input to parameters in the actions.
     With tree-level matching the renormalization scale does not directly show up in the expressions, but

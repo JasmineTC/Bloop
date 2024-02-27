@@ -514,7 +514,7 @@ bm20 = {
     "lam12p" : 0.1
 }
 bmList.append(bm20)
-bugfix = 0.1
+bugfix = 1
 bm21 = {
     
     ## Renormalization scale is also an input since we're inputting some action parameters directly

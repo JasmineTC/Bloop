@@ -4,7 +4,6 @@ from typing import Tuple
 
 from .GenericModel import GenericModel
 from .BetaFunctions import BetaFunctions4D
-from .VeffMinimizer import VeffMinimizer
 
 
 """Class TransitionFinder -- This handles all logic for tracking the temperature dependence of a model,
@@ -29,7 +28,7 @@ class TransitionFinder:
         TRange = np.asanyarray(TRange)
 
         renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams,  self.model.inputParams["RGScale"])
-
+        
         """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale like 7T.
         To make this work nicely, integrate the beta functions here up to some high enough scale and store the resulting couplings
         in interpolated functions.
@@ -75,6 +74,10 @@ class TransitionFinder:
             matchingScale = 4.0*np.pi*np.exp(-EulerGamma) * T
             
             paramsForMatching = betas.RunCoupling(matchingScale)
+            
+            ##Check if couplings are pert
+            GenericModel.checkSingleCoupling(paramsForMatching)
+            
             ## These need to be in the dict
             paramsForMatching["RGScale"] = matchingScale
             paramsForMatching["T"] = T

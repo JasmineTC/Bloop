@@ -292,7 +292,7 @@ class EffectivePotential:
             veffFiles.append( pathToCurrentFile / "Data/EffectivePotential/Veff_NLO.txt")
         if (self.loopOrder >= 2):
             ##TODO Change back when done bugfixing
-            veffFiles.append( pathToCurrentFile / "Data/EffectivePotential/Veff_NNLO_SS_Off.txt")
+            veffFiles.append( pathToCurrentFile / "Data/EffectivePotential/Veff_NNLO.txt")
 
 
         ## Hack: combine these into a one file so that ParsedExpressionSystem understand it

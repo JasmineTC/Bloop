@@ -49,7 +49,8 @@ minimizationResults = transitionFinder.traceFreeEnergyMinimum()
 
 #filename = f"Results/{date.today()}-BM-{args.benchMarkNumber}-LoopOrder{args.loopOrder}"
 #filename = f"Results/Debug/g_01/SS_Off/BM_{args.benchMarkNumber}_gHDM_{ghdm}_SS_Off"
-filename = f"Results/Debug/g_01/1loop/BM_{args.benchMarkNumber}_gHDM_{ghdm}_1loop"
-np.savetxt(filename + ".txt", minimizationResults)
+#filename = f"Results/Debug/g_01/1loop/BM_{args.benchMarkNumber}_gHDM_{ghdm}_1loop"
+filename = f"Results/Debug/nonpert/BM_{args.benchMarkNumber}_gHDM_{ghdm}_2loop"
+#np.savetxt(filename + ".txt", minimizationResults)
 if args.plot == True:
     PlotResult.PlotData(minimizationResults, args.benchMarkNumber,args.loopOrder, filename)

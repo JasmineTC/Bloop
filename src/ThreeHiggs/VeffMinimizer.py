@@ -25,7 +25,6 @@ class VeffMinimizer:
 
     def __init__(self, numVariables: int):
         self.numVariables = numVariables
-        #self.__algo = MinimizationAlgos.eDIRECTGLOBAL
 
     
 
@@ -104,20 +103,20 @@ class VeffMinimizer:
                 
                 location, value = opt2.optimize(location),  opt2.last_optimum_value()
                 ##For testing how well minimiser does
-                points = 150
-                xMax = max(2, location[2]) 
-                xList = np.linspace(1e-4, xMax*1.4, points)
-                yList = np.zeros(points)
-                for i, value in enumerate(xList):
-                    yList[i] = function( (0, 0, value) )
-                yList = yList - yList[0]
-                plt.plot(xList, yList, '.')
-                plt.xlabel('v3')
-                plt.ylabel('V')
-                plt.vlines(location[2], min(yList), max(yList))
-                plt.title(f'Benchmark {self.bmNumber} - gHDM {self.ghdm}, T {T} 1loop')
-                plt.savefig(f"Results/Debug/g_01/1loop/BM_{self.bmNumber}_gHDM_{self.ghdm}_T_{T}_1loop.png")
-                plt.close()
+                # points = 150
+                # xMax = max(2, location[2]) 
+                # xList = np.linspace(1e-4, xMax*1.4, points)
+                # yList = np.zeros(points)
+                # for i, value in enumerate(xList):
+                #     yList[i] = function( (0, 0, value) )
+                # yList = yList - yList[0]
+                # plt.plot(xList, yList, '.')
+                # plt.xlabel('v3')
+                # plt.ylabel('V')
+                # plt.vlines(location[2], min(yList), max(yList))
+                # plt.title(f'Benchmark {self.bmNumber} - gHDM {self.ghdm}, T {T} 1loop')
+                # plt.savefig(f"Results/Debug/g_01/1loop/BM_{self.bmNumber}_gHDM_{self.ghdm}_T_{T}_1loop.png")
+                # plt.close()
                 
             case MinimizationAlgos.eNelderMead:
                 opt = nlopt.opt(nlopt.LN_NELDERMEAD, 3)
