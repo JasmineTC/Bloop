@@ -1,5 +1,7 @@
 import numpy as np
-import pathlib
+from datetime import date
+
+today = date.today()
 
 import ThreeHiggs
 
@@ -7,6 +9,12 @@ from ThreeHiggs import GenericModel
 from ThreeHiggs import TransitionFinder
 
 import Benchmarks.Benchmarks_3HDM
+from PlotResult import PlotResult
+
+from ThreeHiggs import MinimizationAlgos
+
+userinput = ThreeHiggs.UserInput()
+args = userinput.parse()
 
 hardToSoftFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleParams_NLO.txt")
 softScaleRGEFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleRGE.txt")
@@ -14,19 +22,35 @@ softToUltrasoftFile = ThreeHiggs.getResourcePath("Data/SoftToUltrasoft/ultrasoft
 
 
 ## Model object setup + load matching relations
-model3HDM = GenericModel()
+model3HDM = GenericModel(loopOrder = args.loopOrder)
 model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
 model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
+## Set algorithm to use for Veff minimization
+model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eDIRECTGLOBAL)
+## Set tolerances used by global and local methods in Veff minimization
+## Order is global abs, global rel, local abs, local rel
+model3HDM.effectivePotential.minimizer.setTolerances(1e-1, 1e-1, 1e-5, 1e-5)
+model3HDM.effectivePotential.minimizer.setBmNumber(args.benchMarkNumber)
 
-inputParams = Benchmarks.Benchmarks_3HDM.BM1
-#inputParams = Benchmarks.Benchmarks_3HDM.BM_SM_like
+
+#print("!!!")
+#print("Currently not matching soft --> ultrasoft, this is WIP. Also: 2-loop masses lack some log terms")
+#print("!!!")
+
+
+inputParams = Benchmarks.Benchmarks_3HDM.bmList[args.benchMarkNumber]
+ghdm = inputParams["ghDM"]
+model3HDM.effectivePotential.minimizer.setgHDM(ghdm)
 
 transitionFinder = TransitionFinder(model=model3HDM)
-
-## Scanning loops would start here
-
-print("Start finite-T stuff")
 model3HDM.setInputParams(inputParams)
+minimizationResults = transitionFinder.traceFreeEnergyMinimum()
 
-transitionFinder.traceFreeEnergyMinimum()
+#filename = f"Results/{date.today()}-BM-{args.benchMarkNumber}-LoopOrder{args.loopOrder}"
+#filename = f"Results/Debug/g_01/SS_Off/BM_{args.benchMarkNumber}_gHDM_{ghdm}_SS_Off"
+#filename = f"Results/Debug/g_01/1loop/BM_{args.benchMarkNumber}_gHDM_{ghdm}_1loop"
+filename = f"Results/Debug/nonpert/BM_{args.benchMarkNumber}_gHDM_{ghdm}_2loop"
+#np.savetxt(filename + ".txt", minimizationResults)
+if args.plot == True:
+    PlotResult.PlotData(minimizationResults, args.benchMarkNumber,args.loopOrder, filename)

@@ -1,18 +1,16 @@
 import numpy as np
 import numpy.typing as npt
 from typing import Tuple
-import scipy.optimize
-from dataclasses import dataclass
 
 from scipy.optimize import least_squares
 
 import pathlib ## for hacking
 
-from .Integrals import J3
 
-from .ParsedExpression import ParsedExpressionSystem, SystemOfEquations, ParsedExpression
+from .ParsedExpression import ParsedExpressionSystem, SystemOfEquations
 from .CommonUtils import combineDicts
 
+from .VeffMinimizer import VeffMinimizer
 
 class MixingAngleEquations(SystemOfEquations):
     """This is just a SystemOfEquations but we add a common solve() routine that can be configured for solving sines of angles, 
@@ -35,10 +33,12 @@ class MixingAngleEquations(SystemOfEquations):
         def evaluateWrapper(x: npt.ArrayLike, *args):
             return self.evaluateSystem( x.tolist() + list(args) )
         
-        #fsolve method produces sin_i >1, cannot tell fsolve that sin_i is bounded, use least squares instead
-        #res = scipy.optimize.fsolve(evaluateWrapper, initialGuess, args=(otherArgs))
+        ##Least squares will minimise a function given an initial guess and some bounds (needed so abs(S_i) <= 1)
+        ##ftol controls the difference in function evalution, xtol how small the change in arguement can be, gtol how much the gradient changes
+        ##the default tol of 1e-8 was not sufficient for outputs to agree on different machines
+        ##Changed the jacobian calculation to use 3 point method, twice as many computations but should be more accurate
+        #res = (least_squares(evaluateWrapper, initialGuess, bounds=(-1,1), args=(otherArgs), ftol = 1e-9, xtol=1e-9, gtol=1e-9, jac='3-point')).x
         res = (least_squares(evaluateWrapper, initialGuess, bounds=(-1,1), args=(otherArgs))).x
-
         ## The solver can throw warnings if it tries to evaluate the eqs outside sine's value range. So TODO change this to some algorithm that can limit the search range 
 
         ## We solved sines, not angles, but this is OK for now at least. So just return the sines.
@@ -109,6 +109,7 @@ class VeffParams:
         """
         ## To make this work nicely we need to put the field in same dict as our other inputs, so hack it here (will need optimization)
         _, _, v3 = fields
+        #v3 = fields
         knownParamsDict = self.actionParams.copy()
         knownParamsDict["v3"] = v3
         
@@ -211,6 +212,8 @@ class EffectivePotential:
     ## One expression for each loop order
     expressions: ParsedExpressionSystem
 
+    minimizer: VeffMinimizer
+
     def __init__(self, loopOrder, initialModelParameters: dict = None):
         """loopOrder specifies how many perturbative orders we take. 
         This CANNOT be changed at runtime, you will have to make a new object instead.
@@ -227,6 +230,8 @@ class EffectivePotential:
         
         if (initialModelParameters):
             self.setModelParameters(initialModelParameters)
+
+        self.minimizer = VeffMinimizer(3) # currently the numVariables is not used by minimizer
 
         
 
@@ -308,7 +313,6 @@ class EffectivePotential:
 
         ## summing works because the result is a list [V0, V1, ...]
         res = sum( self.expressions.evaluateSystemWithDict(paramDict) )
-
         return res
 
 
@@ -320,14 +324,14 @@ class EffectivePotential:
         ## Then self.evaluate would return a numpy array which scipy doesn't know how to work with. 
         ## Here I make an array of lambda functions and minimize those separately
 
-
         ## Minimize real part only:
         VeffWrapper = lambda fields: np.real ( self.evaluate(fields) )
 
-        res = scipy.optimize.minimize(VeffWrapper, initialGuess)
+        ##Added bounds to minimize to reduce the IR senstivity coming from low mass modes
+        bounds = ((1e-6, 1e-6), (1e-6, 1e-6), (1e-6, 1e3))
 
-        ## res.x = location, res.fun = value, res.success = flag for determining if the algorithm finished successfully
-        location = res.x # this is np.array valued
+        location, value = self.minimizer.minimize(VeffWrapper, initialGuess, bounds)
+
 
         if np.any(np.isnan(location)):
             location  = [np.nan] * len[initialGuess]
@@ -347,8 +351,8 @@ class EffectivePotential:
         """
         
         if (minimumCandidates == None or len(minimumCandidates) == 0):
-            ## Just search "symmetric" and "broken" in the phi3 direction
-            minimumCandidates = [ [0., 0., 1e-4], [0., 0., 100.] ]
+            ## Initial guesses for minimiser
+            minimumCandidates = [ [0., 0., 1e-4]]
 
         deepest = np.inf
         res = [np.nan]*3, np.inf

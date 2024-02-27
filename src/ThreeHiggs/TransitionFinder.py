@@ -22,14 +22,13 @@ class TransitionFinder:
 
 
 
-    ## This is a way too big routine 
-    ##TODO Change step size in T back to 1 when done testing
-    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 2.5)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
+    ## This is a way too big routine
+    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 1.)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
 
         TRange = np.asanyarray(TRange)
 
         renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams,  self.model.inputParams["RGScale"])
-
+        
         """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale like 7T.
         To make this work nicely, integrate the beta functions here up to some high enough scale and store the resulting couplings
         in interpolated functions.
@@ -62,14 +61,23 @@ class TransitionFinder:
         ## This will contain minimization results in form: 
         ## [ [T, Veff(min), field1, field2, ...], ... ]
         minimizationResults = []
+ 
+        counter = 0
+        #dog = VeffMinimizer(1)
         for T in TRange:
-
+            print (f'Start of temp = {T} loop')
+            
+            #dog.setTemp(T)            
             ## Final scale in 3D
             goalRGScale =  T
 
             matchingScale = 4.0*np.pi*np.exp(-EulerGamma) * T
             
             paramsForMatching = betas.RunCoupling(matchingScale)
+            
+            ##Check if couplings are pert
+            GenericModel.checkPerturbativity(paramsForMatching)
+            
             ## These need to be in the dict
             paramsForMatching["RGScale"] = matchingScale
             paramsForMatching["T"] = T
@@ -85,13 +93,16 @@ class TransitionFinder:
             self.model.effectivePotential.setModelParameters(params3D)
 
             minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
-
+            
             minimizationResults.append( [T, valueVeff, *minimum] )
+            if minimum[2] < 1e-3:
+                print (f"Symmetric phase found at temp {T}")
+                if counter == 3:
+                    break
+                counter += 1
 
-            # temp
-            print (f"{[T, minimum, valueVeff]=}")
-
+            
 
         minimizationResults = np.asanyarray(minimizationResults)
-        print( minimizationResults )
-        np.savetxt("results_test.txt", minimizationResults)
+        ## print( minimizationResults )
+        return (minimizationResults)

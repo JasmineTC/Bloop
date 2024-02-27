@@ -1,6 +1,6 @@
-import numpy as np
 import numpy.typing as npt
 from typing import Tuple
+import numpy as np
 
 from .EffectivePotential import EffectivePotential
 from .DimensionalReduction import DimensionalReduction
@@ -29,15 +29,17 @@ class GenericModel():
     MZ = 91.1876
     ## Top quark mass 
     Mt = 172.76
+    ##TODO we now run this, needs adjusting
     ## SU(3) coupling, we neglect it's running. This is the value at Z pole
     g3 = np.sqrt(0.1183 * 4.0 * np.pi)
 
 
-    def __init__(self):
+    def __init__(self, loopOrder = 1):
+        
         self.inputParams = {}
         self.dimensionalReduction = DimensionalReduction()
         ## 3D potential:
-        self.effectivePotential = EffectivePotential(loopOrder=2)
+        self.effectivePotential = EffectivePotential(loopOrder=loopOrder)
 
     
     def setInputParams(self, inputParams):
@@ -51,7 +53,14 @@ class GenericModel():
         mSpm1 = delta1c + mS1
         mSpm2 = deltac + mSpm1
         return mS2, mSpm1, mSpm2
-
+    
+    @staticmethod
+    ##One massive if statement (than many if statements because of memory checks) to check if indiviual couplings are less than 4 pi
+    ##This is not a sufficient check! Need to find the combinations of couplings that appear in all diagrams to be sure
+    def checkPerturbativity(param : dict[str, float]) -> None:
+        #print ("checkSingleCoupling called")
+        if abs(param["lam11"]) > 4*np.pi or abs(param["lam12"]) > 4*np.pi or abs(param["lam12p"]) > 4*np.pi or abs(param["lam1Im"]) > 4*np.pi or abs(param["lam1Re"]) > 4*np.pi or abs(param["lam22"]) > 4*np.pi or abs(param["lam23"]) > 4*np.pi or abs(param["lam23p"]) > 4*np.pi or abs(param["lam2Im"]) > 4*np.pi or abs(param["lam2Re"]) > 4*np.pi or abs(param["lam31"]) > 4*np.pi or abs(param["lam31p"]) > 4*np.pi or abs(param["lam33"]) > 4*np.pi or abs(param["lam3Im"]) > 4*np.pi or abs(param["lam3Re"]) > 4*np.pi or abs(param["g1"]) > 4*np.pi or abs(param["g2"]) > 4*np.pi or abs(param["g3"]) > 4*np.pi:
+            print ("Model is at risk of being non-pert")
 
     """This goes from whatever "physical" input to parameters in the actions.
     With tree-level matching the renormalization scale does not directly show up in the expressions, but
@@ -155,7 +164,4 @@ class GenericModel():
         res["RGScale"] = RGScale
 
         return res
-
-        
-
     
