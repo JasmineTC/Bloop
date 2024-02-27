@@ -351,8 +351,8 @@ class EffectivePotential:
         """
         
         if (minimumCandidates == None or len(minimumCandidates) == 0):
-            ## Just search "symmetric" and "broken" in the phi3 direction
-            minimumCandidates = [ [0., 0., 1e-4]]#, [0., 0., 30.] ]
+            ## Initial guesses for minimiser
+            minimumCandidates = [ [0., 0., 1e-4]]
 
         deepest = np.inf
         res = [np.nan]*3, np.inf

@@ -76,7 +76,7 @@ class TransitionFinder:
             paramsForMatching = betas.RunCoupling(matchingScale)
             
             ##Check if couplings are pert
-            GenericModel.checkSingleCoupling(paramsForMatching)
+            GenericModel.checkPerturbativity(paramsForMatching)
             
             ## These need to be in the dict
             paramsForMatching["RGScale"] = matchingScale
