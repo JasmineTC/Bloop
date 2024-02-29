@@ -6,7 +6,7 @@ from scipy.optimize import least_squares
 
 import pathlib ## for hacking
 
-
+from .parsedmatrix import ParsedMatrix
 from .ParsedExpression import ParsedExpressionSystem, SystemOfEquations
 from .CommonUtils import combineDicts
 
@@ -98,6 +98,7 @@ class VeffParams:
         self.initMassExpressions()
         self.initDiagonalizationConditions()
         self.initShorthandSymbols()
+        self.initScalarMassMatrix()
 
 
     def setActionParams(self, inputParams: dict[str, float]) -> None:
@@ -108,9 +109,11 @@ class VeffParams:
         """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation.
         """
         ## To make this work nicely we need to put the field in same dict as our other inputs, so hack it here (will need optimization)
-        _, _, v3 = fields
+        v1, v2, v3 = fields
         #v3 = fields
         knownParamsDict = self.actionParams.copy()
+        knownParamsDict["v1"] = v1
+        knownParamsDict["v2"] = v2
         knownParamsDict["v3"] = v3
         
         if (bNeedsDiagonalization):
@@ -144,7 +147,7 @@ class VeffParams:
         vectorMassesSquaredDict = self.vectorMassesSquared.evaluateSystemWithDict(knownParams, bReturnDict=True)
         ## Take abs. TODO handle better
         for key in vectorMassesSquaredDict:
-            vectorMassesSquaredDict[key] = abs(vectorMassesSquaredDict[key])
+            vectorMassesSquaredDict[key] = np.abs(vectorMassesSquaredDict[key])
         return vectorMassesSquaredDict
 
     def evaluateMasses(self, knownParams: dict[str, float]) -> dict[str, float]:
@@ -199,6 +202,15 @@ class VeffParams:
         self.postDiagonalizationShorthands = ParsedExpressionSystem(postDiagonalizationShorthandsFile)
         self.preVeffShorthands = ParsedExpressionSystem(preVeffShorthandsFile)
 
+    def initScalarMassMatrix(self):
+
+        ## TODO read these paths from a config or something. This is a hack
+        pathToCurrentFile = pathlib.Path(__file__).parent.resolve()
+        massMatrixFile = pathToCurrentFile / "Data/EffectivePotential_threeFields/scalarMassMatrix.txt"
+        definitionsFile = pathToCurrentFile / "Data/EffectivePotential_threeFields/scalarMassMatrix_definitions.txt"
+
+        self.scalarMassMatrix = ParsedMatrix(massMatrixFile, definitionsFile)
+
 
 """ Evaluating the potential: 
 1. Call setModelParameters() with a dict that sets all parameters in the action. 
@@ -207,14 +219,7 @@ This is assumed to be using 3D EFT, so the params are temperature dependent.
 """
 class EffectivePotential:
 
-    
-    loopOrder: int
-    ## One expression for each loop order
-    expressions: ParsedExpressionSystem
-
-    minimizer: VeffMinimizer
-
-    def __init__(self, loopOrder, initialModelParameters: dict = None):
+    def __init__(self, loopOrder: int, initialModelParameters: dict = None):
         """loopOrder specifies how many perturbative orders we take. 
         This CANNOT be changed at runtime, you will have to make a new object instead.
         Order count starts from 0. Tree level is 0, 1-loop is 1 etc.
@@ -239,40 +244,8 @@ class EffectivePotential:
     def setModelParameters(self, modelParameters: dict) -> None:
         """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate 
         """
-
         self.params.setActionParams(modelParameters)
 
-        """
-        self.g1sq = modelParameters["g1sq"]
-        self.g2sq = modelParameters["g2sq"]
-        ## QCD coupling g3 not needed
-
-        self.mu1sq = modelParameters["mu1sq"]
-        self.mu2sq = modelParameters["mu2sq"]
-        self.mu3sq = modelParameters["mu3sq"]
-
-        self.lam11 = modelParameters["lam11"]
-        self.lam22 = modelParameters["lam22"]
-        self.lam33 = modelParameters["lam33"]
-        self.lam12 = modelParameters["lam12"]
-        self.lam23 = modelParameters["lam23"]
-        self.lam31 = modelParameters["lam31"]
-        ## Primed params
-        self.lam12p = modelParameters["lam12p"]
-        self.lam23p = modelParameters["lam23p"]
-        self.lam31p = modelParameters["lam31p"]
-
-        self.mu12sqRe = modelParameters["mu12sqRe"]
-        self.mu12sqIm = modelParameters["mu12sqIm"]
-        self.lam1Re = modelParameters["lam1Re"]
-        self.lam1Im = modelParameters["lam1Im"]
-        self.lam2Re = modelParameters["lam2Re"]
-        self.lam2Im = modelParameters["lam2Im"]
-        self.lam3Re = modelParameters["lam3Re"]
-        self.lam3Im = modelParameters["lam3Im"]
-
-        self.modelParameter = modelParameters ## Dunno if we want to have this tbh, but store for now
-        """
 
     def initExpressions(self):
 
@@ -289,7 +262,7 @@ class EffectivePotential:
             veffFiles.append( pathToCurrentFile / "Data/EffectivePotential/Veff_NNLO.txt")
 
 
-        ## Hack: combine these into a one file so that ParsedExpressionSystem understand it
+        ## HACK: combine these into a one file so that ParsedExpressionSystem understand it
 
         tempFileName = pathToCurrentFile / "tempFile1424522343.txt"
 

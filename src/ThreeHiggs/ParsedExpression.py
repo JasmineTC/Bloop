@@ -261,16 +261,11 @@ that describe the unknowns versus symbols that are known inputs to the expressio
 """
 class SystemOfEquations(ParsedExpressionSystem):
 
-    ## what we solve for
-    unknownVariables: list[str]
-    ## "known" inputs
-    otherVariables: list[str]
-
     def __init__(self, fileName: str, unknownVariables: list[str]):
         
-        ## Call parent constructor
         super().__init__(fileName)
 
+        ## what we solve for
         self.unknownVariables = unknownVariables
 
         ## Check that we have same number of eqs as unknowns 
@@ -300,6 +295,7 @@ class SystemOfEquations(ParsedExpressionSystem):
         filteredArguments = [ item for item in self.functionArguments if item not in self.unknownVariables ]
         rearrangedArguments = self.unknownVariables + filteredArguments
 
+        ## "known" inputs
         self.otherVariables = filteredArguments
 
         ## And create new lambdas

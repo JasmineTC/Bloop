@@ -3,7 +3,6 @@ import nlopt
 import numpy as np
 import scipy.optimize
 from typing import Callable, Tuple
-import matplotlib.pylab as plt ## Just used for plotting potential in testing phase
 
 class MinimizationAlgos(Enum):
     ##Enums work by setting the LHS, some important name you want to refer to later and keep fixed, to some unique number you don't care about

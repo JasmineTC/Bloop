@@ -9,12 +9,14 @@ from ThreeHiggs import GenericModel
 from ThreeHiggs import TransitionFinder
 
 import Benchmarks.Benchmarks_3HDM
-from PlotResult import PlotResult
-
 from ThreeHiggs import MinimizationAlgos
+
+from ThreeHiggs.parsedmatrix import ParsedMatrix
 
 userinput = ThreeHiggs.UserInput()
 args = userinput.parse()
+
+##  TEST TEST
 
 hardToSoftFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleParams_NLO.txt")
 softScaleRGEFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleRGE.txt")
@@ -34,11 +36,6 @@ model3HDM.effectivePotential.minimizer.setTolerances(1e-1, 1e-1, 1e-5, 1e-5)
 model3HDM.effectivePotential.minimizer.setBmNumber(args.benchMarkNumber)
 
 
-#print("!!!")
-#print("Currently not matching soft --> ultrasoft, this is WIP. Also: 2-loop masses lack some log terms")
-#print("!!!")
-
-
 inputParams = Benchmarks.Benchmarks_3HDM.bmList[args.benchMarkNumber]
 ghdm = inputParams["ghDM"]
 model3HDM.effectivePotential.minimizer.setgHDM(ghdm)
@@ -52,5 +49,7 @@ minimizationResults = transitionFinder.traceFreeEnergyMinimum()
 #filename = f"Results/Debug/g_01/1loop/BM_{args.benchMarkNumber}_gHDM_{ghdm}_1loop"
 filename = f"Results/Debug/nonpert/BM_{args.benchMarkNumber}_gHDM_{ghdm}_2loop"
 #np.savetxt(filename + ".txt", minimizationResults)
+
 if args.plot == True:
+    from PlotResult import PlotResult
     PlotResult.PlotData(minimizationResults, args.benchMarkNumber,args.loopOrder, filename)
