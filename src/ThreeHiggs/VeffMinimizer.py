@@ -51,7 +51,6 @@ class VeffMinimizer:
         self.bmNumber = bmNumber
         
     def minimize(self, function: Callable, initialGuess: np.ndarray, bounds) -> Tuple[np.ndarray, float]:
-    #def minimize(self, function: Callable, initialGuess: ndarray, bounds) -> Tuple[ndarray, float]:
         """Give bounds in format ((min1, max1), (min2, max2)) etc, one pair for each variable.
         Returns: 
         location, Veff(location)

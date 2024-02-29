@@ -1,0 +1,2 @@
+stW -> g1/Sqrt[g1^2 + g2^2]
+ctW -> g2/Sqrt[g1^2 + g2^2]

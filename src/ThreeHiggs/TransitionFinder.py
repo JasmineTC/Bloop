@@ -25,6 +25,8 @@ class TransitionFinder:
     ## This is a way too big routine
     def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 1.)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
 
+        assert self.model.effectivePotential.IsConfigured(), "Veff has not been configured, please call its configure() function before use"
+
         TRange = np.asanyarray(TRange)
 
         renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams,  self.model.inputParams["RGScale"])

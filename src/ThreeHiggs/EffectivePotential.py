@@ -1,61 +1,37 @@
 import numpy as np
 import numpy.typing as npt
 from typing import Tuple
+import tempfile # hacking
 
-from scipy.optimize import least_squares
+from scipy import linalg
+from dataclasses import dataclass
 
-import pathlib ## for hacking
-
-from .parsedmatrix import ParsedMatrix
+from .parsedmatrix import ParsedMatrix, MatrixDefinitionFiles
 from .ParsedExpression import ParsedExpressionSystem, SystemOfEquations
-from .CommonUtils import combineDicts
+from .CommonUtils import combineDicts, diagonalizeSymmetric
 
 from .VeffMinimizer import VeffMinimizer
 
-class MixingAngleEquations(SystemOfEquations):
-    """This is just a SystemOfEquations but we add a common solve() routine that can be configured for solving sines of angles, 
-    and then returning the angles."""
+@dataclass(slots=True)
+class VeffConfig:
+    # Names of the background-field variables that the Veff depends on
+    fieldNames: list[str]
+    # 0 = tree etc
+    loopOrder: int
+    # list of file names from where we parse expressions for the Veff. These get added together when evaluating Veff(fields)
+    veffFiles: list[str]
+    # Vector boson mass squares
+    vectorMassFile: str
+    # Shorthand symbols for vectors. Gets evaluated before masses
+    vectorShorthandFile: str
 
-    def __init__(self, fileName: str, unknownVariables: list[str]):
-        super().__init__(fileName, unknownVariables)
-
-
-    def solve(self, knownVariables: dict[str, float]) -> list[float]:
-
-        ## Get list of "extra" variables in correct order
-        otherArgs = tuple( self.getOtherVariablesFromDict(knownVariables) )
-
-        ## Initial guesses for the sines
-        initialGuess = 0., 0., 0., 0., 0., 0.
-
-        ## function signature needs to be f(x, *args) if x are the unknowns.
-        ## This is now a very stupid implementation, too much list <-> tuple <-> numpy array etc conversions. TODO need to clean this up
-        def evaluateWrapper(x: npt.ArrayLike, *args):
-            return self.evaluateSystem( x.tolist() + list(args) )
-        
-        ##Least squares will minimise a function given an initial guess and some bounds (needed so abs(S_i) <= 1)
-        ##ftol controls the difference in function evalution, xtol how small the change in arguement can be, gtol how much the gradient changes
-        ##the default tol of 1e-8 was not sufficient for outputs to agree on different machines
-        ##Changed the jacobian calculation to use 3 point method, twice as many computations but should be more accurate
-        #res = (least_squares(evaluateWrapper, initialGuess, bounds=(-1,1), args=(otherArgs), ftol = 1e-9, xtol=1e-9, gtol=1e-9, jac='3-point')).x
-        res = (least_squares(evaluateWrapper, initialGuess, bounds=(-1,1), args=(otherArgs))).x
-        ## The solver can throw warnings if it tries to evaluate the eqs outside sine's value range. So TODO change this to some algorithm that can limit the search range 
-
-        ## We solved sines, not angles, but this is OK for now at least. So just return the sines.
+    # Constant matrix transformation that brings the mass matrix into block diagonal form
+    scalarPermutationMatrix: np.ndarray
+    # Specify scalar mass matrices to diagonalize, can have many. The full mass matrix should be block diagonal in these (after the permutation transform)
+    scalarMassMatrices: list[MatrixDefinitionFiles]
+    # Full rotation from unpermutated basis to diagonal basis
+    scalarRotationMatrixFile: str
     
-        ## return list, not numpy array for now
-        return res.tolist()
-    
-    def solveAsDict(self, knownVariables: dict[str, float]) -> dict[str, float]:
-        """Same as solve() but returns a dict with named output.
-        """
-
-        solns = self.solve(knownVariables)
-        return dict(zip( self.unknownVariables, solns ))
-        
-
-
-
 
 ## everything we need to evaluate the potential. this is very WIP
 class VeffParams:
@@ -73,32 +49,11 @@ class VeffParams:
         6. Evaluate pre-Veff shorthand symbols (so stuff that does into rotation matrices)
     """
 
-    fields: dict[str, float]
-    actionParams: dict[str, float]
-    angles: dict[str, float]
-    masses: dict[str, float]
+    def __init__(self, veffConfig: VeffConfig):
 
-    ## TODO export these from mathematica and read in here
-    fieldNames: list[str] = ["v3"]
-
-    """Equations that need to be solved numerically to guarantee diagonal mass matrix (at tree level).
-    We allow there to be many independent systems of equations.
-    """
-    diagonalizationConditions: list[MixingAngleEquations]
-    
-    ## Field-dependent masses
-    vectorMassesSquared: ParsedExpressionSystem
-    scalarMassesSquared: ParsedExpressionSystem
-
-    ## Shorthand symbols
-    postDiagonalizationShorthands: ParsedExpressionSystem
-    preVeffShorthands: ParsedExpressionSystem
-
-    def __init__(self):
-        self.initMassExpressions()
-        self.initDiagonalizationConditions()
-        self.initShorthandSymbols()
-        self.initScalarMassMatrix()
+        self.fieldNames = veffConfig.fieldNames
+        self.configureVectors(veffConfig)
+        self.configureScalars(veffConfig)
 
 
     def setActionParams(self, inputParams: dict[str, float]) -> None:
@@ -108,32 +63,27 @@ class VeffParams:
     def evaluateAll(self, fields: list[float], bNeedsDiagonalization=True) -> dict[str, float]:
         """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation.
         """
-        ## To make this work nicely we need to put the field in same dict as our other inputs, so hack it here (will need optimization)
-        v1, v2, v3 = fields
-        #v3 = fields
+        # Gradually build a dict containing (key, val) for all needed symbols
+        # TODO this will need to be optimized
         knownParamsDict = self.actionParams.copy()
-        knownParamsDict["v1"] = v1
-        knownParamsDict["v2"] = v2
-        knownParamsDict["v3"] = v3
+
+        ## Background fields
+        for i, value in enumerate(fields):
+            knownParamsDict[self.fieldNames[i]] = value
+
+        ## Vectors
+        vectorShorthands = self.vectorShorthands.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
+        knownParamsDict = combineDicts(knownParamsDict, vectorShorthands)
+        vectorMasses = self.vectorMassesSquared.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
+        knownParamsDict = combineDicts(knownParamsDict, vectorMasses)
+
+        ## Scalars
+        diagDict = self.diagonalizeScalars(knownParamsDict)
         
-        if (bNeedsDiagonalization):
-            ## Diagonalization conditions
-            diagCondDict = self.solveDiagonalizationConditions(knownParamsDict)
-            knownParamsDict = combineDicts(knownParamsDict, diagCondDict)
-
-            ## Post-diagonalization symbols
-            shorthands = self.postDiagonalizationShorthands.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
-            knownParamsDict = combineDicts(knownParamsDict, shorthands)
-
-            ## Masses
-            masses = self.evaluateMasses(knownParamsDict)
-            knownParamsDict = combineDicts(knownParamsDict, masses)
-
-            ## pre-Veff symbols
-            shorthands = self.preVeffShorthands.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
-            knownParamsDict = combineDicts(knownParamsDict, shorthands)
+        knownParamsDict = combineDicts(knownParamsDict, diagDict)
 
         return knownParamsDict
+
     
 
     def evaluateScalarMasses(self, knownParams: dict[str, float]) -> dict[str, float]:
@@ -154,63 +104,67 @@ class VeffParams:
         return combineDicts( self.evaluateScalarMasses(knownParams), self.evaluateVectorMasses(knownParams) )
 
 
-    def solveDiagonalizationConditions(self, knownParams: dict[str, float]) -> dict[str, float]:
-        assert self.diagonalizationConditions != None
+
+    def configureVectors(self, veffConfig: VeffConfig) -> None:
+        """Configures vector boson expressions."""
+        self.vectorMassesSquared = ParsedExpressionSystem(veffConfig.vectorMassFile)
+        self.vectorShorthands = ParsedExpressionSystem(veffConfig.vectorShorthandFile)
+
+    def configureScalars(self, veffConfig: VeffConfig) -> None:
+        """Configures scalar expressions, diagonalization in particular.
+        """
+
+        self.scalarPermutationMatrix = veffConfig.scalarPermutationMatrix
+        ## can have many matrices if we've block-diagonalized already
+        self.scalarMassMatrices = []
+
+        ## ASSUME: the blocks are given in order: upper left to lower right. TODO improve this
         
-        solutionsDict = {}
-        for cond in self.diagonalizationConditions:
-             
-            solutionsDict = combineDicts( solutionsDict, cond.solveAsDict(knownParams) )
+        for matrixInfo in veffConfig.scalarMassMatrices:
+            self.scalarMassMatrices.append( ParsedMatrix(matrixInfo.matrixFile, matrixInfo.expressionsFile) )
+
+
+        self.scalarRotationMatrix = ParsedMatrix(veffConfig.scalarRotationMatrixFile)
+
+
+    def diagonalizeScalars(self, params: dict[str, float]) -> dict[str, float]:
+        """Finds a rotation matrix that diagonalizes the scalar mass matrix
+        and returns a dict with diagonalization-specific params
+        """
+        # TODO optimize
+
+        outDict = {}
+
+        # Diagonalize blocks separately
+        blockRot = []
+        blockM = []
+        for m in self.scalarMassMatrices:
+            
+            numericalM = m.evaluateWithDict(params)
+            _, vects = diagonalizeSymmetric( numericalM, bCheckFinite=False )
+            blockRot.append(vects)
+            blockM.append(numericalM)
+
+        # Note: @ is short for numpy matrix multiplication
+
+        ## Rotation that diagonalizes the original, unpermuted mass matrix (so we undo the permutation)
+        rot = linalg.block_diag(*blockRot) @ self.scalarPermutationMatrix
+        ## Diagonalized mass matrix
+        diag = rot @ linalg.block_diag(*blockM) @ np.transpose(rot)
+
+        ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
+        ## matrix element symbol in the Veff expressions. This is currently very hacky 
         
-        return solutionsDict
+        outDict = self.scalarRotationMatrix.matchSymbols(rot)
 
+        ## TODO improve this. currently I just hardcode scalar mass names
+        massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
 
-    def initMassExpressions(self):
+        for i, msq in enumerate(np.diagonal(diag)):
+            outDict[massNames[i]] = msq
 
-        ## TODO read these paths from a config or something. This is a hack
-        pathToCurrentFile = pathlib.Path(__file__).parent.resolve()
-        scalarMassesFile = pathToCurrentFile / "Data/EffectivePotential/scalarMasses.txt"
-        vectorMassesFile = pathToCurrentFile / "Data/EffectivePotential/vectorMasses.txt"
-        
-        self.vectorMassesSquared = ParsedExpressionSystem(vectorMassesFile)
-        self.scalarMassesSquared = ParsedExpressionSystem(scalarMassesFile)
-
-
-    def initDiagonalizationConditions(self):
-
-        self.diagonalizationConditions = []
-
-        ## TODO read these paths from a config or something. This is a hack
-        pathToCurrentFile = pathlib.Path(__file__).parent.resolve()
-        neutralAngleFile = pathToCurrentFile / "Data/EffectivePotential/neutralDiagonalizationAnglesEquations.txt"
-        chargedAngleFile = pathToCurrentFile / "Data/EffectivePotential/chargedDiagonalizationAnglesEquations.txt"
-
-        ## Currently we have to explicitly list the unknown variables by name:
-
-        self.diagonalizationConditions.append( MixingAngleEquations(neutralAngleFile, ['S1Ne', 'S2Ne', 'S3Ne', 'S4Ne', 'S5Ne', 'S6Ne']) )
-
-        self.diagonalizationConditions.append( MixingAngleEquations(chargedAngleFile, ['S1Ch', 'S2Ch', 'S3Ch', 'S4Ch', 'S5Ch', 'S6Ch']) )
-
-
-    def initShorthandSymbols(self):
-
-        ## TODO read these paths from a config or something. This is a hack
-        pathToCurrentFile = pathlib.Path(__file__).parent.resolve()
-        postDiagonalizationShorthandsFile = pathToCurrentFile / "Data/EffectivePotential/postDiagonalizationShorthands.txt"
-        preVeffShorthandsFile = pathToCurrentFile / "Data/EffectivePotential/preVeffShorthands.txt"
-
-        self.postDiagonalizationShorthands = ParsedExpressionSystem(postDiagonalizationShorthandsFile)
-        self.preVeffShorthands = ParsedExpressionSystem(preVeffShorthandsFile)
-
-    def initScalarMassMatrix(self):
-
-        ## TODO read these paths from a config or something. This is a hack
-        pathToCurrentFile = pathlib.Path(__file__).parent.resolve()
-        massMatrixFile = pathToCurrentFile / "Data/EffectivePotential_threeFields/scalarMassMatrix.txt"
-        definitionsFile = pathToCurrentFile / "Data/EffectivePotential_threeFields/scalarMassMatrix_definitions.txt"
-
-        self.scalarMassMatrix = ParsedMatrix(massMatrixFile, definitionsFile)
-
+        return outDict
+    
 
 """ Evaluating the potential: 
 1. Call setModelParameters() with a dict that sets all parameters in the action. 
@@ -219,27 +173,34 @@ This is assumed to be using 3D EFT, so the params are temperature dependent.
 """
 class EffectivePotential:
 
-    def __init__(self, loopOrder: int, initialModelParameters: dict = None):
-        """loopOrder specifies how many perturbative orders we take. 
-        This CANNOT be changed at runtime, you will have to make a new object instead.
-        Order count starts from 0. Tree level is 0, 1-loop is 1 etc.
+    def __init__(self):
+        """This doesn't do much, you need to call configure()
         """
 
-        self.loopOrder = loopOrder
+        self.bConfigured = False
+        self.params = None
+        ## How many background fields do we depend on
+        self.nbrFields: int = 0
 
-        self.initExpressions()
 
-        self.bNeedsDiagonalization = (loopOrder > 0)
-
-        self.params = VeffParams()
+    def configure(self, veffConfig: VeffConfig) -> None:
         
-        if (initialModelParameters):
-            self.setModelParameters(initialModelParameters)
+        self.fieldNames = veffConfig.fieldNames
+        self.nbrFields = len(self.fieldNames)
 
-        self.minimizer = VeffMinimizer(3) # currently the numVariables is not used by minimizer
+        self.loopOrder = veffConfig.loopOrder
+        self.initExpressions(veffConfig.veffFiles)
 
+        self.bNeedsDiagonalization = (self.loopOrder > 0)
+
+        self.params = VeffParams(veffConfig)
         
+        self.minimizer = VeffMinimizer(self.nbrFields) # currently the numVariables is not used by minimizer
+        self.bConfigured = True
 
+
+    def IsConfigured(self) -> bool:
+        return self.bConfigured
 
     def setModelParameters(self, modelParameters: dict) -> None:
         """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate 
@@ -247,33 +208,22 @@ class EffectivePotential:
         self.params.setActionParams(modelParameters)
 
 
-    def initExpressions(self):
+    def initExpressions(self, filesToParse: list[str]) -> None:
 
         self.expressions = []
-        
-        ## TODO read these paths from a config or something. This is a hack
-        pathToCurrentFile = pathlib.Path(__file__).parent.resolve()
-
-        veffFiles = []
-        veffFiles.append( pathToCurrentFile / "Data/EffectivePotential/Veff_LO.txt")
-        if (self.loopOrder >= 1):
-            veffFiles.append( pathToCurrentFile / "Data/EffectivePotential/Veff_NLO.txt")
-        if (self.loopOrder >= 2):
-            veffFiles.append( pathToCurrentFile / "Data/EffectivePotential/Veff_NNLO.txt")
-
-
-        ## HACK: combine these into a one file so that ParsedExpressionSystem understand it
-
-        tempFileName = pathToCurrentFile / "tempFile1424522343.txt"
-
-        with open(tempFileName, 'w') as tempf:
-            for filename in veffFiles:
+        ## HACK: combine these into one file so that ParsedExpressionSystem understand it
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as tempf:
+            for filename in filesToParse:
                 with open(filename, 'r') as f:
                     content = f.read()
                     tempf.write(content)
                     tempf.write("\n")
+                    print(tempf)
 
-        self.expressions = ParsedExpressionSystem(tempFileName)
+            ## close here because we need to re-open for parsing
+            tempf.close()
+            self.expressions = ParsedExpressionSystem(tempf.name)
+
 
     def evaluate(self, fields: list[float]) -> complex:
         """Evaluate Veff at specified field values. Uses the currently set model parameters.

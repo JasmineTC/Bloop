@@ -189,7 +189,7 @@ class ParsedExpressionSystem:
         """
         with open(fileName, "r", encoding="utf-8") as file:
             expressions = file.readlines()
-        
+
         parsedSymbols = []
         self.parsedExpressions = []
         for line in expressions:
