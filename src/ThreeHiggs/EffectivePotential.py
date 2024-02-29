@@ -218,7 +218,6 @@ class EffectivePotential:
                     content = f.read()
                     tempf.write(content)
                     tempf.write("\n")
-                    print(tempf)
 
             ## close here because we need to re-open for parsing
             tempf.close()

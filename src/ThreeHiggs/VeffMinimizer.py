@@ -59,7 +59,7 @@ class VeffMinimizer:
         wrapped a second time to give it room for the useless grad arguement  
         """
         ##TODO take bounds as user input, rather than hard coding
-        
+
         match(self.__algo):
 
             case MinimizationAlgos.eScipy:
