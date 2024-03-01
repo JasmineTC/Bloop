@@ -121,7 +121,7 @@ class VeffParams:
         """Finds a rotation matrix that diagonalizes the scalar mass matrix
         and returns a dict with diagonalization-specific params
         """
-        # TODO optimize
+        # TODO optimize, comment this with some matrix eqs
 
         outDict = {}
 
@@ -136,11 +136,14 @@ class VeffParams:
             blockM.append(numericalM)
 
         # Note: @ is short for numpy matrix multiplication
+        
+        ## This diagonalizes the block-diagonal mass matrix
+        blockDiagRot = linalg.block_diag(*blockRot)
+        ## Diagonalized mass matrix
+        diag = blockDiagRot @ linalg.block_diag(*blockM) @ np.transpose(blockDiagRot)
 
         ## Rotation that diagonalizes the original, unpermuted mass matrix (so we undo the permutation)
-        rot = linalg.block_diag(*blockRot) @ self.scalarPermutationMatrix
-        ## Diagonalized mass matrix
-        diag = rot @ linalg.block_diag(*blockM) @ np.transpose(rot)
+        rot = blockDiagRot @ self.scalarPermutationMatrix
 
         ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
         ## matrix element symbol in the Veff expressions. This is currently very hacky 
@@ -156,7 +159,7 @@ class VeffParams:
         else:
             for i, msq in enumerate(np.diagonal(diag)):
                 outDict[massNames[i]] = msq
-                
+
         return outDict
     
 
