@@ -131,7 +131,21 @@ class VeffParams:
         for m in self.scalarMassMatrices:
             
             numericalM = m.evaluateWithDict(params)
-            _, vects = diagonalizeSymmetric( numericalM, bCheckFinite=False )
+            eigenValue, vects = diagonalizeSymmetric( numericalM, bCheckFinite=False )
+            ## Quick check that the numerical mass matrix is diagonal after being rotated by vects
+            rotatedMassMatrix = np.transpose(vects) @ numericalM @ vects
+            for i in range(6):
+                for j in range(6):
+                    ## If on the diagonal compute abs % diff with eigenvalues and rotated matrix, if large then something went wrong
+                    if i == j and abs((eigenValue[i]-rotatedMassMatrix[i,i])/eigenValue[i]) > 1e-5:
+                        print (f"Large difference in eigenValues at index {i},{j}")
+                        print (f'The rotated mass matrix is {rotatedMassMatrix}')
+                        input()
+                    if i != j and rotatedMassMatrix[i,j] > 1e-8:
+                        print (f"Off diagonal element {i}{j} is larger than 1e-8, may not be diagonal")
+                        print (f'The rotated mass matrix is {rotatedMassMatrix}')
+                        input()
+                        
             blockRot.append(vects)
             blockM.append(numericalM)
 
@@ -235,7 +249,7 @@ class EffectivePotential:
 
 
     ## Return value is location, value
-    def findLocalMinimum(self, initialGuess: list[float]) -> Tuple[list[float], complex]:
+    def findLocalMinimum(self, T, initialGuess: list[float]) -> Tuple[list[float], complex]:
         
         ## I think we need to manually vectorize here if our parameters are arrays (ie. got multiple temperature inputs).
         ## Then self.evaluate would return a numpy array which scipy doesn't know how to work with. 
@@ -247,7 +261,7 @@ class EffectivePotential:
         ##Added bounds to minimize to reduce the IR senstivity coming from low mass modes
         bounds = ((1e-6, 1e-6), (1e-6, 1e-6), (1e-6, 1e3))
 
-        location, value = self.minimizer.minimize(VeffWrapper, initialGuess, bounds)
+        location, value = self.minimizer.minimize(T, VeffWrapper, initialGuess, bounds)
 
 
         if np.any(np.isnan(location)):
@@ -261,7 +275,7 @@ class EffectivePotential:
         return location, value
     
 
-    def findGlobalMinimum(self, minimumCandidates: list[list[float]] = None) -> Tuple[list[float], complex]:
+    def findGlobalMinimum(self, T, minimumCandidates: list[list[float]] = None) -> Tuple[list[float], complex]:
         """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
         Generally will not work very well if no candidates minima are given. 
         Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
@@ -276,7 +290,7 @@ class EffectivePotential:
 
         ## Should we vectorize??
         for candidate in minimumCandidates:
-            location, value = self.findLocalMinimum(candidate)
+            location, value = self.findLocalMinimum(T,candidate)
             if (np.real(value) < deepest):
                 res = location, value
                 deepest = np.real(value)
