@@ -31,6 +31,9 @@ class VeffConfig:
     scalarMassMatrices: list[MatrixDefinitionFiles]
     # Full rotation from unpermutated basis to diagonal basis
     scalarRotationMatrixFile: str
+
+    # Take absolute value of mass squares?
+    bAbsoluteMsq: bool = False
     
 
 ## everything we need to evaluate the potential. this is very WIP
@@ -52,6 +55,8 @@ class VeffParams:
     def __init__(self, veffConfig: VeffConfig):
 
         self.fieldNames = veffConfig.fieldNames
+        self.bAbsoluteMsq = veffConfig.bAbsoluteMsq
+
         self.configureVectors(veffConfig)
         self.configureScalars(veffConfig)
 
@@ -75,6 +80,11 @@ class VeffParams:
         vectorShorthands = self.vectorShorthands.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
         knownParamsDict = combineDicts(knownParamsDict, vectorShorthands)
         vectorMasses = self.vectorMassesSquared.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
+
+        if (self.bAbsoluteMsq):
+            for key, val in vectorMasses.items():
+                vectorMasses[key] = np.abs(val)
+
         knownParamsDict = combineDicts(knownParamsDict, vectorMasses)
 
         ## Scalars
@@ -83,26 +93,6 @@ class VeffParams:
         knownParamsDict = combineDicts(knownParamsDict, diagDict)
 
         return knownParamsDict
-
-    
-
-    def evaluateScalarMasses(self, knownParams: dict[str, float]) -> dict[str, float]:
-        scalarMassesSquaredDict =  self.scalarMassesSquared.evaluateSystemWithDict(knownParams, bReturnDict=True)
-        ## Take abs. TODO handle better
-        for key in scalarMassesSquaredDict:
-            scalarMassesSquaredDict[key] = abs(scalarMassesSquaredDict[key])
-        return scalarMassesSquaredDict
-
-    def evaluateVectorMasses(self, knownParams: dict[str, float]) -> dict[str, float]:
-        vectorMassesSquaredDict = self.vectorMassesSquared.evaluateSystemWithDict(knownParams, bReturnDict=True)
-        ## Take abs. TODO handle better
-        for key in vectorMassesSquaredDict:
-            vectorMassesSquaredDict[key] = np.abs(vectorMassesSquaredDict[key])
-        return vectorMassesSquaredDict
-
-    def evaluateMasses(self, knownParams: dict[str, float]) -> dict[str, float]:
-        return combineDicts( self.evaluateScalarMasses(knownParams), self.evaluateVectorMasses(knownParams) )
-
 
 
     def configureVectors(self, veffConfig: VeffConfig) -> None:
@@ -160,9 +150,13 @@ class VeffParams:
         ## TODO improve this. currently I just hardcode scalar mass names
         massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
 
-        for i, msq in enumerate(np.diagonal(diag)):
-            outDict[massNames[i]] = msq
-
+        if (self.bAbsoluteMsq):
+            for i, msq in enumerate(np.diagonal(diag)):
+                outDict[massNames[i]] = np.abs(msq)
+        else:
+            for i, msq in enumerate(np.diagonal(diag)):
+                outDict[massNames[i]] = msq
+                
         return outDict
     
 
@@ -235,6 +229,7 @@ class EffectivePotential:
 
         ## summing works because the result is a list [V0, V1, ...]
         res = sum( self.expressions.evaluateSystemWithDict(paramDict) )
+
         return res
 
 

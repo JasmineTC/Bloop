@@ -123,5 +123,5 @@ class ParsedMatrix:
         # should not have any free symbols
         assert len(sympyMatrix.free_symbols) == 0, "Failed to parse constant matrix: has free symbols!"
         # can't lambdify with no arguments, so do standard conversion to numpy array instead
-        return np.array(sympyMatrix.tolist())
+        return np.array(sympyMatrix.tolist()).astype(np.float64)
 

@@ -49,13 +49,15 @@ veffConfig = ThreeHiggs.VeffConfig(
                                          ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight_definitions.txt"))
     ],
     scalarRotationMatrixFile = ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarRotationMatrix.txt"),
+    # We will take abs values of all mass^2
+    bAbsoluteMsq = True,
 )
 
 model3HDM.effectivePotential.configure(veffConfig)
 
 
 ## Set algorithm to use for Veff minimization
-model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eScipy)
+model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eDIRECTGLOBAL)
 ## Set tolerances used by global and local methods in Veff minimization
 ## Order is global abs, global rel, local abs, local rel
 model3HDM.effectivePotential.minimizer.setTolerances(1e-1, 1e-1, 1e-5, 1e-5)
@@ -75,6 +77,8 @@ minimizationResults = transitionFinder.traceFreeEnergyMinimum()
 #filename = f"Results/Debug/g_01/1loop/BM_{args.benchMarkNumber}_gHDM_{ghdm}_1loop"
 filename = f"Results/Debug/nonpert/BM_{args.benchMarkNumber}_gHDM_{ghdm}_2loop"
 #np.savetxt(filename + ".txt", minimizationResults)
+
+print(f"{minimizationResults=}")
 
 if args.plot == True:
     from PlotResult import PlotResult
