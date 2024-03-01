@@ -140,11 +140,9 @@ class VeffParams:
                     if i == j and abs((eigenValue[i]-rotatedMassMatrix[i,i])/eigenValue[i]) > 1e-5:
                         print (f"Large difference in eigenValues at index {i},{j}")
                         print (f'The rotated mass matrix is {rotatedMassMatrix}')
-                        input()
                     if i != j and rotatedMassMatrix[i,j] > 1e-8:
                         print (f"Off diagonal element {i}{j} is larger than 1e-8, may not be diagonal")
                         print (f'The rotated mass matrix is {rotatedMassMatrix}')
-                        input()
                         
             blockRot.append(vects)
             blockM.append(numericalM)
@@ -155,7 +153,8 @@ class VeffParams:
         rot = linalg.block_diag(*blockRot) @ self.scalarPermutationMatrix
         ## Diagonalized mass matrix
         diag = rot @ linalg.block_diag(*blockM) @ np.transpose(rot)
-
+        print (diag)
+        input ()
         ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
         ## matrix element symbol in the Veff expressions. This is currently very hacky 
         
