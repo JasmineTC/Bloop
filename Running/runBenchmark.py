@@ -1,4 +1,6 @@
 import numpy as np
+
+##TODO clean
 from datetime import date
 
 today = date.today()
@@ -12,6 +14,8 @@ import Benchmarks.Benchmarks_3HDM
 from ThreeHiggs import MinimizationAlgos
 
 from ThreeHiggs.parsedmatrix import ParsedMatrix
+
+import pickle 
 
 userinput = ThreeHiggs.UserInput()
 args = userinput.parse()
@@ -34,7 +38,8 @@ if (args.loopOrder >= 1):
 if (args.loopOrder >= 2):
     veffFiles.append( ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/Veff_NNLO.txt") )
 
-veffConfig = ThreeHiggs.VeffConfig(
+## Expensive string operations, ideally avoid by running once, pickle then load pickle each future time
+_veffConfig = ThreeHiggs.VeffConfig(
     fieldNames = ['v1', 'v2', 'v3'],
     loopOrder = args.loopOrder,
     veffFiles = veffFiles,
@@ -52,6 +57,15 @@ veffConfig = ThreeHiggs.VeffConfig(
     # We will take abs values of all mass^2
     bAbsoluteMsq = True,
 )
+
+with open(f"veffConfig_LoopOrder{args.loopOrder}.pkl", "wb") as pklFile:
+    pickle.dump(_veffConfig, pklFile)
+
+
+with open(f"veffConfig_LoopOrder{args.loopOrder}.pkl", "rb") as pklFile:
+    veffConfig = pickle.load(pklFile)
+
+
 
 model3HDM.effectivePotential.configure(veffConfig)
 
