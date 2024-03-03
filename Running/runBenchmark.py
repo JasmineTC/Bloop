@@ -1,19 +1,13 @@
 import numpy as np
-
-##TODO clean
 from datetime import date
 
-today = date.today()
-
 import ThreeHiggs
-
 from ThreeHiggs import GenericModel
 from ThreeHiggs import TransitionFinder
+from ThreeHiggs import MinimizationAlgos
+from ThreeHiggs.parsedmatrix import ParsedMatrix
 
 import Benchmarks.Benchmarks_3HDM
-from ThreeHiggs import MinimizationAlgos
-
-from ThreeHiggs.parsedmatrix import ParsedMatrix
 
 import pickle 
 
@@ -30,42 +24,42 @@ model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScale
 model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
 
-## ---- Configure Veff
-veffFiles = []
-veffFiles.append( ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/Veff_LO.txt") )
-if (args.loopOrder >= 1):
-    veffFiles.append( ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/Veff_NLO.txt") )
-if (args.loopOrder >= 2):
-    veffFiles.append( ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/Veff_NNLO.txt") )
+if args.loadpickle:
+    with open(ThreeHiggs.getResourcePath(f"Data/Pickle/veffConfig_LoopOrder{args.loopOrder}.pkl"), "rb") as pklFile:
+        veffConfig = pickle.load(pklFile)
 
-## Expensive string operations, ideally avoid by running once, pickle then load pickle each future time
-_veffConfig = ThreeHiggs.VeffConfig(
-    fieldNames = ['v1', 'v2', 'v3'],
-    loopOrder = args.loopOrder,
-    veffFiles = veffFiles,
-    vectorMassFile = ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/vectorMasses.txt"),
-    vectorShorthandFile = ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/vectorShorthands.txt"),
-    #
-    scalarPermutationMatrix = ParsedMatrix.parseConstantMatrix(ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarPermutationMatrix.txt")),
-    scalarMassMatrices = [ 
-        ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_upperLeft.txt"),
-                                         ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_upperLeft_definitions.txt")),
-        ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight.txt"),
-                                         ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight_definitions.txt"))
-    ],
-    scalarRotationMatrixFile = ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarRotationMatrix.txt"),
-    # We will take abs values of all mass^2
-    bAbsoluteMsq = True,
-)
-
-with open(f"veffConfig_LoopOrder{args.loopOrder}.pkl", "wb") as pklFile:
-    pickle.dump(_veffConfig, pklFile)
-
-
-with open(f"veffConfig_LoopOrder{args.loopOrder}.pkl", "rb") as pklFile:
-    veffConfig = pickle.load(pklFile)
-
-
+else:
+    ## ---- Configure Veff
+    veffFiles = []
+    veffFiles.append( ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/Veff_LO.txt") )
+    if (args.loopOrder >= 1):
+        veffFiles.append( ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/Veff_NLO.txt") )
+    if (args.loopOrder >= 2):
+        veffFiles.append( ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/Veff_NNLO.txt") )
+    
+    ## EIt's (slightly) faster to generate this config file once and then store it in binary
+    ## Use pickle to store/laod the binary file.
+    veffConfig = ThreeHiggs.VeffConfig(
+        fieldNames = ['v1', 'v2', 'v3'],
+        loopOrder = args.loopOrder,
+        veffFiles = veffFiles,
+        vectorMassFile = ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/vectorMasses.txt"),
+        vectorShorthandFile = ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/vectorShorthands.txt"),
+        #
+        scalarPermutationMatrix = ParsedMatrix.parseConstantMatrix(ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarPermutationMatrix.txt")),
+        scalarMassMatrices = [ 
+            ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_upperLeft.txt"),
+                                             ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_upperLeft_definitions.txt")),
+            ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight.txt"),
+                                             ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight_definitions.txt"))
+        ],
+        scalarRotationMatrixFile = ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarRotationMatrix.txt"),
+        # We will take abs values of all mass^2
+        bAbsoluteMsq = True,
+    )
+    if args.dumppickle:
+        with open(ThreeHiggs.getResourcePath(f"Data/Pickle/veffConfig_LoopOrder{args.loopOrder}.pkl"), "wb") as pklFile:
+            pickle.dump(veffConfig, pklFile)
 
 model3HDM.effectivePotential.configure(veffConfig)
 
@@ -86,14 +80,14 @@ transitionFinder = TransitionFinder(model=model3HDM)
 model3HDM.setInputParams(inputParams)
 minimizationResults = transitionFinder.traceFreeEnergyMinimum()
 
+print(f"{minimizationResults=}")
+
 #filename = f"Results/{date.today()}-BM-{args.benchMarkNumber}-LoopOrder{args.loopOrder}"
 #filename = f"Results/Debug/g_01/SS_Off/BM_{args.benchMarkNumber}_gHDM_{ghdm}_SS_Off"
 filename = f"Results/Debug/3BG/BM_{args.benchMarkNumber}"
 
 if args.save == True:
     np.savetxt(filename + ".txt", minimizationResults)
-
-print(f"{minimizationResults=}")
 
 if args.plot == True:
     from PlotResult import PlotResult
