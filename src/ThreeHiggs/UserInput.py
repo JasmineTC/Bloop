@@ -26,9 +26,9 @@ class UserInput(argparse.ArgumentParser):
         ##multiprocessing.cpu_count gets from the the system how many cores are avaviable, +1 needed because of how range works
         self.add_argument('-c', '--cores', action = 'store', default = 1, dest = 'cores', type = int, choices = list(range(1, multiprocessing.cpu_count() + 1)),
                           help = "Used to specify how many cores to run the bench mark list on")
-        self.add_argument('-d', '--dump', action = 'store_true', default=False, dest = 'dump',  
+        self.add_argument('-d', '--dump', action = 'store_true', default=False, dest = 'dumpPickle',  
                           help = "Used to store the veffConfig file in binary")
-        self.add_argument('-L', '--load', action = 'store_true', default=False, dest = 'load',  
+        self.add_argument('-L', '--load', action = 'store_true', default=False, dest = 'loadPickle',  
                           help = "Used to load the veffConfig file from binary")
     ##Used to check userinputs are valid, mostly done with the choice keyword above now though
     def parse(self):

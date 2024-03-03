@@ -9,11 +9,12 @@ from ThreeHiggs.parsedmatrix import ParsedMatrix
 
 import Benchmarks.Benchmarks_3HDM
 
-import pickle 
+import pickle ##Note 
 
 userinput = ThreeHiggs.UserInput()
 args = userinput.parse()
 
+## This should be put inside the pickle
 hardToSoftFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleParams_NLO.txt")
 softScaleRGEFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleRGE.txt")
 softToUltrasoftFile = ThreeHiggs.getResourcePath("Data/SoftToUltrasoft/ultrasoftScaleParams_NLO.txt")
@@ -24,11 +25,19 @@ model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScale
 model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
 
-if args.loadpickle:
+if args.loadPickle:
     with open(ThreeHiggs.getResourcePath(f"Data/Pickle/veffConfig_LoopOrder{args.loopOrder}.pkl"), "rb") as pklFile:
         veffConfig = pickle.load(pklFile)
 
 else:
+    hardToSoftFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleParams_NLO.txt")
+    softScaleRGEFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleRGE.txt")
+    softToUltrasoftFile = ThreeHiggs.getResourcePath("Data/SoftToUltrasoft/ultrasoftScaleParams_NLO.txt")
+
+    ## Model object setup + load matching relations
+    model3HDM = GenericModel()
+    model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
+    model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
     ## ---- Configure Veff
     veffFiles = []
     veffFiles.append( ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/Veff_LO.txt") )
@@ -57,10 +66,12 @@ else:
         # We will take abs values of all mass^2
         bAbsoluteMsq = True,
     )
-    if args.dumppickle:
+    model3HDM.effectivePotential.configure(veffConfig)
+    if args.dumpPickle:
         with open(ThreeHiggs.getResourcePath(f"Data/Pickle/veffConfig_LoopOrder{args.loopOrder}.pkl"), "wb") as pklFile:
             pickle.dump(veffConfig, pklFile)
 
+##TODO pickle this as best as possible
 model3HDM.effectivePotential.configure(veffConfig)
 
 
@@ -69,6 +80,7 @@ model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eDIRECTGLO
 ## Set tolerances used by global and local methods in Veff minimization
 ## Order is global abs, global rel, local abs, local rel
 model3HDM.effectivePotential.minimizer.setTolerances(1e-1, 1e-1, 1e-5, 1e-5)
+## Set benchMarkNumber in minimizer for title and file naming
 model3HDM.effectivePotential.minimizer.setBmNumber(args.benchMarkNumber)
 
 

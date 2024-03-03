@@ -50,7 +50,7 @@ class VeffMinimizer:
     def setBmNumber(self, bmNumber : int) -> None:
         self.bmNumber = bmNumber
         
-    def minimize(self, function: Callable, initialGuess: np.ndarray, bounds) -> Tuple[np.ndarray, float]:
+    def minimize(self, T, function: Callable, initialGuess: np.ndarray, bounds) -> Tuple[np.ndarray, float]:
         """Give bounds in format ((min1, max1), (min2, max2)) etc, one pair for each variable.
         Returns: 
         location, Veff(location)
@@ -71,6 +71,7 @@ class VeffMinimizer:
                 
                 
             case MinimizationAlgos.eDIRECTGLOBAL:
+
                 ##The idea of this case is to use a global minimiser to get the ballpark of the global minimum
                 ##then use that as initial guess for a local solver
                 opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, 3)

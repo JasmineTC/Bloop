@@ -33,6 +33,7 @@ class VeffConfig:
     scalarRotationMatrixFile: str
 
     # Take absolute value of mass squares?
+    ## TODO Didn't we set this to true in the config?
     bAbsoluteMsq: bool = False
     
 
@@ -108,7 +109,8 @@ class VeffParams:
         ## can have many matrices if we've block-diagonalized already
         self.scalarMassMatrices = []
 
-        ## ASSUME: the blocks are given in order: upper left to lower right. TODO improve this
+        ## ASSUME: the blocks are given in order: upper left to lower right. 
+        ##TODO improve this
         
         for matrixInfo in veffConfig.scalarMassMatrices:
             self.scalarMassMatrices.append( ParsedMatrix(matrixInfo.matrixFile, matrixInfo.expressionsFile) )
@@ -246,8 +248,6 @@ class EffectivePotential:
         res = sum( self.expressions.evaluateSystemWithDict(paramDict) )
 
         return res
-
-
 
     ## Return value is location, value
     def findLocalMinimum(self, T, initialGuess: list[float]) -> Tuple[list[float], complex]:
