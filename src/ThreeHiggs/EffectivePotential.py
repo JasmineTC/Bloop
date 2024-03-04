@@ -134,17 +134,19 @@ class VeffParams:
             
             numericalM = m.evaluateWithDict(params)
             eigenValue, vects = diagonalizeSymmetric( numericalM, bCheckFinite=False )
+            ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
+
             ## Quick check that the numerical mass matrix is diagonal after being rotated by vects
-            rotatedMassMatrix = np.transpose(vects) @ numericalM @ vects
+            diagonalBlock = np.transpose(vects) @ numericalM @ vects
             for i in range(6):
                 for j in range(6):
                     ## If on the diagonal compute abs % diff with eigenvalues and rotated matrix, if large then something went wrong
-                    if i == j and abs((eigenValue[i]-rotatedMassMatrix[i,i])/eigenValue[i]) > 1e-5:
+                    if i == j and abs((eigenValue[i]-diagonalBlock[i,i])/eigenValue[i]) > 1e-5:
                         print (f"Large difference in eigenValues at index {i},{j}")
-                        print (f'The rotated mass matrix is {rotatedMassMatrix}')
-                    if i != j and rotatedMassMatrix[i,j] > 1e-8:
+                        print (f'The rotated mass matrix is {diagonalBlock}')
+                    if i != j and diagonalBlock[i,j] > 1e-8:
                         print (f"Off diagonal element {i}{j} is larger than 1e-8, may not be diagonal")
-                        print (f'The rotated mass matrix is {rotatedMassMatrix}')
+                        print (f'The rotated mass matrix is {diagonalBlock}')
                         
             blockRot.append(vects)
             blockM.append(numericalM)
@@ -154,10 +156,11 @@ class VeffParams:
         ## This diagonalizes the block-diagonal mass matrix
         blockDiagRot = linalg.block_diag(*blockRot)
         ## Diagonalized mass matrix
-        diag = blockDiagRot @ linalg.block_diag(*blockM) @ np.transpose(blockDiagRot)
+        diag = np.transpose(blockDiagRot) @ linalg.block_diag(*blockM) @ blockDiagRot
 
-        ## Rotation that diagonalizes the original, unpermuted mass matrix (so we undo the permutation)
-        rot = blockDiagRot @ self.scalarPermutationMatrix
+        ## Rotation that diagonalizes the original, unpermuted mass matrix.
+        ## So we undo the permutation, and we need to transpose to match what we gave DRalgo
+        rot = np.transpose(blockDiagRot) @ self.scalarPermutationMatrix
 
         ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
         ## matrix element symbol in the Veff expressions. This is currently very hacky 
