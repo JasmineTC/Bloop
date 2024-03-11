@@ -14,8 +14,11 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('-n', '--benchMarkNumber', action = 'store', default = 0, dest = 'benchMarkNumber', type = int,
                           help = "Used to specify a particular bench mark point in the list to run")
         ##Takes user arguement to define what loop order to calculate the effective potential to
-        self.add_argument('-l', '--loopOrder', action = 'store', default = 2, dest = 'loopOrder', type = int, choices = [1, 2],
+        self.add_argument('-l', '--loopOrder', action = 'store', default = 2, dest = 'loopOrder', type = int, choices = [0, 1, 2],
                           help = "Used to specify if the effective potential should be calculated to one or two loop")
+        ##Takes user bool to decide if plots should be made after saving results
+        self.add_argument('-s', '--save', action = 'store_true', default=False, dest = 'save',  
+                          help = "Used to specify if the results of the minimisation should be saved")
         ##Takes user bool to decide if plots should be made after saving results
         self.add_argument('-p', '--plot', action = 'store_true', default=False, dest = 'plot',  
                           help = "Used to specify if a plot of minimium vs temp should be made")
@@ -23,7 +26,10 @@ class UserInput(argparse.ArgumentParser):
         ##multiprocessing.cpu_count gets from the the system how many cores are avaviable, +1 needed because of how range works
         self.add_argument('-c', '--cores', action = 'store', default = 1, dest = 'cores', type = int, choices = list(range(1, multiprocessing.cpu_count() + 1)),
                           help = "Used to specify how many cores to run the bench mark list on")
-        
+        self.add_argument('-d', '--dump', action = 'store_true', default=False, dest = 'dumpPickle',  
+                          help = "Used to store the veffConfig file in binary")
+        self.add_argument('-L', '--load', action = 'store_true', default=False, dest = 'loadPickle',  
+                          help = "Used to load the veffConfig file from binary")
     ##Used to check userinputs are valid, mostly done with the choice keyword above now though
     def parse(self):
         

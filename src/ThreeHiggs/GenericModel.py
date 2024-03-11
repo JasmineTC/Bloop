@@ -34,12 +34,12 @@ class GenericModel():
     g3 = np.sqrt(0.1183 * 4.0 * np.pi)
 
 
-    def __init__(self, loopOrder = 1):
+    def __init__(self):
         
         self.inputParams = {}
         self.dimensionalReduction = DimensionalReduction()
         ## 3D potential:
-        self.effectivePotential = EffectivePotential(loopOrder=loopOrder)
+        self.effectivePotential = EffectivePotential()
 
     
     def setInputParams(self, inputParams):

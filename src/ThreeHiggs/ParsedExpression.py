@@ -187,30 +187,30 @@ class ParsedExpressionSystem:
         """Read system of expressions from file, one per line.
         The expressions will become functions of all symbols that appear. 
         """
-        with open(fileName, "r", encoding="utf-8") as file:
-            expressions = file.readlines()
-        
+
         parsedSymbols = []
         self.parsedExpressions = []
-        for line in expressions:
-            try:
-
-                expr = ParsedExpression(line, bReplaceGreekSymbols=True)
-
-                self.parsedExpressions.append(expr)
-
-                ## find symbols but store as string, not the sympy type  
-                for symbol in expr.symbols:
-                    ## NOTE this conversion will cause issues with pathological symbols like "A B" 
-                    # https://stackoverflow.com/questions/59401738/convert-sympy-symbol-to-string-such-that-it-can-always-be-parsed
-                    symbol_str = str(symbol)
-                    if symbol_str not in parsedSymbols:
-                        parsedSymbols.append(symbol_str)
-                        
-            except ValueError:
-                print(f"Error parsing file {fileName}, line: {line}")
-
-        self._lambdifyExpressions(parsedSymbols)
+        
+        with open(fileName, "r", encoding="utf-8") as file:
+            for line in file.readlines():
+                try:
+    
+                    expr = ParsedExpression(line, bReplaceGreekSymbols=True)
+    
+                    self.parsedExpressions.append(expr)
+    
+                    ## find symbols but store as string, not the sympy type  
+                    for symbol in expr.symbols:
+                        ## NOTE this conversion will cause issues with pathological symbols like "A B" 
+                        # https://stackoverflow.com/questions/59401738/convert-sympy-symbol-to-string-such-that-it-can-always-be-parsed
+                        symbol_str = str(symbol)
+                        if symbol_str not in parsedSymbols:
+                            parsedSymbols.append(symbol_str)
+                            
+                except ValueError:
+                    print(f"Error parsing file {fileName}, line: {line}")
+    
+            self._lambdifyExpressions(parsedSymbols)
 
 
     def evaluateSystemWithDict(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
@@ -261,16 +261,11 @@ that describe the unknowns versus symbols that are known inputs to the expressio
 """
 class SystemOfEquations(ParsedExpressionSystem):
 
-    ## what we solve for
-    unknownVariables: list[str]
-    ## "known" inputs
-    otherVariables: list[str]
-
     def __init__(self, fileName: str, unknownVariables: list[str]):
         
-        ## Call parent constructor
         super().__init__(fileName)
 
+        ## what we solve for
         self.unknownVariables = unknownVariables
 
         ## Check that we have same number of eqs as unknowns 
@@ -300,6 +295,7 @@ class SystemOfEquations(ParsedExpressionSystem):
         filteredArguments = [ item for item in self.functionArguments if item not in self.unknownVariables ]
         rearrangedArguments = self.unknownVariables + filteredArguments
 
+        ## "known" inputs
         self.otherVariables = filteredArguments
 
         ## And create new lambdas
