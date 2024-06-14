@@ -51,6 +51,7 @@ veffConfig = ThreeHiggs.VeffConfig(
     # We will take abs values of all mass^2
     bAbsoluteMsq = True,
 )
+
 model3HDM.effectivePotential.configure(veffConfig)
 
 ## Set algorithm to use for Veff minimization
