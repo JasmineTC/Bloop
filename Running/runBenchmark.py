@@ -15,30 +15,21 @@ userinput = ThreeHiggs.UserInput()
 args = userinput.parse()
 
 ## This should be put inside the pickle
-hardToSoftFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleParams_NLO.txt")
-softScaleRGEFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleRGE.txt")
-softToUltrasoftFile = ThreeHiggs.getResourcePath("Data/SoftToUltrasoft/ultrasoftScaleParams_NLO.txt")
+hardToSoftFile = ThreeHiggs.getResourcePath(args.hardToSoftFile)
+softScaleRGEFile = ThreeHiggs.getResourcePath(args.softScaleRGEFile)
+softToUltrasoftFile = ThreeHiggs.getResourcePath(args.softToUltraSoftFile)
 
 ## Model object setup + load matching relations
 model3HDM = GenericModel()
 model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
 model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
-hardToSoftFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleParams_NLO.txt")
-softScaleRGEFile = ThreeHiggs.getResourcePath("Data/HardToSoft/softScaleRGE.txt")
-softToUltrasoftFile = ThreeHiggs.getResourcePath("Data/SoftToUltrasoft/ultrasoftScaleParams_NLO.txt")
-
-## Model object setup + load matching relations
-model3HDM = GenericModel()
-model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
-model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 ## ---- Configure Veff
-veffFiles = []
-veffFiles.append( ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/Veff_LO.txt") )
+veffFiles = [ThreeHiggs.getResourcePath(args.loFile)]
 if (args.loopOrder >= 1):
-    veffFiles.append( ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/Veff_NLO.txt") )
+    veffFiles.append( ThreeHiggs.getResourcePath(args.nloFile) )
 if (args.loopOrder >= 2):
-    veffFiles.append( ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/Veff_NNLO.txt") )
+    veffFiles.append( ThreeHiggs.getResourcePath(args.nnloFile) )
 
 ## EIt's (slightly) faster to generate this config file once and then store it in binary
 ## Use pickle to store/laod the binary file.
@@ -46,31 +37,31 @@ veffConfig = ThreeHiggs.VeffConfig(
     fieldNames = ['v1', 'v2', 'v3'],
     loopOrder = args.loopOrder,
     veffFiles = veffFiles,
-    vectorMassFile = ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/vectorMasses.txt"),
-    vectorShorthandFile = ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/vectorShorthands.txt"),
+    vectorMassFile = ThreeHiggs.getResourcePath(args.vectorsMassesSquaredFile),
+    vectorShorthandFile = ThreeHiggs.getResourcePath(args.vectorsShortHandsFile),
     #
-    scalarPermutationMatrix = ParsedMatrix.parseConstantMatrix(ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarPermutationMatrix.txt")),
+    scalarPermutationMatrix = ParsedMatrix.parseConstantMatrix(ThreeHiggs.getResourcePath(args.scalarPermutationFile)),
     scalarMassMatrices = [ 
-        ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_upperLeft.txt"),
-                                         ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_upperLeft_definitions.txt")),
-        ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight.txt"),
-                                         ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight_definitions.txt"))
+        ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath(args.scalarMassMatrixUpperLeftFile),
+                                         ThreeHiggs.getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile)),
+        ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath(args.scalarMassMatrixBottomRightFile),
+                                         ThreeHiggs.getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile))
     ],
-    scalarRotationMatrixFile = ThreeHiggs.getResourcePath("Data/EffectivePotential_threeFields/scalarRotationMatrix.txt"),
+    scalarRotationMatrixFile = ThreeHiggs.getResourcePath(args.scalarRotationFile),
     # We will take abs values of all mass^2
     bAbsoluteMsq = True,
 )
 model3HDM.effectivePotential.configure(veffConfig)
 
-##TODO pickle this as best as possible
-model3HDM.effectivePotential.configure(veffConfig)
-
-
 ## Set algorithm to use for Veff minimization
 model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eDIRECTGLOBAL)
 ## Set tolerances used by global and local methods in Veff minimization
 ## Order is global abs, global rel, local abs, local rel
-model3HDM.effectivePotential.minimizer.setTolerances(1e-1, 1e-1, 1e-5, 1e-5)
+model3HDM.effectivePotential.minimizer.setTolerances(args.absGlobalTolerance,
+                                                     args.relGlobalTolerance, 
+                                                     args.absLocalTolerance, 
+                                                     args.relLocalTolerance)
+
 ## Set benchMarkNumber in minimizer for title and file naming
 model3HDM.effectivePotential.minimizer.setBmNumber(args.benchMarkNumber)
 
