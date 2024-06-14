@@ -201,6 +201,8 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--absLocalTolerance', action = 'store', default = 1e-2, dest = 'absLocalTolerance')
         self.add_argument('--relLocalTolerance', action = 'store', default = 5e-2, dest = 'relLocalTolerance')
 
+        self.add_argument('--plot', action = 'store_true', default = False, dest = 'plot')
+
         self.add_argument('--firstStage', type = Stages.fromString, default = "convertMathematica", dest = 'firstStage')
         self.add_argument('--lastStage', type = Stages.fromString, default = "plot", dest = 'lastStage')
 
