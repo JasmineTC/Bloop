@@ -88,11 +88,10 @@ print(f"{minimizationResults=}")
 #filename = f"Results/{date.today()}-BM-{args.benchMarkNumber}-LoopOrder{args.loopOrder}"
 #filename = f"Results/Debug/g_01/SS_Off/BM_{args.benchMarkNumber}_gHDM_{ghdm}_SS_Off"
 
-basePath = "Results/Debug/3BG/"
-filename = f"{basePath}/BM_{args.benchMarkNumber}"
+filename = f"{args.resultsDirectory}/BM_{args.benchMarkNumber}"
 
 from pathlib import Path
-Path(filename).mkdir(parents = True, exist_ok = True)
+Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
 
 if args.save == True:
     np.savetxt(filename + ".txt", minimizationResults)
