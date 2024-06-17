@@ -50,7 +50,7 @@ class UserInput(argparse.ArgumentParser):
 
         self.add_argument('--nnloFile', 
                           action = 'store', 
-                          default = "Data/EffectivePotential_threeFields/Veff_NNLO2.txt",
+                          default = "Data/EffectivePotential_threeFields/Veff_NNLO.txt",
                           dest = 'nnloFile')
 
         self.add_argument('--vectorsMassesSquaredFile', 
@@ -108,10 +108,10 @@ class UserInput(argparse.ArgumentParser):
                           default = "Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight_definitions.txt",
                           dest = 'scalarMassMatrixBottomRightDefinitionsFile')
 
-        self.add_argument('--absGlobalTolerance', action = 'store', default = 0.5, dest = 'absGlobalTolerance')
-        self.add_argument('--relGlobalTolerance', action = 'store', default = 1., dest = 'relGlobalTolerance')
-        self.add_argument('--absLocalTolerance', action = 'store', default = 1e-2, dest = 'absLocalTolerance')
-        self.add_argument('--relLocalTolerance', action = 'store', default = 5e-2, dest = 'relLocalTolerance')
+        self.add_argument('--absGlobalTolerance', action = 'store', default = 1e-1, dest = 'absGlobalTolerance')
+        self.add_argument('--relGlobalTolerance', action = 'store', default = 1e-1, dest = 'relGlobalTolerance')
+        self.add_argument('--absLocalTolerance', action = 'store', default = 1e-5, dest = 'absLocalTolerance')
+        self.add_argument('--relLocalTolerance', action = 'store', default = 1e-5, dest = 'relLocalTolerance')
 
         self.add_argument('--plot', action = 'store_true', default = False, dest = 'plot')
 
