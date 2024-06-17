@@ -41,9 +41,7 @@ class TransitionFinder:
 
         ## TODO Are the beta function routines safe if endScale is smaller than startScale?
 
-        betas = BetaFunctions4D(muRange)
-
-        betas.SolveBetaFunction(renormalizedParams)
+        betas = BetaFunctions4D(muRange, renormalizedParams)
         
         """ 
         Now for the temperature loop. I see two options:
