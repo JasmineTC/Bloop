@@ -76,7 +76,11 @@ class TransitionFinder:
             paramsForMatching = betas.RunCoupling(matchingScale)
             
             ##Check if couplings are pert
-            GenericModel.checkPerturbativity(paramsForMatching)
+            if not GenericModel.bIsPerturbative(paramsForMatching):
+                print ("One of the abs(couplings) is larger than 4pi or is nan")
+            if not GenericModel.bIsBounded(paramsForMatching):
+                print ("Model is not bounded from below, exiting")
+                exit(-1)
             
             ## These need to be in the dict
             paramsForMatching["RGScale"] = matchingScale
