@@ -4,16 +4,6 @@ from .EffectivePotential import EffectivePotential
 from .DimensionalReduction import DimensionalReduction
 
 class GenericModel():
-    """ Control variables """
-    # Set to true if the input dict contains 3HDM mass splittings (in GeV) instead of masses directly.
-    bMassSplittingInput: bool = True
-
-    dimensionalReduction: DimensionalReduction
-    effectivePotential: EffectivePotential
-
-    ## This is the "physical" input 
-    inputParams: dict[str, float]
-
     """ Define some constants that are inputs too, but we won't scan over these. 
     """
     ## "Higgs VEV". Consider using Fermi constant instead
