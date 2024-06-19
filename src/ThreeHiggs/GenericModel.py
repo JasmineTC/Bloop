@@ -6,10 +6,6 @@ from .DimensionalReduction import DimensionalReduction
 class GenericModel():
     """ Define some constants that are inputs too, but we won't scan over these. 
     """
-    ## "Higgs VEV". Consider using Fermi constant instead
-    v = 246.22
-    ## Higgs mass
-    MH = 125.00
     ## Gauge boson masses
     MW = 80.377
     MZ = 91.1876
@@ -31,38 +27,26 @@ class GenericModel():
     def setInputParams(self, inputParams):
         self.inputParams = inputParams
 
-    ## Convert Venus' mass splitting (deltas) input to mass values. Returns mS2, mSpm1, mSpm2 (pm meaning plus/minus; the charged masses)
-    @staticmethod
-    def massSplittingsToMasses(mS1: float, delta12: float, delta1c: float, deltac: float) -> tuple[float, float, float]:
-
+    ## 1909.09234 and eq (38) for mass splittings
+    def massSplittingsToMasses(self, mS1: float, delta12: float, delta1c: float, deltac: float) -> tuple[float, float, float]:
         mS2 = delta12 + mS1
         mSpm1 = delta1c + mS1
         mSpm2 = deltac + mSpm1
         return mS2, mSpm1, mSpm2
     
-    @staticmethod
     ##One massive if statement (than many if statements because of memory checks) to check if indiviual couplings are less than 4 pi
-    ##This is not a sufficient check! Need to find the combinations of couplings that appear in all diagrams to be sure
+    ## Should acutally check vertices but this isn't a feature (yet) in DRalgo
     def checkPerturbativity(param : dict[str, float]) -> None:
         #print ("checkSingleCoupling called")
         if abs(param["lam11"]) > 4*np.pi or abs(param["lam12"]) > 4*np.pi or abs(param["lam12p"]) > 4*np.pi or abs(param["lam1Im"]) > 4*np.pi or abs(param["lam1Re"]) > 4*np.pi or abs(param["lam22"]) > 4*np.pi or abs(param["lam23"]) > 4*np.pi or abs(param["lam23p"]) > 4*np.pi or abs(param["lam2Im"]) > 4*np.pi or abs(param["lam2Re"]) > 4*np.pi or abs(param["lam31"]) > 4*np.pi or abs(param["lam31p"]) > 4*np.pi or abs(param["lam33"]) > 4*np.pi or abs(param["lam3Im"]) > 4*np.pi or abs(param["lam3Re"]) > 4*np.pi or abs(param["g1"]) > 4*np.pi or abs(param["g2"]) > 4*np.pi or abs(param["g3"]) > 4*np.pi:
             print ("Model is at risk of being non-pert")
 
-    """This goes from whatever "physical" input to parameters in the actions.
+    """Take inputs from the BM file and convert them to parameters in the action.
     With tree-level matching the renormalization scale does not directly show up in the expressions, but
     needs to be specified for later loop calculations.
-
-    Here the optional arguments are:
-        bDarkDemocracyLimit=True if we set various phi1, phi2 specific couplings equal to each other as defined in the draft.
-    """ 
+    """
     def calculateRenormalizedParameters(self, inputParams: dict[str, float]) -> dict[str, float]:
-
-        ## See sect 2.2.4 in 1909.09234 and eq (38) for mass splittings
-
-        ## Avoid 1/0 in expression for alpha (at least)
-        SMALL_NUMBER = 1e-100
-
-        v = self.v
+        v = 246.22   ## "Higgs VEV". Consider using Fermi constant instead
 
         mS1 = inputParams["mS1"]
 
@@ -101,9 +85,9 @@ class GenericModel():
         res["g3"] = self.g3                                     # SU(3)
 
         ## Scalar potential parameters. Some of the RHS of these depend on LHS of others, so need to do in smart order
-
-        res["mu3sq"] = self.MH**2 / 2. 
-        res["lam33"] = self.MH**2 / 2. / v**2
+        MHsq = 125.00**2 ## Higgs mass squared
+        res["mu3sq"] = MHsq / 2. 
+        res["lam33"] = MHsq / (2.*v**2) 
 
         ### mu12^2 is real in our starting basis but not generally so after loop corrections
         mu12sq = 0.5 * (mSpm2**2 - mSpm1**2)
@@ -118,10 +102,8 @@ class GenericModel():
 
         #### Compute some helper parameters
 
-        ## eq (13)
-        LambdaMinus = np.sqrt( mu12sq**2 + v**4*lam2Abs**2 - 2.*v**2*mu12sq*lam2Abs*cosTheta)
-        ## eq (12)
-        alpha = (-mu12sq + v**2*lam2Abs*cosTheta - LambdaMinus) / ( (v**2*lam2Abs*sinTheta) + SMALL_NUMBER)
+        LambdaMinus = np.sqrt( mu12sq**2 + v**4*lam2Abs**2 - 2.*v**2*mu12sq*lam2Abs*cosTheta) ## Eq 13
+        alpha = (-mu12sq + v**2*lam2Abs*cosTheta - LambdaMinus) / ( (v**2*lam2Abs*sinTheta) + 1e-100) ## Eq 12 - Adding 1e-100 to avoid 1/0
 
         mu2sq = v**2/2. * ghDM - v**2 / (alpha**2 + 1.) * (2.*alpha* sinTheta + (alpha**2 - 1.)*cosTheta) * lam2Abs - 0.5*(mS2**2 + mS1**2)
 
