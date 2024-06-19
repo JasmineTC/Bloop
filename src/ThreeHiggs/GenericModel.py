@@ -85,12 +85,12 @@ class GenericModel():
                     "lam23": 1./v**2 * (2.*mu2sq + mSpm2**2 + mSpm1**2),
                     "lam23p": 1./v**2 * (mS2**2 + mS1**2 - mSpm2**2 - mSpm1**2)}
         
-            if inputParams["darkHierarchy"]: ## eq. (4) but generalised to Hieracy (inputParams["darkHierarchy"] = 1 gives democracy) 
-                res["mu1sq"] = inputParams["darkHierarchy"]*res["mu2sq"]
-                res["lam3Re"] = inputParams["darkHierarchy"]*res["lam2Re"]
-                res["lam3Im"] = inputParams["darkHierarchy"]*res["lam2Im"]
-                res["lam31"] = inputParams["darkHierarchy"]*res["lam23"]
-                res["lam31p"] = inputParams["darkHierarchy"]*res["lam23p"]
+            if inputParams["darkHierarchy"]: ## eq. (4) but generalised to Hieracy (inputParams["darkHierarchy"] = 1 gives democracy)
+                res |= {"mu1sq": inputParams["darkHierarchy"]*res["mu2sq"],
+                        "lam3Re": inputParams["darkHierarchy"]*res["lam2Re"],
+                        "lam3Im": inputParams["darkHierarchy"]*res["lam2Im"],
+                        "lam31": inputParams["darkHierarchy"]*res["lam23"],
+                        "lam31p": inputParams["darkHierarchy"]*res["lam23p"]}
     
             else:
                 print("Input params only implemented in dark hieracy limit!")    
