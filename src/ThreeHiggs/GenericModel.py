@@ -4,17 +4,6 @@ from .EffectivePotential import EffectivePotential
 from .DimensionalReduction import DimensionalReduction
 
 class GenericModel():
-    """ Define some constants that are inputs too, but we won't scan over these. 
-    """
-    ## Gauge boson masses
-    MW = 80.377
-    MZ = 91.1876
-    ## Top quark mass 
-    Mt = 172.76
-    ##TODO we now run this, needs adjusting
-    ## SU(3) coupling, we neglect it's running. This is the value at Z pole
-    g3 = np.sqrt(0.1183 * 4.0 * np.pi)
-
 
     def __init__(self):
         
@@ -23,7 +12,6 @@ class GenericModel():
         ## 3D potential:
         self.effectivePotential = EffectivePotential()
 
-    
     def setInputParams(self, inputParams):
         self.inputParams = inputParams
 
@@ -34,19 +22,18 @@ class GenericModel():
         mSpm2 = deltac + mSpm1
         return mS2, mSpm1, mSpm2
     
-    ##One massive if statement (than many if statements because of memory checks) to check if indiviual couplings are less than 4 pi
     ## Should acutally check vertices but this isn't a feature (yet) in DRalgo
     def checkPerturbativity(param : dict[str, float]) -> None:
         #print ("checkSingleCoupling called")
         if abs(param["lam11"]) > 4*np.pi or abs(param["lam12"]) > 4*np.pi or abs(param["lam12p"]) > 4*np.pi or abs(param["lam1Im"]) > 4*np.pi or abs(param["lam1Re"]) > 4*np.pi or abs(param["lam22"]) > 4*np.pi or abs(param["lam23"]) > 4*np.pi or abs(param["lam23p"]) > 4*np.pi or abs(param["lam2Im"]) > 4*np.pi or abs(param["lam2Re"]) > 4*np.pi or abs(param["lam31"]) > 4*np.pi or abs(param["lam31p"]) > 4*np.pi or abs(param["lam33"]) > 4*np.pi or abs(param["lam3Im"]) > 4*np.pi or abs(param["lam3Re"]) > 4*np.pi or abs(param["g1"]) > 4*np.pi or abs(param["g2"]) > 4*np.pi or abs(param["g3"]) > 4*np.pi:
             print ("Model is at risk of being non-pert")
 
-    """Take inputs from the BM file and convert them to parameters in the action.
-    With tree-level matching the renormalization scale does not directly show up in the expressions, but
-    needs to be specified for later loop calculations.
-    """
     def calculateRenormalizedParameters(self, inputParams: dict[str, float]) -> dict[str, float]:
-        v = 246.22   ## "Higgs VEV". Consider using Fermi constant instead
+        """Take inputs from the BM file and convert them to parameters in the action.
+        With tree-level matching the renormalization scale does not directly show up in the expressions, but
+        needs to be specified for later loop calculations."""
+
+        v = 246.22  ## "Higgs VEV". Consider using Fermi constant instead
 
         mS1 = inputParams["mS1"]
 
@@ -77,12 +64,13 @@ class GenericModel():
         res["lam12p"] = inputParams["lam12p"]
 
         ## Yukawas (not squared! would it be better to store y^2?)
-        res["yt3"] = np.sqrt(2.) * self.Mt / v 
-
+        res["yt3"] = np.sqrt(2.) * 172.76 / v  ## 172.76 is the top mass
+        MW = 80.377 ## W boson mass
+        MZ = 91.1876 ## Z boson mass
         ## Gauge couplings
-        res["g1"] = 2.*np.sqrt(self.MZ**2 - self.MW**2) / v     # Hypercharge
-        res["g2"] = 2.*self.MW / v                              # SU(2)
-        res["g3"] = self.g3                                     # SU(3)
+        res["g1"] = 2.*np.sqrt(MZ**2 - MW**2) / v   # U(1)
+        res["g2"] = 2.*MW / v                       # SU(2)
+        res["g3"] = np.sqrt(0.1183 * 4.0 * np.pi)   # SU(3)
 
         ## Scalar potential parameters. Some of the RHS of these depend on LHS of others, so need to do in smart order
         MHsq = 125.00**2 ## Higgs mass squared
