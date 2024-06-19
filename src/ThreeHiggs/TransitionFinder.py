@@ -1,18 +1,12 @@
 import numpy as np
-import numpy.typing as npt
-from typing import Tuple
 
 from .GenericModel import GenericModel
 from .BetaFunctions import BetaFunctions4D
-
 
 """Class TransitionFinder -- This handles all logic for tracking the temperature dependence of a model,
 identifying phase transitions, determining physical parameters of a transition etc. 
 """
 class TransitionFinder:
-
-    model: GenericModel
-
     def __init__(self, model=None):
 
         if (model == None):
@@ -20,10 +14,8 @@ class TransitionFinder:
 
         self.model = model
 
-
-
     ## This is a way too big routine
-    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 1.)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
+    def traceFreeEnergyMinimum(self, TRange: np.ndarray = np.arange(50., 200., 1.)) -> tuple[np.ndarray, np.ndarray]:
 
         assert self.model.effectivePotential.IsConfigured(), "Veff has not been configured, please call its configure() function before use"
 
@@ -75,10 +67,10 @@ class TransitionFinder:
             
             paramsForMatching = betas.RunCoupling(matchingScale)
             
-            ##Check if couplings are pert
-            if not GenericModel.bIsPerturbative(paramsForMatching):
+            from ThreeHiggs.GenericModel import bIsPerturbative, bIsBounded
+            if not bIsPerturbative(paramsForMatching):
                 print ("One of the abs(couplings) is larger than 4pi or is nan")
-            if not GenericModel.bIsBounded(paramsForMatching):
+            if not bIsBounded(paramsForMatching):
                 print ("Model is not bounded from below, exiting")
                 exit(-1)
             
@@ -108,5 +100,4 @@ class TransitionFinder:
             
 
         minimizationResults = np.asanyarray(minimizationResults)
-        ## print( minimizationResults )
         return (minimizationResults)
