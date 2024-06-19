@@ -3,9 +3,7 @@ import numpy as np
 from .EffectivePotential import EffectivePotential
 from .DimensionalReduction import DimensionalReduction
 
-## Could be an ABC, but just implementing for 3HDM for now
 class GenericModel():
-
     """ Control variables """
     # Set to true if the input dict contains 3HDM mass splittings (in GeV) instead of masses directly.
     bMassSplittingInput: bool = True
@@ -78,8 +76,7 @@ class GenericModel():
 
         mS1 = inputParams["mS1"]
 
-        if (self.bMassSplittingInput):
-
+        if inputParams["bMassSplittingInput"]:
             mS2, mSpm1, mSpm2 = self.massSplittingsToMasses(mS1, inputParams["delta12"], inputParams["delta1c"], inputParams["deltac"])
 
         else:
@@ -145,17 +142,16 @@ class GenericModel():
     
 
         ## Set remaining params
-        if (bDarkDemocracyLimit):
-            
+        if inputParams["darkHierarchy"]:
             ## eq. (4)
-            res["mu1sq"] = res["mu2sq"]
-            res["lam3Re"] = res["lam2Re"]
-            res["lam3Im"] = res["lam2Im"]
-            res["lam31"] = res["lam23"]
-            res["lam31p"] = res["lam23p"]
+            res["mu1sq"] = inputParams["darkHierarchy"]*res["mu2sq"]
+            res["lam3Re"] = inputParams["darkHierarchy"]*res["lam2Re"]
+            res["lam3Im"] = inputParams["darkHierarchy"]*res["lam2Im"]
+            res["lam31"] = inputParams["darkHierarchy"]*res["lam23"]
+            res["lam31p"] = inputParams["darkHierarchy"]*res["lam23p"]
 
         else:
-            print("Input params only implemented in ''dark democracy`` limit!")    
+            print("Input params only implemented in dark hieracy limit!")    
             raise NotImplementedError 
 
 
