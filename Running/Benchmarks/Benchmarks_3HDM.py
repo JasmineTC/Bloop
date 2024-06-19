@@ -11,14 +11,14 @@ bm0 = {
     ## "Physical" masses of the scalar sector at tree level
     "mS1" : 300,
     "bMassSplittingInput": True, ## Use mass splittings as Venus does or directly put in masses
-    "preCalculated": False, ## Are all non SM couplings calculated before hand or does generic model need to do it?
+    "bpreCalculated": False, ## Are all non SM couplings calculated before hand or does generic model need to do it?
     "delta12" : 0, # mS2 - mS1
     "delta1c" : 0, # mSpm1 - mS1 => set 0 to make lam23p = 0
     "deltac" : 0, # mSpm2 - mSpm1, splitting between charged scalars => if degenerate, mu12^2 = 0 
 
     "thetaCPV" : 0.0, ##CP violating angle
     "ghDM" : 0.0, ## Higgs coupling to the DM candidate i.e. H S1 S1
-
+    "darkHierarchy": 1, ## Multiplicative value between dark sector params
     ## Dark sector parameters
     "lam1Re" : 1e-12,
     "lam1Im" : 1e-12,
@@ -33,14 +33,14 @@ bm1 = {
     "RGScale" : __MZ,
     "mS1" : 67,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 4.,
     "delta1c" : 50.,
     "deltac" : 1.,
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.0,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -55,7 +55,7 @@ bm2 = {
 
     "mS1" : 57,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 8.,
     "delta1c" : 50.,
     "deltac" : 1.,
@@ -77,7 +77,7 @@ bm3 = {
 
     "mS1" : 70,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 12.,
     "delta1c" : 50.,
     "deltac" : 1.,
@@ -99,7 +99,7 @@ bm4 = {
 
     "mS1" : 48,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 20.,
     "delta1c" : 50.,
     "deltac" : 1.,
@@ -121,7 +121,7 @@ bm5 = {
 
     "mS1" : 75,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 55.,
     "delta1c" : 50.,
     "deltac" : 1.,
@@ -143,7 +143,7 @@ bm6 = {
 
     "mS1" : 74,
     "bMassSplittingInput": True, 
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 55.,
     "delta1c" : 50.,
     "deltac" : 15.,
@@ -165,7 +165,7 @@ bm7 = {
 
     "mS1" : 90,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 5.,
     "delta1c" : 1.,
     "deltac" : 1.,
@@ -187,7 +187,7 @@ bm8 = {
 
     "mS1" : 90,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 55.,
     "delta1c" : 1.,
     "deltac" : 1.,
@@ -209,7 +209,7 @@ bm9 = {
 
     "mS1" : 90,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 55.,
     "delta1c" : 1.,
     "deltac" : 22.,
@@ -232,7 +232,7 @@ bm10 = {
 
     "mS1" : 300,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 0,
     "delta1c" : 0,
     "deltac" : 0, 
@@ -254,7 +254,7 @@ bm11 = {
 
     "mS1" : 67,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 4.,
     "delta1c" : 50.,
     "deltac" : 1.,
@@ -276,7 +276,7 @@ bm12 = {
 
     "mS1" : 57,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 8.,
     "delta1c" : 50.,
     "deltac" : 1.,
@@ -298,7 +298,7 @@ bm13 = {
 
     "mS1" : 70,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 12.,
     "delta1c" : 50.,
     "deltac" : 1.,
@@ -320,7 +320,7 @@ bm14 = {
 
     "mS1" : 48,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 20.,
     "delta1c" : 50.,
     "deltac" : 1.,
@@ -342,7 +342,7 @@ bm15 = {
 
     "mS1" : 75,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 55.,
     "delta1c" : 50.,
     "deltac" : 1.,
@@ -364,7 +364,7 @@ bm16 = {
 
     "mS1" : 74,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 55.,
     "delta1c" : 50.,
     "deltac" : 15.,
@@ -386,7 +386,7 @@ bm17 = {
 
     "mS1" : 90,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 5.,
     "delta1c" : 1.,
     "deltac" : 1.,
@@ -408,7 +408,7 @@ bm18 = {
 
     "mS1" : 90,
     "bMassSplittingInput": True, 
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 55.,
     "delta1c" : 1.,
     "deltac" : 1.,
@@ -430,7 +430,7 @@ bm19 = {
 
     "mS1" : 90,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 55.,
     "delta1c" : 1.,
     "deltac" : 22.,
@@ -452,7 +452,7 @@ bm20 = {
     
     "mS1" : 100,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 50.,
     "delta1c" : 10.,
     "deltac" : 50.,
@@ -474,7 +474,7 @@ bm21 = {
     
     "mS1" : 100,
     "bMassSplittingInput": True,
-    "preCalculated": False,
+    "bpreCalculated": False,
     "delta12" : 50.,
     "delta1c" : 80.,
     "deltac" : 30.,
