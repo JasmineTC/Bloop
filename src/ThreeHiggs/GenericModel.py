@@ -1,5 +1,3 @@
-import numpy.typing as npt
-from typing import Tuple
 import numpy as np
 
 from .EffectivePotential import EffectivePotential
@@ -47,7 +45,7 @@ class GenericModel():
 
     ## Convert Venus' mass splitting (deltas) input to mass values. Returns mS2, mSpm1, mSpm2 (pm meaning plus/minus; the charged masses)
     @staticmethod
-    def massSplittingsToMasses(mS1: float, delta12: float, delta1c: float, deltac: float) -> Tuple[float, float, float]:
+    def massSplittingsToMasses(mS1: float, delta12: float, delta1c: float, deltac: float) -> tuple[float, float, float]:
 
         mS2 = delta12 + mS1
         mSpm1 = delta1c + mS1
