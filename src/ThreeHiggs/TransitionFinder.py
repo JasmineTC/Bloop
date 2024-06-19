@@ -29,7 +29,7 @@ class TransitionFinder:
 
         TRange = np.asanyarray(TRange)
 
-        renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams,  self.model.inputParams["RGScale"])
+        renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams)
         
         """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale like 7T.
         To make this work nicely, integrate the beta functions here up to some high enough scale and store the resulting couplings

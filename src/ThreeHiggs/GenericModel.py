@@ -55,7 +55,7 @@ class GenericModel():
     Here the optional arguments are:
         bDarkDemocracyLimit=True if we set various phi1, phi2 specific couplings equal to each other as defined in the draft.
     """ 
-    def calculateRenormalizedParameters(self, inputParams: dict[str, float], RGScale: float, bDarkDemocracyLimit=True) -> dict[str, float]:
+    def calculateRenormalizedParameters(self, inputParams: dict[str, float]) -> dict[str, float]:
 
         ## See sect 2.2.4 in 1909.09234 and eq (38) for mass splittings
 
@@ -145,7 +145,7 @@ class GenericModel():
             raise NotImplementedError 
 
 
-        res["RGScale"] = RGScale
+        res["RGScale"] = inputParams["RGScale"]
 
         return res
     
