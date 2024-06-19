@@ -62,7 +62,7 @@ bm2 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.0,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -84,7 +84,7 @@ bm3 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.0,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -106,7 +106,7 @@ bm4 = {
 
     "thetaCPV" : 5.*np.pi/6.,
     "ghDM" : 0.0,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -128,7 +128,7 @@ bm5 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.0,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -150,7 +150,7 @@ bm6 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.0,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -172,7 +172,7 @@ bm7 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.0,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -194,7 +194,7 @@ bm8 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.0,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -216,7 +216,7 @@ bm9 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.0,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -239,7 +239,7 @@ bm10 = {
 
     "thetaCPV" : 0.0,
     "ghDM" : 0.0,
-
+    "darkHierarchy": 1,
     "lam1Re" : 1e-12,
     "lam1Im" : 1e-12,
     "lam11" : 1e-12,
@@ -261,7 +261,7 @@ bm11 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.02,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -283,7 +283,7 @@ bm12 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.02,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -305,7 +305,7 @@ bm13 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.02,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -327,7 +327,7 @@ bm14 = {
 
     "thetaCPV" : 5.*np.pi/6.,
     "ghDM" : 0.01,
-    
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -349,7 +349,7 @@ bm15 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.02,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -371,7 +371,7 @@ bm16 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.02,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -393,7 +393,7 @@ bm17 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.02,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -415,7 +415,7 @@ bm18 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.02,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -437,7 +437,7 @@ bm19 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.02,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -459,7 +459,7 @@ bm20 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.1,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
@@ -481,7 +481,7 @@ bm21 = {
 
     "thetaCPV" : 2.*np.pi/3.,
     "ghDM" : 0.1,
-
+    "darkHierarchy": 1,
     "lam1Re" : 0.1,
     "lam1Im" : 0.0,
     "lam11" : 0.1,
