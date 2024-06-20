@@ -2,6 +2,43 @@ import math as m
 
 from .EffectivePotential import EffectivePotential
 from .DimensionalReduction import DimensionalReduction
+    
+def bIsPerturbative(param : dict[str, float]) -> bool:
+    ## One massive if statement (meant to be faster than lots of small checks) to check if indiviual couplings are less than 4 pi
+    ## Should actually check vertices but this isn't a feature (yet) in DRalgo
+    return abs(param["lam11"]) < 4*m.pi and \
+       abs(param["lam12"]) < 4*m.pi and \
+       abs(param["lam12p"]) < 4*m.pi and \
+       abs(param["lam1Im"]) < 4*m.pi and \
+       abs(param["lam1Re"]) < 4*m.pi and \
+       abs(param["lam22"]) < 4*m.pi and \
+       abs(param["lam23"]) < 4*m.pi and \
+       abs(param["lam23p"]) < 4*m.pi and \
+       abs(param["lam2Im"]) < 4*m.pi and \
+       abs(param["lam2Re"]) < 4*m.pi and \
+       abs(param["lam31"]) < 4*m.pi and \
+       abs(param["lam31p"]) < 4*m.pi and \
+       abs(param["lam33"]) < 4*m.pi and \
+       abs(param["lam3Im"]) < 4*m.pi and \
+       abs(param["lam3Re"]) < 4*m.pi and \
+       abs(param["g1"]) < 4*m.pi and \
+       abs(param["g2"]) < 4*m.pi and \
+       abs(param["g3"]) < 4*m.pi
+
+def bIsBounded(param : dict[str, float]) -> bool:
+    ## Taking equations 26-31 from the draft that ensure the potential is bounded from below.
+    lamx = param["lam12"] + min(0, param["lam12p"] - 2*m.sqrt(param["lam1Re"]**2 + param["lam1Im"]**2) )
+    lamy = param["lam31"] + min(0, param["lam31p"] - 2*m.sqrt(param["lam3Re"]**2 + param["lam3Im"]**2) )
+    lamz = param["lam23"] + min(0, param["lam23p"] - 2*m.sqrt(param["lam2Re"]**2 + param["lam2Im"]**2) )
+
+    return param["lam11"] > 0 and \
+           param["lam22"] > 0 and \
+           param["lam33"] > 0 and \
+           lamx > -2*m.sqrt(param["lam11"]*param["lam22"]) and \
+           lamy > -2*m.sqrt(param["lam11"]*param["lam33"]) and \
+           lamz > -2*m.sqrt(param["lam22"]*param["lam33"]) and \
+           (m.sqrt(param["lam33"])*lamx + m.sqrt(param["lam11"])*lamz + m.sqrt(param["lam22"])*lamy >= 0 or \
+           param["lam33"]*lamx**2 + param["lam11"]*lamz**2 + param["lam22"]*lamy**2 -param["lam11"]*param["lam22"]*param["lam33"] - 2*lamx*lamy*lamz < 0)
 
 class GenericModel():
     def __init__(self):
@@ -18,45 +55,6 @@ class GenericModel():
         mSpm1 = delta1c + mS1
         mSpm2 = deltac + mSpm1
         return mS2, mSpm1, mSpm2
-    
-    @staticmethod
-    def bIsPerturbative(param : dict[str, float]) -> bool:
-        ## One massive if statement (meant to be faster than lots of small checks) to check if indiviual couplings are less than 4 pi
-        ## Should actually check vertices but this isn't a feature (yet) in DRalgo
-        return abs(param["lam11"]) < 4*m.pi and \
-           abs(param["lam12"]) < 4*m.pi and \
-           abs(param["lam12p"]) < 4*m.pi and \
-           abs(param["lam1Im"]) < 4*m.pi and \
-           abs(param["lam1Re"]) < 4*m.pi and \
-           abs(param["lam22"]) < 4*m.pi and \
-           abs(param["lam23"]) < 4*m.pi and \
-           abs(param["lam23p"]) < 4*m.pi and \
-           abs(param["lam2Im"]) < 4*m.pi and \
-           abs(param["lam2Re"]) < 4*m.pi and \
-           abs(param["lam31"]) < 4*m.pi and \
-           abs(param["lam31p"]) < 4*m.pi and \
-           abs(param["lam33"]) < 4*m.pi and \
-           abs(param["lam3Im"]) < 4*m.pi and \
-           abs(param["lam3Re"]) < 4*m.pi and \
-           abs(param["g1"]) < 4*m.pi and \
-           abs(param["g2"]) < 4*m.pi and \
-           abs(param["g3"]) < 4*m.pi
-    
-    @staticmethod
-    def bIsBounded(param : dict[str, float]) -> bool:
-        ## Taking equations 26-31 from the draft that ensure the potential is bounded from below.
-        lamx = param["lam12"] + min(0, param["lam12p"] - 2*m.sqrt(param["lam1Re"]**2 + param["lam1Im"]**2) )
-        lamy = param["lam31"] + min(0, param["lam31p"] - 2*m.sqrt(param["lam3Re"]**2 + param["lam3Im"]**2) )
-        lamz = param["lam23"] + min(0, param["lam23p"] - 2*m.sqrt(param["lam2Re"]**2 + param["lam2Im"]**2) )
- 
-        return param["lam11"] > 0 and \
-               param["lam22"] > 0 and \
-               param["lam33"] > 0 and \
-               lamx > -2*m.sqrt(param["lam11"]*param["lam22"]) and \
-               lamy > -2*m.sqrt(param["lam11"]*param["lam33"]) and \
-               lamz > -2*m.sqrt(param["lam22"]*param["lam33"]) and \
-               (m.sqrt(param["lam33"])*lamx + m.sqrt(param["lam11"])*lamz + m.sqrt(param["lam22"])*lamy >= 0 or \
-               param["lam33"]*lamx**2 + param["lam11"]*lamz**2 + param["lam22"]*lamy**2 -param["lam11"]*param["lam22"]*param["lam33"] - 2*lamx*lamy*lamz < 0)
 
     def calculateRenormalizedParameters(self, inputParams: dict[str, float]) -> dict[str, float]:
         """Take inputs from the BM file and convert them to parameters in the action.
