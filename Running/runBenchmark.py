@@ -14,16 +14,6 @@ import pickle ##Note
 userinput = ThreeHiggs.UserInput()
 args = userinput.parse()
 
-## This should be put inside the pickle
-hardToSoftFile = ThreeHiggs.getResourcePath(args.hardToSoftFile)
-softScaleRGEFile = ThreeHiggs.getResourcePath(args.softScaleRGEFile)
-softToUltrasoftFile = ThreeHiggs.getResourcePath(args.softToUltraSoftFile)
-
-## Model object setup + load matching relations
-model3HDM = GenericModel()
-model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
-model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
-
 ## ---- Configure Veff
 veffFiles = [ThreeHiggs.getResourcePath(args.loFile)]
 if (args.loopOrder >= 1):
@@ -31,28 +21,29 @@ if (args.loopOrder >= 1):
 if (args.loopOrder >= 2):
     veffFiles.append( ThreeHiggs.getResourcePath(args.nnloFile) )
 
-## EIt's (slightly) faster to generate this config file once and then store it in binary
-## Use pickle to store/laod the binary file.
-veffConfig = ThreeHiggs.VeffConfig(
-    fieldNames = ['v1', 'v2', 'v3'],
-    loopOrder = args.loopOrder,
-    veffFiles = veffFiles,
-    vectorMassFile = ThreeHiggs.getResourcePath(args.vectorsMassesSquaredFile),
-    vectorShorthandFile = ThreeHiggs.getResourcePath(args.vectorsShortHandsFile),
-    #
-    scalarPermutationMatrix = ParsedMatrix.parseConstantMatrix(ThreeHiggs.getResourcePath(args.scalarPermutationFile)),
-    scalarMassMatrices = [ 
-        ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath(args.scalarMassMatrixUpperLeftFile),
-                                         ThreeHiggs.getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile)),
-        ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath(args.scalarMassMatrixBottomRightFile),
-                                         ThreeHiggs.getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile))
-    ],
-    scalarRotationMatrixFile = ThreeHiggs.getResourcePath(args.scalarRotationFile),
-    # We will take abs values of all mass^2
-    bAbsoluteMsq = True,
-)
+## This should be put inside the pickle
+hardToSoftFile = ThreeHiggs.getResourcePath(args.hardToSoftFile)
+softScaleRGEFile = ThreeHiggs.getResourcePath(args.softScaleRGEFile)
+softToUltrasoftFile = ThreeHiggs.getResourcePath(args.softToUltraSoftFile)
 
-model3HDM.effectivePotential.configure(veffConfig)
+from ThreeHiggs.EffectivePotential import EffectivePotential
+effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
+                                        True,
+                                        ThreeHiggs.getResourcePath(args.vectorsMassesSquaredFile),
+                                        ThreeHiggs.getResourcePath(args.vectorsShortHandsFile),
+                                        ParsedMatrix.parseConstantMatrix(ThreeHiggs.getResourcePath(args.scalarPermutationFile)),
+                                        [ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath(args.scalarMassMatrixUpperLeftFile),
+                                                                          ThreeHiggs.getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile)),
+                                         ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath(args.scalarMassMatrixBottomRightFile),
+                                                                          ThreeHiggs.getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile))],
+                                        ThreeHiggs.getResourcePath(args.scalarRotationFile),
+                                        args.loopOrder,
+                                        veffFiles)
+
+## Model object setup + load matching relations
+model3HDM = GenericModel(effectivePotential)
+model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
+model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
 ## Set algorithm to use for Veff minimization
 model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eDIRECTGLOBAL)
