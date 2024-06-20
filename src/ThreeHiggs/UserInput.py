@@ -21,7 +21,7 @@ class UserInput(argparse.ArgumentParser):
 
         ##TODO make safe by checking if int given actually has a bm point
         ##something like if benchMarkNumber > len(bm list) then exit
-        self.add_argument('-n', '--benchMarkNumber', action = 'store', default = 0, dest = 'benchMarkNumber', type = int,
+        self.add_argument('-n', '--benchMarkNumber', action = 'store', dest = 'benchMarkNumber', type = int,
                           help = "Used to specify a particular bench mark point in the list to run")
 
         self.add_argument('-l', '--loopOrder', action = 'store', default = 2, dest = 'loopOrder', type = int, choices = [0, 1, 2],

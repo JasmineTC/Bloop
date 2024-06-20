@@ -60,33 +60,35 @@ model3HDM.effectivePotential.minimizer.setTolerances(args.absGlobalTolerance,
                                                      args.absLocalTolerance, 
                                                      args.relLocalTolerance)
 
-## Set benchMarkNumber in minimizer for title and file naming
-model3HDM.effectivePotential.minimizer.setBmNumber(args.benchMarkNumber)
-
 with open(args.benchMarkFile) as benchMarkFile:
     from json import load
-    inputParams = load(benchMarkFile)[args.benchMarkNumber]
+    benchMarks = load(benchMarkFile)
 
-ghdm = inputParams["ghDM"]
-model3HDM.effectivePotential.minimizer.setgHDM(ghdm)
+    for index, benchMark in enumerate(benchMarks):
+        if args.benchMarkNumber:
+            if index != args.benchMarkNumber:
+                continue
 
-from ThreeHiggs.TransitionFinder import TransitionFinder
-transitionFinder = TransitionFinder(model=model3HDM)
-model3HDM.setInputParams(inputParams)
-minimizationResults = transitionFinder.traceFreeEnergyMinimum()
-
-print(f"{minimizationResults=}")
-
-filename = f"{args.resultsDirectory}/BM_{args.benchMarkNumber}"
-
-from pathlib import Path
-Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
-
-if args.save == True:
-    from numpy import savetxt
-    savetxt(filename + ".txt", minimizationResults)
-
-if args.plot == True:
-    from PlotResult import PlotResult
-    PlotResult.PlotData(minimizationResults, args.benchMarkNumber,args.loopOrder, filename)
+        ghdm = benchMark["ghDM"]
+        model3HDM.effectivePotential.minimizer.setgHDM(ghdm)
+        
+        from ThreeHiggs.TransitionFinder import TransitionFinder
+        transitionFinder = TransitionFinder(model=model3HDM)
+        model3HDM.setInputParams(benchMark)
+        minimizationResults = transitionFinder.traceFreeEnergyMinimum()
+        
+        print(f"{minimizationResults=}")
+        
+        filename = f"{args.resultsDirectory}/BM_{args.benchMarkNumber}"
+        
+        from pathlib import Path
+        Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
+        
+        if args.save == True:
+            from numpy import savetxt
+            savetxt(filename + ".txt", minimizationResults)
+        
+        if args.plot == True:
+            from PlotResult import PlotResult
+            PlotResult.PlotData(minimizationResults, args.benchMarkNumber,args.loopOrder, filename)
     
