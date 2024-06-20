@@ -1,167 +1,134 @@
-import numpy.typing as npt
-from typing import Tuple
-import numpy as np
+import math as m
 
 from .EffectivePotential import EffectivePotential
 from .DimensionalReduction import DimensionalReduction
+    
+def bIsPerturbative(param : dict[str, float]) -> bool:
+    ## One massive if statement (meant to be faster than lots of small checks) to check if indiviual couplings are less than 4 pi
+    ## Should actually check vertices but this isn't a feature (yet) in DRalgo
+    return abs(param["lam11"]) < 4*m.pi and \
+       abs(param["lam12"]) < 4*m.pi and \
+       abs(param["lam12p"]) < 4*m.pi and \
+       abs(param["lam1Im"]) < 4*m.pi and \
+       abs(param["lam1Re"]) < 4*m.pi and \
+       abs(param["lam22"]) < 4*m.pi and \
+       abs(param["lam23"]) < 4*m.pi and \
+       abs(param["lam23p"]) < 4*m.pi and \
+       abs(param["lam2Im"]) < 4*m.pi and \
+       abs(param["lam2Re"]) < 4*m.pi and \
+       abs(param["lam31"]) < 4*m.pi and \
+       abs(param["lam31p"]) < 4*m.pi and \
+       abs(param["lam33"]) < 4*m.pi and \
+       abs(param["lam3Im"]) < 4*m.pi and \
+       abs(param["lam3Re"]) < 4*m.pi and \
+       abs(param["g1"]) < 4*m.pi and \
+       abs(param["g2"]) < 4*m.pi and \
+       abs(param["g3"]) < 4*m.pi
 
-## Could be an ABC, but just implementing for 3HDM for now
+def bIsBounded(param : dict[str, float]) -> bool:
+    ## Taking equations 26-31 from the draft that ensure the potential is bounded from below.
+    lamx = param["lam12"] + min(0, param["lam12p"] - 2*m.sqrt(param["lam1Re"]**2 + param["lam1Im"]**2) )
+    lamy = param["lam31"] + min(0, param["lam31p"] - 2*m.sqrt(param["lam3Re"]**2 + param["lam3Im"]**2) )
+    lamz = param["lam23"] + min(0, param["lam23p"] - 2*m.sqrt(param["lam2Re"]**2 + param["lam2Im"]**2) )
+
+    return param["lam11"] > 0 and \
+           param["lam22"] > 0 and \
+           param["lam33"] > 0 and \
+           lamx > -2*m.sqrt(param["lam11"]*param["lam22"]) and \
+           lamy > -2*m.sqrt(param["lam11"]*param["lam33"]) and \
+           lamz > -2*m.sqrt(param["lam22"]*param["lam33"]) and \
+           (m.sqrt(param["lam33"])*lamx + m.sqrt(param["lam11"])*lamz + m.sqrt(param["lam22"])*lamy >= 0 or \
+           param["lam33"]*lamx**2 + param["lam11"]*lamz**2 + param["lam22"]*lamy**2 -param["lam11"]*param["lam22"]*param["lam33"] - 2*lamx*lamy*lamz < 0)
+
 class GenericModel():
-
-    """ Control variables """
-    # Set to true if the input dict contains 3HDM mass splittings (in GeV) instead of masses directly.
-    bMassSplittingInput: bool = True
-
-    dimensionalReduction: DimensionalReduction
-    effectivePotential: EffectivePotential
-
-    ## This is the "physical" input 
-    inputParams: dict[str, float]
-
-    """ Define some constants that are inputs too, but we won't scan over these. 
-    """
-    ## "Higgs VEV". Consider using Fermi constant instead
-    v = 246.22
-    ## Higgs mass
-    MH = 125.00
-    ## Gauge boson masses
-    MW = 80.377
-    MZ = 91.1876
-    ## Top quark mass 
-    Mt = 172.76
-    ##TODO we now run this, needs adjusting
-    ## SU(3) coupling, we neglect it's running. This is the value at Z pole
-    g3 = np.sqrt(0.1183 * 4.0 * np.pi)
-
-
     def __init__(self):
-        
         self.inputParams = {}
         self.dimensionalReduction = DimensionalReduction()
-        ## 3D potential:
-        self.effectivePotential = EffectivePotential()
+        self.effectivePotential = EffectivePotential()  ## 3D potential:
 
-    
     def setInputParams(self, inputParams):
         self.inputParams = inputParams
 
-    ## Convert Venus' mass splitting (deltas) input to mass values. Returns mS2, mSpm1, mSpm2 (pm meaning plus/minus; the charged masses)
-    @staticmethod
-    def massSplittingsToMasses(mS1: float, delta12: float, delta1c: float, deltac: float) -> Tuple[float, float, float]:
-
+    ## 1909.09234 and eq (38) for mass splittings
+    def massSplittingsToMasses(self, mS1: float, delta12: float, delta1c: float, deltac: float) -> tuple[float, float, float]:
         mS2 = delta12 + mS1
         mSpm1 = delta1c + mS1
         mSpm2 = deltac + mSpm1
         return mS2, mSpm1, mSpm2
-    
-    @staticmethod
-    ##One massive if statement (than many if statements because of memory checks) to check if indiviual couplings are less than 4 pi
-    ##This is not a sufficient check! Need to find the combinations of couplings that appear in all diagrams to be sure
-    def checkPerturbativity(param : dict[str, float]) -> None:
-        #print ("checkSingleCoupling called")
-        if abs(param["lam11"]) > 4*np.pi or abs(param["lam12"]) > 4*np.pi or abs(param["lam12p"]) > 4*np.pi or abs(param["lam1Im"]) > 4*np.pi or abs(param["lam1Re"]) > 4*np.pi or abs(param["lam22"]) > 4*np.pi or abs(param["lam23"]) > 4*np.pi or abs(param["lam23p"]) > 4*np.pi or abs(param["lam2Im"]) > 4*np.pi or abs(param["lam2Re"]) > 4*np.pi or abs(param["lam31"]) > 4*np.pi or abs(param["lam31p"]) > 4*np.pi or abs(param["lam33"]) > 4*np.pi or abs(param["lam3Im"]) > 4*np.pi or abs(param["lam3Re"]) > 4*np.pi or abs(param["g1"]) > 4*np.pi or abs(param["g2"]) > 4*np.pi or abs(param["g3"]) > 4*np.pi:
-            print ("Model is at risk of being non-pert")
 
-    """This goes from whatever "physical" input to parameters in the actions.
-    With tree-level matching the renormalization scale does not directly show up in the expressions, but
-    needs to be specified for later loop calculations.
-
-    Here the optional arguments are:
-        bDarkDemocracyLimit=True if we set various phi1, phi2 specific couplings equal to each other as defined in the draft.
-    """ 
-    def calculateRenormalizedParameters(self, inputParams: dict[str, float], RGScale: float, bDarkDemocracyLimit=True) -> dict[str, float]:
-
-        ## See sect 2.2.4 in 1909.09234 and eq (38) for mass splittings
-
-        ## Avoid 1/0 in expression for alpha (at least)
-        SMALL_NUMBER = 1e-100
-
-        v = self.v
-
-        mS1 = inputParams["mS1"]
-
-        if (self.bMassSplittingInput):
-
-            mS2, mSpm1, mSpm2 = self.massSplittingsToMasses(mS1, inputParams["delta12"], inputParams["delta1c"], inputParams["deltac"])
-
-        else:
-            mS2 = inputParams["mS2"]
-            ## Charged masses:
-            mSpm1 = inputParams["mSpm1"]
-            mSpm2 = inputParams["mSpm2"]
-
-        ## This is the complex phase of lambda_2
-        thetaCPV = inputParams["thetaCPV"]
-        ghDM = inputParams["ghDM"]
-
-        sinTheta = np.sin(thetaCPV)
-        cosTheta = np.cos(thetaCPV)
-
+    def calculateRenormalizedParameters(self, inputParams: dict[str, float]) -> dict[str, float]:
+        """Take inputs from the BM file and convert them to parameters in the action.
+        With tree-level matching the renormalization scale does not directly show up in the expressions, but
+        needs to be specified for later loop calculations."""
         res = {}
-
-        ## First copy action params that were given as direct inputs
-        res["lam1Re"] = inputParams["lam1Re"]
-        res["lam1Im"] = inputParams["lam1Im"]
-        res["lam11"] = inputParams["lam11"]
-        res["lam22"] = inputParams["lam22"]
-        res["lam12"] = inputParams["lam12"]
-        res["lam12p"] = inputParams["lam12p"]
-
-        ## Yukawas (not squared! would it be better to store y^2?)
-        res["yt3"] = np.sqrt(2.) * self.Mt / v 
-
-        ## Gauge couplings
-        res["g1"] = 2.*np.sqrt(self.MZ**2 - self.MW**2) / v     # Hypercharge
-        res["g2"] = 2.*self.MW / v                              # SU(2)
-        res["g3"] = self.g3                                     # SU(3)
-
-        ## Scalar potential parameters. Some of the RHS of these depend on LHS of others, so need to do in smart order
-
-        res["mu3sq"] = self.MH**2 / 2. 
-        res["lam33"] = self.MH**2 / 2. / v**2
-
-        ### mu12^2 is real in our starting basis but not generally so after loop corrections
-        mu12sq = 0.5 * (mSpm2**2 - mSpm1**2)
-        res["mu12sqRe"] = mu12sq
-        res["mu12sqIm"] = 0.0
-
-        # Abs value of lambda2 (which is complex):
-        lam2Abs = 1./v**2 * ( mu12sq*cosTheta + 0.25 * np.sqrt( (2.*mu12sq*cosTheta)**2 + (mS2**2 - mS1**2)**2 - (mSpm2**2 - mSpm1**2)**2 ) )
-
-        res["lam2Re"] = lam2Abs * cosTheta
-        res["lam2Im"] = lam2Abs * sinTheta
-
-        #### Compute some helper parameters
-
-        ## eq (13)
-        LambdaMinus = np.sqrt( mu12sq**2 + v**4*lam2Abs**2 - 2.*v**2*mu12sq*lam2Abs*cosTheta)
-        ## eq (12)
-        alpha = (-mu12sq + v**2*lam2Abs*cosTheta - LambdaMinus) / ( (v**2*lam2Abs*sinTheta) + SMALL_NUMBER)
-
-        mu2sq = v**2/2. * ghDM - v**2 / (alpha**2 + 1.) * (2.*alpha* sinTheta + (alpha**2 - 1.)*cosTheta) * lam2Abs - 0.5*(mS2**2 + mS1**2)
-
-        res["mu2sq"] = mu2sq
-
-        res["lam23"] = 1./v**2 * (2.*mu2sq + mSpm2**2 + mSpm1**2)
-        res["lam23p"] = 1./v**2 * (mS2**2 + mS1**2 - mSpm2**2 - mSpm1**2)
-    
-
-        ## Set remaining params
-        if (bDarkDemocracyLimit):
+        ## --- SM fermions and gauge bosons ---
+        v = 246.22  ## "Higgs VEV". Consider using Fermi constant instead
+        res["yt3"] = m.sqrt(2.) * 172.76 / v  ## 172.76 is the top mass (not squared! would it be better to store y^2?)
+        MW = 80.377 ## W boson mass
+        MZ = 91.1876 ## Z boson mass
+        
+        res |= {"g1": 2.*m.sqrt(MZ**2 - MW**2)/ v,   # U(1)
+                "g2": 2.*MW/ v,                      # SU(2)
+                "g3": m.sqrt(0.1183 * 4.0 * m.pi)}   # SU(3)
+        
+        ## --- BSM scalars ---
+        if inputParams["bpreCalculated"]:  
+            res |= inputParams["couplings"]
             
-            ## eq. (4)
-            res["mu1sq"] = res["mu2sq"]
-            res["lam3Re"] = res["lam2Re"]
-            res["lam3Im"] = res["lam2Im"]
-            res["lam31"] = res["lam23"]
-            res["lam31p"] = res["lam23p"]
-
         else:
-            print("Input params only implemented in ''dark democracy`` limit!")    
-            raise NotImplementedError 
+            mS1 = inputParams["mS1"]
+            
+            if inputParams["bMassSplittingInput"]:
+                mS2, mSpm1, mSpm2 = self.massSplittingsToMasses(mS1, inputParams["delta12"], inputParams["delta1c"], inputParams["deltac"])
+    
+            else:
+                mS2 = inputParams["mS2"]
+                mSpm1 = inputParams["mSpm1"]
+                mSpm2 = inputParams["mSpm2"]
+    
+            res |= {"lam1Re": inputParams["lam1Re"],
+                    "lam1Im": inputParams["lam1Im"],
+                    "lam11": inputParams["lam11"],
+                    "lam22": inputParams["lam22"],
+                    "lam12": inputParams["lam12"],
+                    "lam12p": inputParams["lam12p"]}
 
-
-        res["RGScale"] = RGScale
+            ## Scalar potential parameters. Some of the RHS of these depend on LHS of others, so need to do in smart order
+            MHsq = 125.00**2 ## Higgs mass squared
+            res |= {"mu3sq": MHsq / 2.,
+                    "lam33": MHsq / (2.*v**2) }
+    
+            mu12sq = 0.5 * (mSpm2**2 - mSpm1**2)
+            res |= {"mu12sqRe": mu12sq,
+                    "mu12sqIm": 0.} ### mu12^2 is real at tree level (basis choice) but generally complex at loop level
+            
+            sinTheta, cosTheta = m.sin(inputParams["thetaCPV"]), m.cos(inputParams["thetaCPV"])
+            lam2Abs = 1./v**2 * ( mu12sq*cosTheta + 0.25 * m.sqrt( (2.*mu12sq*cosTheta)**2 + (mS2**2 - mS1**2)**2 - (mSpm2**2 - mSpm1**2)**2 ) )
+            res |= {"lam2Re": lam2Abs * cosTheta,
+                    "lam2Im": lam2Abs * sinTheta}
+            
+    
+            #### Compute some helper parameters
+            LambdaMinus = m.sqrt( mu12sq**2 + v**4*lam2Abs**2 - 2.*v**2*mu12sq*lam2Abs*cosTheta) ## Eq 13
+            alpha = (-mu12sq + v**2*lam2Abs*cosTheta - LambdaMinus) / ( (v**2*lam2Abs*sinTheta) + 1e-100) ## Eq 12 - Adding 1e-100 to avoid 1/0
+    
+            mu2sq = v**2/2. * inputParams["ghDM"] - v**2 / (alpha**2 + 1.) * (2.*alpha* sinTheta + (alpha**2 - 1.)*cosTheta) * lam2Abs - 0.5*(mS2**2 + mS1**2)
+            res |= {"mu2sq": mu2sq,
+                    "lam23": 1./v**2 * (2.*mu2sq + mSpm2**2 + mSpm1**2),
+                    "lam23p": 1./v**2 * (mS2**2 + mS1**2 - mSpm2**2 - mSpm1**2)}
+        
+            if inputParams["darkHierarchy"]: ## eq. (4) but generalised to Hieracy (inputParams["darkHierarchy"] = 1 gives democracy)
+                res |= {"mu1sq": inputParams["darkHierarchy"]*res["mu2sq"],
+                        "lam3Re": inputParams["darkHierarchy"]*res["lam2Re"],
+                        "lam3Im": inputParams["darkHierarchy"]*res["lam2Im"],
+                        "lam31": inputParams["darkHierarchy"]*res["lam23"],
+                        "lam31p": inputParams["darkHierarchy"]*res["lam23p"]}
+    
+            else:
+                print("Input params only implemented in dark hieracy limit!")    
+                raise NotImplementedError 
+    
+            res["RGScale"] = inputParams["RGScale"] ## This needs to be last due to bug in beta function!!!
 
         return res
     

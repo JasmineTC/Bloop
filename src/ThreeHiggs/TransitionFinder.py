@@ -1,18 +1,12 @@
 import numpy as np
-import numpy.typing as npt
-from typing import Tuple
 
 from .GenericModel import GenericModel
 from .BetaFunctions import BetaFunctions4D
-
 
 """Class TransitionFinder -- This handles all logic for tracking the temperature dependence of a model,
 identifying phase transitions, determining physical parameters of a transition etc. 
 """
 class TransitionFinder:
-
-    model: GenericModel
-
     def __init__(self, model=None):
 
         if (model == None):
@@ -20,16 +14,14 @@ class TransitionFinder:
 
         self.model = model
 
-
-
     ## This is a way too big routine
-    def traceFreeEnergyMinimum(self, TRange: npt.ArrayLike = np.arange(50., 200., 1.)) -> Tuple[npt.ArrayLike, npt.ArrayLike]:
+    def traceFreeEnergyMinimum(self, TRange: np.ndarray = np.arange(50., 200., 1.)) -> tuple[np.ndarray, np.ndarray]:
 
         assert self.model.effectivePotential.IsConfigured(), "Veff has not been configured, please call its configure() function before use"
 
         TRange = np.asanyarray(TRange)
 
-        renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams,  self.model.inputParams["RGScale"])
+        renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams)
         
         """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale like 7T.
         To make this work nicely, integrate the beta functions here up to some high enough scale and store the resulting couplings
@@ -75,8 +67,12 @@ class TransitionFinder:
             
             paramsForMatching = betas.RunCoupling(matchingScale)
             
-            ##Check if couplings are pert
-            GenericModel.checkPerturbativity(paramsForMatching)
+            from ThreeHiggs.GenericModel import bIsPerturbative, bIsBounded
+            if not bIsPerturbative(paramsForMatching):
+                print ("One of the abs(couplings) is larger than 4pi or is nan")
+            if not bIsBounded(paramsForMatching):
+                print ("Model is not bounded from below, exiting")
+                exit(-1)
             
             ## These need to be in the dict
             paramsForMatching["RGScale"] = matchingScale
@@ -104,5 +100,4 @@ class TransitionFinder:
             
 
         minimizationResults = np.asanyarray(minimizationResults)
-        ## print( minimizationResults )
         return (minimizationResults)

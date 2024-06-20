@@ -107,6 +107,11 @@ class UserInput(argparse.ArgumentParser):
                           action = 'store', 
                           default = "Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight_definitions.txt",
                           dest = 'scalarMassMatrixBottomRightDefinitionsFile')
+        
+        self.add_argument('--benchMarkFile', 
+                  action = 'store', 
+                  default = "Benchmarks/Benchmarks_3HDM.json",#"Benchmarks/ScanDict.json",
+                  dest = 'benchMarkFile')
 
         self.add_argument('--absGlobalTolerance', action = 'store', default = 1e-1, dest = 'absGlobalTolerance')
         self.add_argument('--relGlobalTolerance', action = 'store', default = 1e-1, dest = 'relGlobalTolerance')

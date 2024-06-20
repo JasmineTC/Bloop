@@ -66,8 +66,10 @@ model3HDM.effectivePotential.minimizer.setTolerances(args.absGlobalTolerance,
 ## Set benchMarkNumber in minimizer for title and file naming
 model3HDM.effectivePotential.minimizer.setBmNumber(args.benchMarkNumber)
 
+import json
+with open(args.benchMarkFile) as benchMarkFile:
+    inputParams = json.load(benchMarkFile)[args.benchMarkNumber]
 
-inputParams = Benchmarks.Benchmarks_3HDM.bmList[args.benchMarkNumber]
 ghdm = inputParams["ghDM"]
 model3HDM.effectivePotential.minimizer.setgHDM(ghdm)
 
