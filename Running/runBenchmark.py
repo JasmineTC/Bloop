@@ -11,32 +11,46 @@ import Benchmarks.Benchmarks_3HDM
 
 import pickle ##Note 
 
+def getResourcePath(relativePathToResource: str) -> str:
+    """ Gives a safe path to a packaged resource.
+    
+    Returns
+    -------
+    Path to the resource file: str.
+    """
+
+    ## fallback to hardcoded package name if the __package__ call fails
+    packageName = __package__ or "ThreeHiggs"
+
+    from importlib.resources import files
+    return files(packageName) / relativePathToResource
+
 userinput = ThreeHiggs.UserInput()
 args = userinput.parse()
 
 ## ---- Configure Veff
-veffFiles = [ThreeHiggs.getResourcePath(args.loFile)]
+veffFiles = [getResourcePath(args.loFile)]
 if (args.loopOrder >= 1):
-    veffFiles.append( ThreeHiggs.getResourcePath(args.nloFile) )
+    veffFiles.append( getResourcePath(args.nloFile) )
 if (args.loopOrder >= 2):
-    veffFiles.append( ThreeHiggs.getResourcePath(args.nnloFile) )
+    veffFiles.append( getResourcePath(args.nnloFile) )
 
 ## This should be put inside the pickle
-hardToSoftFile = ThreeHiggs.getResourcePath(args.hardToSoftFile)
-softScaleRGEFile = ThreeHiggs.getResourcePath(args.softScaleRGEFile)
-softToUltrasoftFile = ThreeHiggs.getResourcePath(args.softToUltraSoftFile)
+hardToSoftFile = getResourcePath(args.hardToSoftFile)
+softScaleRGEFile = getResourcePath(args.softScaleRGEFile)
+softToUltrasoftFile = getResourcePath(args.softToUltraSoftFile)
 
 from ThreeHiggs.EffectivePotential import EffectivePotential
 effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         True,
-                                        ThreeHiggs.getResourcePath(args.vectorsMassesSquaredFile),
-                                        ThreeHiggs.getResourcePath(args.vectorsShortHandsFile),
-                                        ParsedMatrix.parseConstantMatrix(ThreeHiggs.getResourcePath(args.scalarPermutationFile)),
-                                        [ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath(args.scalarMassMatrixUpperLeftFile),
-                                                                          ThreeHiggs.getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile)),
-                                         ThreeHiggs.MatrixDefinitionFiles(ThreeHiggs.getResourcePath(args.scalarMassMatrixBottomRightFile),
-                                                                          ThreeHiggs.getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile))],
-                                        ThreeHiggs.getResourcePath(args.scalarRotationFile),
+                                        getResourcePath(args.vectorsMassesSquaredFile),
+                                        getResourcePath(args.vectorsShortHandsFile),
+                                        ParsedMatrix.parseConstantMatrix(getResourcePath(args.scalarPermutationFile)),
+                                        [ThreeHiggs.MatrixDefinitionFiles(getResourcePath(args.scalarMassMatrixUpperLeftFile),
+                                                                          getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile)),
+                                         ThreeHiggs.MatrixDefinitionFiles(getResourcePath(args.scalarMassMatrixBottomRightFile),
+                                                                          getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile))],
+                                        getResourcePath(args.scalarRotationFile),
                                         args.loopOrder,
                                         veffFiles)
 
