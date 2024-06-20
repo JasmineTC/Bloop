@@ -4,20 +4,6 @@ from typing import Tuple
 from scipy import linalg
 #import unicodedata
 
-def getSafePathToResource(relativePathToResource: str) -> str:
-    """ Gives a safe path to a packaged resource.
-    
-    Returns
-    -------
-    Path to the resource file: str.
-    """
-
-    ## fallback to hardcoded package name if the __package__ call fails
-    packageName = __package__ or "ThreeHiggs"
-
-    return importlib.resources.files(packageName) / relativePathToResource
-
-
 def replaceGreekSymbols(string: str) -> str:
 
     ## Unicode magic, this is definitely not ideal

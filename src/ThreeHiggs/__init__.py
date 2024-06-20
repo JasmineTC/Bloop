@@ -7,5 +7,4 @@ from .UserInput import UserInput
 from .VeffMinimizer import VeffMinimizer, MinimizationAlgos
 from .parsedmatrix import MatrixDefinitionFiles
 
-from .CommonUtils import getSafePathToResource as getResourcePath
 from .CommonUtils import diagonalizeSymmetric
