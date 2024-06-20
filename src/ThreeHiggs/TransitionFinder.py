@@ -70,7 +70,7 @@ class TransitionFinder:
                 print ("One of the abs(couplings) is larger than 4pi or is nan")
             if not bIsBounded(paramsForMatching):
                 print ("Model is not bounded from below, exiting")
-                exit(-1)
+                return
             
             ## These need to be in the dict
             paramsForMatching["RGScale"] = matchingScale
