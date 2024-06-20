@@ -41,10 +41,10 @@ def bIsBounded(param : dict[str, float]) -> bool:
            param["lam33"]*lamx**2 + param["lam11"]*lamz**2 + param["lam22"]*lamy**2 -param["lam11"]*param["lam22"]*param["lam33"] - 2*lamx*lamy*lamz < 0)
 
 class GenericModel():
-    def __init__(self):
+    def __init__(self, effectivePotential):
         self.inputParams = {}
         self.dimensionalReduction = DimensionalReduction()
-        self.effectivePotential = EffectivePotential()  ## 3D potential:
+        self.effectivePotential = effectivePotential
 
     def setInputParams(self, inputParams):
         self.inputParams = inputParams

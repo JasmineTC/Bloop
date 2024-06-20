@@ -12,31 +12,6 @@ from .CommonUtils import combineDicts, diagonalizeSymmetric
 
 from .VeffMinimizer import VeffMinimizer
 
-@dataclass(slots=True)
-class VeffConfig:
-    # Names of the background-field variables that the Veff depends on
-    fieldNames: list[str]
-    # 0 = tree etc
-    loopOrder: int
-    # list of file names from where we parse expressions for the Veff. These get added together when evaluating Veff(fields)
-    veffFiles: list[str]
-    # Vector boson mass squares
-    vectorMassFile: str
-    # Shorthand symbols for vectors. Gets evaluated before masses
-    vectorShorthandFile: str
-
-    # Constant matrix transformation that brings the mass matrix into block diagonal form
-    scalarPermutationMatrix: np.ndarray
-    # Specify scalar mass matrices to diagonalize, can have many. The full mass matrix should be block diagonal in these (after the permutation transform)
-    scalarMassMatrices: list[MatrixDefinitionFiles]
-    # Full rotation from unpermutated basis to diagonal basis
-    scalarRotationMatrixFile: str
-
-    # Take absolute value of mass squares?
-    ## TODO Didn't we set this to true in the config?
-    bAbsoluteMsq: bool = False
-    
-
 ## everything we need to evaluate the potential. this is very WIP
 class VeffParams:
     """ Usage after initialization: 
@@ -53,14 +28,25 @@ class VeffParams:
         6. Evaluate pre-Veff shorthand symbols (so stuff that does into rotation matrices)
     """
 
-    def __init__(self, veffConfig: VeffConfig):
+    def __init__(self, 
+                 fieldNames, 
+                 bAbsoluteMsq, 
+                 vectorMassFile, 
+                 vectorShorthandFile, 
+                 scalarPermutationMatrix, 
+                 scalarMassMatrices, 
+                 scalarRotationMatrixFile):
+        self.fieldNames = fieldNames
+        self.bAbsoluteMsq = bAbsoluteMsq
 
-        self.fieldNames = veffConfig.fieldNames
-        self.bAbsoluteMsq = veffConfig.bAbsoluteMsq
-
-        self.configureVectors(veffConfig)
-        self.configureScalars(veffConfig)
-
+        self.vectorMassesSquared = ParsedExpressionSystem(vectorMassFile)
+        self.vectorShorthands = ParsedExpressionSystem(vectorShorthandFile)
+        self.scalarPermutationMatrix = scalarPermutationMatrix
+        ## can have many matrices if we've block-diagonalized already
+        ## ASSUME: the blocks are given in order: upper left to lower right. 
+        ##TODO improve this
+        self.scalarMassMatrices = [ParsedMatrix(matrix.matrixFile, matrix.expressionsFile) for matrix in scalarMassMatrices]
+        self.scalarRotationMatrix = ParsedMatrix(scalarRotationMatrixFile)
 
     def setActionParams(self, inputParams: dict[str, float]) -> None:
         self.actionParams = inputParams
@@ -94,30 +80,6 @@ class VeffParams:
         knownParamsDict = combineDicts(knownParamsDict, diagDict)
 
         return knownParamsDict
-
-
-    def configureVectors(self, veffConfig: VeffConfig) -> None:
-        """Configures vector boson expressions."""
-        self.vectorMassesSquared = ParsedExpressionSystem(veffConfig.vectorMassFile)
-        self.vectorShorthands = ParsedExpressionSystem(veffConfig.vectorShorthandFile)
-
-    def configureScalars(self, veffConfig: VeffConfig) -> None:
-        """Configures scalar expressions, diagonalization in particular.
-        """
-
-        self.scalarPermutationMatrix = veffConfig.scalarPermutationMatrix
-        ## can have many matrices if we've block-diagonalized already
-        self.scalarMassMatrices = []
-
-        ## ASSUME: the blocks are given in order: upper left to lower right. 
-        ##TODO improve this
-        
-        for matrixInfo in veffConfig.scalarMassMatrices:
-            self.scalarMassMatrices.append( ParsedMatrix(matrixInfo.matrixFile, matrixInfo.expressionsFile) )
-
-
-        self.scalarRotationMatrix = ParsedMatrix(veffConfig.scalarRotationMatrixFile)
-
 
     def diagonalizeScalars(self, params: dict[str, float]) -> dict[str, float]:
         """Finds a rotation matrix that diagonalizes the scalar mass matrix
@@ -187,34 +149,45 @@ This is assumed to be using 3D EFT, so the params are temperature dependent.
 """
 class EffectivePotential:
 
-    def __init__(self):
-        """This doesn't do much, you need to call configure()
-        """
-
-        self.bConfigured = False
-        self.params = None
+    def __init__(self,
+                 fieldNames, 
+                 bAbsoluteMsq, 
+                 vectorMassFile, 
+                 vectorShorthandFile, 
+                 scalarPermutationMatrix, 
+                 scalerMassMatrices, 
+                 scalarRotationMatrixFile,
+                 loopOrder,
+                 veffFiles):
         ## How many background fields do we depend on
-        self.nbrFields: int = 0
-
-
-    def configure(self, veffConfig: VeffConfig) -> None:
-        
-        self.fieldNames = veffConfig.fieldNames
+        self.fieldNames = fieldNames
         self.nbrFields = len(self.fieldNames)
 
-        self.loopOrder = veffConfig.loopOrder
-        self.initExpressions(veffConfig.veffFiles)
+        self.params = VeffParams(fieldNames, 
+                                 bAbsoluteMsq, 
+                                 vectorMassFile, 
+                                 vectorShorthandFile, 
+                                 scalarPermutationMatrix, 
+                                 scalerMassMatrices, 
+                                 scalarRotationMatrixFile)
+        
+        self.loopOrder = loopOrder
+
+        ## HACK: combine these into one file so that ParsedExpressionSystem understand it
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as tempf:
+            for filename in veffFiles:
+                with open(filename, 'r') as f:
+                    content = f.read()
+                    tempf.write(content)
+                    tempf.write("\n")
+
+            ## close here because we need to re-open for parsing
+            tempf.close()
+            self.expressions = ParsedExpressionSystem(tempf.name)
 
         self.bNeedsDiagonalization = (self.loopOrder > 0)
-
-        self.params = VeffParams(veffConfig)
-        
         self.minimizer = VeffMinimizer(self.nbrFields) # currently the numVariables is not used by minimizer
-        self.bConfigured = True
 
-
-    def IsConfigured(self) -> bool:
-        return self.bConfigured
 
     def setModelParameters(self, modelParameters: dict) -> None:
         """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate 
@@ -225,17 +198,6 @@ class EffectivePotential:
     def initExpressions(self, filesToParse: list[str]) -> None:
 
         self.expressions = []
-        ## HACK: combine these into one file so that ParsedExpressionSystem understand it
-        with tempfile.NamedTemporaryFile(mode='w', delete=False) as tempf:
-            for filename in filesToParse:
-                with open(filename, 'r') as f:
-                    content = f.read()
-                    tempf.write(content)
-                    tempf.write("\n")
-
-            ## close here because we need to re-open for parsing
-            tempf.close()
-            self.expressions = ParsedExpressionSystem(tempf.name)
 
 
     def evaluate(self, fields: list[float]) -> complex:
