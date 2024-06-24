@@ -94,8 +94,10 @@ class TransitionFinder:
 
             minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum(T)
             
+
             minimizationResults.append( [T, valueVeff, *minimum] )
-            if minimum[2] < 1e-3:
+
+            if np.all(minimum < 1e-3):
                 print (f"Symmetric phase found at temp {T}")
                 if counter == 3:
                     break
