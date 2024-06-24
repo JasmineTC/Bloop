@@ -1,6 +1,4 @@
 import numpy as np
-import numpy.typing as npt
-from typing import Tuple
 import tempfile # hacking
 
 from scipy import linalg
@@ -8,9 +6,53 @@ from dataclasses import dataclass
 
 from .parsedmatrix import ParsedMatrix, MatrixDefinitionFiles
 from .ParsedExpression import ParsedExpressionSystem, SystemOfEquations
-from .CommonUtils import combineDicts, diagonalizeSymmetric
+from .CommonUtils import combineDicts
 
 from .VeffMinimizer import VeffMinimizer
+
+def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.ndarray, np.ndarray]:
+    """Diagonalizes a symmetric matrix. 
+    Returns eigvalues, eigvectors in a matrix form
+    For a general model the vector masses will also need this so don't factorise too hard!
+    """
+    if method == "np":
+        return np.linalg.eigh(matrix)
+    elif method == "mp":
+        import mpmath as mp
+        mp.mp.dps = 30
+        eigenValue, eigenVector = mp.eigsy(mp.matrix(matrix), eigvals_only = False)
+        return (np.array(eigenValue.tolist(),dtype=np.float64), np.array(eigenVector.tolist(),dtype=np.float64))
+    elif method == "scipy":
+        import scipy
+        return scipy.linalg.eigh(matrix, check_finite = False)
+    else:
+        print(f"{method} is not assigned to a method in diagonalizeSymmetric, exiting program.")
+        exit(-1)
+
+@dataclass(slots=True)
+class VeffConfig:
+    # Names of the background-field variables that the Veff depends on
+    fieldNames: list[str]
+    # 0 = tree etc
+    loopOrder: int
+    # list of file names from where we parse expressions for the Veff. These get added together when evaluating Veff(fields)
+    veffFiles: list[str]
+    # Vector boson mass squares
+    vectorMassFile: str
+    # Shorthand symbols for vectors. Gets evaluated before masses
+    vectorShorthandFile: str
+
+    # Constant matrix transformation that brings the mass matrix into block diagonal form
+    scalarPermutationMatrix: np.ndarray
+    # Specify scalar mass matrices to diagonalize, can have many. The full mass matrix should be block diagonal in these (after the permutation transform)
+    scalarMassMatrices: list[MatrixDefinitionFiles]
+    # Full rotation from unpermutated basis to diagonal basis
+    scalarRotationMatrixFile: str
+
+    # Take absolute value of mass squares?
+    ## TODO Didn't we set this to true in the config?
+    bAbsoluteMsq: bool = False
+    
 
 ## everything we need to evaluate the potential. this is very WIP
 class VeffParams:
@@ -95,7 +137,7 @@ class VeffParams:
         for m in self.scalarMassMatrices:
             
             numericalM = m.evaluateWithDict(params)
-            eigenValue, vects = diagonalizeSymmetric( numericalM, bCheckFinite=False )
+            eigenValue, vects = diagonalizeSymmetric( numericalM, "np")
             ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
 
             ## Quick check that the numerical mass matrix is diagonal after being rotated by vects
@@ -215,7 +257,7 @@ class EffectivePotential:
         return res
 
     ## Return value is location, value
-    def findLocalMinimum(self, T, initialGuess: list[float]) -> Tuple[list[float], complex]:
+    def findLocalMinimum(self, T, initialGuess: list[float]) -> tuple[list[float], complex]:
         
         ## I think we need to manually vectorize here if our parameters are arrays (ie. got multiple temperature inputs).
         ## Then self.evaluate would return a numpy array which scipy doesn't know how to work with. 
@@ -241,7 +283,7 @@ class EffectivePotential:
         return location, value
     
 
-    def findGlobalMinimum(self, T, minimumCandidates: list[list[float]] = None) -> Tuple[list[float], complex]:
+    def findGlobalMinimum(self, T, minimumCandidates: list[list[float]] = None) -> tuple[list[float], complex]:
         """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
         Generally will not work very well if no candidates minima are given. 
         Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
@@ -265,5 +307,5 @@ class EffectivePotential:
 
 
     # just calls self.evaluate
-    def __call__(self, temperature: npt.ArrayLike, fields: npt.ArrayLike) -> complex:
+    def __call__(self, temperature: np.ndarray, fields: np.ndarray) -> complex:
         self.evaluate(temperature, fields)
