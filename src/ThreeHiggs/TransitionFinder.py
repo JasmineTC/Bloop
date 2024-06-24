@@ -14,10 +14,9 @@ class TransitionFinder:
 
         self.model = model
 
-    ## This is a way too big routine
     def traceFreeEnergyMinimum(self, TRange: np.ndarray = np.arange(50., 200., 1.)) -> tuple[np.ndarray, np.ndarray]:
+        assert self.model.effectivePotential.IsConfigured(), "Veff has not been configured, please call its configure() function before use"
 
-        TRange = np.asanyarray(TRange)
 
         renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams)
         
@@ -29,45 +28,26 @@ class TransitionFinder:
         endScale = 7.3 * TRange[-1] ## largest T in our range is T[-1] 
         muRange = np.linspace( startScale, endScale, TRange.size*10 )
 
-        ## TODO Are the beta function routines safe if endScale is smaller than startScale?
-
-        betas = BetaFunctions4D(muRange, renormalizedParams)
-        
-        """ 
-        Now for the temperature loop. I see two options:
-            1. Give the TRange array directly to EFT routines and the Veff => DR results dict of arrays of len(TRange).
-            This way numpy vectorization would be automatic. HOWEVER, minimization with scipy.optimize.minimize is not 
-            directly possible because Veff(x) would be an array of len(TRange), and scipy requires a scalar value.
-            So this does not work currently.
-
-            2. Do an ordinary loop over values in TRange. This is necessarily slow in Python but works. Good thing here is that
-            we can break the T-loop at any point, eg. when we find a transition of interest.
-
-        Going with option 2. 
-        """
+        betas = BetaFunctions4D(muRange, renormalizedParams) ## TODO Are the beta function routines safe if endScale is smaller than startScale?
         
         EulerGamma = 0.5772156649
-
-        ## This will contain minimization results in form: 
-        ## [ [T, Veff(min), field1, field2, ...], ... ]
+        EulerGammaPrime = 2.*(np.log(4.*np.pi) - EulerGamma)
+        
         minimizationResults = []
  
         counter = 0
-        #dog = VeffMinimizer(1)
         for T in TRange:
             print (f'Start of temp = {T} loop')
-            
-            #dog.setTemp(T)            
+                       
             ## Final scale in 3D
+            ## TODO ask Lauri if goalRGscale is ever different from just T
             goalRGScale =  T
 
             matchingScale = 4.0*np.pi*np.exp(-EulerGamma) * T
             
             paramsForMatching = betas.RunCoupling(matchingScale)
             
-            from ThreeHiggs.GenericModel import bIsPerturbative, bIsBounded
-            if not bIsPerturbative(paramsForMatching):
-                print ("One of the abs(couplings) is larger than 4pi or is nan")
+            from ThreeHiggs.GenericModel import bIsBounded, bIsPerturbative
             if not bIsBounded(paramsForMatching):
                 print ("Model is not bounded from below, exiting")
                 return
@@ -77,7 +57,7 @@ class TransitionFinder:
             paramsForMatching["T"] = T
 
             ## Put T-dependent logs in the dict too. Not a particularly nice solution...
-            Lb = 2. * np.log(matchingScale / T) - 2.*(np.log(4.*np.pi) - EulerGamma)
+            Lb = 2. * np.log(matchingScale / T) - EulerGammaPrime
             paramsForMatching["Lb"] = Lb
             paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
 
@@ -88,7 +68,6 @@ class TransitionFinder:
 
             minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum(T)
             
-
             minimizationResults.append( [T, valueVeff, *minimum] )
 
             if np.all(minimum < 1e-3):
@@ -97,7 +76,4 @@ class TransitionFinder:
                     break
                 counter += 1
 
-            
-
-        minimizationResults = np.asanyarray(minimizationResults)
-        return (minimizationResults)
+        return minimizationResults
