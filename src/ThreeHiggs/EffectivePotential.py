@@ -105,8 +105,7 @@ class VeffParams:
             knownParamsDict[self.fieldNames[i]] = value
 
         ## Vectors
-        vectorShorthands = self.vectorShorthands.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
-        knownParamsDict |= vectorShorthands
+        knownParamsDict |= self.vectorShorthands.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
         vectorMasses = self.vectorMassesSquared.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
 
         if (self.bAbsoluteMsq):
@@ -118,10 +117,8 @@ class VeffParams:
 
         knownParamsDict |= vectorMasses
 
-        ## Scalars
-        diagDict = self.diagonalizeScalars(knownParamsDict)
-        
-        knownParamsDict |= diagDict
+        ## Scalars       
+        knownParamsDict |= self.diagonalizeScalars(knownParamsDict)
 
         return knownParamsDict
 
