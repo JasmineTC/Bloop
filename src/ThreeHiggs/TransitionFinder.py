@@ -15,9 +15,6 @@ class TransitionFinder:
         self.model = model
 
     def traceFreeEnergyMinimum(self, TRange: np.ndarray = np.arange(50., 200., 1.)) -> tuple[np.ndarray, np.ndarray]:
-        assert self.model.effectivePotential.IsConfigured(), "Veff has not been configured, please call its configure() function before use"
-
-
         renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams)
         
         """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale like 7T.
@@ -32,6 +29,7 @@ class TransitionFinder:
         
         EulerGamma = 0.5772156649
         EulerGammaPrime = 2.*(np.log(4.*np.pi) - EulerGamma)
+        Lfconst = 4.*np.log(2.)
         
         minimizationResults = []
  
@@ -59,7 +57,7 @@ class TransitionFinder:
             ## Put T-dependent logs in the dict too. Not a particularly nice solution...
             Lb = 2. * np.log(matchingScale / T) - EulerGammaPrime
             paramsForMatching["Lb"] = Lb
-            paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
+            paramsForMatching["Lf"] = Lb + Lfconst
 
             ##This has every coupling needed to compute the EP, computed at the matching scale (I think)
             params3D = self.model.dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)

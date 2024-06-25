@@ -113,6 +113,9 @@ class VeffParams:
         if (self.bAbsoluteMsq):
             for key, val in vectorMasses.items():
                 vectorMasses[key] = np.abs(val)
+        else:
+            for key, val in vectorMasses.items():
+                vectorMasses[key] = complex(val)
 
         knownParamsDict = combineDicts(knownParamsDict, vectorMasses)
 
@@ -127,10 +130,6 @@ class VeffParams:
         """Finds a rotation matrix that diagonalizes the scalar mass matrix
         and returns a dict with diagonalization-specific params
         """
-        # TODO optimize, comment this with some matrix eqs
-
-        outDict = {}
-
         # Diagonalize blocks separately
         subRotationMatrix = []
         subMassMatrix = []
@@ -154,8 +153,8 @@ class VeffParams:
 
         fullMassMatrixDiag = np.transpose(fullRotationMatrix) @ linalg.block_diag(*subMassMatrix) @ fullRotationMatrix
 
-        """ We at the level of DRalgo we permuted the mass matrix to make it block diagonal 
-        ## we need to undo that permutation before we give the rotation matrix to the effectivate potential or something. 
+        """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
+        we need to undo that permutation before we give the rotation matrix to the effectivate potential or something. 
         I am not 100% on this"""
         drAlgoRot = np.transpose(fullRotationMatrix) @ self.scalarPermutationMatrix
 
@@ -163,7 +162,6 @@ class VeffParams:
         ## matrix element symbol in the Veff expressions. This is currently very hacky 
         outDict = self.scalarRotationMatrix.matchSymbols(drAlgoRot)
 
-        ## TODO improve this. currently I just hardcode scalar mass names
         massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
 
         if self.bAbsoluteMsq:
