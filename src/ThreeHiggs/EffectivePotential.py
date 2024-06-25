@@ -230,7 +230,7 @@ class EffectivePotential:
         self.expressions = []
 
 
-    def evaluate(self, fields: list[float]) -> complex:
+    def evaluatePotential(self, fields: list[float]) -> complex:
         """Evaluate Veff at specified field values. Uses the currently set model parameters.
         """
         
@@ -251,7 +251,7 @@ class EffectivePotential:
         ## Here I make an array of lambda functions and minimize those separately
 
         ## Minimize real part only:
-        VeffWrapper = lambda fields: np.real ( self.evaluate(fields) )
+        VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields) )
 
         ##Added bounds to minimize to reduce the IR senstivity coming from low mass modes
         bounds = ((1e-6, 1e-6), (1e-6, 1e-6), (1e-6, 1e3))
@@ -265,7 +265,7 @@ class EffectivePotential:
             value = np.nan
         else:
             ## evaluate once more to get the possible imag parts
-            value = self.evaluate(location)
+            value = self.evaluatePotential(location)
 
         return location, value
     
