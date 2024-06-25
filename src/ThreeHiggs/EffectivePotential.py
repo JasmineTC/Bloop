@@ -14,7 +14,7 @@ def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.nda
     Returns eigvalues, eigvectors in a matrix form
     For a general model the vector masses will also need this so don't factorise too hard!
     """
-    if method == "np":
+    if method == "np" or method == "numpy":
         return np.linalg.eigh(matrix)
     elif method == "mp":
         import mpmath as mp
@@ -76,10 +76,12 @@ class VeffParams:
                  vectorShorthandFile, 
                  scalarPermutationMatrix, 
                  scalarMassMatrices, 
-                 scalarRotationMatrixFile):
+                 scalarRotationMatrixFile,
+                 diagonalizationAlgo):
+        
         self.fieldNames = fieldNames
         self.bAbsoluteMsq = bAbsoluteMsq
-
+        self.diagonalizationAlgo = diagonalizationAlgo
         self.vectorMassesSquared = ParsedExpressionSystem(vectorMassFile)
         self.vectorShorthands = ParsedExpressionSystem(vectorShorthandFile)
         self.scalarPermutationMatrix = scalarPermutationMatrix
@@ -132,7 +134,7 @@ class VeffParams:
         
         for matrix in self.scalarMassMatrices:
             numericalM = matrix.evaluateWithDict(params)
-            eigenValue, vects = diagonalizeSymmetric( numericalM, "scipy")
+            eigenValue, vects = diagonalizeSymmetric( numericalM, self.diagonalizationAlgo)
             ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
             verbose = False
             if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
@@ -187,7 +189,8 @@ class EffectivePotential:
                  scalarRotationMatrixFile,
                  loopOrder,
                  veffFiles,
-                 minimizationAlgo):
+                 minimizationAlgo,
+                 diagonalizationAlgo):
         ## How many background fields do we depend on
         self.fieldNames = fieldNames
         self.nbrFields = len(self.fieldNames)
@@ -198,7 +201,8 @@ class EffectivePotential:
                                  vectorShorthandFile, 
                                  scalarPermutationMatrix, 
                                  scalerMassMatrices, 
-                                 scalarRotationMatrixFile)
+                                 scalarRotationMatrixFile,
+                                 diagonalizationAlgo)
         
         self.loopOrder = loopOrder
         self.minimizationAlgo = minimizationAlgo

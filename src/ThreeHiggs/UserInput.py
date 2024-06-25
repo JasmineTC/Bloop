@@ -121,6 +121,8 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--TRangeStart', action = 'store', default = 50, type = float, dest = 'TRangeStart')
         self.add_argument('--TRangeEnd', action = 'store', default = 200, type = float, dest = 'TRangeEnd')
         self.add_argument('--TRangeStepSize', action = 'store', default = 1, type = float, dest = 'TRangeStepSize')
+        
+        self.add_argument('--DiagAlgo', action = 'store', default = "numpy", type = str, dest = 'DiagAlgo')
 
         self.add_argument('--plot', action = 'store_true', default = False, dest = 'plot')
 
