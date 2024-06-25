@@ -5,8 +5,7 @@ from scipy import linalg
 from dataclasses import dataclass
 
 from .parsedmatrix import ParsedMatrix, MatrixDefinitionFiles
-from .ParsedExpression import ParsedExpressionSystem, SystemOfEquations
-from .CommonUtils import combineDicts
+from .ParsedExpression import ParsedExpressionSystem
 
 from .VeffMinimizer import VeffMinimizer
 
@@ -106,8 +105,7 @@ class VeffParams:
             knownParamsDict[self.fieldNames[i]] = value
 
         ## Vectors
-        vectorShorthands = self.vectorShorthands.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
-        knownParamsDict = combineDicts(knownParamsDict, vectorShorthands)
+        knownParamsDict |= self.vectorShorthands.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
         vectorMasses = self.vectorMassesSquared.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
 
         if (self.bAbsoluteMsq):
@@ -117,12 +115,10 @@ class VeffParams:
             for key, val in vectorMasses.items():
                 vectorMasses[key] = complex(val)
 
-        knownParamsDict = combineDicts(knownParamsDict, vectorMasses)
+        knownParamsDict |= vectorMasses
 
-        ## Scalars
-        diagDict = self.diagonalizeScalars(knownParamsDict)
-        
-        knownParamsDict = combineDicts(knownParamsDict, diagDict)
+        ## Scalars       
+        knownParamsDict |= self.diagonalizeScalars(knownParamsDict)
 
         return knownParamsDict
 
