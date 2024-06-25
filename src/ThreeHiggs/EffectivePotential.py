@@ -239,33 +239,20 @@ class EffectivePotential:
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
         paramDict = self.params.evaluateAll(fields, bNeedsDiagonalization=self.bNeedsDiagonalization)
 
-        ## summing works because the result is a list [V0, V1, ...]
-        res = sum( self.expressions.evaluateSystemWithDict(paramDict) )
-        return res
+        return sum( self.expressions.evaluateSystemWithDict(paramDict) ) ## Sum because the result is a list of tree, 1loop etc 
 
     ## Return value is location, value
     def findLocalMinimum(self, T, initialGuess: list[float]) -> tuple[list[float], complex]:
-        
-        ## I think we need to manually vectorize here if our parameters are arrays (ie. got multiple temperature inputs).
-        ## Then self.evaluate would return a numpy array which scipy doesn't know how to work with. 
-        ## Here I make an array of lambda functions and minimize those separately
 
-        ## Minimize real part only:
-        VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields) )
+        VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields) ) ## Minimize real part only:
 
-        ##Added bounds to minimize to reduce the IR senstivity coming from low mass modes
-        bounds = ((1e-6, 1e-6), (1e-6, 1e-6), (1e-6, 1e3))
-
-        location, value = self.minimizer.minimize(T, VeffWrapper, initialGuess, bounds, self.minimizationAlgo)
-
+        location, value = self.minimizer.minimize(VeffWrapper, initialGuess, self.minimizationAlgo)
 
         if np.any(np.isnan(location)):
-            location  = [np.nan] * len[initialGuess]
-            location = np.asarray(location)
+            location = np.full(len[initialGuess], np.nan )
             value = np.nan
         else:
-            ## evaluate once more to get the possible imag parts
-            value = self.evaluatePotential(location)
+            value = self.evaluatePotential(location) ## evaluate once more to get the possible imag parts
 
         return location, value
     

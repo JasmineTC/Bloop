@@ -20,7 +20,7 @@ class VeffMinimizer:
         self.localRel = localRel
         
         
-    def minimize(self, T, function: callable, initialGuess: np.ndarray, bounds, MinimizationAlgo: MinimizationAlgos) -> tuple[np.ndarray, float]:
+    def minimize(self, function: callable, initialGuess: np.ndarray, MinimizationAlgo: MinimizationAlgos) -> tuple[np.ndarray, float]:
         """Give bounds in format ((min1, max1), (min2, max2)) etc, one pair for each variable.
         Returns: 
         location, Veff(location)
@@ -31,6 +31,7 @@ class VeffMinimizer:
         match(MinimizationAlgo):
             case MinimizationAlgos.eScipy:
                 import scipy.optimize
+                bounds = ((1e-6, 1e-6), (1e-6, 1e-6), (1e-6, 1e3))
                 minimizationResult = scipy.optimize.minimize(function, initialGuess, bounds=bounds, tol = 1e-6)
                 location, value = minimizationResult.x, minimizationResult.fun
                    
