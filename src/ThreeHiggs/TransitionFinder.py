@@ -32,6 +32,7 @@ class TransitionFinder:
         
         EulerGamma = 0.5772156649
         EulerGammaPrime = 2.*(np.log(4.*np.pi) - EulerGamma)
+        Lfconst = 4.*np.log(2.)
         
         minimizationResults = []
  
@@ -59,7 +60,7 @@ class TransitionFinder:
             ## Put T-dependent logs in the dict too. Not a particularly nice solution...
             Lb = 2. * np.log(matchingScale / T) - EulerGammaPrime
             paramsForMatching["Lb"] = Lb
-            paramsForMatching["Lf"] = Lb + 4.*np.log(2.)
+            paramsForMatching["Lf"] = Lb + Lfconst
 
             ##This has every coupling needed to compute the EP, computed at the matching scale (I think)
             params3D = self.model.dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
