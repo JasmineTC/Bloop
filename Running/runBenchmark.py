@@ -68,16 +68,11 @@ with open(args.benchMarkFile) as benchMarkFile:
         if args.benchMarkNumber:
             if index != args.benchMarkNumber:
                 continue
-
-        ghdm = benchMark["ghDM"]
-        model3HDM.effectivePotential.minimizer.setgHDM(ghdm)
         
         from ThreeHiggs.TransitionFinder import TransitionFinder
         transitionFinder = TransitionFinder(model=model3HDM)
         model3HDM.setInputParams(benchMark)
         minimizationResults = transitionFinder.traceFreeEnergyMinimum()
-        
-        print(f"{minimizationResults=}")
         
         filename = f"{args.resultsDirectory}/BM_{args.benchMarkNumber}"
         
