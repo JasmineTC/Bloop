@@ -117,6 +117,10 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--relGlobalTolerance', action = 'store', default = 1e-1, dest = 'relGlobalTolerance')
         self.add_argument('--absLocalTolerance', action = 'store', default = 1e-5, dest = 'absLocalTolerance')
         self.add_argument('--relLocalTolerance', action = 'store', default = 1e-5, dest = 'relLocalTolerance')
+        
+        self.add_argument('--TRangeStart', action = 'store', default = 50, type = float, dest = 'TRangeStart')
+        self.add_argument('--TRangeEnd', action = 'store', default = 200, type = float, dest = 'TRangeEnd')
+        self.add_argument('--TRangeStepSize', action = 'store', default = 1, type = float, dest = 'TRangeStepSize')
 
         self.add_argument('--plot', action = 'store_true', default = False, dest = 'plot')
 

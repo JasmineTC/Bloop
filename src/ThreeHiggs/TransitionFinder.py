@@ -15,13 +15,16 @@ class TransitionFinder:
 
         self.model = model
 
-    def traceFreeEnergyMinimum(self, TRange: np.ndarray = np.arange(50., 200., 1.)) -> tuple[np.ndarray, np.ndarray]:
+    def traceFreeEnergyMinimum(self, TRangeStart: float, 
+                               TRangeEnd: float, 
+                               TRangeStepSize: float) -> tuple[np.ndarray, np.ndarray]:
         renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams)
         
         """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale like 7T.
         To make this work nicely, integrate the beta functions here up to some high enough scale and store the resulting couplings
         in interpolated functions.
         """
+        TRange = np.arange(TRangeStart, TRangeEnd, TRangeStepSize )
         startScale = renormalizedParams["RGScale"]
         endScale = 7.3 * TRange[-1] ## largest T in our range is T[-1] 
         muRange = np.linspace( startScale, endScale, TRange.size*10 )
@@ -67,7 +70,8 @@ class TransitionFinder:
 
             minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
             bReachedUltraSoftScale = self.model.effectivePotential.bReachedUltraSoftScale(minimum, T)
-            minimizationResults.append( [T, valueVeff, *minimum] )
+            
+            minimizationResults.append( [T, valueVeff, *minimum, bIsPerturbative(paramsForMatching), bReachedUltraSoftScale] )
 
             if np.all(minimum < 1e-3):
                 print (f"Symmetric phase found at temp {T}")

@@ -69,7 +69,9 @@ with open(args.benchMarkFile) as benchMarkFile:
         from ThreeHiggs.TransitionFinder import TransitionFinder
         transitionFinder = TransitionFinder(model=model3HDM)
         model3HDM.setInputParams(benchMark)
-        minimizationResults = transitionFinder.traceFreeEnergyMinimum()
+        minimizationResults = transitionFinder.traceFreeEnergyMinimum(args.TRangeStart,
+                                                                      args.TRangeEnd,
+                                                                      args.TRangeStepSize)
         
         filename = f"{args.resultsDirectory}/BM_{args.benchMarkNumber}"
         
