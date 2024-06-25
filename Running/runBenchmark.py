@@ -31,6 +31,7 @@ softToUltrasoftFile = getResourcePath(args.softToUltraSoftFile)
 
 from ThreeHiggs.EffectivePotential import EffectivePotential
 from ThreeHiggs.parsedmatrix import ParsedMatrix, MatrixDefinitionFiles
+from ThreeHiggs.VeffMinimizer import MinimizationAlgos
 effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         True,
                                         getResourcePath(args.vectorsMassesSquaredFile),
@@ -42,7 +43,8 @@ effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                                                getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile))],
                                         getResourcePath(args.scalarRotationFile),
                                         args.loopOrder,
-                                        veffFiles)
+                                        veffFiles,
+                                        MinimizationAlgos.eDIRECTGLOBAL) ## Set algorithm to use for Veff minimization
 
 ## Model object setup + load matching relations
 from ThreeHiggs.GenericModel import GenericModel
@@ -50,11 +52,6 @@ model3HDM = GenericModel(effectivePotential)
 model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
 model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
 
-## Set algorithm to use for Veff minimization
-from ThreeHiggs.VeffMinimizer import MinimizationAlgos
-model3HDM.effectivePotential.minimizer.setAlgorithm(MinimizationAlgos.eDIRECTGLOBAL)
-## Set tolerances used by global and local methods in Veff minimization
-## Order is global abs, global rel, local abs, local rel
 model3HDM.effectivePotential.minimizer.setTolerances(args.absGlobalTolerance,
                                                      args.relGlobalTolerance, 
                                                      args.absLocalTolerance, 

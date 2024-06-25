@@ -186,7 +186,8 @@ class EffectivePotential:
                  scalerMassMatrices, 
                  scalarRotationMatrixFile,
                  loopOrder,
-                 veffFiles):
+                 veffFiles,
+                 minimizationAlgo):
         ## How many background fields do we depend on
         self.fieldNames = fieldNames
         self.nbrFields = len(self.fieldNames)
@@ -200,6 +201,7 @@ class EffectivePotential:
                                  scalarRotationMatrixFile)
         
         self.loopOrder = loopOrder
+        self.minimizationAlgo = minimizationAlgo
 
         ## HACK: combine these into one file so that ParsedExpressionSystem understand it
         with tempfile.NamedTemporaryFile(mode='w', delete=False) as tempf:
@@ -255,7 +257,7 @@ class EffectivePotential:
         ##Added bounds to minimize to reduce the IR senstivity coming from low mass modes
         bounds = ((1e-6, 1e-6), (1e-6, 1e-6), (1e-6, 1e3))
 
-        location, value = self.minimizer.minimize(T, VeffWrapper, initialGuess, bounds)
+        location, value = self.minimizer.minimize(T, VeffWrapper, initialGuess, bounds, self.minimizationAlgo)
 
 
         if np.any(np.isnan(location)):

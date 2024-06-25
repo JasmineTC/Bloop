@@ -23,7 +23,7 @@ class VeffMinimizer:
         self.localRel = localRel
         
         
-    def minimize(self, T, function: callable, initialGuess: np.ndarray, bounds) -> tuple[np.ndarray, float]:
+    def minimize(self, T, function: callable, initialGuess: np.ndarray, bounds, MinimizationAlgo: MinimizationAlgos) -> tuple[np.ndarray, float]:
         """Give bounds in format ((min1, max1), (min2, max2)) etc, one pair for each variable.
         Returns: 
         location, Veff(location)
@@ -31,7 +31,7 @@ class VeffMinimizer:
         Even though we don't use the gradient, nlopt still tries to pass a grad arguemet to the function, so the function needs to be 
         wrapped a second time to give it room for the useless grad arguement"""
 
-        match(self.__algo):
+        match(MinimizationAlgo):
             case MinimizationAlgos.eScipy:
                 import scipy.optimize
                 minimizationResult = scipy.optimize.minimize(function, initialGuess, bounds=bounds, tol = 1e-6)
