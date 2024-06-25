@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 from .GenericModel import GenericModel
 from .BetaFunctions import BetaFunctions4D
@@ -28,7 +29,7 @@ class TransitionFinder:
         betas = BetaFunctions4D(muRange, renormalizedParams) ## TODO Are the beta function routines safe if endScale is smaller than startScale?
         
         EulerGamma = 0.5772156649
-        EulerGammaPrime = 2.*(np.log(4.*np.pi) - EulerGamma)
+        EulerGammaPrime = 2.*(math.log(4.*np.pi) - EulerGamma)
         Lfconst = 4.*np.log(2.)
         
         minimizationResults = []
@@ -41,7 +42,7 @@ class TransitionFinder:
             ## TODO ask Lauri if goalRGscale is ever different from just T
             goalRGScale =  T
 
-            matchingScale = 4.0*np.pi*np.exp(-EulerGamma) * T
+            matchingScale = 4.0*np.pi*math.exp(-EulerGamma) * T
             
             paramsForMatching = betas.RunCoupling(matchingScale)
             
@@ -55,7 +56,7 @@ class TransitionFinder:
             paramsForMatching["T"] = T
 
             ## Put T-dependent logs in the dict too. Not a particularly nice solution...
-            Lb = 2. * np.log(matchingScale / T) - EulerGammaPrime
+            Lb = 2. * math.log(matchingScale / T) - EulerGammaPrime
             paramsForMatching["Lb"] = Lb
             paramsForMatching["Lf"] = Lb + Lfconst
 
