@@ -1,6 +1,4 @@
 import numpy as np
-import numpy.typing as npt
-from typing import Tuple
 import tempfile # hacking
 
 from scipy import linalg
@@ -8,9 +6,53 @@ from dataclasses import dataclass
 
 from .parsedmatrix import ParsedMatrix, MatrixDefinitionFiles
 from .ParsedExpression import ParsedExpressionSystem, SystemOfEquations
-from .CommonUtils import combineDicts, diagonalizeSymmetric
+from .CommonUtils import combineDicts
 
 from .VeffMinimizer import VeffMinimizer
+
+def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.ndarray, np.ndarray]:
+    """Diagonalizes a symmetric matrix. 
+    Returns eigvalues, eigvectors in a matrix form
+    For a general model the vector masses will also need this so don't factorise too hard!
+    """
+    if method == "np":
+        return np.linalg.eigh(matrix)
+    elif method == "mp":
+        import mpmath as mp
+        mp.mp.dps = 30
+        eigenValue, eigenVector = mp.eigsy(mp.matrix(matrix), eigvals_only = False)
+        return (np.array(eigenValue.tolist(),dtype=np.float64), np.array(eigenVector.tolist(),dtype=np.float64))
+    elif method == "scipy":
+        import scipy
+        return scipy.linalg.eigh(matrix, check_finite = False)
+    else:
+        print(f"{method} is not assigned to a method in diagonalizeSymmetric, exiting program.")
+        exit(-1)
+
+@dataclass(slots=True)
+class VeffConfig:
+    # Names of the background-field variables that the Veff depends on
+    fieldNames: list[str]
+    # 0 = tree etc
+    loopOrder: int
+    # list of file names from where we parse expressions for the Veff. These get added together when evaluating Veff(fields)
+    veffFiles: list[str]
+    # Vector boson mass squares
+    vectorMassFile: str
+    # Shorthand symbols for vectors. Gets evaluated before masses
+    vectorShorthandFile: str
+
+    # Constant matrix transformation that brings the mass matrix into block diagonal form
+    scalarPermutationMatrix: np.ndarray
+    # Specify scalar mass matrices to diagonalize, can have many. The full mass matrix should be block diagonal in these (after the permutation transform)
+    scalarMassMatrices: list[MatrixDefinitionFiles]
+    # Full rotation from unpermutated basis to diagonal basis
+    scalarRotationMatrixFile: str
+
+    # Take absolute value of mass squares?
+    ## TODO Didn't we set this to true in the config?
+    bAbsoluteMsq: bool = False
+    
 
 ## everything we need to evaluate the potential. this is very WIP
 class VeffParams:
@@ -87,49 +129,46 @@ class VeffParams:
     def diagonalizeScalars(self, params: dict[str, float]) -> dict[str, float]:
         """Finds a rotation matrix that diagonalizes the scalar mass matrix
         and returns a dict with diagonalization-specific params
-        Note: @ is short for numpy matrix multiplication
         """
         # Diagonalize blocks separately
-        blockRot = []
-        blockM = []
+        subRotationMatrix = []
+        subMassMatrix = []
         
-        for m in self.scalarMassMatrices:
-            numericalM = m.evaluateWithDict(params)
-            eigenValue, vects = diagonalizeSymmetric( numericalM, bCheckFinite=False )
+        for matrix in self.scalarMassMatrices:
+            numericalM = matrix.evaluateWithDict(params)
+            eigenValue, vects = diagonalizeSymmetric( numericalM, "scipy")
             ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
             verbose = False
-            if verbose:
-                ## 'Quick' check that the numerical mass matrix is diagonal after being rotated by vects
+            if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
                 diagonalBlock = np.transpose(vects) @ numericalM @ vects
-                ## Gives the indices of all the off diagonal elements as two np.array
                 offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
                 if np.any(diagonalBlock[offDiagonalIndex]) > 1e-8:
                     print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
    
                             
-            blockRot.append(vects)
-            blockM.append(numericalM)
-        
-        ## This diagonalizes the block-diagonal mass matrix
-        blockDiagRot = linalg.block_diag(*blockRot)
-        ## Diagonalized mass matrix
-        diag = np.transpose(blockDiagRot) @ linalg.block_diag(*blockM) @ blockDiagRot
+            subRotationMatrix.append(vects)
+            subMassMatrix.append(numericalM)
 
-        ## Rotation that diagonalizes the original, unpermuted mass matrix.
-        ## So we undo the permutation, and we need to transpose to match what we gave DRalgo
-        rot = np.transpose(blockDiagRot) @ self.scalarPermutationMatrix
+        fullRotationMatrix = linalg.block_diag(*subRotationMatrix)
+
+        fullMassMatrixDiag = np.transpose(fullRotationMatrix) @ linalg.block_diag(*subMassMatrix) @ fullRotationMatrix
+
+        """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
+        we need to undo that permutation before we give the rotation matrix to the effectivate potential or something. 
+        I am not 100% on this"""
+        drAlgoRot = np.transpose(fullRotationMatrix) @ self.scalarPermutationMatrix
 
         ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
         ## matrix element symbol in the Veff expressions. This is currently very hacky 
-        outDict = self.scalarRotationMatrix.matchSymbols(rot)
+        outDict = self.scalarRotationMatrix.matchSymbols(drAlgoRot)
 
         massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
 
         if self.bAbsoluteMsq:
-            for i, msq in enumerate(np.diagonal(diag)):
+            for i, msq in enumerate(np.diagonal(fullMassMatrixDiag)):
                 outDict[massNames[i]] = np.abs(msq)
         else:
-            for i, msq in enumerate(np.diagonal(diag)):
+            for i, msq in enumerate(np.diagonal(fullMassMatrixDiag)):
                 outDict[massNames[i]] = complex(msq)
 
         return outDict
@@ -208,7 +247,7 @@ class EffectivePotential:
         return res
 
     ## Return value is location, value
-    def findLocalMinimum(self, T, initialGuess: list[float]) -> Tuple[list[float], complex]:
+    def findLocalMinimum(self, T, initialGuess: list[float]) -> tuple[list[float], complex]:
         
         ## I think we need to manually vectorize here if our parameters are arrays (ie. got multiple temperature inputs).
         ## Then self.evaluate would return a numpy array which scipy doesn't know how to work with. 
@@ -234,7 +273,7 @@ class EffectivePotential:
         return location, value
     
 
-    def findGlobalMinimum(self, T, minimumCandidates: list[list[float]] = None) -> Tuple[list[float], complex]:
+    def findGlobalMinimum(self, T, minimumCandidates: list[list[float]] = None) -> tuple[list[float], complex]:
         """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
         Generally will not work very well if no candidates minima are given. 
         Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
@@ -258,5 +297,5 @@ class EffectivePotential:
 
 
     # just calls self.evaluate
-    def __call__(self, temperature: npt.ArrayLike, fields: npt.ArrayLike) -> complex:
+    def __call__(self, temperature: np.ndarray, fields: np.ndarray) -> complex:
         self.evaluate(temperature, fields)
