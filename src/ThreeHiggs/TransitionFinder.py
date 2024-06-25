@@ -15,9 +15,6 @@ class TransitionFinder:
         self.model = model
 
     def traceFreeEnergyMinimum(self, TRange: np.ndarray = np.arange(50., 200., 1.)) -> tuple[np.ndarray, np.ndarray]:
-        assert self.model.effectivePotential.IsConfigured(), "Veff has not been configured, please call its configure() function before use"
-
-
         renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams)
         
         """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale like 7T.

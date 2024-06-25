@@ -71,6 +71,9 @@ class VeffParams:
         if (self.bAbsoluteMsq):
             for key, val in vectorMasses.items():
                 vectorMasses[key] = np.abs(val)
+        else:
+            for key, val in vectorMasses.items():
+                vectorMasses[key] = complex(val)
 
         knownParamsDict = combineDicts(knownParamsDict, vectorMasses)
 
@@ -84,36 +87,28 @@ class VeffParams:
     def diagonalizeScalars(self, params: dict[str, float]) -> dict[str, float]:
         """Finds a rotation matrix that diagonalizes the scalar mass matrix
         and returns a dict with diagonalization-specific params
+        Note: @ is short for numpy matrix multiplication
         """
-        # TODO optimize, comment this with some matrix eqs
-
-        outDict = {}
-
         # Diagonalize blocks separately
         blockRot = []
         blockM = []
+        
         for m in self.scalarMassMatrices:
-            
             numericalM = m.evaluateWithDict(params)
             eigenValue, vects = diagonalizeSymmetric( numericalM, bCheckFinite=False )
             ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
-
-            ## Quick check that the numerical mass matrix is diagonal after being rotated by vects
-            diagonalBlock = np.transpose(vects) @ numericalM @ vects
-            for i in range(6):
-                for j in range(6):
-                    ## If on the diagonal compute abs % diff with eigenvalues and rotated matrix, if large then something went wrong
-                    if i == j and abs((eigenValue[i]-diagonalBlock[i,i])/eigenValue[i]) > 1e-5:
-                        print (f"Large difference in eigenValues at index {i},{j}")
-                        print (f'The rotated mass matrix is {diagonalBlock}')
-                    if i != j and diagonalBlock[i,j] > 1e-8:
-                        print (f"Off diagonal element {i}{j} is larger than 1e-8, may not be diagonal")
-                        print (f'The rotated mass matrix is {diagonalBlock}')
-                        
+            verbose = False
+            if verbose:
+                ## 'Quick' check that the numerical mass matrix is diagonal after being rotated by vects
+                diagonalBlock = np.transpose(vects) @ numericalM @ vects
+                ## Gives the indices of all the off diagonal elements as two np.array
+                offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
+                if np.any(diagonalBlock[offDiagonalIndex]) > 1e-8:
+                    print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
+   
+                            
             blockRot.append(vects)
             blockM.append(numericalM)
-
-        # Note: @ is short for numpy matrix multiplication
         
         ## This diagonalizes the block-diagonal mass matrix
         blockDiagRot = linalg.block_diag(*blockRot)
@@ -126,18 +121,16 @@ class VeffParams:
 
         ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
         ## matrix element symbol in the Veff expressions. This is currently very hacky 
-        
         outDict = self.scalarRotationMatrix.matchSymbols(rot)
 
-        ## TODO improve this. currently I just hardcode scalar mass names
         massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
 
-        if (self.bAbsoluteMsq):
+        if self.bAbsoluteMsq:
             for i, msq in enumerate(np.diagonal(diag)):
                 outDict[massNames[i]] = np.abs(msq)
         else:
             for i, msq in enumerate(np.diagonal(diag)):
-                outDict[massNames[i]] = msq
+                outDict[massNames[i]] = complex(msq)
 
         return outDict
     
