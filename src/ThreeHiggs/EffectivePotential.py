@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from .parsedmatrix import ParsedMatrix, MatrixDefinitionFiles
 from .ParsedExpression import ParsedExpressionSystem
 
-from .VeffMinimizer import VeffMinimizer
+from .VeffMinimizer import VeffMinimizer, MinimizationAlgos
 
 def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.ndarray, np.ndarray]:
     """Diagonalizes a symmetric matrix. 
@@ -241,12 +241,11 @@ class EffectivePotential:
 
         return sum( self.expressions.evaluateSystemWithDict(paramDict) ) ## Sum because the result is a list of tree, 1loop etc 
 
-    ## Return value is location, value
-    def findLocalMinimum(self, T, initialGuess: list[float]) -> tuple[list[float], complex]:
+    def findLocalMinimum(self, initialGuess: list[float], algo) -> tuple[list[float], complex]:
 
         VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields) ) ## Minimize real part only:
 
-        location, value = self.minimizer.minimize(VeffWrapper, initialGuess, self.minimizationAlgo)
+        location, value = self.minimizer.minimize(VeffWrapper, initialGuess, algo)
 
         if np.any(np.isnan(location)):
             location = np.full(len[initialGuess], np.nan )
@@ -264,19 +263,27 @@ class EffectivePotential:
         """
         
         if not minimumCandidates:
-            minimumCandidates = [ [1e-4, 1e-4, 1e-4]]
+            minimumCandidates = [ [1e-4, 1e-4, 1e-4] ]
 
-        deepest = np.inf
-        res = [np.nan]*3, np.inf
+        bestResult = ((np.nan, np.nan, np.nan), np.inf)
+        
+        if self.minimizationAlgo == MinimizationAlgos.eCombo:
+            result = self.findLocalMinimum(minimumCandidates[0], MinimizationAlgos.eDIRECTGLOBAL)
+            if (np.real(result[1]) < np.real(bestResult[1])):
+                bestResult = result
+            
+            for candidate in minimumCandidates:
+                result = self.findLocalMinimum(candidate, MinimizationAlgos.eBOBYQA)
+                if (np.real(result[1]) < np.real(bestResult[1])):
+                    bestResult = result
+                    
+        else:
+            for candidate in minimumCandidates:
+                result = self.findLocalMinimum(candidate, self.minimizationAlgo)
+                if (np.real(result[1]) < np.real(bestResult[1])):
+                    bestResult = result
 
-        for candidate in minimumCandidates:
-            location, value = self.findLocalMinimum(T,candidate)
-            if (np.real(value) < deepest):
-                res = location, value
-                deepest = np.real(value)
-
-        return res
-
+        return bestResult
 
     # just calls self.evaluate
     def __call__(self, temperature: np.ndarray, fields: np.ndarray) -> complex:

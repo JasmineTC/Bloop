@@ -6,6 +6,7 @@ class MinimizationAlgos(Enum):
     eScipy = 1 
     eBOBYQA = 2 
     eDIRECTGLOBAL = 3 
+    eCombo = 4
     
 class VeffMinimizer:
 
