@@ -256,7 +256,7 @@ class EffectivePotential:
         return location, value
     
 
-    def findGlobalMinimum(self, T, minimumCandidates: list[list[float]] = None) -> tuple[list[float], complex]:
+    def findGlobalMinimum(self, minimumCandidates: list[list[float]] = None) -> tuple[list[float], complex]:
         """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
         Generally will not work very well if no candidates minima are given. 
         Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
@@ -284,6 +284,51 @@ class EffectivePotential:
                     bestResult = result
 
         return bestResult
+    
+    
+    def getUltraSoftScale(self, paramDict, T: float) -> float:
+        '''Returns
+        -------
+        float
+            Given a field input and temperature compute the scale of ultra soft physics which is g^2 T/ 16 pi
+            g is taken to be the largest coupling in the theory to give the tightest constraint'''
+
+        couplings = np.array([paramDict['lam1Re'], paramDict['lam1Im'],
+                              paramDict['lam11'], paramDict['lam22'],
+                              paramDict['lam12'], paramDict['lam12p'],
+                              paramDict['g1'], paramDict['g2'],
+                              paramDict['g3'], paramDict['lam33'],
+                              paramDict['lam2Re'], paramDict['lam2Im'],
+                              paramDict['lam23'], paramDict['lam23p'],
+                              paramDict['lam3Re'], paramDict['lam3Im'],
+                              paramDict['lam31'], paramDict['lam31p']]) 
+        return np.max(np.abs(couplings))**2 * T / (16*np.pi)
+
+    def bReachedUltraSoftScale(self, fields: list[complex], T: float) -> bool:
+        '''
+        Check if we can trust the results by comparing the masses we find at the minimum to the ultra soft scale i.e.
+        Are all physical masses > g^2 T/16pi, we use the largest coupling in the theory to do the comparrsion 
+        --Note we expect some goldstone bosons from the symmetry breaking so we check the number of light modes = goldstone modes
+        ----Get someone to check the logic of this
+        2) Return true if # of light modes is less than the # of goldstone modes
+        '''
+        ## If all field values are close to zero then we are probably in the symmetric phase with no goldstone bosons
+        ## TODO: the symmetric phase cannot be described by pert theory so shouldn't be trusted, so should prob just return False right away
+        ## But get someone to check this
+        goldStone = 0 if np.all(np.abs(fields) < 0.1) else 3
+        paramDict = self.params.evaluateAll(fields, bNeedsDiagonalization=self.bNeedsDiagonalization)
+
+        ultraSoftScale = self.getUltraSoftScale(paramDict, T)
+    
+        ## Convert mass into real type to do comparisons 
+        massList = np.real([paramDict["MSsq01"], paramDict["MSsq02"],
+                            paramDict["MSsq03"], paramDict["MSsq04"],
+                            paramDict["MSsq05"], paramDict["MSsq06"],
+                            paramDict["MSsq07"], paramDict["MSsq08"],
+                            paramDict["MSsq09"], paramDict["MSsq10"],
+                            paramDict["MSsq11"], paramDict["MSsq12"]])
+    
+        return len([lowMass for lowMass in massList if lowMass < ultraSoftScale]) > goldStone
 
     # just calls self.evaluate
     def __call__(self, temperature: np.ndarray, fields: np.ndarray) -> complex:
