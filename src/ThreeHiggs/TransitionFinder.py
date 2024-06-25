@@ -64,8 +64,8 @@ class TransitionFinder:
             
             self.model.effectivePotential.setModelParameters(params3D)
 
-            minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum(T)
-            
+            minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
+            bReachedUltraSoftScale = self.model.effectivePotential.bReachedUltraSoftScale(minimum, T)
             minimizationResults.append( [T, valueVeff, *minimum] )
 
             if np.all(minimum < 1e-3):
