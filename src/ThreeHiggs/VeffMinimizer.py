@@ -11,9 +11,6 @@ class VeffMinimizer:
 
     def __init__(self, numVariables: int):
         self.numVariables = numVariables
-
-    def setAlgorithm(self, algo: MinimizationAlgos) -> None:
-        self.__algo = algo
         
     def setTolerances(self, globalAbs : float, globalRel : float, localAbs : float, localRel : float) -> None:
         self.globalAbs = globalAbs
