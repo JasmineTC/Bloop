@@ -241,7 +241,6 @@ class EffectivePotential:
 
         ## summing works because the result is a list [V0, V1, ...]
         res = sum( self.expressions.evaluateSystemWithDict(paramDict) )
-
         return res
 
     ## Return value is location, value
@@ -277,14 +276,12 @@ class EffectivePotential:
         Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
         """
         
-        if (minimumCandidates == None or len(minimumCandidates) == 0):
-            ## Initial guesses for minimiser
-            minimumCandidates = [ [0., 0., 1e-4]]
+        if not minimumCandidates:
+            minimumCandidates = [ [1e-4, 1e-4, 1e-4]]
 
         deepest = np.inf
         res = [np.nan]*3, np.inf
 
-        ## Should we vectorize??
         for candidate in minimumCandidates:
             location, value = self.findLocalMinimum(T,candidate)
             if (np.real(value) < deepest):
