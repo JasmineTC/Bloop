@@ -1,6 +1,6 @@
 import numpy as np
+from numpy import pi, log, sqrt
 import sympy
-from sympy import pi
 from sympy.parsing.mathematica import parse_mathematica
 
 from typing import Callable, Tuple
@@ -97,9 +97,8 @@ class ParsedExpression:
         """
 
         ## Unpack the list to make it work with our lambda
-        import numpy as np
-        return eval(self.lambdaExpression, functionArguments | locals())
-    
+        
+        return eval(self.lambdaExpression, functionArguments | {"log": log, "sqrt": sqrt, "pi": pi})
 
     def __str__(self) -> str:
         return self.identifier + " == " + self.stringExpression
@@ -158,10 +157,7 @@ class ParsedExpression:
         for s in argumentList:
             argumentSymbols.append(sympy.Symbol(s))
 
-        return compile(str(sympyExpression).replace("sqrt", "np.sqrt") \
-                                           .replace("pi", "np.pi") \
-                                           .replace("log", "np.log") \
-                                           .replace("EulerGamma", "0.5772156649015329") \
+        return compile(str(sympyExpression).replace("EulerGamma", "0.5772156649015329") \
                                            .replace('Glaisher', "1.28242712910062"), "", mode = "eval")
     
     @staticmethod
@@ -230,8 +226,6 @@ class ParsedExpressionSystem:
         """
         ## Collect inputs from the dict and put them in correct order. I do this by taking the right order from our first expression.
         ## This is fine since all our expressions use the same input list. 
-        inputList = self.parsedExpressions[0]._paramDictToOrderedList(inputDict)
-
         outList = [None] * len(self.parsedExpressions)
         for i in np.arange(len(outList)):
             outList[i] = self.parsedExpressions[i](inputDict)
@@ -240,17 +234,10 @@ class ParsedExpressionSystem:
             return outList
         else:
             return  { self.parsedExpressions[i].identifier : outList[i] for i in np.arange(len(outList)) } 
-        
-
-    def evaluateSystem(self, arguments: list[float]) -> Tuple:
-        """Evaluates the system of expressions at given input and returns a tuple of floats.
-        """
-        return tuple( [expr(arguments) for expr in self.parsedExpressions] )
-
 
     def __call__(self, arguments: list[float]) -> Tuple:
         """Just calls evaluateSystem()"""
-        return self.evaluateSystem(arguments)
+        return self.evaluateSystemWithDict(arguments)
 
     def __str__(self) -> str:
         return str([ str(expr) for expr in self.parsedExpressions ])
