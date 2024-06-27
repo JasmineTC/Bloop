@@ -5,7 +5,7 @@ from sympy.parsing.mathematica import parse_mathematica
 
 from typing import Callable, Tuple
 
-from .CommonUtils import replaceGreekSymbols, dictToOrderedList
+from .CommonUtils import replaceGreekSymbols
 
 
 class ParsedExpression:
@@ -279,12 +279,6 @@ class SystemOfEquations(ParsedExpressionSystem):
             
 
         self._rearrangeSymbols()
-
-    def getOtherVariablesFromDict(self, otherVariablesDict: dict[str, float]) -> list[float]:
-        """Puts numbers from dict in correct order for our lambda evaluation, does not look for our unknown variables.
-        """
-        return dictToOrderedList(otherVariablesDict, self.otherVariables)
-
 
     def _rearrangeSymbols(self) -> None:
         """This rearranges our internal symbol list and expression lambdas so that the unknown variables come before other variables.
