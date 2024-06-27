@@ -66,6 +66,10 @@ class ParsedExpression:
 
             self.stringExpression = expression
 
+            if not self.stringExpression:
+                from pdb import set_trace
+                set_trace()
+
             self.sympyExpression, self.symbols = self._parseMathematicaExpression(expression)
 
 
@@ -93,7 +97,8 @@ class ParsedExpression:
         """
 
         ## Unpack the list to make it work with our lambda
-        return self.lambdaExpression(*functionArguments)
+        import numpy as np
+        return eval(self.lambdaExpression, functionArguments | locals())
     
 
     def __str__(self) -> str:
@@ -125,7 +130,11 @@ class ParsedExpression:
         """
 
         sympyExpr: sympy.Expr 
-        sympyExpr = parse_mathematica(expression)
+        try:
+            sympyExpr = parse_mathematica(expression)
+        except:
+            from pdb import set_trace
+            set_trace()
         
         if (bSubstituteConstants):
             ## Do this here to prevent things like Glaisher from appearing in list of free symbols
@@ -149,8 +158,11 @@ class ParsedExpression:
         for s in argumentList:
             argumentSymbols.append(sympy.Symbol(s))
 
-        return sympy.lambdify(argumentSymbols, sympyExpression, modules='numpy')
-    
+        return compile(str(sympyExpression).replace("sqrt", "np.sqrt") \
+                                           .replace("pi", "np.pi") \
+                                           .replace("log", "np.log") \
+                                           .replace("EulerGamma", "0.5772156649015329") \
+                                           .replace('Glaisher', "1.28242712910062"), "", mode = "eval")
     
     @staticmethod
     def _substNumericalConstants(sympyExpression: sympy.Expr) -> sympy.Expr:
@@ -222,7 +234,7 @@ class ParsedExpressionSystem:
 
         outList = [None] * len(self.parsedExpressions)
         for i in np.arange(len(outList)):
-            outList[i] = self.parsedExpressions[i](inputList)
+            outList[i] = self.parsedExpressions[i](inputDict)
 
         if not bReturnDict:
             return outList

@@ -30,19 +30,13 @@ class ParameterMatching:
     ## LN: not used currently since the symbols are read automatically from .txt
 
     def __init__(self):
-        
         self.matchingRelations = {}
-        
 
     def getMatchedParams(self, inputParams: dict[str, float]) -> dict[str, float]:
-
-        ## put input params in an array so that matching relation lambdas can be evaluated
-        inParamList = self._paramDictToOrderedList(inputParams)
-
         matchedParams = {}
 
         for key, expr in self.matchingRelations.items():
-            matchedParams[key] = expr(inParamList) ## Unpack because the lambdas don't take lists
+            matchedParams[key] = expr(inputParams) ## Unpack because the lambdas don't take lists
 
         return matchedParams
     
