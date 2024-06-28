@@ -58,5 +58,9 @@ class VeffMinimizer:
                 opt.set_xtol_rel(self.localRel)
                 
                 location, value = opt.optimize(initialGuess),  opt.last_optimum_value()
+        
+        else:
+            print(f"ERROR: {minimizationAlgo} does not match any of our minimzationAlgos, attempting to exit")
+            exit()
                
         return location, value
