@@ -31,15 +31,16 @@ softToUltrasoftFile = getResourcePath(args.softToUltraSoftFile)
 
 from ThreeHiggs.EffectivePotential import EffectivePotential
 from ThreeHiggs.parsedmatrix import ParsedMatrix, MatrixDefinitionFiles
+from ThreeHiggs.VeffMinimizer import MinimizationAlgos
 effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         True,
                                         getResourcePath(args.vectorsMassesSquaredFile),
                                         getResourcePath(args.vectorsShortHandsFile),
                                         ParsedMatrix.parseConstantMatrix(getResourcePath(args.scalarPermutationFile)),
-                                        [MatrixDefinitionFiles(getResourcePath(args.scalarMassMatrixUpperLeftFile),
-                                                               getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile)),
-                                         MatrixDefinitionFiles(getResourcePath(args.scalarMassMatrixBottomRightFile),
-                                                               getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile))],
+                                        [[getResourcePath(args.scalarMassMatrixUpperLeftFile),
+                                          getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile)],
+                                         [getResourcePath(args.scalarMassMatrixBottomRightFile),
+                                          getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile)]],
                                         getResourcePath(args.scalarRotationFile),
                                         args.loopOrder,
                                         veffFiles,
