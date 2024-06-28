@@ -43,7 +43,7 @@ effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         getResourcePath(args.scalarRotationFile),
                                         args.loopOrder,
                                         veffFiles,
-                                        "directGlobal", ## Set algorithm to use for Veff minimization
+                                        args.minimizationAlgo, ## Set algorithm to use for Veff minimization
                                         args.DiagAlgo) ## Set algorithm for scalar mass diag to use
 
 ## Model object setup + load matching relations
