@@ -85,9 +85,5 @@ class SystemOfEquations(ParsedExpressionSystem):
         self.otherVariables = filteredArguments
 
     def getEquations(self):
-        eqs = [None] * len(self.parsedExpressions)
-        for i in range(len(eqs)):
-            eqs[i] = self.parsedExpressions[i].lambdaExpression
-
-        return eqs
+        return [expr.lambdaExpression for expr in self.parsedExpressions]
         
