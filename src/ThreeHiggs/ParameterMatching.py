@@ -14,14 +14,6 @@ ie. DRalgo appends a '3d'. I don't want the '3d' part, but this is easy to remov
 
 ## This would make a good abstract class
 class ParameterMatching:
-
-
-    ## stores lambdas for evaluating params in the soft scale theory
-    matchingRelations: dict[str, Callable]
-
-    ## List of arguments needed to evaluate the matching relations
-    parameterNames: list[str]
-
     ## This list specifies names for parameters that enter the matching relations. 
     # Needs to match symbol names in the file that defines matching relations except that:
     # 1. "Unicode" symbols like λ are automatically converted to ANSI according to rules in CommonUtils.replaceGreekSymbols(). For example λ -> lam  
@@ -32,49 +24,14 @@ class ParameterMatching:
     def __init__(self):
         self.matchingRelations = {}
 
-    def getMatchedParams(self, inputParams: dict[str, float]) -> dict[str, float]:
-        matchedParams = {}
+    def getMatchedParams(self, inputParams):
+        return {key: expr(inputParams) for key, expr in self.matchingRelations.items()}
 
-        for key, expr in self.matchingRelations.items():
-            matchedParams[key] = expr(inputParams) ## Unpack because the lambdas don't take lists
-
-        return matchedParams
-    
-
-    def __call__(self, inputParams: dict[str, float]) -> dict[str, float]:
-        """This just calls getMatchedParams(inputParams)
-        """
+    def __call__(self, inputParams):
         return self.getMatchedParams(inputParams)
 
-
-    def createMatchingRelations(self, fileToRead: str = None) -> None:
-
-        self.matchingRelations = {}
-
-        ## Read from file if a filename was given
-        if (fileToRead != None):
-            symbolNames, parsedMatchingRelations = self.parseMatchingRelations(fileToRead)
-
-            #print("List of symbols in the matching relations:\n", symbolNames)
-            
-            ## I'll just have all matching relations take the same list of args
-            self.parameterNames = symbolNames
-            self.matchingRelations = self.lambdifyMatchingRelations(parsedMatchingRelations, self.parameterNames)
-
-
-        ## No input file so use the manual matching implementation
-        else: 
-            self.implementMatchingRelations()
-    ##
-
-    def implementMatchingRelations(self):
-        ### Manually implement matching here if you don't want to read them from file
-        raise NotImplementedError
-        """
-        self.matchingRelations["g1sq"] = self._exprToFunction(self.__parsedMatchingRelations['g13d^2'], argumentSymbols)
-        self.matchingRelations["g2sq"] = self._exprToFunction(self.__parsedMatchingRelations['g23d^2'], argumentSymbols)
-        # etc
-        """
+    def createMatchingRelations(self, fileToRead):
+        self.parameterNames, self.matchingRelations = self.parseMatchingRelations(fileToRead)
 
     def parseMatchingRelations(self, filePath: str) -> Tuple[list[str], dict[str, ParsedExpression]]:
 
@@ -86,25 +43,20 @@ class ParameterMatching:
         parsedSymbols = [] ## Automatically find all symbols that appear in matching relations
 
         for line in expressions:
-            try:
-                lhs, rhs = map(str.strip, line.split("->"))
+            lhs, rhs = map(str.strip, line.split("->"))
 
-                expr = ParsedExpression(rhs, bReplaceGreekSymbols=True)
+            expr = ParsedExpression(rhs, bReplaceGreekSymbols=True)
 
-                ## Replace Greeks also on the LHS and store in dict as LHS : parsedRHS
-                parsedExpressions[ replaceGreekSymbols(lhs) ] = expr
+            ## Replace Greeks also on the LHS and store in dict as LHS : parsedRHS
+            parsedExpressions[ replaceGreekSymbols(lhs) ] = expr
 
-                ## find symbols but store as string, not the sympy type  
-                for symbol in expr.symbols:
-                    ## NOTE this conversion will cause issues with pathological symbols like "A B" 
-                    # https://stackoverflow.com/questions/59401738/convert-sympy-symbol-to-string-such-that-it-can-always-be-parsed
-                    symbol_str = str(symbol)
-                    if symbol_str not in parsedSymbols:
-                        parsedSymbols.append(symbol_str)
-                        
-            except ValueError:
-
-                print(f"Error parsing line: {line}")
+            ## find symbols but store as string, not the sympy type  
+            for symbol in expr.symbols:
+                ## NOTE this conversion will cause issues with pathological symbols like "A B" 
+                # https://stackoverflow.com/questions/59401738/convert-sympy-symbol-to-string-such-that-it-can-always-be-parsed
+                symbol_str = str(symbol)
+                if symbol_str not in parsedSymbols:
+                    parsedSymbols.append(symbol_str)
 
         parsedSymbols.sort()
         return parsedSymbols, parsedExpressions
@@ -118,7 +70,6 @@ class ParameterMatching:
         convertedExpressions = {}
         
         for key, expr in parsedExpressions.items():
-            expr.makeCallable(argumentNames)
             convertedExpressions[key] = expr
 
         return convertedExpressions

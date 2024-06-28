@@ -79,23 +79,12 @@ class ParsedMatrix:
 
         return symbolicMatrix
 
-
-    def evaluate(self, arguments: list[str]) -> np.ndarray:
-        """Evaluates the matrix element expressions and puts them in a 2D np.ndarray.
-        Input list needs to be ordered as assumed by the expressions.
-        """
-        if (self.bHasExpressions):
-            evaluatedExpressions = self.matrixElementExpressions.evaluateSystem(arguments)
-            return self.matrix(evaluatedExpressions)
-        else:
-            raise RuntimeError("TODO! matrix mess...")
-    
-    def evaluateWithDict(self, arguments: dict[str, float]) -> np.ndarray:
+    def __call__(self, arguments):
         """Evaluates the matrix element expressions and puts them in a 2D np.ndarray.
         The input dict needs to contain keys for all function arguments needed by the expressions. 
         """
         if (self.bHasExpressions):
-            evaluatedExpressions = self.matrixElementExpressions.evaluateSystemWithDict(arguments)
+            evaluatedExpressions = self.matrixElementExpressions(arguments)
             ## the above gives a list but we need a tuple, so unpack
             return self.matrix(*evaluatedExpressions) 
         else:
