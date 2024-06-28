@@ -86,8 +86,11 @@ class VeffParams:
         ## can have many matrices if we've block-diagonalized already
         ## ASSUME: the blocks are given in order: upper left to lower right. 
         ##TODO improve this
-        self.scalarMassMatrices = [ParsedMatrix(matrix[0], matrix[1]) for matrix in scalarMassMatrices]
-        self.scalarRotationMatrix = ParsedMatrix(scalarRotationMatrixFile)
+        from ThreeHiggs.ParsedExpression import MassMatrix
+        self.scalarMassMatrices = [MassMatrix(matrix[0], matrix[1]) for matrix in scalarMassMatrices]
+
+        from ThreeHiggs.ParsedExpression import RotationMatrix
+        self.scalarRotationMatrix = RotationMatrix(scalarRotationMatrixFile)
 
     def setActionParams(self, inputParams: dict[str, float]) -> None:
         self.actionParams = inputParams
@@ -132,7 +135,13 @@ class VeffParams:
         
         for matrix in self.scalarMassMatrices:
             numericalM = matrix(params)
-            eigenValue, vects = diagonalizeSymmetric( numericalM, self.diagonalizationAlgo)
+
+            try:
+                eigenValue, vects = diagonalizeSymmetric( numericalM, self.diagonalizationAlgo)
+
+            except:
+                from pdb import set_trace
+                set_trace()
             ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
             verbose = False
             if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
