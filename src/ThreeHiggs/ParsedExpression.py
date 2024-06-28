@@ -86,66 +86,44 @@ class ParsedMatrix:
         If definitions are not given, this becomes a direct function of its symbolic matrix elements.
         """
         self.bHasExpressions = False
-        sympyMatrix = self.parseMatrix(matrixFile)
-        self.shape = sympyMatrix.shape
-
-        if (matrixElementDefinitionsFile):
-            self.matrixElementExpressions = ParsedExpressionSystem(matrixElementDefinitionsFile)
-            self.bHasExpressions = True
-
-        ## Make index map so that we know which symbol is which a_ij
-        self.symbolMap: dict[str, Tuple[int, int]]  = {}
-        for i in range(sympyMatrix.shape[0]):
-            for j in range(sympyMatrix.shape[1]):
-                element = sympyMatrix[i, j]
-
-                if element.is_symbol:
-                    self.symbolMap[str(element)] = i, j
-
-        
-        """Lambdify the matrix. For arguments: 
-            1) If expressions were given, use same order as how the expressions are output
-            2) If expressions were not given, use whatever order 
-        """
-        if (self.bHasExpressions):
-            self.argumentSymbols = self.matrixElementExpressions.getExpressionNames()
-        else:
-            ## TODO use set
-            self.argumentSymbols = [str(s) for s in sympyMatrix.free_symbols]
-
-        self.matrix = sympy.lambdify(self.argumentSymbols, sympyMatrix, modules='numpy')
-
-
-    @staticmethod
-    def parseMatrix(fileName: str) -> sympy.Matrix:
-        """Parses a symbolic matrix from text file.
-        The matrix is assumed to be in format:
-        {a11, a12, ...}
-        {a21, a22, ...}
-        etc, ie. one row per line. This is how Mathematica exports a 2D table.
-        """
-
-        with open(fileName, 'r') as file:
+        with open(matrixFile, 'r') as file:
             lines = file.readlines()
 
         ## Interpret the lines
         matrixData = [[symbol.strip() for symbol in line.strip().lstrip('{').rstrip('}').split(',')] for line in lines]
+        self.sympyMatrix = sympy.Matrix(matrixData)
+        self.shape = self.sympyMatrix.shape
 
-        symbolicMatrix = sympy.Matrix(matrixData)
-
-        return symbolicMatrix
+class MassMatrix(ParsedMatrix):
+    def __init__(self, matrixFileName, definitionsFileName):
+        super().__init__(matrixFileName)
+        self.matrixElementExpressions = ParsedExpressionSystem(definitionsFileName)
+        self.argumentSymbols = self.matrixElementExpressions.getExpressionNames()
+        self.matrix = compile(str(self.sympyMatrix.tolist()), "", mode = "eval")
 
     def __call__(self, arguments):
         """Evaluates the matrix element expressions and puts them in a 2D np.ndarray.
         The input dict needs to contain keys for all function arguments needed by the expressions. 
         """
-        if (self.bHasExpressions):
-            evaluatedExpressions = self.matrixElementExpressions(arguments)
-            ## the above gives a list but we need a tuple, so unpack
-            return self.matrix(*evaluatedExpressions) 
-        else:
-            raise RuntimeError("TODO! matrix mess...")
+        arguments |= self.matrixElementExpressions(arguments, bReturnDict = True)
+        return eval(self.matrix, arguments | {"log": log, 
+                                              "sqrt": sqrt, 
+                                              "pi": pi, 
+                                              "EulerGamma": EulerGamma,
+                                              "Glaisher": Glaisher})
 
+class RotationMatrix(ParsedMatrix):
+    def __init__(self, fileName):
+        super().__init__(fileName)
+        ## Make index map so that we know which symbol is which a_ij
+        self.argumentSymbols = [str(s) for s in self.sympyMatrix.free_symbols]
+        self.symbolMap: dict[str, Tuple[int, int]]  = {}
+        for i in range(self.sympyMatrix.shape[0]):
+            for j in range(self.sympyMatrix.shape[1]):
+                element = self.sympyMatrix[i, j]
+
+                if element.is_symbol:
+                    self.symbolMap[str(element)] = i, j
 
     def matchSymbols(self, numericalMatrix: np.ndarray) -> dict[str, float]:
         """Evaluates our symbols by plugging in numbers from the input numerical matrix.
@@ -159,14 +137,4 @@ class ParsedMatrix:
             outDict[symbol] = numericalMatrix[idx]
 
         return outDict
-
-
-    @staticmethod
-    def parseConstantMatrix(fileName: str) -> np.ndarray:
-        sympyMatrix = ParsedMatrix.parseMatrix(fileName)
-
-        # should not have any free symbols
-        assert len(sympyMatrix.free_symbols) == 0, "Failed to parse constant matrix: has free symbols!"
-        # can't lambdify with no arguments, so do standard conversion to numpy array instead
-        return np.array(sympyMatrix.tolist()).astype(np.float64)
 
