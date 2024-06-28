@@ -42,8 +42,6 @@ softScaleRGEFile = getResourcePath(args.softScaleRGEFile)
 softToUltrasoftFile = getResourcePath(args.softToUltraSoftFile)
 
 from ThreeHiggs.EffectivePotential import EffectivePotential
-from ThreeHiggs.parsedmatrix import ParsedMatrix, MatrixDefinitionFiles
-from ThreeHiggs.VeffMinimizer import MinimizationAlgos
 effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         True,
                                         getResourcePath(args.vectorsMassesSquaredFile),
