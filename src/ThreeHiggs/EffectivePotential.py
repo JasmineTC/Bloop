@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from .parsedmatrix import ParsedMatrix, MatrixDefinitionFiles
 from .ParsedExpression import ParsedExpressionSystem
 
-from .VeffMinimizer import VeffMinimizer, MinimizationAlgos
+from .VeffMinimizer import VeffMinimizer
 
 def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.ndarray, np.ndarray]:
     """Diagonalizes a symmetric matrix. 
@@ -271,13 +271,13 @@ class EffectivePotential:
 
         bestResult = ((np.nan, np.nan, np.nan), np.inf)
         
-        if self.minimizationAlgo == MinimizationAlgos.eCombo:
-            result = self.findLocalMinimum(minimumCandidates[0], MinimizationAlgos.eDIRECTGLOBAL)
+        if self.minimizationAlgo == "Combo":
+            result = self.findLocalMinimum(minimumCandidates[0], "directGlobal")
             if (np.real(result[1]) < np.real(bestResult[1])):
                 bestResult = result
             
             for candidate in minimumCandidates:
-                result = self.findLocalMinimum(candidate, MinimizationAlgos.eBOBYQA)
+                result = self.findLocalMinimum(candidate, "BOBYQA")
                 if (np.real(result[1]) < np.real(bestResult[1])):
                     bestResult = result
                     
@@ -314,8 +314,7 @@ class EffectivePotential:
         Are all physical masses > g^2 T/16pi, we use the largest coupling in the theory to do the comparrsion 
         --Note we expect some goldstone bosons from the symmetry breaking so we check the number of light modes = goldstone modes
         ----Get someone to check the logic of this
-        2) Return true if # of light modes is less than the # of goldstone modes
-        '''
+        2) Return true if # of light modes is less than the # of goldstone modes'''
         ## If all field values are close to zero then we are probably in the symmetric phase with no goldstone bosons
         ## TODO: the symmetric phase cannot be described by pert theory so shouldn't be trusted, so should prob just return False right away
         ## But get someone to check this

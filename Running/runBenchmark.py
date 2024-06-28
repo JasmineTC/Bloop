@@ -31,7 +31,6 @@ softToUltrasoftFile = getResourcePath(args.softToUltraSoftFile)
 
 from ThreeHiggs.EffectivePotential import EffectivePotential
 from ThreeHiggs.parsedmatrix import ParsedMatrix, MatrixDefinitionFiles
-from ThreeHiggs.VeffMinimizer import MinimizationAlgos
 effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         True,
                                         getResourcePath(args.vectorsMassesSquaredFile),
@@ -44,7 +43,7 @@ effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         getResourcePath(args.scalarRotationFile),
                                         args.loopOrder,
                                         veffFiles,
-                                        MinimizationAlgos.eDIRECTGLOBAL, ## Set algorithm to use for Veff minimization
+                                        args.minimizationAlgo, ## Set algorithm to use for Veff minimization
                                         args.DiagAlgo) ## Set algorithm for scalar mass diag to use
 
 ## Model object setup + load matching relations

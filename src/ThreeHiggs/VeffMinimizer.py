@@ -1,15 +1,7 @@
-from enum import Enum
 import nlopt
 import numpy as np
 
-class MinimizationAlgos(Enum):
-    eScipy = 1 
-    eBOBYQA = 2 
-    eDIRECTGLOBAL = 3 
-    eCombo = 4
-    
 class VeffMinimizer:
-
     def __init__(self, numVariables: int):
         self.numVariables = numVariables
         
@@ -21,7 +13,7 @@ class VeffMinimizer:
         self.localRel = localRel
         
         
-    def minimize(self, function: callable, initialGuess: np.ndarray, MinimizationAlgo: MinimizationAlgos) -> tuple[np.ndarray, float]:
+    def minimize(self, function: callable, initialGuess: np.ndarray, minimizationAlgo: str) -> tuple[np.ndarray, float]:
         """Give bounds in format ((min1, max1), (min2, max2)) etc, one pair for each variable.
         Returns: 
         location, Veff(location)
@@ -29,14 +21,13 @@ class VeffMinimizer:
         Even though we don't use the gradient, nlopt still tries to pass a grad arguemet to the function, so the function needs to be 
         wrapped a second time to give it room for the useless grad arguement"""
 
-        match(MinimizationAlgo):
-            case MinimizationAlgos.eScipy:
+        if minimizationAlgo == "scipy":
                 import scipy.optimize
                 bounds = ((1e-6, 1e-6), (1e-6, 1e-6), (1e-6, 1e3))
                 minimizationResult = scipy.optimize.minimize(function, initialGuess, bounds=bounds, tol = 1e-6)
                 location, value = minimizationResult.x, minimizationResult.fun
                    
-            case MinimizationAlgos.eDIRECTGLOBAL:
+        elif minimizationAlgo == "directGlobal":
                 ##The idea of this case is to use a global minimiser to get the ballpark of the global minimum
                 ##then use that as initial guess for a local solver
                 opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, self.numVariables)
@@ -57,7 +48,7 @@ class VeffMinimizer:
                 
                 location, value = opt2.optimize(location),  opt2.last_optimum_value()
                 
-            case MinimizationAlgos.eBOBYQA:
+        elif minimizationAlgo == "BOBYQA":
                 opt = nlopt.opt(nlopt.LN_BOBYQA, self.numVariables)
                 functionWrapper = lambda fields, grad: function(fields) 
                 opt.set_min_objective(functionWrapper)
@@ -67,5 +58,9 @@ class VeffMinimizer:
                 opt.set_xtol_rel(self.localRel)
                 
                 location, value = opt.optimize(initialGuess),  opt.last_optimum_value()
+        
+        else:
+            print(f"ERROR: {minimizationAlgo} does not match any of our minimzationAlgos, attempting to exit")
+            exit()
                
         return location, value
