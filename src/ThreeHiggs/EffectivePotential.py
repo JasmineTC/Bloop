@@ -246,7 +246,7 @@ class EffectivePotential:
         return sum(self.expressions(paramDict)) ## Sum because the result is a list of tree, 1loop etc 
 
     def findLocalMinimum(self, initialGuess: list[float], algo) -> tuple[list[float], complex]:
-
+        
         VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields) ) ## Minimize real part only:
 
         location, value = self.minimizer.minimize(VeffWrapper, initialGuess, algo)
@@ -271,7 +271,7 @@ class EffectivePotential:
 
         bestResult = ((np.nan, np.nan, np.nan), np.inf)
         
-        if self.minimizationAlgo == "Combo":
+        if self.minimizationAlgo == "combo":
             result = self.findLocalMinimum(minimumCandidates[0], "directGlobal")
             if (np.real(result[1]) < np.real(bestResult[1])):
                 bestResult = result

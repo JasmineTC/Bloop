@@ -27,7 +27,7 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('-l', '--loopOrder', action = 'store', default = 2, dest = 'loopOrder', type = int, choices = [0, 1, 2],
                           help = "Used to specify if the effective potential should be calculated to one or two loop")
         
-        self.add_argument('--minimizationAlgo', action = 'store', default="directGlobal", dest = 'minimizationAlgo',  
+        self.add_argument('--minimizationAlgo', action = 'store', default="combo", dest = 'minimizationAlgo',  
                           help = "Used to specify which algothrym the minimizer uses, options are combo, directGlobal, BOBYQA and scipy")     
 
         self.add_argument('-s', '--save', action = 'store_true', default=False, dest = 'save',  
