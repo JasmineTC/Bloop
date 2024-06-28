@@ -102,22 +102,6 @@ class ParsedExpression:
 
     def __str__(self) -> str:
         return self.identifier + " == " + self.stringExpression
-    
-    ## TODO some redundancy since a similar function is also defined in ParameterMatching, so cleanup
-    def _paramDictToOrderedList(self, paramDict: dict[str, float]) -> list[float]:
-        """Put input dict to correct order for our lambda function. 
-        """
-        outList = [None] * len(self.functionArguments)
-        
-        ## Fill the list in correct order
-        for i in range(len(outList)):
-            if (self.functionArguments[i] in paramDict):
-                outList[i] = paramDict[ self.functionArguments[i] ]
-            else:
-                raise RuntimeError(f"{self.__class__.__name__} object called with invalid dict: {self.functionArguments[i]} not found!")
-
-        return outList
-
 
     @staticmethod
     def _parseMathematicaExpression(expression: str, bSubstituteConstants: bool = True) -> Tuple[sympy.Expr, list[sympy.Symbol]]:
@@ -128,12 +112,7 @@ class ParsedExpression:
         expression, symbols.
         """
 
-        sympyExpr: sympy.Expr 
-        try:
-            sympyExpr = parse_mathematica(expression)
-        except:
-            from pdb import set_trace
-            set_trace()
+        sympyExpr = parse_mathematica(expression)
         
         if (bSubstituteConstants):
             ## Do this here to prevent things like Glaisher from appearing in list of free symbols

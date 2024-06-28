@@ -76,22 +76,6 @@ class ParameterMatching:
         # etc
         """
 
-
-    def _paramDictToOrderedList(self, params: dict[str, float]) -> list[float]:
-        """Convert a dict of input params to list that has same ordering as that defined in defineMatchingRelations().
-        This is needed because the functions produced by sympy lambdify do not take dicts as argument.
-        """ 
-
-        ## TODO would be much better to have a dedicated "params" class that handles all parameter stuff
-        outList = [None] * len(self.parameterNames)
-        
-        for i in range(len(outList)):
-            outList[i] = params[ self.parameterNames[i] ]
-
-        return outList
-
-
-
     def parseMatchingRelations(self, filePath: str) -> Tuple[list[str], dict[str, ParsedExpression]]:
 
         with open(filePath, "r", encoding="utf-8") as file:
