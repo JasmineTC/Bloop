@@ -1,5 +1,17 @@
 import ThreeHiggs
 
+def parseConstantMatrix(lines):
+    symbols = [[symbol for symbol in line.rstrip()
+                                         .rstrip('}')
+                                         .lstrip('{')
+                                         .split(',')] for line in lines]
+
+    from sympy import Matrix
+    sympyMatrix = Matrix(symbols)
+
+    from numpy import array, float64
+    return array(sympyMatrix.tolist()).astype(float64)
+
 def getResourcePath(relativePathToResource: str) -> str:
     """ Gives a safe path to a packaged resource.
     
@@ -36,7 +48,8 @@ effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         True,
                                         getResourcePath(args.vectorsMassesSquaredFile),
                                         getResourcePath(args.vectorsShortHandsFile),
-                                        ParsedMatrix.parseConstantMatrix(getResourcePath(args.scalarPermutationFile)),
+                                        parseConstantMatrix(open(getResourcePath(args.scalarPermutationFile), 
+                                                            encoding = "utf-8").readlines()),
                                         [[getResourcePath(args.scalarMassMatrixUpperLeftFile),
                                           getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile)],
                                          [getResourcePath(args.scalarMassMatrixBottomRightFile),
