@@ -6,14 +6,10 @@ from typing import Callable, Tuple
 
 from .CommonUtils import replaceGreekSymbols
 
+from math import log, sqrt
 pi = float(sympy.pi.evalf())
 EulerGamma = float(sympy.EulerGamma.evalf())
 Glaisher = 1.28242712910062
-def log(x):
-    return float(sympy.log(float(x)))
-
-def sqrt(x):
-    return float(sympy.sqrt(float(x)))
 
 class ParsedExpression:
     def __init__(self, expression: str = None, bReplaceGreekSymbols=True):
