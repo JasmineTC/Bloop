@@ -1,12 +1,19 @@
 import numpy as np
 import sympy
-from sympy import pi
 from sympy.parsing.mathematica import parse_mathematica
 
 from typing import Callable, Tuple
 
-from .CommonUtils import replaceGreekSymbols, dictToOrderedList
+from .CommonUtils import replaceGreekSymbols
 
+pi = float(sympy.pi.evalf())
+EulerGamma = float(sympy.EulerGamma.evalf())
+Glaisher = 1.28242712910062
+def log(x):
+    return float(sympy.log(float(x)))
+
+def sqrt(x):
+    return float(sympy.sqrt(float(x)))
 
 class ParsedExpression:
     """ Class ParsedExpression
@@ -65,7 +72,6 @@ class ParsedExpression:
                 self.identifier = lhs
 
             self.stringExpression = expression
-
             self.sympyExpression, self.symbols = self._parseMathematicaExpression(expression)
 
 
@@ -87,33 +93,15 @@ class ParsedExpression:
 
 
     def __call__(self, functionArguments: list[float]) -> float:
-        """This evaluates self.lambdaExpression with specified arguments.
-        Argument should be a list of numbers, in the order that matches 
-        the list originally given to makeCallable().
-        """
-
-        ## Unpack the list to make it work with our lambda
-        return self.lambdaExpression(*functionArguments)
-    
+        return eval(self.lambdaExpression, 
+                    functionArguments | {"log": log, 
+                                         "sqrt": sqrt, 
+                                         "pi": pi, 
+                                         "EulerGamma": EulerGamma,
+                                         "Glaisher": Glaisher})
 
     def __str__(self) -> str:
         return self.identifier + " == " + self.stringExpression
-    
-    ## TODO some redundancy since a similar function is also defined in ParameterMatching, so cleanup
-    def _paramDictToOrderedList(self, paramDict: dict[str, float]) -> list[float]:
-        """Put input dict to correct order for our lambda function. 
-        """
-        outList = [None] * len(self.functionArguments)
-        
-        ## Fill the list in correct order
-        for i in range(len(outList)):
-            if (self.functionArguments[i] in paramDict):
-                outList[i] = paramDict[ self.functionArguments[i] ]
-            else:
-                raise RuntimeError(f"{self.__class__.__name__} object called with invalid dict: {self.functionArguments[i]} not found!")
-
-        return outList
-
 
     @staticmethod
     def _parseMathematicaExpression(expression: str, bSubstituteConstants: bool = True) -> Tuple[sympy.Expr, list[sympy.Symbol]]:
@@ -124,16 +112,8 @@ class ParsedExpression:
         expression, symbols.
         """
 
-        sympyExpr: sympy.Expr 
         sympyExpr = parse_mathematica(expression)
-        
-        if (bSubstituteConstants):
-            ## Do this here to prevent things like Glaisher from appearing in list of free symbols
-            sympyExpr = ParsedExpression._substNumericalConstants(sympyExpr)
-
-        ## find symbols in the expression
         symbols = sympyExpr.free_symbols
-
         return sympyExpr, symbols
 
 
@@ -149,8 +129,8 @@ class ParsedExpression:
         for s in argumentList:
             argumentSymbols.append(sympy.Symbol(s))
 
-        return sympy.lambdify(argumentSymbols, sympyExpression, modules='numpy')
-    
+        from random import random
+        return compile(str(sympyExpression), "<string>", mode = "eval")
     
     @staticmethod
     def _substNumericalConstants(sympyExpression: sympy.Expr) -> sympy.Expr:
@@ -178,10 +158,6 @@ class ParsedExpressionSystem:
     def __init__(self, fileName: str = None):
         if (fileName):
             self.parseExpressions(fileName)
-
-        ## TODO should maybe check that all expressions use the same input ordering. Currently this is automatic, 
-        ## but things will go horribly wrong if the order ever changes by some reason
-
 
     def parseExpressions(self, fileName: str) -> Tuple:
         """Read system of expressions from file, one per line.
@@ -218,27 +194,18 @@ class ParsedExpressionSystem:
         """
         ## Collect inputs from the dict and put them in correct order. I do this by taking the right order from our first expression.
         ## This is fine since all our expressions use the same input list. 
-        inputList = self.parsedExpressions[0]._paramDictToOrderedList(inputDict)
-
         outList = [None] * len(self.parsedExpressions)
         for i in np.arange(len(outList)):
-            outList[i] = self.parsedExpressions[i](inputList)
+            outList[i] = self.parsedExpressions[i](inputDict)
 
         if not bReturnDict:
             return outList
         else:
             return  { self.parsedExpressions[i].identifier : outList[i] for i in np.arange(len(outList)) } 
-        
-
-    def evaluateSystem(self, arguments: list[float]) -> Tuple:
-        """Evaluates the system of expressions at given input and returns a tuple of floats.
-        """
-        return tuple( [expr(arguments) for expr in self.parsedExpressions] )
-
 
     def __call__(self, arguments: list[float]) -> Tuple:
         """Just calls evaluateSystem()"""
-        return self.evaluateSystem(arguments)
+        return self.evaluateSystemWithDict(arguments)
 
     def __str__(self) -> str:
         return str([ str(expr) for expr in self.parsedExpressions ])
@@ -280,12 +247,6 @@ class SystemOfEquations(ParsedExpressionSystem):
             
 
         self._rearrangeSymbols()
-
-    def getOtherVariablesFromDict(self, otherVariablesDict: dict[str, float]) -> list[float]:
-        """Puts numbers from dict in correct order for our lambda evaluation, does not look for our unknown variables.
-        """
-        return dictToOrderedList(otherVariablesDict, self.otherVariables)
-
 
     def _rearrangeSymbols(self) -> None:
         """This rearranges our internal symbol list and expression lambdas so that the unknown variables come before other variables.

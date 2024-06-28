@@ -30,19 +30,13 @@ class ParameterMatching:
     ## LN: not used currently since the symbols are read automatically from .txt
 
     def __init__(self):
-        
         self.matchingRelations = {}
-        
 
     def getMatchedParams(self, inputParams: dict[str, float]) -> dict[str, float]:
-
-        ## put input params in an array so that matching relation lambdas can be evaluated
-        inParamList = self._paramDictToOrderedList(inputParams)
-
         matchedParams = {}
 
         for key, expr in self.matchingRelations.items():
-            matchedParams[key] = expr(inParamList) ## Unpack because the lambdas don't take lists
+            matchedParams[key] = expr(inputParams) ## Unpack because the lambdas don't take lists
 
         return matchedParams
     
@@ -81,22 +75,6 @@ class ParameterMatching:
         self.matchingRelations["g2sq"] = self._exprToFunction(self.__parsedMatchingRelations['g23d^2'], argumentSymbols)
         # etc
         """
-
-
-    def _paramDictToOrderedList(self, params: dict[str, float]) -> list[float]:
-        """Convert a dict of input params to list that has same ordering as that defined in defineMatchingRelations().
-        This is needed because the functions produced by sympy lambdify do not take dicts as argument.
-        """ 
-
-        ## TODO would be much better to have a dedicated "params" class that handles all parameter stuff
-        outList = [None] * len(self.parameterNames)
-        
-        for i in range(len(outList)):
-            outList[i] = params[ self.parameterNames[i] ]
-
-        return outList
-
-
 
     def parseMatchingRelations(self, filePath: str) -> Tuple[list[str], dict[str, ParsedExpression]]:
 

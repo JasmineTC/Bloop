@@ -21,18 +21,6 @@ def replaceGreekSymbols(string: str) -> str:
 
     return newString
 
-
-def dictToOrderedList(inDict: dict[any, any], keyOrder: list[any]):
-    """ Picks values from a dict and puts them in a list with specified order.
-    Currently this performs no checks on whether keys are found or not
-    """
-    outList = [None] * len(keyOrder)
-    for i in range(len(outList)):
-        outList[i] = inDict[ keyOrder[i] ]
-
-    return outList
-
-
 def combineDicts(dict1: dict[any, any], dict2: dict[any, any]) -> dict[any, any]:
     """Combine dicts by unpacking both"""
     ## Combine dicts by unpacking both
