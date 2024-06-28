@@ -118,7 +118,6 @@ class ParameterMatching:
         convertedExpressions = {}
         
         for key, expr in parsedExpressions.items():
-            expr.makeCallable(argumentNames)
             convertedExpressions[key] = expr
 
         return convertedExpressions
