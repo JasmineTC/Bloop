@@ -20,12 +20,7 @@ class ParsedExpression:
         self.expression = parsedExpression["expression"]
         self.symbols = parsedExpression["symbols"]
 
-        try:
-            self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
-
-        except:
-            from pdb import set_trace
-            set_trace()
+        self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
 
     def __call__(self, functionArguments: list[float]) -> float:
         return eval(self.lambdaExpression, 
