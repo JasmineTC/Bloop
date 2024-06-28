@@ -135,13 +135,8 @@ class VeffParams:
         
         for matrix in self.scalarMassMatrices:
             numericalM = matrix(params)
+            eigenValue, vects = diagonalizeSymmetric( numericalM, self.diagonalizationAlgo)
 
-            try:
-                eigenValue, vects = diagonalizeSymmetric( numericalM, self.diagonalizationAlgo)
-
-            except:
-                from pdb import set_trace
-                set_trace()
             ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
             verbose = False
             if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
