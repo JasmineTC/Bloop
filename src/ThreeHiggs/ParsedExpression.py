@@ -12,20 +12,20 @@ EulerGamma = float(sympy.EulerGamma.evalf())
 Glaisher = 1.28242712910062
 
 class ParsedExpression:
-    def __init__(self, expression: str = None, bReplaceGreekSymbols=True):
-        expression = replaceGreekSymbols(expression) 
-        self.stringExpression = expression
+    def __init__(self, line, bReplaceGreekSymbols=True):
+        from ThreeHiggs.MathematicaParsers import parseExpression
+        parsedExpression = parseExpression(line)
 
-        if ("->" in expression):
-            lhs, rhs = map(str.strip, expression.split("->"))
+        self.identifier = parsedExpression["identifier"]
+        self.expression = parsedExpression["expression"]
+        self.symbols = parsedExpression["symbols"]
 
-            expression = rhs
-            self.identifier = lhs
+        try:
+            self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
 
-        self.stringExpression = expression
-        self.sympyExpression = parse_mathematica(expression)
-        self.symbols = self.sympyExpression.free_symbols
-        self.lambdaExpression = compile(str(self.sympyExpression), "<string>", mode = "eval")
+        except:
+            from pdb import set_trace
+            set_trace()
 
     def __call__(self, functionArguments: list[float]) -> float:
         return eval(self.lambdaExpression, 
