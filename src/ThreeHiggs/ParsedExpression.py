@@ -72,11 +72,6 @@ class ParsedExpression:
                 self.identifier = lhs
 
             self.stringExpression = expression
-
-            if not self.stringExpression:
-                from pdb import set_trace
-                set_trace()
-
             self.sympyExpression, self.symbols = self._parseMathematicaExpression(expression)
 
 
@@ -98,25 +93,12 @@ class ParsedExpression:
 
 
     def __call__(self, functionArguments: list[float]) -> float:
-        """This evaluates self.lambdaExpression with specified arguments.
-        Argument should be a list of numbers, in the order that matches 
-        the list originally given to makeCallable().
-        """
-
-        ## Unpack the list to make it work with our lambda
-        
-        try:
-            return eval(self.lambdaExpression, 
-                        functionArguments | {"log": log, 
-                                             "sqrt": sqrt, 
-                                             "pi": pi, 
-                                             "EulerGamma": EulerGamma,
-                                             "Glaisher": Glaisher})
-
-        except TypeError as err:
-            print(err)
-            from pdb import set_trace
-            set_trace()
+        return eval(self.lambdaExpression, 
+                    functionArguments | {"log": log, 
+                                         "sqrt": sqrt, 
+                                         "pi": pi, 
+                                         "EulerGamma": EulerGamma,
+                                         "Glaisher": Glaisher})
 
     def __str__(self) -> str:
         return self.identifier + " == " + self.stringExpression
@@ -131,14 +113,7 @@ class ParsedExpression:
         """
 
         sympyExpr = parse_mathematica(expression)
-        
-        if (bSubstituteConstants):
-            ## Do this here to prevent things like Glaisher from appearing in list of free symbols
-            sympyExpr = ParsedExpression._substNumericalConstants(sympyExpr)
-
-        ## find symbols in the expression
         symbols = sympyExpr.free_symbols
-
         return sympyExpr, symbols
 
 
