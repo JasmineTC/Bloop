@@ -1,5 +1,4 @@
 import numpy as np
-from numpy import pi, log, sqrt
 import sympy
 from sympy.parsing.mathematica import parse_mathematica
 
@@ -7,6 +6,14 @@ from typing import Callable, Tuple
 
 from .CommonUtils import replaceGreekSymbols
 
+pi = float(sympy.pi.evalf())
+EulerGamma = float(sympy.EulerGamma.evalf())
+Glaisher = 1.28242712910062
+def log(x):
+    return float(sympy.log(float(x)))
+
+def sqrt(x):
+    return float(sympy.sqrt(float(x)))
 
 class ParsedExpression:
     """ Class ParsedExpression
@@ -98,7 +105,18 @@ class ParsedExpression:
 
         ## Unpack the list to make it work with our lambda
         
-        return eval(self.lambdaExpression, functionArguments | {"log": log, "sqrt": sqrt, "pi": pi})
+        try:
+            return eval(self.lambdaExpression, 
+                        functionArguments | {"log": log, 
+                                             "sqrt": sqrt, 
+                                             "pi": pi, 
+                                             "EulerGamma": EulerGamma,
+                                             "Glaisher": Glaisher})
+
+        except TypeError as err:
+            print(err)
+            from pdb import set_trace
+            set_trace()
 
     def __str__(self) -> str:
         return self.identifier + " == " + self.stringExpression
@@ -136,8 +154,8 @@ class ParsedExpression:
         for s in argumentList:
             argumentSymbols.append(sympy.Symbol(s))
 
-        return compile(str(sympyExpression).replace("EulerGamma", "0.5772156649015329") \
-                                           .replace('Glaisher', "1.28242712910062"), "", mode = "eval")
+        from random import random
+        return compile(str(sympyExpression), "<string>", mode = "eval")
     
     @staticmethod
     def _substNumericalConstants(sympyExpression: sympy.Expr) -> sympy.Expr:
@@ -165,10 +183,6 @@ class ParsedExpressionSystem:
     def __init__(self, fileName: str = None):
         if (fileName):
             self.parseExpressions(fileName)
-
-        ## TODO should maybe check that all expressions use the same input ordering. Currently this is automatic, 
-        ## but things will go horribly wrong if the order ever changes by some reason
-
 
     def parseExpressions(self, fileName: str) -> Tuple:
         """Read system of expressions from file, one per line.
