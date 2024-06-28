@@ -46,7 +46,7 @@ class ParsedExpressionSystem:
         self.parsedExpressions = list(map(lambda line: ParsedExpression(line, bReplaceGreekSymbols=True),
                                           open(fileName, "r", encoding="utf-8").readlines()))
 
-    def evaluateSystemWithDict(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
+    def __call__(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
         """Optional argument is a hack
         """
         ## Collect inputs from the dict and put them in correct order. I do this by taking the right order from our first expression.
@@ -59,10 +59,6 @@ class ParsedExpressionSystem:
             return outList
         else:
             return  { self.parsedExpressions[i].identifier : outList[i] for i in np.arange(len(outList)) } 
-
-    def __call__(self, arguments: list[float]) -> Tuple:
-        """Just calls evaluateSystem()"""
-        return self.evaluateSystemWithDict(arguments)
 
     def getExpressionNames(self) -> list[str]:
         return [ expr.identifier for expr in self.parsedExpressions ]

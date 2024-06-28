@@ -107,8 +107,8 @@ class VeffParams:
             knownParamsDict[self.fieldNames[i]] = value
 
         ## Vectors
-        knownParamsDict |= self.vectorShorthands.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
-        vectorMasses = self.vectorMassesSquared.evaluateSystemWithDict(knownParamsDict, bReturnDict=True)
+        knownParamsDict |= self.vectorShorthands(knownParamsDict, bReturnDict=True)
+        vectorMasses = self.vectorMassesSquared(knownParamsDict, bReturnDict=True)
 
         if (self.bAbsoluteMsq):
             for key, val in vectorMasses.items():
@@ -133,7 +133,7 @@ class VeffParams:
         subMassMatrix = []
         
         for matrix in self.scalarMassMatrices:
-            numericalM = matrix.evaluateWithDict(params)
+            numericalM = matrix(params)
             eigenValue, vects = diagonalizeSymmetric( numericalM, self.diagonalizationAlgo)
             ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
             verbose = False
@@ -243,7 +243,7 @@ class EffectivePotential:
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
         paramDict = self.params.evaluateAll(fields, bNeedsDiagonalization=self.bNeedsDiagonalization)
 
-        return sum( self.expressions.evaluateSystemWithDict(paramDict) ) ## Sum because the result is a list of tree, 1loop etc 
+        return sum(self.expressions(paramDict)) ## Sum because the result is a list of tree, 1loop etc 
 
     def findLocalMinimum(self, initialGuess: list[float], algo) -> tuple[list[float], complex]:
 
