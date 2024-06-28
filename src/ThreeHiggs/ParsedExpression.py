@@ -78,4 +78,63 @@ class SystemOfEquations(ParsedExpressionSystem):
 
     def getEquations(self):
         return [expr.lambdaExpression for expr in self.parsedExpressions]
-        
+
+class ParsedMatrix:
+    def __init__(self, matrixFile, matrixElementDefinitionsFile = None):
+        """Need 2 files: the matrix is read from matrixFile, definitions for symbols in the matrix
+        are read from matrixElementDefinitionsFile.
+        If definitions are not given, this becomes a direct function of its symbolic matrix elements.
+        """
+        self.bHasExpressions = False
+        with open(matrixFile, 'r') as file:
+            lines = file.readlines()
+
+        ## Interpret the lines
+        matrixData = [[symbol.strip() for symbol in line.strip().lstrip('{').rstrip('}').split(',')] for line in lines]
+        self.sympyMatrix = sympy.Matrix(matrixData)
+        self.shape = self.sympyMatrix.shape
+
+class MassMatrix(ParsedMatrix):
+    def __init__(self, matrixFileName, definitionsFileName):
+        super().__init__(matrixFileName)
+        self.matrixElementExpressions = ParsedExpressionSystem(definitionsFileName)
+        self.argumentSymbols = self.matrixElementExpressions.getExpressionNames()
+        self.matrix = compile(str(self.sympyMatrix.tolist()), "", mode = "eval")
+
+    def __call__(self, arguments):
+        """Evaluates the matrix element expressions and puts them in a 2D np.ndarray.
+        The input dict needs to contain keys for all function arguments needed by the expressions. 
+        """
+        arguments |= self.matrixElementExpressions(arguments, bReturnDict = True)
+        return eval(self.matrix, arguments | {"log": log, 
+                                              "sqrt": sqrt, 
+                                              "pi": pi, 
+                                              "EulerGamma": EulerGamma,
+                                              "Glaisher": Glaisher})
+
+class RotationMatrix(ParsedMatrix):
+    def __init__(self, fileName):
+        super().__init__(fileName)
+        ## Make index map so that we know which symbol is which a_ij
+        self.argumentSymbols = [str(s) for s in self.sympyMatrix.free_symbols]
+        self.symbolMap: dict[str, Tuple[int, int]]  = {}
+        for i in range(self.sympyMatrix.shape[0]):
+            for j in range(self.sympyMatrix.shape[1]):
+                element = self.sympyMatrix[i, j]
+
+                if element.is_symbol:
+                    self.symbolMap[str(element)] = i, j
+
+    def matchSymbols(self, numericalMatrix: np.ndarray) -> dict[str, float]:
+        """Evaluates our symbols by plugging in numbers from the input numerical matrix.
+        Returns a dict with symbols names as keys.
+        """
+        assert numericalMatrix.shape == self.shape, "Matrix substitute error, shapes don't match!"
+
+        outDict = {}
+        for symbol in self.argumentSymbols:
+            idx = self.symbolMap[symbol]
+            outDict[symbol] = numericalMatrix[idx]
+
+        return outDict
+

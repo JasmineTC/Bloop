@@ -4,8 +4,7 @@ import tempfile # hacking
 from scipy import linalg
 from dataclasses import dataclass
 
-from .parsedmatrix import ParsedMatrix, MatrixDefinitionFiles
-from .ParsedExpression import ParsedExpressionSystem
+from .ParsedExpression import ParsedExpressionSystem, ParsedMatrix
 
 from .VeffMinimizer import VeffMinimizer
 
@@ -44,7 +43,6 @@ class VeffConfig:
     # Constant matrix transformation that brings the mass matrix into block diagonal form
     scalarPermutationMatrix: np.ndarray
     # Specify scalar mass matrices to diagonalize, can have many. The full mass matrix should be block diagonal in these (after the permutation transform)
-    scalarMassMatrices: list[MatrixDefinitionFiles]
     # Full rotation from unpermutated basis to diagonal basis
     scalarRotationMatrixFile: str
 
@@ -88,8 +86,11 @@ class VeffParams:
         ## can have many matrices if we've block-diagonalized already
         ## ASSUME: the blocks are given in order: upper left to lower right. 
         ##TODO improve this
-        self.scalarMassMatrices = [ParsedMatrix(matrix.matrixFile, matrix.expressionsFile) for matrix in scalarMassMatrices]
-        self.scalarRotationMatrix = ParsedMatrix(scalarRotationMatrixFile)
+        from ThreeHiggs.ParsedExpression import MassMatrix
+        self.scalarMassMatrices = [MassMatrix(matrix[0], matrix[1]) for matrix in scalarMassMatrices]
+
+        from ThreeHiggs.ParsedExpression import RotationMatrix
+        self.scalarRotationMatrix = RotationMatrix(scalarRotationMatrixFile)
 
     def setActionParams(self, inputParams: dict[str, float]) -> None:
         self.actionParams = inputParams
@@ -135,6 +136,7 @@ class VeffParams:
         for matrix in self.scalarMassMatrices:
             numericalM = matrix(params)
             eigenValue, vects = diagonalizeSymmetric( numericalM, self.diagonalizationAlgo)
+
             ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
             verbose = False
             if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
