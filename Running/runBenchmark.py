@@ -19,11 +19,6 @@ userinput = UserInput()
 args = userinput.parse()
 
 ## ---- Configure Veff
-veffFiles = [getResourcePath(args.loFile)]
-if (args.loopOrder >= 1):
-    veffFiles.append( getResourcePath(args.nloFile) )
-if (args.loopOrder >= 2):
-    veffFiles.append( getResourcePath(args.nnloFile) )
 
 hardToSoftFile = getResourcePath(args.hardToSoftFile)
 softScaleRGEFile = getResourcePath(args.softScaleRGEFile)
@@ -58,6 +53,14 @@ from ThreeHiggs.ParsedExpression import RotationMatrix
 scalarRotationMatrix = RotationMatrix(parseRotationMatrix(open(getResourcePath(args.scalarRotationFile), 
                                                                encoding = "utf-8").readlines())["matrix"])
 
+veffLines = open(getResourcePath(args.loFile), encoding = "utf-8").readlines()
+if (args.loopOrder >= 1):
+    veffLines += open(getResourcePath(args.nloFile), encoding = "utf-8").readlines()
+if (args.loopOrder >= 2):
+    veffLines += open(getResourcePath(args.nnloFile), encoding = "utf-8").readlines()
+
+veff = ParsedExpressionSystem(parseExpressionSystem(veffLines))
+
 from ThreeHiggs.EffectivePotential import EffectivePotential
 effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         True,
@@ -67,7 +70,7 @@ effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         scalarMassMatrices,
                                         scalarRotationMatrix,
                                         args.loopOrder,
-                                        veffFiles,
+                                        veff,
                                         args.minimizationAlgo, ## Set algorithm to use for Veff minimization
                                         args.DiagAlgo) ## Set algorithm for scalar mass diag to use
 

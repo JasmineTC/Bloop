@@ -190,7 +190,7 @@ class EffectivePotential:
                  scalerMassMatrices, 
                  scalarRotationMatrix,
                  loopOrder,
-                 veffFiles,
+                 veff,
                  minimizationAlgo,
                  diagonalizationAlgo):
         ## How many background fields do we depend on
@@ -208,20 +208,7 @@ class EffectivePotential:
         
         self.loopOrder = loopOrder
         self.minimizationAlgo = minimizationAlgo
-
-        ## HACK: combine these into one file so that ParsedExpressionSystem understand it
-        with tempfile.NamedTemporaryFile(mode='w', delete=False) as tempf:
-            for filename in veffFiles:
-                with open(filename, 'r') as f:
-                    content = f.read()
-                    tempf.write(content)
-                    tempf.write("\n")
-
-            ## close here because we need to re-open for parsing
-            tempf.close()
-            from ThreeHiggs.MathematicaParsers import parseExpressionSystem
-            self.expressions = ParsedExpressionSystem(parseExpressionSystem(open(tempf.name, encoding = 'utf-8').readlines()))
-
+        self.expressions = veff
         self.bNeedsDiagonalization = (self.loopOrder > 0)
         self.minimizer = VeffMinimizer(self.nbrFields) # currently the numVariables is not used by minimizer
 
