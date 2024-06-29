@@ -83,9 +83,8 @@ class MassMatrix:
                                               "Glaisher": Glaisher})
 
 class RotationMatrix:
-    def __init__(self, fileName):
-        from ThreeHiggs.MathematicaParsers import parseRotationMatrix
-        self.symbolMap = parseRotationMatrix(open(fileName, 'r', encoding = "utf-8").readlines())["matrix"]
+    def __init__(self, symbolMap):
+        self.symbolMap = symbolMap
 
     def __call__(self, numericalM):
         """Evaluates our symbols by plugging in numbers from the input numerical matrix.

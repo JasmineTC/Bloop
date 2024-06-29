@@ -74,7 +74,7 @@ class VeffParams:
                  vectorShorthandFile, 
                  scalarPermutationMatrix, 
                  scalarMassMatrices, 
-                 scalarRotationMatrixFile,
+                 scalarRotationMatrix,
                  diagonalizationAlgo):
         
         self.fieldNames = fieldNames
@@ -89,8 +89,7 @@ class VeffParams:
         from ThreeHiggs.ParsedExpression import MassMatrix
         self.scalarMassMatrices = [MassMatrix(matrix[0], matrix[1]) for matrix in scalarMassMatrices]
 
-        from ThreeHiggs.ParsedExpression import RotationMatrix
-        self.scalarRotationMatrix = RotationMatrix(scalarRotationMatrixFile)
+        self.scalarRotationMatrix = scalarRotationMatrix
 
     def setActionParams(self, inputParams: dict[str, float]) -> None:
         self.actionParams = inputParams
@@ -188,7 +187,7 @@ class EffectivePotential:
                  vectorShorthandFile, 
                  scalarPermutationMatrix, 
                  scalerMassMatrices, 
-                 scalarRotationMatrixFile,
+                 scalarRotationMatrix,
                  loopOrder,
                  veffFiles,
                  minimizationAlgo,
@@ -203,7 +202,7 @@ class EffectivePotential:
                                  vectorShorthandFile, 
                                  scalarPermutationMatrix, 
                                  scalerMassMatrices, 
-                                 scalarRotationMatrixFile,
+                                 scalarRotationMatrix,
                                  diagonalizationAlgo)
         
         self.loopOrder = loopOrder
@@ -223,7 +222,6 @@ class EffectivePotential:
 
         self.bNeedsDiagonalization = (self.loopOrder > 0)
         self.minimizer = VeffMinimizer(self.nbrFields) # currently the numVariables is not used by minimizer
-
 
     def setModelParameters(self, modelParameters: dict) -> None:
         """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate 
