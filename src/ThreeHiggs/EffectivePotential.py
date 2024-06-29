@@ -4,7 +4,7 @@ import tempfile # hacking
 from scipy import linalg
 from dataclasses import dataclass
 
-from .ParsedExpression import ParsedExpressionSystem, ParsedMatrix
+from .ParsedExpression import ParsedExpressionSystem
 
 from .VeffMinimizer import VeffMinimizer
 
@@ -160,7 +160,7 @@ class VeffParams:
 
         ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
         ## matrix element symbol in the Veff expressions. This is currently very hacky 
-        outDict = self.scalarRotationMatrix.matchSymbols(drAlgoRot)
+        outDict = self.scalarRotationMatrix(drAlgoRot)
 
         massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
 

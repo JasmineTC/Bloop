@@ -1,6 +1,5 @@
 import numpy as np
 import sympy
-from sympy.parsing.mathematica import parse_mathematica
 
 from typing import Callable, Tuple
 
@@ -74,27 +73,14 @@ class SystemOfEquations(ParsedExpressionSystem):
     def getEquations(self):
         return [expr.lambdaExpression for expr in self.parsedExpressions]
 
-class ParsedMatrix:
-    def __init__(self, matrixFile, matrixElementDefinitionsFile = None):
-        """Need 2 files: the matrix is read from matrixFile, definitions for symbols in the matrix
-        are read from matrixElementDefinitionsFile.
-        If definitions are not given, this becomes a direct function of its symbolic matrix elements.
-        """
-        self.bHasExpressions = False
-        with open(matrixFile, 'r') as file:
-            lines = file.readlines()
-
-        ## Interpret the lines
-        matrixData = [[symbol.strip() for symbol in line.strip().lstrip('{').rstrip('}').split(',')] for line in lines]
-        self.sympyMatrix = sympy.Matrix(matrixData)
-        self.shape = self.sympyMatrix.shape
-
-class MassMatrix(ParsedMatrix):
+class MassMatrix:
     def __init__(self, matrixFileName, definitionsFileName):
-        super().__init__(matrixFileName)
         self.matrixElementExpressions = ParsedExpressionSystem(definitionsFileName)
-        self.argumentSymbols = self.matrixElementExpressions.getExpressionNames()
-        self.matrix = compile(str(self.sympyMatrix.tolist()), "", mode = "eval")
+        
+        from ThreeHiggs.MathematicaParsers import parseMassMatrix
+        self.matrix = compile(str(parseMassMatrix(open(matrixFileName, 'r', encoding = "utf-8").readlines())),
+                              "",
+                              mode = "eval")
 
     def __call__(self, arguments):
         """Evaluates the matrix element expressions and puts them in a 2D np.ndarray.
@@ -107,29 +93,15 @@ class MassMatrix(ParsedMatrix):
                                               "EulerGamma": EulerGamma,
                                               "Glaisher": Glaisher})
 
-class RotationMatrix(ParsedMatrix):
+class RotationMatrix:
     def __init__(self, fileName):
-        super().__init__(fileName)
-        ## Make index map so that we know which symbol is which a_ij
-        self.argumentSymbols = [str(s) for s in self.sympyMatrix.free_symbols]
-        self.symbolMap: dict[str, Tuple[int, int]]  = {}
-        for i in range(self.sympyMatrix.shape[0]):
-            for j in range(self.sympyMatrix.shape[1]):
-                element = self.sympyMatrix[i, j]
+        from ThreeHiggs.MathematicaParsers import parseRotationMatrix
+        self.symbolMap = parseRotationMatrix(open(fileName, 'r', encoding = "utf-8").readlines())
 
-                if element.is_symbol:
-                    self.symbolMap[str(element)] = i, j
-
-    def matchSymbols(self, numericalMatrix: np.ndarray) -> dict[str, float]:
+    def __call__(self, numericalM):
         """Evaluates our symbols by plugging in numbers from the input numerical matrix.
         Returns a dict with symbols names as keys.
         """
-        assert numericalMatrix.shape == self.shape, "Matrix substitute error, shapes don't match!"
 
-        outDict = {}
-        for symbol in self.argumentSymbols:
-            idx = self.symbolMap[symbol]
-            outDict[symbol] = numericalMatrix[idx]
-
-        return outDict
+        return {symbol: numericalM[indices] for symbol, indices in self.symbolMap.items()}
 
