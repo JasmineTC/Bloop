@@ -1,13 +1,8 @@
 import numpy as np
-import sympy
-
-from typing import Callable, Tuple
-
-from .CommonUtils import replaceGreekSymbols
 
 from math import log, sqrt
-pi = float(sympy.pi.evalf())
-EulerGamma = float(sympy.EulerGamma.evalf())
+pi = np.pi
+EulerGamma = 0.5772156649015329
 Glaisher = 1.28242712910062
 
 class ParsedExpression:
