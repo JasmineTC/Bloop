@@ -45,7 +45,8 @@ class ParameterMatching:
         for line in expressions:
             lhs, rhs = map(str.strip, line.split("->"))
 
-            expr = ParsedExpression(rhs, bReplaceGreekSymbols=True)
+            from ThreeHiggs.MathematicaParsers import parseExpression
+            expr = ParsedExpression(parseExpression(rhs))
 
             ## Replace Greeks also on the LHS and store in dict as LHS : parsedRHS
             parsedExpressions[ replaceGreekSymbols(lhs) ] = expr

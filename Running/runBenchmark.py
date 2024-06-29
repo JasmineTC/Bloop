@@ -1,17 +1,5 @@
 import ThreeHiggs
 
-def parseConstantMatrix(lines):
-    symbols = [[symbol for symbol in line.rstrip()
-                                         .rstrip('}')
-                                         .lstrip('{')
-                                         .split(',')] for line in lines]
-
-    from sympy import Matrix
-    sympyMatrix = Matrix(symbols)
-
-    from numpy import array, float64
-    return array(sympyMatrix.tolist()).astype(float64)
-
 def getResourcePath(relativePathToResource: str) -> str:
     """ Gives a safe path to a packaged resource.
     
@@ -31,30 +19,58 @@ userinput = UserInput()
 args = userinput.parse()
 
 ## ---- Configure Veff
-veffFiles = [getResourcePath(args.loFile)]
-if (args.loopOrder >= 1):
-    veffFiles.append( getResourcePath(args.nloFile) )
-if (args.loopOrder >= 2):
-    veffFiles.append( getResourcePath(args.nnloFile) )
 
 hardToSoftFile = getResourcePath(args.hardToSoftFile)
 softScaleRGEFile = getResourcePath(args.softScaleRGEFile)
 softToUltrasoftFile = getResourcePath(args.softToUltraSoftFile)
 
+from ThreeHiggs.MathematicaParsers import parseExpressionSystem
+from ThreeHiggs.ParsedExpression import ParsedExpressionSystem
+vectorMassesSquared = ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.vectorMassesSquaredFile), 
+                                                                        encoding = "utf-8").readlines()))
+
+vectorShortHands = ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.vectorShortHandsFile), 
+                                                                     encoding = "utf-8").readlines()))
+
+from ThreeHiggs.MathematicaParsers import parseConstantMatrix
+scalarPermutationMatrix = parseConstantMatrix(open(getResourcePath(args.scalarPermutationFile), 
+                                                   encoding = "utf-8").readlines())["matrix"]
+
+
+from ThreeHiggs.MathematicaParsers import parseMassMatrix
+from ThreeHiggs.ParsedExpression import MassMatrix
+scalarMassMatrixUpperLeft = MassMatrix(parseMassMatrix(open(getResourcePath(args.scalarMassMatrixUpperLeftFile), encoding = "utf-8").readlines())["matrix"],
+                                       ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile),
+                                                                                         encoding = "utf-8").readlines())))
+
+scalarMassMatrixBottomRight = MassMatrix(parseMassMatrix(open(getResourcePath(args.scalarMassMatrixBottomRightFile), encoding = "utf-8").readlines())["matrix"],
+                                       ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile),
+                                                                                         encoding = "utf-8").readlines())))
+scalarMassMatrices = [scalarMassMatrixUpperLeft, scalarMassMatrixBottomRight]
+
+from ThreeHiggs.MathematicaParsers import parseRotationMatrix
+from ThreeHiggs.ParsedExpression import RotationMatrix
+scalarRotationMatrix = RotationMatrix(parseRotationMatrix(open(getResourcePath(args.scalarRotationFile), 
+                                                               encoding = "utf-8").readlines())["matrix"])
+
+veffLines = open(getResourcePath(args.loFile), encoding = "utf-8").readlines()
+if (args.loopOrder >= 1):
+    veffLines += open(getResourcePath(args.nloFile), encoding = "utf-8").readlines()
+if (args.loopOrder >= 2):
+    veffLines += open(getResourcePath(args.nnloFile), encoding = "utf-8").readlines()
+
+veff = ParsedExpressionSystem(parseExpressionSystem(veffLines))
+
 from ThreeHiggs.EffectivePotential import EffectivePotential
 effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         True,
-                                        getResourcePath(args.vectorsMassesSquaredFile),
-                                        getResourcePath(args.vectorsShortHandsFile),
-                                        parseConstantMatrix(open(getResourcePath(args.scalarPermutationFile), 
-                                                            encoding = "utf-8").readlines()),
-                                        [[getResourcePath(args.scalarMassMatrixUpperLeftFile),
-                                          getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile)],
-                                         [getResourcePath(args.scalarMassMatrixBottomRightFile),
-                                          getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile)]],
-                                        getResourcePath(args.scalarRotationFile),
+                                        vectorMassesSquared,
+                                        vectorShortHands,
+                                        scalarPermutationMatrix,
+                                        scalarMassMatrices,
+                                        scalarRotationMatrix,
                                         args.loopOrder,
-                                        veffFiles,
+                                        veff,
                                         args.minimizationAlgo, ## Set algorithm to use for Veff minimization
                                         args.DiagAlgo) ## Set algorithm for scalar mass diag to use
 

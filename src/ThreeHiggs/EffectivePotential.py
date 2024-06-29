@@ -4,7 +4,7 @@ import tempfile # hacking
 from scipy import linalg
 from dataclasses import dataclass
 
-from .ParsedExpression import ParsedExpressionSystem, ParsedMatrix
+from .ParsedExpression import ParsedExpressionSystem
 
 from .VeffMinimizer import VeffMinimizer
 
@@ -70,27 +70,27 @@ class VeffParams:
     def __init__(self, 
                  fieldNames, 
                  bAbsoluteMsq, 
-                 vectorMassFile, 
-                 vectorShorthandFile, 
+                 vectorMassesSquared, 
+                 vectorShortHands, 
                  scalarPermutationMatrix, 
                  scalarMassMatrices, 
-                 scalarRotationMatrixFile,
+                 scalarRotationMatrix,
                  diagonalizationAlgo):
         
         self.fieldNames = fieldNames
         self.bAbsoluteMsq = bAbsoluteMsq
         self.diagonalizationAlgo = diagonalizationAlgo
-        self.vectorMassesSquared = ParsedExpressionSystem(vectorMassFile)
-        self.vectorShorthands = ParsedExpressionSystem(vectorShorthandFile)
+
+        self.vectorMassesSquared = vectorMassesSquared
+        self.vectorShortHands = vectorShortHands
+
         self.scalarPermutationMatrix = scalarPermutationMatrix
         ## can have many matrices if we've block-diagonalized already
         ## ASSUME: the blocks are given in order: upper left to lower right. 
         ##TODO improve this
-        from ThreeHiggs.ParsedExpression import MassMatrix
-        self.scalarMassMatrices = [MassMatrix(matrix[0], matrix[1]) for matrix in scalarMassMatrices]
+        self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
 
-        from ThreeHiggs.ParsedExpression import RotationMatrix
-        self.scalarRotationMatrix = RotationMatrix(scalarRotationMatrixFile)
+        self.scalarRotationMatrix = scalarRotationMatrix
 
     def setActionParams(self, inputParams: dict[str, float]) -> None:
         self.actionParams = inputParams
@@ -108,7 +108,7 @@ class VeffParams:
             knownParamsDict[self.fieldNames[i]] = value
 
         ## Vectors
-        knownParamsDict |= self.vectorShorthands(knownParamsDict, bReturnDict=True)
+        knownParamsDict |= self.vectorShortHands(knownParamsDict, bReturnDict=True)
         vectorMasses = self.vectorMassesSquared(knownParamsDict, bReturnDict=True)
 
         if (self.bAbsoluteMsq):
@@ -160,7 +160,7 @@ class VeffParams:
 
         ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
         ## matrix element symbol in the Veff expressions. This is currently very hacky 
-        outDict = self.scalarRotationMatrix.matchSymbols(drAlgoRot)
+        outDict = self.scalarRotationMatrix(drAlgoRot)
 
         massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
 
@@ -184,13 +184,13 @@ class EffectivePotential:
     def __init__(self,
                  fieldNames, 
                  bAbsoluteMsq, 
-                 vectorMassFile, 
-                 vectorShorthandFile, 
+                 vectorMassesSquared, 
+                 vectorShorthands, 
                  scalarPermutationMatrix, 
                  scalerMassMatrices, 
-                 scalarRotationMatrixFile,
+                 scalarRotationMatrix,
                  loopOrder,
-                 veffFiles,
+                 veff,
                  minimizationAlgo,
                  diagonalizationAlgo):
         ## How many background fields do we depend on
@@ -199,31 +199,18 @@ class EffectivePotential:
 
         self.params = VeffParams(fieldNames, 
                                  bAbsoluteMsq, 
-                                 vectorMassFile, 
-                                 vectorShorthandFile, 
+                                 vectorMassesSquared, 
+                                 vectorShorthands, 
                                  scalarPermutationMatrix, 
                                  scalerMassMatrices, 
-                                 scalarRotationMatrixFile,
+                                 scalarRotationMatrix,
                                  diagonalizationAlgo)
         
         self.loopOrder = loopOrder
         self.minimizationAlgo = minimizationAlgo
-
-        ## HACK: combine these into one file so that ParsedExpressionSystem understand it
-        with tempfile.NamedTemporaryFile(mode='w', delete=False) as tempf:
-            for filename in veffFiles:
-                with open(filename, 'r') as f:
-                    content = f.read()
-                    tempf.write(content)
-                    tempf.write("\n")
-
-            ## close here because we need to re-open for parsing
-            tempf.close()
-            self.expressions = ParsedExpressionSystem(tempf.name)
-
+        self.expressions = veff
         self.bNeedsDiagonalization = (self.loopOrder > 0)
         self.minimizer = VeffMinimizer(self.nbrFields) # currently the numVariables is not used by minimizer
-
 
     def setModelParameters(self, modelParameters: dict) -> None:
         """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate 
