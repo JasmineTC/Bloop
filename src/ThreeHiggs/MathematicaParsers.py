@@ -7,18 +7,18 @@ def parseExpression(line):
     from sympy.parsing.mathematica import parse_mathematica
     from .CommonUtils import replaceGreekSymbols
     expression = parse_mathematica(replaceGreekSymbols(line))
-    symbols = list(expression.free_symbols)
+    symbols = [str(symbol) for symbol in expression.free_symbols]
 
-    return {"identifier": identifier, "expression": str(expression), "symbols": symbols}
+    return {"identifier": identifier, "expression": str(expression), "symbols": sorted(symbols)}
 
 def parseExpressionSystem(lines):
     return [parseExpression(line) for line in lines]
 
 def parseMatrix(lines):
-    return [[symbol for symbol in line.rstrip()
-                                      .rstrip('}')
-                                      .lstrip('{')
-                                      .split(',')] for line in lines]
+    return [[symbol.strip() for symbol in line.strip()
+                                              .strip('}')
+                                              .strip('{')
+                                              .split(',')] for line in lines]
 
 def parseConstantMatrix(lines):
     matrix = parseMatrix(lines)
