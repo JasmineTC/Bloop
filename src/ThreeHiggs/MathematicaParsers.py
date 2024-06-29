@@ -18,19 +18,17 @@ def parseMatrix(lines):
                                       .split(',')] for line in lines]
 
 def parseConstantMatrix(lines):
-    symbols = parseMatrix(lines)
+    matrix = parseMatrix(lines)
 
     from sympy import Matrix
-    sympyMatrix = Matrix(symbols)
+    sympyMatrix = Matrix(matrix)
 
     from numpy import array, float64
-    return array(sympyMatrix.tolist()).astype(float64)
+    return {"matrix": array(sympyMatrix.tolist()).astype(float64).tolist()}
 
 def parseMassMatrix(lines):
     from sympy import Matrix
-    sympyMatrix = Matrix(parseMatrix(lines))
-
-    return str(sympyMatrix.tolist())
+    return {"matrix": str(Matrix(parseMatrix(lines)).tolist())}
 
 def parseRotationMatrix(lines):
     from sympy import Matrix
@@ -45,5 +43,5 @@ def parseRotationMatrix(lines):
             if element.is_symbol:
                 symbolMap[str(sympyMatrix[i, j])] = i, j
 
-    return symbolMap
+    return {"matrix": symbolMap}
 

@@ -62,15 +62,12 @@ class SystemOfEquations(ParsedExpressionSystem):
         ## "known" inputs
         self.otherVariables = filteredArguments
 
-    def getEquations(self):
-        return [expr.lambdaExpression for expr in self.parsedExpressions]
-
 class MassMatrix:
     def __init__(self, matrixFileName, definitionsFileName):
         self.matrixElementExpressions = ParsedExpressionSystem(definitionsFileName)
         
         from ThreeHiggs.MathematicaParsers import parseMassMatrix
-        self.matrix = compile(str(parseMassMatrix(open(matrixFileName, 'r', encoding = "utf-8").readlines())),
+        self.matrix = compile(str(parseMassMatrix(open(matrixFileName, 'r', encoding = "utf-8").readlines())["matrix"]),
                               "",
                               mode = "eval")
 
@@ -88,7 +85,7 @@ class MassMatrix:
 class RotationMatrix:
     def __init__(self, fileName):
         from ThreeHiggs.MathematicaParsers import parseRotationMatrix
-        self.symbolMap = parseRotationMatrix(open(fileName, 'r', encoding = "utf-8").readlines())
+        self.symbolMap = parseRotationMatrix(open(fileName, 'r', encoding = "utf-8").readlines())["matrix"]
 
     def __call__(self, numericalM):
         """Evaluates our symbols by plugging in numbers from the input numerical matrix.
