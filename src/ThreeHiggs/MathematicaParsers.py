@@ -11,6 +11,9 @@ def parseExpression(line):
 
     return {"identifier": identifier, "expression": str(expression), "symbols": symbols}
 
+def parseExpressionSystem(lines):
+    return [parseExpression(line) for line in lines]
+
 def parseMatrix(lines):
     return [[symbol for symbol in line.rstrip()
                                       .rstrip('}')

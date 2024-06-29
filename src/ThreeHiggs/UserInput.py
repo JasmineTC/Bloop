@@ -56,15 +56,15 @@ class UserInput(argparse.ArgumentParser):
                           default = "Data/EffectivePotential_threeFields/Veff_NNLO.txt",
                           dest = 'nnloFile')
 
-        self.add_argument('--vectorsMassesSquaredFile', 
+        self.add_argument('--vectorMassesSquaredFile', 
                           action = 'store', 
                           default = "Data/EffectivePotential_threeFields/vectorMasses.txt",
-                          dest = 'vectorsMassesSquaredFile')
+                          dest = 'vectorMassesSquaredFile')
 
-        self.add_argument('--vectorsShortHandsFile', 
+        self.add_argument('--vectorShortHandsFile', 
                           action = 'store', 
                           default = "Data/EffectivePotential_threeFields/vectorShorthands.txt",
-                          dest = 'vectorsShortHandsFile')
+                          dest = 'vectorShortHandsFile')
 
         self.add_argument('--hardToSoftFile', 
                           action = 'store', 

@@ -29,19 +29,34 @@ hardToSoftFile = getResourcePath(args.hardToSoftFile)
 softScaleRGEFile = getResourcePath(args.softScaleRGEFile)
 softToUltrasoftFile = getResourcePath(args.softToUltraSoftFile)
 
-from ThreeHiggs.EffectivePotential import EffectivePotential
+from ThreeHiggs.MathematicaParsers import parseExpressionSystem
+from ThreeHiggs.ParsedExpression import ParsedExpressionSystem
+vectorMassesSquared = ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.vectorMassesSquaredFile), 
+                                                                        encoding = "utf-8").readlines()))
+
+vectorShortHands = ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.vectorShortHandsFile), 
+                                                                     encoding = "utf-8").readlines()))
+
+from ThreeHiggs.MathematicaParsers import parseRotationMatrix
+from ThreeHiggs.ParsedExpression import RotationMatrix
+scalarRotationMatrix = RotationMatrix(parseRotationMatrix(open(getResourcePath(args.scalarRotationFile), 
+                                                               encoding = "utf-8").readlines())["matrix"])
+
 from ThreeHiggs.MathematicaParsers import parseConstantMatrix
+scalarPermutationMatrix = parseConstantMatrix(open(getResourcePath(args.scalarPermutationFile), 
+                                                   encoding = "utf-8").readlines())["matrix"]
+
+from ThreeHiggs.EffectivePotential import EffectivePotential
 effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         True,
-                                        getResourcePath(args.vectorsMassesSquaredFile),
-                                        getResourcePath(args.vectorsShortHandsFile),
-                                        parseConstantMatrix(open(getResourcePath(args.scalarPermutationFile), 
-                                                            encoding = "utf-8").readlines())["matrix"],
+                                        vectorMassesSquared,
+                                        vectorShortHands,
+                                        scalarPermutationMatrix,
                                         [[getResourcePath(args.scalarMassMatrixUpperLeftFile),
                                           getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile)],
                                          [getResourcePath(args.scalarMassMatrixBottomRightFile),
                                           getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile)]],
-                                        getResourcePath(args.scalarRotationFile),
+                                        scalarRotationMatrix,
                                         args.loopOrder,
                                         veffFiles,
                                         args.minimizationAlgo, ## Set algorithm to use for Veff minimization

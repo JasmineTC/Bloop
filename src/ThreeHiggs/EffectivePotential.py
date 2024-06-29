@@ -70,8 +70,8 @@ class VeffParams:
     def __init__(self, 
                  fieldNames, 
                  bAbsoluteMsq, 
-                 vectorMassFile, 
-                 vectorShorthandFile, 
+                 vectorMassesSquared, 
+                 vectorShortHands, 
                  scalarPermutationMatrix, 
                  scalarMassMatrices, 
                  scalarRotationMatrix,
@@ -80,14 +80,15 @@ class VeffParams:
         self.fieldNames = fieldNames
         self.bAbsoluteMsq = bAbsoluteMsq
         self.diagonalizationAlgo = diagonalizationAlgo
-        self.vectorMassesSquared = ParsedExpressionSystem(vectorMassFile)
-        self.vectorShorthands = ParsedExpressionSystem(vectorShorthandFile)
+
+        self.vectorMassesSquared = vectorMassesSquared
+        self.vectorShortHands = vectorShortHands
+
         self.scalarPermutationMatrix = scalarPermutationMatrix
         ## can have many matrices if we've block-diagonalized already
         ## ASSUME: the blocks are given in order: upper left to lower right. 
         ##TODO improve this
-        from ThreeHiggs.ParsedExpression import MassMatrix
-        self.scalarMassMatrices = [MassMatrix(matrix[0], matrix[1]) for matrix in scalarMassMatrices]
+        self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
 
         self.scalarRotationMatrix = scalarRotationMatrix
 
@@ -183,8 +184,8 @@ class EffectivePotential:
     def __init__(self,
                  fieldNames, 
                  bAbsoluteMsq, 
-                 vectorMassFile, 
-                 vectorShorthandFile, 
+                 vectorMassesSquared, 
+                 vectorShorthands, 
                  scalarPermutationMatrix, 
                  scalerMassMatrices, 
                  scalarRotationMatrix,
@@ -198,8 +199,8 @@ class EffectivePotential:
 
         self.params = VeffParams(fieldNames, 
                                  bAbsoluteMsq, 
-                                 vectorMassFile, 
-                                 vectorShorthandFile, 
+                                 vectorMassesSquared, 
+                                 vectorShorthands, 
                                  scalarPermutationMatrix, 
                                  scalerMassMatrices, 
                                  scalarRotationMatrix,

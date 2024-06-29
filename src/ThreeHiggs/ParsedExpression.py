@@ -3,10 +3,7 @@ EulerGamma = 0.5772156649015329
 Glaisher = 1.28242712910062
 
 class ParsedExpression:
-    def __init__(self, line, bReplaceGreekSymbols=True):
-        from ThreeHiggs.MathematicaParsers import parseExpression
-        parsedExpression = parseExpression(line)
-
+    def __init__(self, parsedExpression):
         self.identifier = parsedExpression["identifier"]
         self.expression = parsedExpression["expression"]
         self.symbols = parsedExpression["symbols"]
@@ -24,9 +21,9 @@ class ParsedExpression:
 """ class ParsedExpressionSystem -- Describes a collection of ParsedExpressions that are to be evaluated simultaneously with same input.
 """
 class ParsedExpressionSystem:
-    def __init__(self, fileName = None):
-        self.parsedExpressions = list(map(lambda line: ParsedExpression(line, bReplaceGreekSymbols=True),
-                                          open(fileName, "r", encoding="utf-8").readlines()))
+    def __init__(self, parsedExpressionSystem):
+        self.parsedExpressions = [ParsedExpression(parsedExpression) 
+                                  for parsedExpression in parsedExpressionSystem]
 
     def __call__(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
         """Optional argument is a hack
