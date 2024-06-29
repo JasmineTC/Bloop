@@ -77,7 +77,7 @@ class MassMatrix:
 
 class RotationMatrix:
     def __init__(self, symbolMap):
-        self.symbolMap = symbolMap
+        self.symbolMap = symbolMap["matrix"]
 
     def __call__(self, numericalM):
         """Evaluates our symbols by plugging in numbers from the input numerical matrix.

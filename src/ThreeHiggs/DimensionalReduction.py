@@ -18,11 +18,11 @@ class DimensionalReduction():
         self.bDoUltrasoftScaleRGE = False
 
 
-    def setupHardToSoftMatching(self, hardToSoftFile: str, softScaleRGEFile: str = None) -> None:
-        """softScaleRGEFile specifies where RGEs are loaded from. If left to None, 
+    def setupHardToSoftMatching(self, hardToSoftLines, softScaleRGELines = None):
+        """softScaleRGELines specifies where RGEs are loaded from. If left to None, 
         will not perform RG running at soft scale."""
 
-        self.matchToSoft.createMatchingRelations(hardToSoftFile)
+        self.matchToSoft.createMatchingRelations(hardToSoftLines)
         #self.matchToSoft.matchingRelations = self.__remove3dSuffices(self.matchToSoft.matchingRelations)
 
         print("Setup Hard -> Soft matching relations.")
@@ -32,17 +32,17 @@ class DimensionalReduction():
         print( list(self.matchToSoft.matchingRelations.keys()) )
         print("")
 
-        if (softScaleRGEFile):
+        if (softScaleRGELines):
             self.bDoSoftScaleRGE = True
             self.softScaleRGE = ParameterMatching()
-            self.softScaleRGE.createMatchingRelations(softScaleRGEFile)
+            self.softScaleRGE.createMatchingRelations(softScaleRGELines)
             #self.softScaleRGE.matchingRelations = self.__remove3dSuffices(self.softScaleRGE.matchingRelations)
 
 
-    def setupSoftToUltrasoftMatching(self, softToUltrasoftFile: str, ultrasoftScaleRGEFile: str = None) -> None:
+    def setupSoftToUltrasoftMatching(self, softToUltrasoftLines, ultrasoftScaleRGELines = None):
         
         ## At US scale let's remove the 3d and US suffices from resulting params. That way they work with directly Veff
-        self.matchToUltrasoft.createMatchingRelations(softToUltrasoftFile)
+        self.matchToUltrasoft.createMatchingRelations(softToUltrasoftLines)
         self.matchToUltrasoft.matchingRelations = self.__remove3dSuffices(self.matchToUltrasoft.matchingRelations, bRemoveSuffixUS=True)
 
         print("Setup Soft -> Ultrasoft matching relations.")
