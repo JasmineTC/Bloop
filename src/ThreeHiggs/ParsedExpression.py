@@ -1,7 +1,4 @@
-import numpy as np
-
-from math import log, sqrt
-pi = np.pi
+from math import pi, log, sqrt
 EulerGamma = 0.5772156649015329
 Glaisher = 1.28242712910062
 
@@ -37,13 +34,13 @@ class ParsedExpressionSystem:
         ## Collect inputs from the dict and put them in correct order. I do this by taking the right order from our first expression.
         ## This is fine since all our expressions use the same input list. 
         outList = [None] * len(self.parsedExpressions)
-        for i in np.arange(len(outList)):
+        for i in range(len(outList)):
             outList[i] = self.parsedExpressions[i](inputDict)
 
         if not bReturnDict:
             return outList
         else:
-            return  { self.parsedExpressions[i].identifier : outList[i] for i in np.arange(len(outList)) } 
+            return  { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) } 
 
     def getExpressionNames(self) -> list[str]:
         return [ expr.identifier for expr in self.parsedExpressions ]
