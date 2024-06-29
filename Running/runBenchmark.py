@@ -1,6 +1,6 @@
 import ThreeHiggs
 
-def getResourcePath(relativePathToResource: str) -> str:
+def getResourcePath(relativePathToResource):
     """ Gives a safe path to a packaged resource.
     
     Returns
@@ -8,11 +8,15 @@ def getResourcePath(relativePathToResource: str) -> str:
     Path to the resource file: str.
     """
 
+
+def getLines(relativePathToResource):
     ## fallback to hardcoded package name if the __package__ call fails
     packageName = __package__ or "ThreeHiggs"
 
     from importlib.resources import files
-    return files(packageName) / relativePathToResource
+    path = files(packageName) / relativePathToResource
+
+    return open(path, encoding = "utf-8").readlines()
 
 from ThreeHiggs.UserInput import UserInput
 userinput = UserInput()
@@ -20,44 +24,37 @@ args = userinput.parse()
 
 ## ---- Configure Veff
 
-hardToSoftFile = getResourcePath(args.hardToSoftFile)
-softScaleRGEFile = getResourcePath(args.softScaleRGEFile)
-softToUltrasoftFile = getResourcePath(args.softToUltraSoftFile)
+hardToSoftFile = getLines(args.hardToSoftFile)
+softScaleRGEFile = getLines(args.softScaleRGEFile)
+softToUltrasoftFile = getLines(args.softToUltraSoftFile)
 
 from ThreeHiggs.MathematicaParsers import parseExpressionSystem
 from ThreeHiggs.ParsedExpression import ParsedExpressionSystem
-vectorMassesSquared = ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.vectorMassesSquaredFile), 
-                                                                        encoding = "utf-8").readlines()))
-
-vectorShortHands = ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.vectorShortHandsFile), 
-                                                                     encoding = "utf-8").readlines()))
+vectorMassesSquared = ParsedExpressionSystem(parseExpressionSystem(getLines(args.vectorMassesSquaredFile)))
+vectorShortHands = ParsedExpressionSystem(parseExpressionSystem(getLines(args.vectorShortHandsFile)))
 
 from ThreeHiggs.MathematicaParsers import parseConstantMatrix
-scalarPermutationMatrix = parseConstantMatrix(open(getResourcePath(args.scalarPermutationFile), 
-                                                   encoding = "utf-8").readlines())["matrix"]
-
+scalarPermutationMatrix = parseConstantMatrix(getLines(args.scalarPermutationFile))["matrix"]
 
 from ThreeHiggs.MathematicaParsers import parseMassMatrix
 from ThreeHiggs.ParsedExpression import MassMatrix
-scalarMassMatrixUpperLeft = MassMatrix(parseMassMatrix(open(getResourcePath(args.scalarMassMatrixUpperLeftFile), encoding = "utf-8").readlines())["matrix"],
-                                       ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile),
-                                                                                         encoding = "utf-8").readlines())))
+scalarMassMatrixUpperLeft = MassMatrix(parseMassMatrix(getLines(args.scalarMassMatrixUpperLeftFile))["matrix"],
+                                       ParsedExpressionSystem(parseExpressionSystem(getLines(args.scalarMassMatrixUpperLeftDefinitionsFile))))
 
-scalarMassMatrixBottomRight = MassMatrix(parseMassMatrix(open(getResourcePath(args.scalarMassMatrixBottomRightFile), encoding = "utf-8").readlines())["matrix"],
-                                       ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile),
-                                                                                         encoding = "utf-8").readlines())))
+scalarMassMatrixBottomRight = MassMatrix(parseMassMatrix(getLines(args.scalarMassMatrixBottomRightFile))["matrix"],
+                                         ParsedExpressionSystem(parseExpressionSystem(getLines(args.scalarMassMatrixBottomRightDefinitionsFile))))
+
 scalarMassMatrices = [scalarMassMatrixUpperLeft, scalarMassMatrixBottomRight]
 
 from ThreeHiggs.MathematicaParsers import parseRotationMatrix
 from ThreeHiggs.ParsedExpression import RotationMatrix
-scalarRotationMatrix = RotationMatrix(parseRotationMatrix(open(getResourcePath(args.scalarRotationFile), 
-                                                               encoding = "utf-8").readlines())["matrix"])
+scalarRotationMatrix = RotationMatrix(parseRotationMatrix(getLines(args.scalarRotationFile)))
 
-veffLines = open(getResourcePath(args.loFile), encoding = "utf-8").readlines()
+veffLines = getLines(args.loFile)
 if (args.loopOrder >= 1):
-    veffLines += open(getResourcePath(args.nloFile), encoding = "utf-8").readlines()
+    veffLines += getLines(args.nloFile)
 if (args.loopOrder >= 2):
-    veffLines += open(getResourcePath(args.nnloFile), encoding = "utf-8").readlines()
+    veffLines += getLines(args.nnloFile)
 
 veff = ParsedExpressionSystem(parseExpressionSystem(veffLines))
 

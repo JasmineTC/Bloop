@@ -33,16 +33,12 @@ class ParameterMatching:
     def createMatchingRelations(self, fileToRead):
         self.parameterNames, self.matchingRelations = self.parseMatchingRelations(fileToRead)
 
-    def parseMatchingRelations(self, filePath: str) -> Tuple[list[str], dict[str, ParsedExpression]]:
-
-        with open(filePath, "r", encoding="utf-8") as file:
-            expressions = file.readlines()
-
+    def parseMatchingRelations(self, lines):
         ## Dict for storing ParsedExpression objects
         parsedExpressions = {}
         parsedSymbols = [] ## Automatically find all symbols that appear in matching relations
 
-        for line in expressions:
+        for line in lines:
             lhs, rhs = map(str.strip, line.split("->"))
 
             from ThreeHiggs.MathematicaParsers import parseExpression
