@@ -60,13 +60,9 @@ class SystemOfEquations(ParsedExpressionSystem):
         self.otherVariables = filteredArguments
 
 class MassMatrix:
-    def __init__(self, matrixFileName, definitionsFileName):
-        self.matrixElementExpressions = ParsedExpressionSystem(definitionsFileName)
-        
-        from ThreeHiggs.MathematicaParsers import parseMassMatrix
-        self.matrix = compile(str(parseMassMatrix(open(matrixFileName, 'r', encoding = "utf-8").readlines())["matrix"]),
-                              "",
-                              mode = "eval")
+    def __init__(self, matrix, definitions):
+        self.matrixElementExpressions = definitions
+        self.matrix = matrix 
 
     def __call__(self, arguments):
         """Evaluates the matrix element expressions and puts them in a 2D np.ndarray.
