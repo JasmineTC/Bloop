@@ -37,14 +37,26 @@ vectorMassesSquared = ParsedExpressionSystem(parseExpressionSystem(open(getResou
 vectorShortHands = ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.vectorShortHandsFile), 
                                                                      encoding = "utf-8").readlines()))
 
+from ThreeHiggs.MathematicaParsers import parseConstantMatrix
+scalarPermutationMatrix = parseConstantMatrix(open(getResourcePath(args.scalarPermutationFile), 
+                                                   encoding = "utf-8").readlines())["matrix"]
+
+
+from ThreeHiggs.MathematicaParsers import parseMassMatrix
+from ThreeHiggs.ParsedExpression import MassMatrix
+scalarMassMatrixUpperLeft = MassMatrix(parseMassMatrix(open(getResourcePath(args.scalarMassMatrixUpperLeftFile), encoding = "utf-8").readlines())["matrix"],
+                                       ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile),
+                                                                                         encoding = "utf-8").readlines())))
+
+scalarMassMatrixBottomRight = MassMatrix(parseMassMatrix(open(getResourcePath(args.scalarMassMatrixBottomRightFile), encoding = "utf-8").readlines())["matrix"],
+                                       ParsedExpressionSystem(parseExpressionSystem(open(getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile),
+                                                                                         encoding = "utf-8").readlines())))
+scalarMassMatrices = [scalarMassMatrixUpperLeft, scalarMassMatrixBottomRight]
+
 from ThreeHiggs.MathematicaParsers import parseRotationMatrix
 from ThreeHiggs.ParsedExpression import RotationMatrix
 scalarRotationMatrix = RotationMatrix(parseRotationMatrix(open(getResourcePath(args.scalarRotationFile), 
                                                                encoding = "utf-8").readlines())["matrix"])
-
-from ThreeHiggs.MathematicaParsers import parseConstantMatrix
-scalarPermutationMatrix = parseConstantMatrix(open(getResourcePath(args.scalarPermutationFile), 
-                                                   encoding = "utf-8").readlines())["matrix"]
 
 from ThreeHiggs.EffectivePotential import EffectivePotential
 effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
@@ -52,10 +64,7 @@ effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                         vectorMassesSquared,
                                         vectorShortHands,
                                         scalarPermutationMatrix,
-                                        [[getResourcePath(args.scalarMassMatrixUpperLeftFile),
-                                          getResourcePath(args.scalarMassMatrixUpperLeftDefinitionsFile)],
-                                         [getResourcePath(args.scalarMassMatrixBottomRightFile),
-                                          getResourcePath(args.scalarMassMatrixBottomRightDefinitionsFile)]],
+                                        scalarMassMatrices,
                                         scalarRotationMatrix,
                                         args.loopOrder,
                                         veffFiles,

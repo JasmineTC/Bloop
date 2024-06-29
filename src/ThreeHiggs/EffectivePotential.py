@@ -108,7 +108,7 @@ class VeffParams:
             knownParamsDict[self.fieldNames[i]] = value
 
         ## Vectors
-        knownParamsDict |= self.vectorShorthands(knownParamsDict, bReturnDict=True)
+        knownParamsDict |= self.vectorShortHands(knownParamsDict, bReturnDict=True)
         vectorMasses = self.vectorMassesSquared(knownParamsDict, bReturnDict=True)
 
         if (self.bAbsoluteMsq):
@@ -219,7 +219,8 @@ class EffectivePotential:
 
             ## close here because we need to re-open for parsing
             tempf.close()
-            self.expressions = ParsedExpressionSystem(tempf.name)
+            from ThreeHiggs.MathematicaParsers import parseExpressionSystem
+            self.expressions = ParsedExpressionSystem(parseExpressionSystem(open(tempf.name, encoding = 'utf-8').readlines()))
 
         self.bNeedsDiagonalization = (self.loopOrder > 0)
         self.minimizer = VeffMinimizer(self.nbrFields) # currently the numVariables is not used by minimizer
