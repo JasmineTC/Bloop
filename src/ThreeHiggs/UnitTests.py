@@ -1,5 +1,4 @@
 from unittest import TestCase
-from unittest import main
 
 class MathematicaParsersTestCase(TestCase):
     def test_parseExpression(self):
@@ -59,5 +58,6 @@ class MathematicaParsersTestCase(TestCase):
         self.assertEqual(reference, parseRotationMatrix(source))
 
 if __name__ == "__main__":
+    from unittest import main
     main()
 
