@@ -84,5 +84,5 @@ class RotationMatrix:
         Returns a dict with symbols names as keys.
         """
 
-        return {symbol: numericalM[indices] for symbol, indices in self.symbolMap.items()}
+        return {symbol: numericalM[indices[0]][indices[1]] for symbol, indices in self.symbolMap.items()}
 

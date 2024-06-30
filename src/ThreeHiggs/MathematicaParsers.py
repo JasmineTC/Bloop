@@ -44,7 +44,7 @@ def parseRotationMatrix(lines):
             element = sympyMatrix[i, j]
 
             if element.is_symbol:
-                symbolMap[str(sympyMatrix[i, j])] = i, j
+                symbolMap[str(sympyMatrix[i, j])] = [i, j]
 
     return {"matrix": symbolMap}
 
@@ -100,7 +100,7 @@ class UnitTests(TestCase):
         self.assertEqual(reference, parseMassMatrix(source))
 
     def test_parseRotationMatrix(self):
-        reference = {"matrix": {"mssq00": (0, 0), "mssq11": (1, 1)}}
+        reference = {"matrix": {"mssq00": [0, 0], "mssq11": [1, 1]}}
         source = ["{mssq00, 0}", "{0, mssq11}"]
 
         from ThreeHiggs.MathematicaParsers import parseRotationMatrix
