@@ -15,7 +15,7 @@ args = userinput.parse()
 
 from ThreeHiggs.UserInput import Stages
 if args.firstStage <= Stages.convertMathematica <= args.lastStage:
-    with open(f"{args.resultsDirectory}/parsedExpressions.json", "w") as parsedExpressionsFile:
+    with open(args.parsedExpressionsFile, "w") as parsedExpressionsFile:
         veffLines = getLines(args.loFile)
         if (args.loopOrder >= 1):
             veffLines += getLines(args.nloFile)
@@ -42,7 +42,7 @@ if args.firstStage <= Stages.convertMathematica <= args.lastStage:
              indent = 4)
 
 if args.firstStage <= Stages.minimization <= args.lastStage:
-    with open(f"{args.resultsDirectory}/parsedExpressions.json", "r") as parsedExpressionsFile:
+    with open(args.parsedExpressionsFile, "r") as parsedExpressionsFile:
         from json import load
         parsedExpressions = load(parsedExpressionsFile)
         
