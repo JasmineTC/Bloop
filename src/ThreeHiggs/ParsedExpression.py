@@ -86,3 +86,42 @@ class RotationMatrix:
 
         return {symbol: numericalM[indices[0]][indices[1]] for symbol, indices in self.symbolMap.items()}
 
+from unittest import TestCase
+class ParsedExpressionUnitTests(TestCase):
+    def test_ParsedExpression(self):
+        source = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+                  "identifier": "Identifier",
+                  "symbols": ['lam', 'mssq']}
+
+        reference = 5.400944901447568
+
+        self.assertEqual(reference, ParsedExpression(source)({"lam": 100, "mssq": 100}))
+
+    def test_ParsedExpressionSystem(self):
+        source = [{"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+                   "identifier": "Identifier",
+                   "symbols": ['lam', 'mssq']},
+                  {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+                   "identifier": "Identifier",
+                   "symbols": ['lam', 'mssq']},
+                  {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+                   "identifier": "Identifier",
+                   "symbols": ['lam', 'mssq']}]
+
+        reference = [5.400944901447568, 5.400944901447568, 5.400944901447568]
+
+        self.assertEqual(reference, ParsedExpressionSystem(source)({"lam": 100, "mssq": 100}))
+
+    def test_MassMatrix(self):
+        source = [{"matrix": "[[1, 0], [0, mssq]]"}["matrix"],
+                  ParsedExpressionSystem([{"identifier": "mssq", "symbols": [], "expression": "1"}])]
+
+        reference = [[1, 0], [0, 1]]
+        self.assertEqual(reference, MassMatrix(*source)({}))
+
+    def test_RotationMatrix(self):
+        source = {"matrix": {"mssq00": [0, 0], "mssq11": [1, 1]}}
+        reference = {"mssq00": 1, "mssq11": -1}
+
+        self.assertEqual(reference, RotationMatrix(source)([[1, 0], [0, -1]]))
+

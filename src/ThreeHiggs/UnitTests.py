@@ -1,6 +1,7 @@
 if __name__ == "__main__":
-    from unittest import main
+    from ThreeHiggs.MathematicaParsers import MathematicaParsersUnitTests
+    from ThreeHiggs.ParsedExpression import ParsedExpressionUnitTests
 
-    from ThreeHiggs.MathematicaParsers import UnitTests
+    from unittest import main
     main()
 
