@@ -116,6 +116,11 @@ class UserInput(argparse.ArgumentParser):
                   default = "Benchmarks/Benchmarks_3HDM.json",#"Benchmarks/ScanDict.json",
                   dest = 'benchMarkFile')
 
+        self.add_argument('--parsedExpressionsFile', 
+                  action = 'store', 
+                  default = "parsedExpressions.json",#"Benchmarks/ScanDict.json",
+                  dest = 'parsedExpressionsFile')
+
         self.add_argument('--absGlobalTolerance', action = 'store', default = 1e-1, dest = 'absGlobalTolerance')
         self.add_argument('--relGlobalTolerance', action = 'store', default = 1e-1, dest = 'relGlobalTolerance')
         self.add_argument('--absLocalTolerance', action = 'store', default = 1e-5, dest = 'absLocalTolerance')
