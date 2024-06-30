@@ -49,7 +49,7 @@ def parseRotationMatrix(lines):
     return {"matrix": symbolMap}
 
 from unittest import TestCase
-class UnitTests(TestCase):
+class MathematicaParsersUnitTests(TestCase):
     def test_parseExpression(self):
         reference = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
                      "identifier": "Identifier",
