@@ -1,14 +1,5 @@
 import ThreeHiggs
 
-def getResourcePath(relativePathToResource):
-    """ Gives a safe path to a packaged resource.
-    
-    Returns
-    -------
-    Path to the resource file: str.
-    """
-
-
 def getLines(relativePathToResource):
     ## fallback to hardcoded package name if the __package__ call fails
     packageName = __package__ or "ThreeHiggs"
@@ -47,22 +38,6 @@ with open(f"{args.resultsDirectory}/parsedExpressions.json", "w") as parsedExpre
           "veff": parseExpressionSystem(veffLines)},
          parsedExpressionsFile,
          indent = 4)
-
-#from ThreeHiggs.ParsedExpression import ParsedExpressionSystem
-#vectorMassesSquared = ParsedExpressionSystem(parseExpressionSystem(getLines(args.vectorMassesSquaredFile)))
-#vectorShortHands = ParsedExpressionSystem(parseExpressionSystem(getLines(args.vectorShortHandsFile)))
-#scalarPermutationMatrix = parseConstantMatrix(getLines(args.scalarPermutationFile))["matrix"]
-#
-#scalarMassMatrixUpperLeft = MassMatrix(parseMassMatrix(getLines(args.scalarMassMatrixUpperLeftFile))["matrix"],
-#                                       ParsedExpressionSystem(parseExpressionSystem(getLines(args.scalarMassMatrixUpperLeftDefinitionsFile))))
-#
-#scalarMassMatrixBottomRight = MassMatrix(parseMassMatrix(getLines(args.scalarMassMatrixBottomRightFile))["matrix"],
-#                                         ParsedExpressionSystem(parseExpressionSystem(getLines(args.scalarMassMatrixBottomRightDefinitionsFile))))
-#
-#scalarMassMatrices = [scalarMassMatrixUpperLeft, scalarMassMatrixBottomRight]
-#
-#from ThreeHiggs.MathematicaParsers import parseRotationMatrix
-#scalarRotationMatrix = RotationMatrix(parseRotationMatrix(getLines(args.scalarRotationFile)))
 
 ## ---- Configure Veff
 with open(f"{args.resultsDirectory}/parsedExpressions.json", "r") as parsedExpressionsFile:
