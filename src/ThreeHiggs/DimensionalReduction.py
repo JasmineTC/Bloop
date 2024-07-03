@@ -9,21 +9,11 @@ from .ParameterMatching import ParameterMatching
 ## Collects all needed matching relations to go from 4D params to 3D ultrasoft EFT
 class DimensionalReduction():
 
-    def __init__(self):
-        self.matchToSoft = ParameterMatching()
-        self.matchToUltrasoft = ParameterMatching()
-
-        ## These default to False and are only toggled on if RGE files are specified when setupping matching relations
-        self.bDoSoftScaleRGE = False
-        self.bDoUltrasoftScaleRGE = False
-
-
-    def setupHardToSoftMatching(self, hardToSoftLines, softScaleRGELines = None):
-        """softScaleRGELines specifies where RGEs are loaded from. If left to None, 
-        will not perform RG running at soft scale."""
-
-        self.matchToSoft.createMatchingRelations(hardToSoftLines)
-        #self.matchToSoft.matchingRelations = self.__remove3dSuffices(self.matchToSoft.matchingRelations)
+    def __init__(self, hardToSoft, softScaleRGE, softToUltraSoft):
+        self.matchToSoft = hardToSoft
+        self.softScaleRGE = softScaleRGE
+        self.matchToUltrasoft = softToUltraSoft
+        self.matchToUltrasoft.matchingRelations = self.__remove3dSuffices(self.matchToUltrasoft.matchingRelations, bRemoveSuffixUS=True)
 
         print("Setup Hard -> Soft matching relations.")
         print("-- Inputs:")
@@ -32,19 +22,6 @@ class DimensionalReduction():
         print( list(self.matchToSoft.matchingRelations.keys()) )
         print("")
 
-        if (softScaleRGELines):
-            self.bDoSoftScaleRGE = True
-            self.softScaleRGE = ParameterMatching()
-            self.softScaleRGE.createMatchingRelations(softScaleRGELines)
-            #self.softScaleRGE.matchingRelations = self.__remove3dSuffices(self.softScaleRGE.matchingRelations)
-
-
-    def setupSoftToUltrasoftMatching(self, softToUltrasoftLines, ultrasoftScaleRGELines = None):
-        
-        ## At US scale let's remove the 3d and US suffices from resulting params. That way they work with directly Veff
-        self.matchToUltrasoft.createMatchingRelations(softToUltrasoftLines)
-        self.matchToUltrasoft.matchingRelations = self.__remove3dSuffices(self.matchToUltrasoft.matchingRelations, bRemoveSuffixUS=True)
-
         print("Setup Soft -> Ultrasoft matching relations.")
         print("-- Inputs:")
         print(self.matchToUltrasoft.parameterNames)
@@ -52,12 +29,11 @@ class DimensionalReduction():
         print( list(self.matchToUltrasoft.matchingRelations.keys()) )
         print("")
 
-
     def getEFTParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
         """This goes from input hard scale parameters to whatever the final EFT is.
         """
         softScaleParams = self.getSoftScaleParams(paramsForMatching, goalRGScale)
-        ultrasoftScaleParams = self.matchToUltrasoft.getMatchedParams(softScaleParams)
+        ultrasoftScaleParams = self.matchToUltrasoft(softScaleParams)
 
         ## HACK this is the RG scale name in Veff
         ultrasoftScaleParams["mu3US"] = goalRGScale
@@ -67,46 +43,25 @@ class DimensionalReduction():
 
 
     ## NB: T should be in the input dict
-    def getSoftScaleParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
+    def getSoftScaleParams(self, paramsForMatching: dict[str, float], goalScale: float) -> dict[str, float]:
         """Match hard scale --> soft scale theory
         """
-        outParams = self.matchToSoft.getMatchedParams(paramsForMatching)
+        outParams = self.matchToSoft(paramsForMatching)
 
         ## RG scale needs to be in the parameter dict
         outParams["RGScale"] = paramsForMatching["RGScale"]
-
-        if (self.bDoSoftScaleRGE):
-            outParams = self.solveSoftScaleRGE(outParams, goalRGScale)
-        else:
-            ## No explicit running, but still need to have the RG scale in the out dict
-            outParams["RGscale"] = goalRGScale
-
-        return outParams
-    
-    def solveSoftScaleRGE(self, initialParams: dict[str, float], goalScale: float) -> dict[str, float]:
-        """Evolves parameters in soft scale EFT to goalScale. Starting scale is read from initialParams["RGScale"].
-        This modifies the input dict in place!
-        """
-        #startScale = initialParams["RGScale"]
-        initialParams["goalScale"] = goalScale
-        initialParams["startScale"] = initialParams["RGScale"]
-
-        evolvedParams = self.softScaleRGE.getMatchedParams(initialParams)
+        outParams["goalScale"] = goalScale
+        outParams["startScale"] = outParams["RGScale"]
 
         ## The above gives masses only (usually). So merge it to the initial dict to get all params
-        initialParams.update(evolvedParams)
-        initialParams["RGScale"] = goalScale
-        return initialParams
-
-    def getUltrasoftScaleParams(self, softScaleParams: dict[str, float], goalRGScale: float) -> dict[str, float]:
-        """Match soft scale --> ultrasoft scale theory
-        """
-        outParams = self.matchToUltrasoft.getMatchedParams(softScaleParams)
-        ## TODO RG running. But we for now we don't need it tbh
+        outParams |= self.softScaleRGE(outParams)
+        outParams["RGScale"] = goalScale
 
         return outParams
 
-    
+    # Unused. Remove me.
+    def getUltrasoftScaleParams(self, softScaleParams: dict[str, float], goalRGScale: float) -> dict[str, float]:
+        return self.matchToUltrasoft(softScaleParams)
 
     @staticmethod
     def __remove3dSuffices(matchingRelations: dict[str, any], bRemoveSuffixUS=False) -> dict[str, any]:
