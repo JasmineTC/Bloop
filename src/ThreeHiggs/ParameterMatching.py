@@ -45,31 +45,6 @@ class ParameterMatching:
 
         self.parameterNames.sort()
 
-        """Modifies notation in matching relations so that the matched param dict does not use the "3d" suffix (comes from DRalgo by default)
-        """
-        return
-
-        if not arg:
-            return
-
-        newDict = self.matchingRelations
-
-        # DRalgo also gives gauge couplings as "g13d^2" etc, which is terrible => change to g1sq.
-        # Crazy oneliner, creates a new dict where just the key names are different:
-        newDict = { key.replace("^2", "sq") : value for key, value in newDict.items() }
-
-        """ For ultrasoft theory DRalgo appends "US" => remove that too. Gauge couplings again need special treatment."""
-        newDict = { key[:-len("US")] if key.endswith("US") else key : value for key, value in newDict.items() }
-        newDict = { key.replace("USsq", "sq") if key.endswith("USsq") else key : value for key, value in newDict.items() }
-
-        ## Remove "3d" suffix with even crazier oneliner (suffix meaning that it's removed only from end of the string)
-        newDict = { key[:-len("3d")] if key.endswith("3d") else key : value for key, value in newDict.items() }
-
-        ## Gauge couplings are originally of form g3d^2 so account for that too 
-        newDict = { key.replace("3dsq", "sq") if key.endswith("3dsq") else key : value for key, value in newDict.items() }
-    
-        self.matchingRelations = newDict
-
     def __call__(self, inputParams):
         return {key: expr(inputParams) for key, expr in self.matchingRelations.items()}
 
