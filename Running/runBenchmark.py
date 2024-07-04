@@ -65,17 +65,19 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                 ParsedExpressionSystem(parsedExpressions["veff"]),
                                                 args.minimizationAlgo, ## Set algorithm to use for Veff minimization
                                                 args.DiagAlgo) ## Set algorithm for scalar mass diag to use
-    
+
+    from ThreeHiggs.DimensionalReduction import DimensionalReduction
+    from ThreeHiggs.ParameterMatching import ParameterMatching
+    dimensionalReduction = DimensionalReduction(ParameterMatching(getLines(args.hardToSoftFile)),
+                                                ParameterMatching(getLines(args.softScaleRGEFile)),
+                                                ParameterMatching(getLines(args.softToUltraSoftFile)))
+
     ## Model object setup + load matching relations
     from ThreeHiggs.GenericModel import GenericModel
-    model3HDM = GenericModel(effectivePotential)
+    model3HDM = GenericModel(effectivePotential, dimensionalReduction)
     
-    hardToSoftFile = getLines(args.hardToSoftFile)
-    softScaleRGEFile = getLines(args.softScaleRGEFile)
-    softToUltrasoftFile = getLines(args.softToUltraSoftFile)
-    
-    model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
-    model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
+    #model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
+    #model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
     
     model3HDM.effectivePotential.minimizer.setTolerances(args.absGlobalTolerance,
                                                          args.relGlobalTolerance, 

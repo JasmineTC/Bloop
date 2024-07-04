@@ -21,22 +21,10 @@ class ParameterMatching:
     #parameterNames = [ 'T', 'Lb', 'Lf', 'g1', 'g2', 'g3',  ]  
     ## LN: not used currently since the symbols are read automatically from .txt
 
-    def __init__(self):
-        self.matchingRelations = {}
-
-    def getMatchedParams(self, inputParams):
-        return {key: expr(inputParams) for key, expr in self.matchingRelations.items()}
-
-    def __call__(self, inputParams):
-        return self.getMatchedParams(inputParams)
-
-    def createMatchingRelations(self, fileToRead):
-        self.parameterNames, self.matchingRelations = self.parseMatchingRelations(fileToRead)
-
-    def parseMatchingRelations(self, lines):
+    def __init__(self, lines):
         ## Dict for storing ParsedExpression objects
-        parsedExpressions = {}
-        parsedSymbols = [] ## Automatically find all symbols that appear in matching relations
+        self.matchingRelations = {}
+        self.parameterNames = [] ## Automatically find all symbols that appear in matching relations
 
         for line in lines:
             lhs, rhs = map(str.strip, line.split("->"))
@@ -45,28 +33,18 @@ class ParameterMatching:
             expr = ParsedExpression(parseExpression(rhs))
 
             ## Replace Greeks also on the LHS and store in dict as LHS : parsedRHS
-            parsedExpressions[ replaceGreekSymbols(lhs) ] = expr
+            self.matchingRelations[ replaceGreekSymbols(lhs) ] = expr
 
             ## find symbols but store as string, not the sympy type  
             for symbol in expr.symbols:
                 ## NOTE this conversion will cause issues with pathological symbols like "A B" 
                 # https://stackoverflow.com/questions/59401738/convert-sympy-symbol-to-string-such-that-it-can-always-be-parsed
                 symbol_str = str(symbol)
-                if symbol_str not in parsedSymbols:
-                    parsedSymbols.append(symbol_str)
+                if symbol_str not in self.parameterNames:
+                    self.parameterNames.append(symbol_str)
 
-        parsedSymbols.sort()
-        return parsedSymbols, parsedExpressions
-    
+        self.parameterNames.sort()
 
-    def lambdifyMatchingRelations(self, parsedExpressions: dict[str, ParsedExpression], argumentNames: list[str]) -> dict[str, Callable]:
-        """Convert dict of ParsedExpressions to a dict of lambdas, same keys. argumentNames (list of strings)
-        specifies what arguments the lambda functions need 
-        """
+    def __call__(self, inputParams):
+        return {key: expr(inputParams) for key, expr in self.matchingRelations.items()}
 
-        convertedExpressions = {}
-        
-        for key, expr in parsedExpressions.items():
-            convertedExpressions[key] = expr
-
-        return convertedExpressions
