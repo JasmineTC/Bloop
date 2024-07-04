@@ -1,5 +1,3 @@
-import ThreeHiggs
-
 def getLines(relativePathToResource):
     ## fallback to hardcoded package name if the __package__ call fails
     packageName = __package__ or "ThreeHiggs"
