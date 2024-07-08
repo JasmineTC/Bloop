@@ -12,7 +12,7 @@ if __name__ == "__main__":
         ## "Physical" masses of the scalar sector at tree level
         "mS1" : 300,
         "bMassSplittingInput": True, ## Use mass splittings as Venus does or directly put in masses
-        "bpreCalculated": False, ## Are all non SM couplings calculated before hand or does generic model need to do it?
+        "bPreCalculated": False, ## Are all non SM couplings calculated before hand or does generic model need to do it?
         "delta12" : 0, # mS2 - mS1
         "delta1c" : 0, # mSpm1 - mS1 => set 0 to make lam23p = 0
         "deltac" : 0, # mSpm2 - mSpm1, splitting between charged scalars => if degenerate, mu12^2 = 0 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
         "RGScale" : __MZ,
         "mS1" : 67,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 4.,
         "delta1c" : 50.,
         "deltac" : 1.,
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     
         "mS1" : 57,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 8.,
         "delta1c" : 50.,
         "deltac" : 1.,
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     
         "mS1" : 70,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 12.,
         "delta1c" : 50.,
         "deltac" : 1.,
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     
         "mS1" : 48,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 20.,
         "delta1c" : 50.,
         "deltac" : 1.,
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     
         "mS1" : 75,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 55.,
         "delta1c" : 50.,
         "deltac" : 1.,
@@ -144,7 +144,7 @@ if __name__ == "__main__":
     
         "mS1" : 74,
         "bMassSplittingInput": True, 
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 55.,
         "delta1c" : 50.,
         "deltac" : 15.,
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     
         "mS1" : 90,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 5.,
         "delta1c" : 1.,
         "deltac" : 1.,
@@ -188,7 +188,7 @@ if __name__ == "__main__":
     
         "mS1" : 90,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 55.,
         "delta1c" : 1.,
         "deltac" : 1.,
@@ -210,7 +210,7 @@ if __name__ == "__main__":
     
         "mS1" : 90,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 55.,
         "delta1c" : 1.,
         "deltac" : 22.,
@@ -233,7 +233,7 @@ if __name__ == "__main__":
     
         "mS1" : 300,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 0,
         "delta1c" : 0,
         "deltac" : 0, 
@@ -255,7 +255,7 @@ if __name__ == "__main__":
     
         "mS1" : 67,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 4.,
         "delta1c" : 50.,
         "deltac" : 1.,
@@ -277,7 +277,7 @@ if __name__ == "__main__":
     
         "mS1" : 57,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 8.,
         "delta1c" : 50.,
         "deltac" : 1.,
@@ -299,7 +299,7 @@ if __name__ == "__main__":
     
         "mS1" : 70,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 12.,
         "delta1c" : 50.,
         "deltac" : 1.,
@@ -321,7 +321,7 @@ if __name__ == "__main__":
     
         "mS1" : 48,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 20.,
         "delta1c" : 50.,
         "deltac" : 1.,
@@ -343,7 +343,7 @@ if __name__ == "__main__":
     
         "mS1" : 75,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 55.,
         "delta1c" : 50.,
         "deltac" : 1.,
@@ -365,7 +365,7 @@ if __name__ == "__main__":
     
         "mS1" : 74,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 55.,
         "delta1c" : 50.,
         "deltac" : 15.,
@@ -387,7 +387,7 @@ if __name__ == "__main__":
     
         "mS1" : 90,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 5.,
         "delta1c" : 1.,
         "deltac" : 1.,
@@ -409,7 +409,7 @@ if __name__ == "__main__":
     
         "mS1" : 90,
         "bMassSplittingInput": True, 
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 55.,
         "delta1c" : 1.,
         "deltac" : 1.,
@@ -431,7 +431,7 @@ if __name__ == "__main__":
     
         "mS1" : 90,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 55.,
         "delta1c" : 1.,
         "deltac" : 22.,
@@ -453,7 +453,7 @@ if __name__ == "__main__":
         
         "mS1" : 100,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 50.,
         "delta1c" : 10.,
         "deltac" : 50.,
@@ -475,7 +475,7 @@ if __name__ == "__main__":
         
         "mS1" : 100,
         "bMassSplittingInput": True,
-        "bpreCalculated": False,
+        "bPreCalculated": False,
         "delta12" : 50.,
         "delta1c" : 80.,
         "deltac" : 30.,
