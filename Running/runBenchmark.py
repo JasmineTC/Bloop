@@ -81,14 +81,6 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
     from ThreeHiggs.GenericModel import GenericModel
     model3HDM = GenericModel(effectivePotential, dimensionalReduction)
     
-    #model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
-    #model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
-    
-    # model3HDM.effectivePotential.minimizer.setTolerances(args.absGlobalTolerance,
-    #                                                      args.relGlobalTolerance, 
-    #                                                      args.absLocalTolerance, 
-    #                                                      args.relLocalTolerance)
-    
     with open(args.benchMarkFile) as benchMarkFile:
         from json import load
         benchMarks = load(benchMarkFile)
