@@ -74,7 +74,7 @@ class GenericModel():
         ## --- BSM scalars ---
         if inputParams["bPreCalculated"]:  
             res |= inputParams["couplingValues"]
-            res |= inputParams["RGScale"]
+            res["RGScale"] = inputParams["RGScale"]
             
         else:
             mS1 = inputParams["mS1"]
