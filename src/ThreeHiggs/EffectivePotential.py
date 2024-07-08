@@ -1,10 +1,6 @@
 import numpy as np
-import tempfile # hacking
-
 from scipy import linalg
 from dataclasses import dataclass
-
-from .ParsedExpression import ParsedExpressionSystem
 
 from .VeffMinimizer import VeffMinimizer
 

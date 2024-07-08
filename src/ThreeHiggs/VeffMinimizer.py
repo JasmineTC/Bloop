@@ -21,15 +21,7 @@ class VeffMinimizer:
         
         self.v1Bounds = v1Bounds
         self.v2Bounds = v2Bounds
-        self.v3Bounds = v3Bounds
-        
-    # def setTolerances(self, globalAbs : float, globalRel : float, localAbs : float, localRel : float) -> None:
-    #     self.globalAbs = globalAbs
-    #     self.globalRel = globalRel
-        
-    #     self.localAbs = localAbs
-    #     self.localRel = localRel
-        
+        self.v3Bounds = v3Bounds        
         
     def minimize(self, function: callable, initialGuess: np.ndarray, minimizationAlgo: str) -> tuple[np.ndarray, float]:
         """Give bounds in format ((min1, max1), (min2, max2)) etc, one pair for each variable.
