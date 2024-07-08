@@ -66,7 +66,10 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                 args.absGlobalTolerance,
                                                 args.relGlobalTolerance, 
                                                 args.absLocalTolerance, 
-                                                args.relLocalTolerance) 
+                                                args.relLocalTolerance,
+                                                args.v1Bounds,
+                                                args.v2Bounds,
+                                                args.v3Bounds) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
     from ThreeHiggs.ParameterMatching import ParameterMatching

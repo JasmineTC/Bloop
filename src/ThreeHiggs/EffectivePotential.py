@@ -197,7 +197,10 @@ class EffectivePotential:
                  absGlobalTolerance,
                  relGlobalTolerance, 
                  absLocalTolerance, 
-                 relLocalTolerance):
+                 relLocalTolerance,
+                 v1Bounds,
+                 v2Bounds,
+                 v3Bounds):
         ## How many background fields do we depend on
         self.fieldNames = fieldNames
         self.nbrFields = len(self.fieldNames)
@@ -219,7 +222,10 @@ class EffectivePotential:
                                        absGlobalTolerance,
                                        relGlobalTolerance, 
                                        absLocalTolerance, 
-                                       relLocalTolerance)
+                                       relLocalTolerance,
+                                       v1Bounds,
+                                       v2Bounds,
+                                       v3Bounds)
 
     def setModelParameters(self, modelParameters: dict) -> None:
         """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate 
