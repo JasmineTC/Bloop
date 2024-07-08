@@ -2,15 +2,33 @@ import nlopt
 import numpy as np
 
 class VeffMinimizer:
-    def __init__(self, numVariables: int):
+    def __init__(self, numVariables: int, 
+                 globalAbs: float,
+                 globalRel: float,
+                 localAbs: float,
+                 localRel: float,
+                 v1Bounds: float,
+                 v2Bounds: float,
+                 v3Bounds: float):
+        
         self.numVariables = numVariables
         
-    def setTolerances(self, globalAbs : float, globalRel : float, localAbs : float, localRel : float) -> None:
         self.globalAbs = globalAbs
         self.globalRel = globalRel
         
         self.localAbs = localAbs
         self.localRel = localRel
+        
+        self.v1Bounds = v1Bounds
+        self.v2Bounds = v2Bounds
+        self.v3Bounds = v3Bounds
+        
+    # def setTolerances(self, globalAbs : float, globalRel : float, localAbs : float, localRel : float) -> None:
+    #     self.globalAbs = globalAbs
+    #     self.globalRel = globalRel
+        
+    #     self.localAbs = localAbs
+    #     self.localRel = localRel
         
         
     def minimize(self, function: callable, initialGuess: np.ndarray, minimizationAlgo: str) -> tuple[np.ndarray, float]:
@@ -23,7 +41,7 @@ class VeffMinimizer:
 
         if minimizationAlgo == "scipy":
                 import scipy.optimize
-                bounds = ((1e-6, 1e-6), (1e-6, 1e-6), (1e-6, 1e3))
+                bounds = ((self.v1Bounds[0], self.v1Bounds[1]), (self.v2Bounds[0], self.v2Bounds[1]), (self.v3Bounds[0], self.v3Bounds[1]))
                 minimizationResult = scipy.optimize.minimize(function, initialGuess, bounds=bounds, tol = 1e-6)
                 location, value = minimizationResult.x, minimizationResult.fun
                    
@@ -33,16 +51,16 @@ class VeffMinimizer:
                 opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, self.numVariables)
                 functionWrapper = lambda fields, grad: function(fields) 
                 opt.set_min_objective(functionWrapper)
-                opt.set_lower_bounds((1e-6, 1e-6, 1e-6))
-                opt.set_upper_bounds((1e-6, 1e-6, 100))
+                opt.set_lower_bounds((self.v1Bounds[0], self.v2Bounds[0], self.v3Bounds[0]))
+                opt.set_upper_bounds((self.v1Bounds[1], self.v2Bounds[1], self.v3Bounds[1]))
                 opt.set_xtol_abs(self.globalAbs)
                 opt.set_xtol_rel(self.globalRel)
                 location = opt.optimize(initialGuess)
                 
                 opt2 = nlopt.opt(nlopt.LN_BOBYQA, self.numVariables)
                 opt2.set_min_objective(functionWrapper)
-                opt2.set_lower_bounds((1e-6, 1e-6, 1e-6))
-                opt2.set_upper_bounds((1e-6, 1e-6, 100))
+                opt2.set_lower_bounds((self.v1Bounds[0], self.v2Bounds[0], self.v3Bounds[0]))
+                opt2.set_upper_bounds((self.v1Bounds[1], self.v2Bounds[1], self.v3Bounds[1]))
                 opt2.set_xtol_abs(self.localAbs)
                 opt2.set_xtol_rel(self.localRel)
                 
@@ -52,8 +70,8 @@ class VeffMinimizer:
                 opt = nlopt.opt(nlopt.LN_BOBYQA, self.numVariables)
                 functionWrapper = lambda fields, grad: function(fields) 
                 opt.set_min_objective(functionWrapper)
-                opt.set_lower_bounds((1e-6, 1e-6, 1e-6))
-                opt.set_upper_bounds((1e-6, 1e-6, 100))
+                opt.set_lower_bounds((self.v1Bounds[0], self.v2Bounds[0], self.v3Bounds[0]))
+                opt.set_upper_bounds((self.v1Bounds[1], self.v2Bounds[1], self.v3Bounds[1]))
                 opt.set_xtol_abs(self.localAbs)
                 opt.set_xtol_rel(self.localRel)
                 

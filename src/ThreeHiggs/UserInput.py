@@ -118,13 +118,17 @@ class UserInput(argparse.ArgumentParser):
 
         self.add_argument('--parsedExpressionsFile', 
                   action = 'store', 
-                  default = "parsedExpressions.json",#"Benchmarks/ScanDict.json",
+                  default = "parsedExpressions.json",
                   dest = 'parsedExpressionsFile')
 
         self.add_argument('--absGlobalTolerance', action = 'store', default = 1e-1, dest = 'absGlobalTolerance')
         self.add_argument('--relGlobalTolerance', action = 'store', default = 1e-1, dest = 'relGlobalTolerance')
         self.add_argument('--absLocalTolerance', action = 'store', default = 1e-5, dest = 'absLocalTolerance')
         self.add_argument('--relLocalTolerance', action = 'store', default = 1e-5, dest = 'relLocalTolerance')
+        
+        self.add_argument('--v1Bounds', nargs = 2, action = 'store', default = [1e-6, 1e-6], type = float, dest = 'v1Bounds')
+        self.add_argument('--v2Bounds', nargs = 2, action = 'store', default = [1e-6, 1e-6], type = float, dest = 'v2Bounds')
+        self.add_argument('--v3Bounds', nargs = 2, action = 'store', default = [1e-6, 100], type = float, dest = 'v3Bounds')
         
         self.add_argument('--TRangeStart', action = 'store', default = 50, type = float, dest = 'TRangeStart')
         self.add_argument('--TRangeEnd', action = 'store', default = 200, type = float, dest = 'TRangeEnd')

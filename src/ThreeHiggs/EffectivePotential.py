@@ -193,7 +193,14 @@ class EffectivePotential:
                  loopOrder,
                  veff,
                  minimizationAlgo,
-                 diagonalizationAlgo):
+                 diagonalizationAlgo,
+                 absGlobalTolerance,
+                 relGlobalTolerance, 
+                 absLocalTolerance, 
+                 relLocalTolerance,
+                 v1Bounds,
+                 v2Bounds,
+                 v3Bounds):
         ## How many background fields do we depend on
         self.fieldNames = fieldNames
         self.nbrFields = len(self.fieldNames)
@@ -211,7 +218,14 @@ class EffectivePotential:
         self.minimizationAlgo = minimizationAlgo
         self.expressions = veff
         self.bNeedsDiagonalization = (self.loopOrder > 0)
-        self.minimizer = VeffMinimizer(self.nbrFields) # currently the numVariables is not used by minimizer
+        self.minimizer = VeffMinimizer(self.nbrFields,                 
+                                       absGlobalTolerance,
+                                       relGlobalTolerance, 
+                                       absLocalTolerance, 
+                                       relLocalTolerance,
+                                       v1Bounds,
+                                       v2Bounds,
+                                       v3Bounds)
 
     def setModelParameters(self, modelParameters: dict) -> None:
         """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate 
