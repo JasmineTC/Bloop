@@ -72,8 +72,9 @@ class GenericModel():
                 "g3": m.sqrt(0.1183 * 4.0 * m.pi)}   # SU(3)
         
         ## --- BSM scalars ---
-        if inputParams["bpreCalculated"]:  
+        if inputParams["bPreCalculated"]:  
             res |= inputParams["couplings"]
+            res |= inputParams["RGScale"]
             
         else:
             mS1 = inputParams["mS1"]

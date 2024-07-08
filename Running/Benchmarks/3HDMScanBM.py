@@ -73,7 +73,7 @@ for mS1 in range(63, 100, 5):
                         
                         if theoreticalConstraints and experimentalConstraints:
                             ThreeHiggsBMDictList.append({
-                                "preCalculated": True,
+                                "bPreCalculated": True,
                                 "bMassSplittingInput": False,
                                 "RGScale" : 91.1876,
                                 
