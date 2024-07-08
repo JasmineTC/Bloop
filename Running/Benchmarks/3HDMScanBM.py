@@ -43,7 +43,7 @@ for mS1 in range(63, 100, 5):
             for delta12 in range(5, 100, 5):
                 for delta1c in range(5, 100, 5):
                     for deltac in range(5, 100, 5):
-                        # if  count >= 2000:                            
+                        # if  count >= 1:                            
                         #     break
                         mS2 = delta12 + mS1
                         mSpm1 = delta1c + mS1
@@ -56,8 +56,8 @@ for mS1 in range(63, 100, 5):
                             break
                         
                         lam2Abs = ( mu12sq*cosTheta + m.sqrt( lam2absInsideSqR )/4 ) /v**2
-                        lam2Re = lam2Abs*cosTheta,
-                        lam2Im = lam2Abs*sinTheta,
+                        lam2Re = lam2Abs*cosTheta
+                        lam2Im = lam2Abs*sinTheta
                         
                         LambdaMinus = m.sqrt( mu12sq**2 + v**4*lam2Abs**2 - 2.*v**2*mu12sq*lam2Abs*cosTheta)
                         alpha = (-mu12sq + v**2*lam2Abs*cosTheta - LambdaMinus) / ( (v**2*lam2Abs*sinTheta) + 1e-100)
@@ -109,7 +109,6 @@ for mS1 in range(63, 100, 5):
                             })
                             count+=1 
                             
-
 with open("Running/Benchmarks/3HDMScanBM.json", "w") as outfile: 
     json.dump(ThreeHiggsBMDictList, outfile, indent = 4)
 
