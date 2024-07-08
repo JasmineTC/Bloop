@@ -62,7 +62,11 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                 args.loopOrder,
                                                 ParsedExpressionSystem(parsedExpressions["veff"]),
                                                 args.minimizationAlgo, ## Set algorithm to use for Veff minimization
-                                                args.DiagAlgo) ## Set algorithm for scalar mass diag to use
+                                                args.DiagAlgo, ## Set algorithm for scalar mass diag to use
+                                                args.absGlobalTolerance,
+                                                args.relGlobalTolerance, 
+                                                args.absLocalTolerance, 
+                                                args.relLocalTolerance) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
     from ThreeHiggs.ParameterMatching import ParameterMatching
@@ -77,10 +81,10 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
     #model3HDM.dimensionalReduction.setupHardToSoftMatching(hardToSoftFile, softScaleRGEFile)
     #model3HDM.dimensionalReduction.setupSoftToUltrasoftMatching(softToUltrasoftFile)
     
-    model3HDM.effectivePotential.minimizer.setTolerances(args.absGlobalTolerance,
-                                                         args.relGlobalTolerance, 
-                                                         args.absLocalTolerance, 
-                                                         args.relLocalTolerance)
+    # model3HDM.effectivePotential.minimizer.setTolerances(args.absGlobalTolerance,
+    #                                                      args.relGlobalTolerance, 
+    #                                                      args.absLocalTolerance, 
+    #                                                      args.relLocalTolerance)
     
     with open(args.benchMarkFile) as benchMarkFile:
         from json import load

@@ -2,15 +2,25 @@ import nlopt
 import numpy as np
 
 class VeffMinimizer:
-    def __init__(self, numVariables: int):
-        self.numVariables = numVariables
+    def __init__(self, numVariables: int, 
+                 globalAbs: float,
+                 globalRel: float,
+                 localAbs: float,
+                 localRel: float):
         
-    def setTolerances(self, globalAbs : float, globalRel : float, localAbs : float, localRel : float) -> None:
+        self.numVariables = numVariables
         self.globalAbs = globalAbs
         self.globalRel = globalRel
         
         self.localAbs = localAbs
         self.localRel = localRel
+        
+    # def setTolerances(self, globalAbs : float, globalRel : float, localAbs : float, localRel : float) -> None:
+    #     self.globalAbs = globalAbs
+    #     self.globalRel = globalRel
+        
+    #     self.localAbs = localAbs
+    #     self.localRel = localRel
         
         
     def minimize(self, function: callable, initialGuess: np.ndarray, minimizationAlgo: str) -> tuple[np.ndarray, float]:
