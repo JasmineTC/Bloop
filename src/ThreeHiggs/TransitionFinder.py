@@ -52,7 +52,7 @@ class TransitionFinder:
             from ThreeHiggs.GenericModel import bIsBounded, bIsPerturbative
             if not bIsBounded(paramsForMatching):
                 print ("Model is not bounded from below, returning nans")
-                return [[np.nan, np.nan, np.nan, np.nan, np.nan, 0, 0]] ## Same length/structure as minimizationResults
+                return [[0, 0, 0, 0, 0, 0, 0]] ## Same length/structure as minimizationResults
             
             ## These need to be in the dict
             paramsForMatching["RGScale"] = matchingScale
