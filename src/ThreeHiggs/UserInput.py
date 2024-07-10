@@ -121,10 +121,10 @@ class UserInput(argparse.ArgumentParser):
                   default = "parsedExpressions.json",
                   dest = 'parsedExpressionsFile')
 
-        self.add_argument('--absGlobalTolerance', action = 'store', default = 1e-1, dest = 'absGlobalTolerance')
-        self.add_argument('--relGlobalTolerance', action = 'store', default = 1e-1, dest = 'relGlobalTolerance')
-        self.add_argument('--absLocalTolerance', action = 'store', default = 1e-5, dest = 'absLocalTolerance')
-        self.add_argument('--relLocalTolerance', action = 'store', default = 1e-5, dest = 'relLocalTolerance')
+        self.add_argument('--absGlobalTolerance', action = 'store', default = 0.5, type = float, dest = 'absGlobalTolerance')
+        self.add_argument('--relGlobalTolerance', action = 'store', default = 0.5, type = float, dest = 'relGlobalTolerance')
+        self.add_argument('--absLocalTolerance', action = 'store', default = 1e-2, type = float, dest = 'absLocalTolerance')
+        self.add_argument('--relLocalTolerance', action = 'store', default = 1e-3, type = float, dest = 'relLocalTolerance')
         
         self.add_argument('--v1Bounds', nargs = 2, action = 'store', default = [1e-6, 1e-6], type = float, dest = 'v1Bounds')
         self.add_argument('--v2Bounds', nargs = 2, action = 'store', default = [1e-6, 1e-6], type = float, dest = 'v2Bounds')
