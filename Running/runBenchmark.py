@@ -42,17 +42,8 @@ if args.firstStage <= Stages.convertMathematica <= args.lastStage:
 if args.firstStage <= Stages.minimization <= args.lastStage:
     with open(args.parsedExpressionsFile, "r") as parsedExpressionsFile:
         from json import load
-        counter = 0
-        while counter < 5:
-            try:
-                parsedExpressions = load(parsedExpressionsFile)
-                break
-            except:
-                counter += 1
-                if counter == 5:
-                    print ("Failed to load the parsed expression file 5 times, attempting to exit")
-                    exit(-1)
-        
+        parsedExpressions = load(parsedExpressionsFile)
+
         from ThreeHiggs.EffectivePotential import EffectivePotential
         from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
                                                  MassMatrix,
