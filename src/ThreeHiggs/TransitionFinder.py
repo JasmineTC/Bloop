@@ -87,32 +87,23 @@ class TransitionFinder:
         return self.convertResultsToDict(minimizationResults)
     
     def convertResultsToDict(self, minimizationResults):
-        tempList = []
-        valueVeffList = []
-        minimumLocation = []
-        bIsPerturbative = []
-        bReachedUltraSoftScale = []
-        bIsBounded = []
-        
-        for i in range(len(minimizationResults)):
-            tempList.append(minimizationResults[i][0])
-            valueVeffList.append(minimizationResults[i][1])
-            minimumLocation.append(minimizationResults[i][2])
-            bIsPerturbative.append(minimizationResults[i][3])
-            bReachedUltraSoftScale.append(minimizationResults[i][4])
-            bIsBounded.append(minimizationResults[i][5])
+        tempList = [result[0] for result in minimizationResults]
+        valueVeffList = [result[1] for result in minimizationResults]
+        minimumLocationList = [result[2] for result in minimizationResults]
+        bIsPerturbativeList = [result[3] for result in minimizationResults]
+        bReachedUltraSoftScaleList = [result[4] for result in minimizationResults]
+        bIsBoundedList = [result[5] for result in minimizationResults]
             
-        minimumLocation = np.transpose(minimumLocation)
+        minimumLocationList = np.transpose(minimumLocationList)
             
         ##Gives the first index where the ultrasoft condition is True or -1 is none is found
-        ultraSoftWarning: int = next((i for i, val in enumerate(bReachedUltraSoftScale) if val == True), -1) 
+        ultraSoftWarning: int = next((i for i, val in enumerate(bReachedUltraSoftScaleList) if val == True), -1) 
         TUltraSoft = tempList[ultraSoftWarning] if ultraSoftWarning >=0 else -1
-            
+
         minimizationResultsDict = {"T": tempList,
                                     "valueVeff": valueVeffList,
-                                    "minimumLocation": minimumLocation.tolist(),
-                                    "bIsPerturbative": all(bIsPerturbative),
+                                    "minimumLocation": minimumLocationList.tolist(),
+                                    "bIsPerturbative": all(bIsPerturbativeList),
                                     "UltraSoftTemp": TUltraSoft,
-                                    "bBoundFromBelow": all(bIsBounded) }
-        
+                                    "bBoundFromBelow": all(bIsBoundedList) }
         return minimizationResultsDict
