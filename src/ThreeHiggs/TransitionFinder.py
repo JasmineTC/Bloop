@@ -4,6 +4,9 @@ import math
 from .GenericModel import GenericModel
 from .BetaFunctions import BetaFunctions4D
 
+def threeDimFieldtoDimensionless(temp: list[float], field: list[float]) -> list[float]:
+    return field/np.sqrt(temp)
+
 """Class TransitionFinder -- This handles all logic for tracking the temperature dependence of a model,
 identifying phase transitions, determining physical parameters of a transition etc. 
 """
@@ -51,8 +54,9 @@ class TransitionFinder:
             
             from ThreeHiggs.GenericModel import bIsBounded, bIsPerturbative
             if not bIsBounded(paramsForMatching):
-                print ("Model is not bounded from below, returning nans")
-                return [[0, 0, 0, 0, 0, 0, 0]] ## Same length/structure as minimizationResults
+                minimizationResults.append( [1, 0, [1], False, False, False] )
+                break
+                
             
             ## These need to be in the dict
             paramsForMatching["RGScale"] = matchingScale
@@ -68,15 +72,47 @@ class TransitionFinder:
             
             self.model.effectivePotential.setModelParameters(params3D)
 
-            minimum, valueVeff = self.model.effectivePotential.findGlobalMinimum()
-            bReachedUltraSoftScale = self.model.effectivePotential.bReachedUltraSoftScale(minimum, T)
-            
-            minimizationResults.append( [T, valueVeff, *minimum, bIsPerturbative(paramsForMatching), bReachedUltraSoftScale] )
+            minimumLocation, valueVeff = self.model.effectivePotential.findGlobalMinimum()
+            bReachedUltraSoftScale = self.model.effectivePotential.bReachedUltraSoftScale(minimumLocation, T)
 
-            if np.all(minimum < 1e-3):
+
+            minimizationResults.append( [T, valueVeff, minimumLocation, bIsPerturbative(paramsForMatching), bReachedUltraSoftScale, 1] )
+
+            if np.all(minimumLocation < 1e-3):
                 print (f"Symmetric phase found at temp {T}")
                 if counter == 3:
                     break
                 counter += 1
 
-        return minimizationResults
+        return self.convertResultsToDict(minimizationResults)
+    
+    def convertResultsToDict(self, minimizationResults):
+        tempList = []
+        valueVeffList = []
+        minimumLocation = []
+        bIsPerturbative = []
+        bReachedUltraSoftScale = []
+        bIsBounded = []
+        
+        for i in range(len(minimizationResults)):
+            tempList.append(minimizationResults[i][0])
+            valueVeffList.append(minimizationResults[i][1])
+            minimumLocation.append(minimizationResults[i][2])
+            bIsPerturbative.append(minimizationResults[i][3])
+            bReachedUltraSoftScale.append(minimizationResults[i][4])
+            bIsBounded.append(minimizationResults[i][5])
+            
+        minimumLocation = np.transpose(minimumLocation)
+            
+        ##Gives the first index where the ultrasoft condition is True or -1 is none is found
+        ultraSoftWarning: int = next((i for i, val in enumerate(bReachedUltraSoftScale) if val == True), -1) 
+        TUltraSoft = tempList[ultraSoftWarning] if ultraSoftWarning >=0 else -1
+            
+        minimizationResultsDict = {"T": tempList,
+                                    "valueVeff": valueVeffList,
+                                    "minimumLocation": minimumLocation.tolist(),
+                                    "bIsPerturbative": all(bIsPerturbative),
+                                    "UltraSoftTemp": TUltraSoft,
+                                    "bBoundFromBelow": all(bIsBounded) }
+        
+        return minimizationResultsDict
