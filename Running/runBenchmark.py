@@ -103,9 +103,11 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
             Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
             
             if args.save == True:
-                from numpy import savetxt
-                savetxt(filename + ".txt", minimizationResults)
-            
+                with open(f"{filename}.json", "w") as file:
+                    dump(minimizationResults, file, indent = 4)
+                
+            # resultsDict = convertResultsToDict(minimizationResults)
+        
             if args.plot == True:
                 from PlotResult import PlotResult
                 PlotResult.PlotData(minimizationResults, args.benchMarkNumber,args.loopOrder, filename)
