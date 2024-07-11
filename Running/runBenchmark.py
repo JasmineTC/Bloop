@@ -74,7 +74,7 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                  RotationMatrix)
 
         effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
-                                                True,
+                                                args.bAbsMass,
                                                 ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
                                                 ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
                                                 parsedExpressions["scalarPermutationMatrix"]["matrix"],
