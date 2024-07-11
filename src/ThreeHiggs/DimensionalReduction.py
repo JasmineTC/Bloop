@@ -1,11 +1,3 @@
-import numpy as np
-import numpy.typing as npt
-from typing import Callable
-from copy import deepcopy
-
-from .ParameterMatching import ParameterMatching
-
-
 ## Collects all needed matching relations to go from 4D params to 3D ultrasoft EFT
 class DimensionalReduction():
 
