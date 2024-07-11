@@ -6,20 +6,21 @@ class DimensionalReduction():
         self.softScaleRGE = softScaleRGE
         self.matchToUltrasoft = softToUltraSoft
         self.matchToUltrasoft.matchingRelations = self.__remove3dSuffices(self.matchToUltrasoft.matchingRelations, bRemoveSuffixUS=True)
-
-        print("Setup Hard -> Soft matching relations.")
-        print("-- Inputs:")
-        print(self.matchToSoft.parameterNames)
-        print("-- Outputs:")
-        print( list(self.matchToSoft.matchingRelations.keys()) )
-        print("")
-
-        print("Setup Soft -> Ultrasoft matching relations.")
-        print("-- Inputs:")
-        print(self.matchToUltrasoft.parameterNames)
-        print("-- Outputs:")
-        print( list(self.matchToUltrasoft.matchingRelations.keys()) )
-        print("")
+        verbose = False ## WIP set this from user arg
+        if verbose:
+            print("Setup Hard -> Soft matching relations.")
+            print("-- Inputs:")
+            print(self.matchToSoft.parameterNames)
+            print("-- Outputs:")
+            print( list(self.matchToSoft.matchingRelations.keys()) )
+            print("")
+        
+            print("Setup Soft -> Ultrasoft matching relations.")
+            print("-- Inputs:")
+            print(self.matchToUltrasoft.parameterNames)
+            print("-- Outputs:")
+            print( list(self.matchToUltrasoft.matchingRelations.keys()) )
+            print("")
 
     def getEFTParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
         """This goes from input hard scale parameters to whatever the final EFT is.
