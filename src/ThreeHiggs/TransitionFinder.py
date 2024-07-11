@@ -41,8 +41,10 @@ class TransitionFinder:
         minimizationResults = []
  
         counter = 0
+        verbose = False
         for T in TRange:
-            print (f'Start of temp = {T} loop')
+            if verbose:
+                print (f'Start of temp = {T} loop')
                        
             ## Final scale in 3D
             ## TODO ask Lauri if goalRGscale is ever different from just T
