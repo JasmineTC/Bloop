@@ -256,9 +256,10 @@ class EffectivePotential:
             value = np.nan
         else:
             value = self.evaluatePotential(location) ## evaluate once more to get the possible imag parts
-
-        return location, value
-    
+            if value.imag > 1e-6: ## If the imaginary part of the potential is large then minimisation has found unphysical min, throw it out
+                value = np.inf
+        ## Taking the real part so compactiable with json (case where imaginary part is non-neligable has already been dealt with)
+        return location, np.real(value) 
 
     def findGlobalMinimum(self, minimumCandidates: list[list[float]] = None) -> tuple[list[float], complex]:
         """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
@@ -273,20 +274,19 @@ class EffectivePotential:
         
         if self.minimizationAlgo == "combo":
             result = self.findLocalMinimum(minimumCandidates[0], "directGlobal")
-            if (np.real(result[1]) < np.real(bestResult[1])):
+            if result[1] < bestResult[1]:
                 bestResult = result
             
             for candidate in minimumCandidates:
                 result = self.findLocalMinimum(candidate, "BOBYQA")
-                if (np.real(result[1]) < np.real(bestResult[1])):
+                if result[1] < bestResult[1]:
                     bestResult = result
                     
         else:
             for candidate in minimumCandidates:
                 result = self.findLocalMinimum(candidate, self.minimizationAlgo)
-                if (np.real(result[1]) < np.real(bestResult[1])):
+                if result[1] < bestResult[1]:
                     bestResult = result
-
         return bestResult
     
     
