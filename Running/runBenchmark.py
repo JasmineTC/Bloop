@@ -1,3 +1,27 @@
+def doMinimization(indexAndBenchMark):
+  index, benchMark = indexAndBenchMark
+
+  from ThreeHiggs.TransitionFinder import TransitionFinder
+  transitionFinder = TransitionFinder(model=model3HDM)
+  model3HDM.setInputParams(benchMark)
+  minimizationResult = transitionFinder.traceFreeEnergyMinimum(args.TRangeStart,
+                                                               args.TRangeEnd,
+                                                               args.TRangeStepSize)
+
+  filename = f"{args.resultsDirectory}/BM_{index}"
+  
+  from pathlib import Path
+  Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
+  
+  if args.save == True:
+      from json import dumps
+      open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
+      
+  if args.plot == True:
+      from PlotResult import PlotResult
+      PlotResult.PlotData(minimizationResults, args.benchMarkNumber,args.loopOrder, filename)
+
+
 def getLines(relativePathToResource):
     ## fallback to hardcoded package name if the __package__ call fails
     packageName = __package__ or "ThreeHiggs"
@@ -84,31 +108,12 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
     with open(args.benchMarkFile) as benchMarkFile:
         from json import load
         benchMarks = load(benchMarkFile)
-    
-        for index, benchMark in enumerate(benchMarks):
-            if args.benchMarkNumber:
-                if index != args.benchMarkNumber:
-                    continue
-            
-            from ThreeHiggs.TransitionFinder import TransitionFinder
-            transitionFinder = TransitionFinder(model=model3HDM)
-            model3HDM.setInputParams(benchMark)
-            minimizationResults = transitionFinder.traceFreeEnergyMinimum(args.TRangeStart,
-                                                                          args.TRangeEnd,
-                                                                          args.TRangeStepSize)
-            
-            filename = f"{args.resultsDirectory}/BM_{args.benchMarkNumber}"
-            
-            from pathlib import Path
-            Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
-            
-            if args.save == True:
-                with open(f"{filename}.json", "w") as file:
-                    dump(minimizationResults, file, indent = 4)
-                
-            # resultsDict = convertResultsToDict(minimizationResults)
-        
-            if args.plot == True:
-                from PlotResult import PlotResult
-                PlotResult.PlotData(minimizationResults, args.benchMarkNumber,args.loopOrder, filename)
+
+        if args.benchMarkNumber:
+            doMinimization((args.benchMarkNumber, benchMarks[args.benchMarkNumber]))
+
+        else:
+            from multiprocessing import Pool
+            with Pool(args.cores) as pool:
+                pool.map(doMinimization, enumerate(benchMarks))
 
