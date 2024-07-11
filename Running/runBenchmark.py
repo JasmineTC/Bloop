@@ -19,7 +19,7 @@ def doMinimization(indexAndBenchMark):
       
   if args.plot == True:
       from PlotResult import PlotResult
-      PlotResult.PlotData(minimizationResults, args.benchMarkNumber,args.loopOrder, filename)
+      PlotResult.PlotData(minimizationResult, args.benchMarkNumber,args.loopOrder, filename)
 
 
 def getLines(relativePathToResource):
