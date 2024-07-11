@@ -1,5 +1,7 @@
 def doMinimization(indexAndBenchMark):
   index, benchMark = indexAndBenchMark
+  if not args.firstBenchmark <= index <= args.lastBenchmark:
+      return
 
   from ThreeHiggs.TransitionFinder import TransitionFinder
   transitionFinder = TransitionFinder(model=model3HDM)
@@ -106,13 +108,8 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
     model3HDM = GenericModel(effectivePotential, dimensionalReduction)
     
     with open(args.benchMarkFile) as benchMarkFile:
-        if args.benchMarkNumber:
-            from json import load
-            doMinimization((args.benchMarkNumber, load(benchMarkFile)[args.benchMarkNumber]))
-
-        else:
-            from multiprocessing import Pool
-            with Pool(args.cores) as pool:
-                from ijson import items
-                pool.map(doMinimization, enumerate(items(benchMarkFile, "item", use_float = True)))
+      from multiprocessing import Pool
+      with Pool(args.cores) as pool:
+          from ijson import items
+          pool.map(doMinimization, enumerate(items(benchMarkFile, "item", use_float = True)))
 
