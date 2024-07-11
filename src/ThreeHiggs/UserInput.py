@@ -138,7 +138,7 @@ class UserInput(argparse.ArgumentParser):
 
         self.add_argument('--plot', action = 'store_true', default = False, dest = 'plot')
         
-        self.add_argument('--bAbsMass', action = 'store_false', default = True, dest = 'bAbsMass')
+        self.add_argument('--bAbsMass', action = 'store_true', default = False, dest = 'bAbsMass')
 
         self.add_argument('--firstStage', type = Stages.fromString, default = "convertMathematica", dest = 'firstStage')
         self.add_argument('--lastStage', type = Stages.fromString, default = "plot", dest = 'lastStage')
