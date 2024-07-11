@@ -81,7 +81,8 @@ class TransitionFinder:
             minimizationResults.append( [T.tolist(), valueVeff.tolist(), minimumLocation.tolist(), bIsPerturbative(paramsForMatching), bReachedUltraSoftScale, 1] )
 
             if np.all(minimumLocation < 1e-3):
-                print (f"Symmetric phase found at temp {T}")
+                if verbose:
+                    print (f"Symmetric phase found at temp {T}")
                 if counter == 3:
                     break
                 counter += 1
