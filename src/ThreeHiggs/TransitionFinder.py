@@ -76,7 +76,7 @@ class TransitionFinder:
             bReachedUltraSoftScale = self.model.effectivePotential.bReachedUltraSoftScale(minimumLocation, T)
 
 
-            minimizationResults.append( [T, valueVeff, minimumLocation, bIsPerturbative(paramsForMatching), bReachedUltraSoftScale, 1] )
+            minimizationResults.append( [T.tolist(), valueVeff.tolist(), minimumLocation.tolist(), bIsPerturbative(paramsForMatching), bReachedUltraSoftScale, 1] )
 
             if np.all(minimumLocation < 1e-3):
                 print (f"Symmetric phase found at temp {T}")
