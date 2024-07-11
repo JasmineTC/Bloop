@@ -106,14 +106,13 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
     model3HDM = GenericModel(effectivePotential, dimensionalReduction)
     
     with open(args.benchMarkFile) as benchMarkFile:
-        from json import load
-        benchMarks = load(benchMarkFile)
-
         if args.benchMarkNumber:
-            doMinimization((args.benchMarkNumber, benchMarks[args.benchMarkNumber]))
+            from json import load
+            doMinimization((args.benchMarkNumber, load(benchMarkFile)[args.benchMarkNumber]))
 
         else:
             from multiprocessing import Pool
             with Pool(args.cores) as pool:
-                pool.map(doMinimization, enumerate(benchMarks))
+                from ijson import items
+                pool.map(doMinimization, enumerate(items(benchMarkFile, "item", use_float = True)))
 
