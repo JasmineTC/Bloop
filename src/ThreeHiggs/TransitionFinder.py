@@ -78,7 +78,7 @@ class TransitionFinder:
             bReachedUltraSoftScale = self.model.effectivePotential.bReachedUltraSoftScale(minimumLocation, T)
 
 
-            minimizationResults.append( [T.tolist(), valueVeff.tolist(), minimumLocation.tolist(), bIsPerturbative(paramsForMatching), bReachedUltraSoftScale, 1] )
+            minimizationResults.append( [T, valueVeff, minimumLocation, bIsPerturbative(paramsForMatching), bReachedUltraSoftScale, 1] )
 
             if np.all(minimumLocation < 1e-3):
                 if verbose:
@@ -90,8 +90,7 @@ class TransitionFinder:
         return self.convertResultsToDict(minimizationResults)
     
     def convertResultsToDict(self, minimizationResults):
-        
-        tempList = [result[0] for result in minimizationResults]
+        tempList = [float(result[0]) for result in minimizationResults]
         bReachedUltraSoftScaleList = [result[4] for result in minimizationResults]
         ##Gives the first index where the ultrasoft condition is True or -1 is none is found
         ultraSoftWarning: int = next((i for i, val in enumerate(bReachedUltraSoftScaleList) if val == True), -1) 
