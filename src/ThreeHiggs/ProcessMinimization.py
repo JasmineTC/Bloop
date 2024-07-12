@@ -6,7 +6,7 @@ def makeFieldDimensionless(temp: list[float], field: list[float]) -> list[float]
 def jumpFinder(array: np.ndarray[float])-> np.ndarray[int]:
     return np.nonzero(np.abs(array) > 0.2)[0]
 
-def interpretData(result, filename: str):
+def interpretData(result, filename: str, bmInput: dict[str, float]):
     v1ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][0]) )
     v2ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][1]) )
     v3ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][2]) )
@@ -18,7 +18,8 @@ def interpretData(result, filename: str):
                     "jumpsv1": [],
                     "jumpsv2": [],
                     "jumpsv3": [],
-                    "UltraSoftTemp": result["UltraSoftTemp"]}
+                    "UltraSoftTemp": result["UltraSoftTemp"],
+                    "bmInput": bmInput}
 
     if len(jumpv1) == 0 and len(jumpv2) == 0 and len(jumpv3)==1: ##Standard one step case
         interpResult["jumpsv3"].append(( v3ListRenormDiff[int(jumpv3)], 

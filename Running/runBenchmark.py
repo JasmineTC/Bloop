@@ -25,7 +25,7 @@ def doMinimization(indexAndBenchMark):
 
   if args.ProcessMin == True:
       from ThreeHiggs.ProcessMinimization import interpretData
-      interpretData(minimizationResult, filename)
+      interpretData(minimizationResult, filename, benchMark["bmInput"])
 
 
 def getLines(relativePathToResource):
