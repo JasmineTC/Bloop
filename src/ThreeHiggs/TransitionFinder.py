@@ -90,21 +90,18 @@ class TransitionFinder:
         return self.convertResultsToDict(minimizationResults)
     
     def convertResultsToDict(self, minimizationResults):
+        # minimumLocationList = [result[2] for result in minimizationResults]
+        # minimumLocationList = np.transpose(minimumLocationList)
+        
         tempList = [result[0] for result in minimizationResults]
-        minimumLocationList = [result[2] for result in minimizationResults]
-        bIsPerturbativeList = [result[3] for result in minimizationResults]
         bReachedUltraSoftScaleList = [result[4] for result in minimizationResults]
-        bIsBoundedList = [result[5] for result in minimizationResults]
-            
-        minimumLocationList = np.transpose(minimumLocationList)
-            
         ##Gives the first index where the ultrasoft condition is True or -1 is none is found
         ultraSoftWarning: int = next((i for i, val in enumerate(bReachedUltraSoftScaleList) if val == True), -1) 
         TUltraSoft = tempList[ultraSoftWarning] if ultraSoftWarning >=0 else -1
 
         return {"T": tempList,
                 "valueVeff": [result[1] for result in minimizationResults],
-                "minimumLocation": minimumLocationList.tolist(),
+                "minimumLocation": np.transpose([result[2] for result in minimizationResults]).tolist(),
                 "bIsPerturbative": all([result[3] for result in minimizationResults]),
                 "UltraSoftTemp": TUltraSoft,
                 "bBoundFromBelow": all([result[5] for result in minimizationResults]) }
