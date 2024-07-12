@@ -42,6 +42,7 @@ class TransitionFinder:
  
         counter = 0
         verbose = False
+        print ("Hi T loop starting")
         for T in TRange:
             if verbose:
                 print (f'Start of temp = {T} loop')
@@ -73,8 +74,22 @@ class TransitionFinder:
             params3D = self.model.dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
             
             self.model.effectivePotential.setModelParameters(params3D)
-
-            minimumLocation, valueVeff = self.model.effectivePotential.findGlobalMinimum()
+            initialGuesses = [[0.1,0.1,0.1],
+                              [-0.1,0.1,0.1],
+                              [1e-3,1e-3,4],
+                              [1e-3,1e-3,10],
+                              [1e-3,1e-3,25], 
+                              [5,5,1e-4],
+                              [-5,5,1e-4],
+                              [40,40,1e-4], 
+                              [-40,40,1e-4],
+                              [5,5,5],
+                              [-5,5,5], 
+                              [40,40,40],
+                              [-40,40,40], 
+                              [59,59,59], 
+                              [-59,59,59]]
+            minimumLocation, valueVeff = self.model.effectivePotential.findGlobalMinimum(initialGuesses)
             bReachedUltraSoftScale = self.model.effectivePotential.bReachedUltraSoftScale(minimumLocation, T)
 
 
