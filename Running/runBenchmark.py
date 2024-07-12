@@ -27,7 +27,6 @@ def doMinimization(indexAndBenchMark):
       from ThreeHiggs.ProcessMinimization import interpretData
       interpretData(minimizationResult, filename, benchMark["bmInput"])
 
-
 def getLines(relativePathToResource):
     ## fallback to hardcoded package name if the __package__ call fails
     packageName = __package__ or "ThreeHiggs"
