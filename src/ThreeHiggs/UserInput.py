@@ -30,9 +30,6 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('-c', '--cores', action = 'store', default = 1, dest = 'cores', type = int, choices = list(range(1, multiprocessing.cpu_count() + 1)),
                           help = "Used to specify how many cores to run the bench mark list on")
 
-        self.add_argument('-P', '--phcpack', action = 'store_true', default=False, dest = 'phcPack',  
-                          help = "Used to specify if PHCpack should be used to find tree level min")
-
         self.add_argument('-v', '--verbose', action = 'store', default = False, dest = 'verbose')
 
         self.add_argument('--loFile', 
