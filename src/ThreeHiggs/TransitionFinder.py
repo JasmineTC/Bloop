@@ -90,7 +90,6 @@ class TransitionFinder:
         return self.convertResultsToDict(minimizationResults)
     
     def convertResultsToDict(self, minimizationResults):
-        
         tempList = [float(result[0]) for result in minimizationResults]
         bReachedUltraSoftScaleList = [result[4] for result in minimizationResults]
         ##Gives the first index where the ultrasoft condition is True or -1 is none is found
