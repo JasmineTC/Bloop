@@ -90,8 +90,6 @@ class TransitionFinder:
         return self.convertResultsToDict(minimizationResults)
     
     def convertResultsToDict(self, minimizationResults):
-        # minimumLocationList = [result[2] for result in minimizationResults]
-        # minimumLocationList = np.transpose(minimumLocationList)
         
         tempList = [result[0] for result in minimizationResults]
         bReachedUltraSoftScaleList = [result[4] for result in minimizationResults]
