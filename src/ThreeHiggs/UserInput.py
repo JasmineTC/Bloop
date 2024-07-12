@@ -36,6 +36,9 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--plot', action = 'store_true', default = False, dest = 'plot',
                           help = 'Bool value, if turned on basic plotting tools are used to plot data from the minimisation')
         
+        self.add_argument('--ProcessMin', action = 'store_true', default = False, dest = 'ProcessMin',
+                          help = 'Bool value, if turned on basic processing tools are used to identify phase transitions from the minimisation results')
+        
         self.add_argument('--bAbsMass', action = 'store_true', default = False, dest = 'bAbsMass',
                           help = "If turned on then take the abs value of masses to avoid negative mass inside sqrts, off by default")
         
