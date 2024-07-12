@@ -42,7 +42,6 @@ class TransitionFinder:
  
         counter = 0
         verbose = False
-        print ("Hi T loop starting")
         for T in TRange:
             if verbose:
                 print (f'Start of temp = {T} loop')

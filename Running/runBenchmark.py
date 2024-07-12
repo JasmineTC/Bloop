@@ -109,8 +109,7 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
 
     ## Model object setup + load matching relations
     from ThreeHiggs.GenericModel import GenericModel
-    model3HDM = GenericModel(effectivePotential, dimensionalReduction)
-    print ("Hi")
+    model3HDM = GenericModel(effectivePotential, dimensionalReduction)sa
     with open(args.benchMarkFile) as benchMarkFile:
       from multiprocessing import Pool
       with Pool(args.cores) as pool:
