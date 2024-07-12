@@ -25,8 +25,7 @@ def doMinimization(indexAndBenchMark):
 
   if args.ProcessMin == True:
       from ThreeHiggs.ProcessMinimization import interpretData
-      interpretData(minimizationResult, filename)
-
+      interpretData(minimizationResult, filename, benchMark["bmInput"])
 
 def getLines(relativePathToResource):
     ## fallback to hardcoded package name if the __package__ call fails
@@ -110,7 +109,6 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
     ## Model object setup + load matching relations
     from ThreeHiggs.GenericModel import GenericModel
     model3HDM = GenericModel(effectivePotential, dimensionalReduction)
-    print ("Hi")
     with open(args.benchMarkFile) as benchMarkFile:
       from multiprocessing import Pool
       with Pool(args.cores) as pool:

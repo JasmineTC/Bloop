@@ -36,6 +36,9 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--plot', action = 'store_true', default = False, dest = 'plot',
                           help = 'Bool value, if turned on basic plotting tools are used to plot data from the minimisation')
         
+        self.add_argument('--ProcessMin', action = 'store_true', default = False, dest = 'ProcessMin',
+                          help = 'Bool value, if turned on basic processing tools are used to identify phase transitions from the minimisation results')
+        
         self.add_argument('--bAbsMass', action = 'store_true', default = False, dest = 'bAbsMass',
                           help = "If turned on then take the abs value of masses to avoid negative mass inside sqrts, off by default")
         
@@ -44,9 +47,9 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--absLocalTolerance', action = 'store', default = 1e-2, type = float, dest = 'absLocalTolerance')
         self.add_argument('--relLocalTolerance', action = 'store', default = 1e-3, type = float, dest = 'relLocalTolerance')
         
-        self.add_argument('--v1Bounds', nargs = 2, action = 'store', default = [1e-6, 1e-6], type = float, dest = 'v1Bounds')
-        self.add_argument('--v2Bounds', nargs = 2, action = 'store', default = [1e-6, 1e-6], type = float, dest = 'v2Bounds')
-        self.add_argument('--v3Bounds', nargs = 2, action = 'store', default = [1e-6, 100], type = float, dest = 'v3Bounds')
+        self.add_argument('--v1Bounds', nargs = 2, action = 'store', default = [-60, 60], type = float, dest = 'v1Bounds')
+        self.add_argument('--v2Bounds', nargs = 2, action = 'store', default = [1e-4, 60], type = float, dest = 'v2Bounds')
+        self.add_argument('--v3Bounds', nargs = 2, action = 'store', default = [1e-4, 60], type = float, dest = 'v3Bounds')
         
         self.add_argument('--TRangeStart', action = 'store', default = 50, type = float, dest = 'TRangeStart')
         self.add_argument('--TRangeEnd', action = 'store', default = 200, type = float, dest = 'TRangeEnd')
