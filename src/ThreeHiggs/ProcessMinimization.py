@@ -14,7 +14,8 @@ def interpretData(result, filename: str, bmInput: dict[str, float]):
     jumpv1 = jumpFinder(v1ListRenormDiff)
     jumpv2 = jumpFinder(v2ListRenormDiff)
     jumpv3 = jumpFinder(v3ListRenormDiff)
-    interpResult = {"bad": False, 
+    interpResult = {"bBoundFromBelow": result["bBoundFromBelow"],
+                    "bad": False, 
                     "jumpsv1": [],
                     "jumpsv2": [],
                     "jumpsv3": [],
