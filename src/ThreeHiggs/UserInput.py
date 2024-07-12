@@ -44,9 +44,9 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--absLocalTolerance', action = 'store', default = 1e-2, type = float, dest = 'absLocalTolerance')
         self.add_argument('--relLocalTolerance', action = 'store', default = 1e-3, type = float, dest = 'relLocalTolerance')
         
-        self.add_argument('--v1Bounds', nargs = 2, action = 'store', default = [1e-6, 1e-6], type = float, dest = 'v1Bounds')
-        self.add_argument('--v2Bounds', nargs = 2, action = 'store', default = [1e-6, 1e-6], type = float, dest = 'v2Bounds')
-        self.add_argument('--v3Bounds', nargs = 2, action = 'store', default = [1e-6, 100], type = float, dest = 'v3Bounds')
+        self.add_argument('--v1Bounds', nargs = 2, action = 'store', default = [-60, 60], type = float, dest = 'v1Bounds')
+        self.add_argument('--v2Bounds', nargs = 2, action = 'store', default = [1e-4, 60], type = float, dest = 'v2Bounds')
+        self.add_argument('--v3Bounds', nargs = 2, action = 'store', default = [1e-4, 60], type = float, dest = 'v3Bounds')
         
         self.add_argument('--TRangeStart', action = 'store', default = 50, type = float, dest = 'TRangeStart')
         self.add_argument('--TRangeEnd', action = 'store', default = 200, type = float, dest = 'TRangeEnd')
