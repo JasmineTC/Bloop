@@ -8,7 +8,8 @@ def doMinimization(indexAndBenchMark):
   model3HDM.setInputParams(benchMark)
   minimizationResult = transitionFinder.traceFreeEnergyMinimum(args.TRangeStart,
                                                                args.TRangeEnd,
-                                                               args.TRangeStepSize)
+                                                               args.TRangeStepSize,
+                                                               verbose = args.verbose)
 
   filename = f"{args.resultsDirectory}/BM_{index}"
   
@@ -106,7 +107,8 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
     dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(parsedExpressions["hardToSoft"]),
                                                 ParsedExpressionSystem(parsedExpressions["softScaleRGE"]),
-                                                ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]))
+                                                ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]),
+                                                verbose = True)
 
     ## Model object setup + load matching relations
     from ThreeHiggs.GenericModel import GenericModel

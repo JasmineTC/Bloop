@@ -1,25 +1,38 @@
 ## Collects all needed matching relations to go from 4D params to 3D ultrasoft EFT
 class DimensionalReduction():
 
-    def __init__(self, hardToSoft, softScaleRGE, softToUltraSoft):
+    def __init__(self, hardToSoft, softScaleRGE, softToUltraSoft, verbose = False):
         self.matchToSoft = hardToSoft
         self.softScaleRGE = softScaleRGE
         self.matchToUltrasoft = softToUltraSoft
 
-        verbose = False ## WIP set this from user arg
         if verbose:
             print("Setup Hard -> Soft matching relations.")
             print("-- Inputs:")
-            print(self.matchToSoft.parameterNames)
+            from functools import reduce
+            print(sorted(list(reduce(lambda a, b: a + [b],
+                                     [parsedExpression.identifier for parsedExpression in self.matchToSoft.parsedExpressions],
+                                     []))))
+
             print("-- Outputs:")
-            print( list(self.matchToSoft.matchingRelations.keys()) )
+            print(sorted(list(set(reduce(lambda a, b: a | set(b),
+                                         [parsedExpression.symbols for parsedExpression in self.matchToSoft.parsedExpressions],
+                                         set())))))
+
             print("")
         
             print("Setup Soft -> Ultrasoft matching relations.")
             print("-- Inputs:")
-            print(self.matchToUltrasoft.parameterNames)
+            from functools import reduce
+            print(sorted(list(reduce(lambda a, b: a + [b],
+                                     [parsedExpression.identifier for parsedExpression in self.matchToUltrasoft.parsedExpressions],
+                                     []))))
+
             print("-- Outputs:")
-            print( list(self.matchToUltrasoft.matchingRelations.keys()) )
+            print(sorted(list(set(reduce(lambda a, b: a | set(b),
+                                         [parsedExpression.symbols for parsedExpression in self.matchToUltrasoft.parsedExpressions],
+                                         set())))))
+
             print("")
 
     def getEFTParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
