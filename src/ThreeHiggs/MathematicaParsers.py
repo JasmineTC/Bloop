@@ -65,6 +65,17 @@ def parseRotationMatrix(lines):
 
 from unittest import TestCase
 class MathematicaParsersUnitTests(TestCase):
+    def test_removeSuffices(self):
+        reference = ["myVarsq", "sqmyVar",
+                     "myVarsq", "myVar", "3dsqmyVar", "3dmyVar",
+                     "myVarsq", "myVar", "USsqmyVar", "USmyVar"]
+
+        source = ["myVar^2", "^2myVar", 
+                  "myVar3dsq", "myVar3d", "3dsqmyVar", "3dmyVar",
+                  "myVarUSsq", "myVarUS", "USsqmyVar", "USmyVar"]
+
+        self.assertEqual(reference, [removeSuffices(sourceString) for sourceString in source])
+
     def test_parseExpression(self):
         reference = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
                      "identifier": "Identifier",
