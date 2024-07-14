@@ -20,7 +20,8 @@ class TransitionFinder:
 
     def traceFreeEnergyMinimum(self, TRangeStart: float, 
                                TRangeEnd: float, 
-                               TRangeStepSize: float) -> tuple[np.ndarray, np.ndarray]:
+                               TRangeStepSize: float,
+                               verbose = False) -> tuple[np.ndarray, np.ndarray]:
         renormalizedParams = self.model.calculateRenormalizedParameters(self.model.inputParams)
         
         """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale like 7T.
@@ -41,7 +42,6 @@ class TransitionFinder:
         minimizationResults = []
  
         counter = 0
-        verbose = False
         for T in TRange:
             if verbose:
                 print (f'Start of temp = {T} loop')
@@ -89,8 +89,9 @@ class TransitionFinder:
                               [59,59,59], 
                               [-59,59,59]]
             minimumLocation, valueVeff = self.model.effectivePotential.findGlobalMinimum(initialGuesses)
-            bReachedUltraSoftScale = self.model.effectivePotential.bReachedUltraSoftScale(minimumLocation, T)
-
+            bReachedUltraSoftScale = self.model.effectivePotential.bReachedUltraSoftScale(minimumLocation, 
+                                                                                          T, 
+                                                                                          verbose = verbose)
 
             minimizationResults.append( [T, valueVeff, minimumLocation, bIsPerturbative(paramsForMatching), bReachedUltraSoftScale, 1] )
 

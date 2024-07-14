@@ -92,7 +92,7 @@ class VeffParams:
         self.actionParams = inputParams
 
 
-    def evaluateAll(self, fields: list[float], bNeedsDiagonalization=True) -> dict[str, float]:
+    def evaluateAll(self, fields: list[float], bNeedsDiagonalization=True, verbose = False) -> dict[str, float]:
         """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation.
         """
         # Gradually build a dict containing (key, val) for all needed symbols
@@ -117,11 +117,11 @@ class VeffParams:
         knownParamsDict |= vectorMasses
 
         ## Scalars       
-        knownParamsDict |= self.diagonalizeScalars(knownParamsDict)
+        knownParamsDict |= self.diagonalizeScalars(knownParamsDict, verbose)
 
         return knownParamsDict
 
-    def diagonalizeScalars(self, params: dict[str, float]) -> dict[str, float]:
+    def diagonalizeScalars(self, params: dict[str, float], verbose = False) -> dict[str, float]:
         """Finds a rotation matrix that diagonalizes the scalar mass matrix
         and returns a dict with diagonalization-specific params
         """
@@ -134,7 +134,6 @@ class VeffParams:
             eigenValue, vects = diagonalizeSymmetric( numericalM, self.diagonalizationAlgo)
 
             ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
-            verbose = False
             if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
                 diagonalBlock = np.transpose(vects) @ numericalM @ vects
                 offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
@@ -234,20 +233,23 @@ class EffectivePotential:
         self.expressions = []
 
 
-    def evaluatePotential(self, fields: list[float]) -> complex:
+    def evaluatePotential(self, fields: list[float], verbose = False) -> complex:
         """Evaluate Veff at specified field values. Uses the currently set model parameters.
         """
         
         self.params.fields = fields
     
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
-        paramDict = self.params.evaluateAll(fields, bNeedsDiagonalization=self.bNeedsDiagonalization)
+        paramDict = self.params.evaluateAll(fields, 
+                                            bNeedsDiagonalization=self.bNeedsDiagonalization, 
+                                            verbose = verbose)
 
         return sum(self.expressions(paramDict)) ## Sum because the result is a list of tree, 1loop etc 
 
-    def findLocalMinimum(self, initialGuess: list[float], algo) -> tuple[list[float], complex]:
+    def findLocalMinimum(self, initialGuess: list[float], algo, verbose = False) -> tuple[list[float], complex]:
         
-        VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields) ) ## Minimize real part only:
+        VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields, 
+                                                                      verbose = verbose) ) ## Minimize real part only:
 
         location, value = self.minimizer.minimize(VeffWrapper, initialGuess, algo)
 
@@ -255,13 +257,13 @@ class EffectivePotential:
             location = np.full(len[initialGuess], np.nan )
             value = np.nan
         else:
-            value = self.evaluatePotential(location) ## evaluate once more to get the possible imag parts
+            value = self.evaluatePotential(location, verbose = verbose) ## evaluate once more to get the possible imag parts
             if value.imag > 1e-6: ## If the imaginary part of the potential is large then minimisation has found unphysical min, throw it out
                 value = np.inf
         ## Taking the real part so compactiable with json (case where imaginary part is non-neligable has already been dealt with)
         return location, np.real(value) 
 
-    def findGlobalMinimum(self, minimumCandidates: list[list[float]] = None) -> tuple[list[float], complex]:
+    def findGlobalMinimum(self, minimumCandidates: list[list[float]] = None, verbose = False) -> tuple[list[float], complex]:
         """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
         Generally will not work very well if no candidates minima are given. 
         Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
@@ -273,18 +275,18 @@ class EffectivePotential:
         bestResult = ((np.nan, np.nan, np.nan), np.inf)
         
         if self.minimizationAlgo == "combo":
-            result = self.findLocalMinimum(minimumCandidates[0], "directGlobal")
+            result = self.findLocalMinimum(minimumCandidates[0], "directGlobal", verbose = verbose)
             if result[1] < bestResult[1]:
                 bestResult = result
             
             for candidate in minimumCandidates:
-                result = self.findLocalMinimum(candidate, "BOBYQA")
+                result = self.findLocalMinimum(candidate, "BOBYQA", verbose = verbose)
                 if result[1] < bestResult[1]:
                     bestResult = result
                     
         else:
             for candidate in minimumCandidates:
-                result = self.findLocalMinimum(candidate, self.minimizationAlgo)
+                result = self.findLocalMinimum(candidate, self.minimizationAlgo, verbose = verbose)
                 if result[1] < bestResult[1]:
                     bestResult = result
         return bestResult
@@ -308,7 +310,7 @@ class EffectivePotential:
                               paramDict['lam31'], paramDict['lam31p']]) 
         return np.max(np.abs(couplings))**2 * T / (16*np.pi)
 
-    def bReachedUltraSoftScale(self, fields: list[complex], T: float) -> bool:
+    def bReachedUltraSoftScale(self, fields: list[complex], T: float, verbose = False) -> bool:
         '''
         Check if we can trust the results by comparing the masses we find at the minimum to the ultra soft scale i.e.
         Are all physical masses > g^2 T/16pi, we use the largest coupling in the theory to do the comparrsion 
@@ -319,7 +321,9 @@ class EffectivePotential:
         ## TODO: the symmetric phase cannot be described by pert theory so shouldn't be trusted, so should prob just return False right away
         ## But get someone to check this
         goldStone = 0 if np.all(np.abs(fields) < 0.1) else 3
-        paramDict = self.params.evaluateAll(fields, bNeedsDiagonalization=self.bNeedsDiagonalization)
+        paramDict = self.params.evaluateAll(fields, 
+                                            bNeedsDiagonalization=self.bNeedsDiagonalization,
+                                            verbose = verbose)
 
         ultraSoftScale = self.getUltraSoftScale(paramDict, T)
     
