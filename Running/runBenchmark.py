@@ -64,7 +64,10 @@ if args.firstStage <= Stages.convertMathematica <= args.lastStage:
               "scalarMassMatrixBottomRight": parseMassMatrix(getLines(args.scalarMassMatrixBottomRightFile)),
               "scalarMassMatrixBottomRightDefinitions": parseExpressionSystem(getLines(args.scalarMassMatrixBottomRightDefinitionsFile)),
               "scalarRotationMatrix": parseRotationMatrix(getLines(args.scalarRotationFile)),
-              "veff": parseExpressionSystem(veffLines)},
+              "veff": parseExpressionSystem(veffLines),
+              "hardToSoft": parseExpressionSystem(getLines(args.hardToSoftFile)),
+              "softScaleRGE": parseExpressionSystem(getLines(args.softScaleRGEFile)),
+              "softToUltraSoft": parseExpressionSystem(getLines(args.softToUltraSoftFile))},
              parsedExpressionsFile,
              indent = 4)
 
@@ -101,10 +104,9 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                 args.v3Bounds) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
-    from ThreeHiggs.ParameterMatching import ParameterMatching
-    dimensionalReduction = DimensionalReduction(ParameterMatching(getLines(args.hardToSoftFile)),
-                                                ParameterMatching(getLines(args.softScaleRGEFile)),
-                                                ParameterMatching(getLines(args.softToUltraSoftFile)))
+    dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(parsedExpressions["hardToSoft"]),
+                                                ParsedExpressionSystem(parsedExpressions["softScaleRGE"]),
+                                                ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]))
 
     ## Model object setup + load matching relations
     from ThreeHiggs.GenericModel import GenericModel

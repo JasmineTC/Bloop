@@ -1,4 +1,18 @@
-def parseExpression(line):
+def removeSuffices(string):
+    string = string.replace("^2", "sq")
+
+    #""" For ultrasoft theory DRalgo appends "US" => remove that too. Gauge couplings again need special treatment."""
+    string = string[:-len("US")] if string.endswith("US") else string
+    string = string.replace("USsq", "sq") if string.endswith("USsq") else string
+
+    ## Remove "3d" suffix with even crazier oneliner (suffix meaning that it's removed only from end of the string)
+    string = string[:-len("3d")] if string.endswith("3d") else string
+    ## Gauge couplings are originally of form g3d^2 so account for that too 
+    string = string.replace("3dsq", "sq") if string.endswith("3dsq") else string
+    
+    return string
+
+def parseExpression(line, remove3DSuffices = False):
     identifier = "anonymous"
 
     if ("->" in line):
@@ -6,13 +20,14 @@ def parseExpression(line):
 
     from sympy.parsing.mathematica import parse_mathematica
     from .CommonUtils import replaceGreekSymbols
-    expression = parse_mathematica(replaceGreekSymbols(line))
+    identifier = removeSuffices(replaceGreekSymbols(identifier))
+    expression = parse_mathematica(replaceGreekSymbols(line).replace("3d", ""))
     symbols = [str(symbol) for symbol in expression.free_symbols]
 
     return {"identifier": identifier, "expression": str(expression), "symbols": sorted(symbols)}
 
-def parseExpressionSystem(lines):
-    return [parseExpression(line) for line in lines]
+def parseExpressionSystem(lines, remove3DSuffices = False):
+    return [parseExpression(line, remove3DSuffices) for line in lines]
 
 def parseMatrix(lines):
     return [[symbol.strip() for symbol in line.strip()
