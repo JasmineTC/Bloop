@@ -56,7 +56,7 @@ class TransitionFinder:
             
             from ThreeHiggs.GenericModel import bIsBounded, bIsPerturbative
             if not bIsBounded(paramsForMatching):
-                minimizationResults.append( [1, 0, [1], False, False, False] )
+                minimizationResults.append( [1, 0, [[0],[0],[0]], False, False, False] )
                 break
                 
             
