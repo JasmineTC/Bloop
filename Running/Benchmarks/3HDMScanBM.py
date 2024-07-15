@@ -110,6 +110,6 @@ for mS1 in range(63, 100, 5):
                             })
                             count+=1 
                             
-with open("Running/Benchmarks/3HDMScanBM.json", "w") as outfile: 
+with open("3HDMScanBM.json", "w") as outfile: 
     json.dump(ThreeHiggsBMDictList, outfile, indent = 4)
 
