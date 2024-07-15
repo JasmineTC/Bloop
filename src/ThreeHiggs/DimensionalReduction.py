@@ -1,32 +1,45 @@
 ## Collects all needed matching relations to go from 4D params to 3D ultrasoft EFT
 class DimensionalReduction():
 
-    def __init__(self, hardToSoft, softScaleRGE, softToUltraSoft):
+    def __init__(self, hardToSoft, softScaleRGE, softToUltraSoft, verbose = False):
         self.matchToSoft = hardToSoft
         self.softScaleRGE = softScaleRGE
         self.matchToUltrasoft = softToUltraSoft
-        self.matchToUltrasoft.matchingRelations = self.__remove3dSuffices(self.matchToUltrasoft.matchingRelations, bRemoveSuffixUS=True)
-        verbose = False ## WIP set this from user arg
+
         if verbose:
             print("Setup Hard -> Soft matching relations.")
             print("-- Inputs:")
-            print(self.matchToSoft.parameterNames)
+            from functools import reduce
+            print(sorted(list(reduce(lambda a, b: a + [b],
+                                     [parsedExpression.identifier for parsedExpression in self.matchToSoft.parsedExpressions],
+                                     []))))
+
             print("-- Outputs:")
-            print( list(self.matchToSoft.matchingRelations.keys()) )
+            print(sorted(list(set(reduce(lambda a, b: a | set(b),
+                                         [parsedExpression.symbols for parsedExpression in self.matchToSoft.parsedExpressions],
+                                         set())))))
+
             print("")
         
             print("Setup Soft -> Ultrasoft matching relations.")
             print("-- Inputs:")
-            print(self.matchToUltrasoft.parameterNames)
+            from functools import reduce
+            print(sorted(list(reduce(lambda a, b: a + [b],
+                                     [parsedExpression.identifier for parsedExpression in self.matchToUltrasoft.parsedExpressions],
+                                     []))))
+
             print("-- Outputs:")
-            print( list(self.matchToUltrasoft.matchingRelations.keys()) )
+            print(sorted(list(set(reduce(lambda a, b: a | set(b),
+                                         [parsedExpression.symbols for parsedExpression in self.matchToUltrasoft.parsedExpressions],
+                                         set())))))
+
             print("")
 
     def getEFTParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
         """This goes from input hard scale parameters to whatever the final EFT is.
         """
         softScaleParams = self.getSoftScaleParams(paramsForMatching, goalRGScale)
-        ultrasoftScaleParams = self.matchToUltrasoft(softScaleParams)
+        ultrasoftScaleParams = self.matchToUltrasoft(softScaleParams, bReturnDict = True)
 
         ## HACK this is the RG scale name in Veff
         ultrasoftScaleParams["mu3US"] = goalRGScale
@@ -39,7 +52,7 @@ class DimensionalReduction():
     def getSoftScaleParams(self, paramsForMatching: dict[str, float], goalScale: float) -> dict[str, float]:
         """Match hard scale --> soft scale theory
         """
-        outParams = self.matchToSoft(paramsForMatching)
+        outParams = self.matchToSoft(paramsForMatching, bReturnDict = True)
 
         ## RG scale needs to be in the parameter dict
         outParams["RGScale"] = paramsForMatching["RGScale"]
@@ -47,7 +60,7 @@ class DimensionalReduction():
         outParams["startScale"] = outParams["RGScale"]
 
         ## The above gives masses only (usually). So merge it to the initial dict to get all params
-        outParams |= self.softScaleRGE(outParams)
+        outParams |= self.softScaleRGE(outParams, bReturnDict = True)
         outParams["RGScale"] = goalScale
 
         return outParams
@@ -56,25 +69,3 @@ class DimensionalReduction():
     def getUltrasoftScaleParams(self, softScaleParams: dict[str, float], goalRGScale: float) -> dict[str, float]:
         return self.matchToUltrasoft(softScaleParams)
 
-    @staticmethod
-    def __remove3dSuffices(matchingRelations: dict[str, any], bRemoveSuffixUS=False) -> dict[str, any]:
-        """Modifies notation in matching relations so that the matched param dict does not use the "3d" suffix (comes from DRalgo by default)
-        """
-
-        newDict = matchingRelations
-
-        # DRalgo also gives gauge couplings as "g13d^2" etc, which is terrible => change to g1sq.
-        # Crazy oneliner, creates a new dict where just the key names are different:
-        newDict = { key.replace("^2", "sq") : value for key, value in newDict.items() }
-
-        if (bRemoveSuffixUS):
-            """ For ultrasoft theory DRalgo appends "US" => remove that too. Gauge couplings again need special treatment."""
-            newDict = { key[:-len("US")] if key.endswith("US") else key : value for key, value in newDict.items() }
-            newDict = { key.replace("USsq", "sq") if key.endswith("USsq") else key : value for key, value in newDict.items() }
-
-        ## Remove "3d" suffix with even crazier oneliner (suffix meaning that it's removed only from end of the string)
-        newDict = { key[:-len("3d")] if key.endswith("3d") else key : value for key, value in newDict.items() }
-        ## Gauge couplings are originally of form g3d^2 so account for that too 
-        newDict = { key.replace("3dsq", "sq") if key.endswith("3dsq") else key : value for key, value in newDict.items() }
-    
-        return newDict
