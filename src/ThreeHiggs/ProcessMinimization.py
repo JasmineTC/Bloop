@@ -15,6 +15,8 @@ def interpretData(result, bmInput: dict[str, float]):
                     "jumpsv3": [],
                     "UltraSoftTemp": result["UltraSoftTemp"],
                     "bmInput": bmInput}
+    if not result["bBoundFromBelow"]:
+        return interpResult ##If unbounded from below no point doing these calcs
     
     v1ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][0]) )
     v2ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][1]) )
