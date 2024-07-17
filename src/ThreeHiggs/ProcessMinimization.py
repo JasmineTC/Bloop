@@ -6,14 +6,7 @@ def makeFieldDimensionless(temp: list[float], field: list[float]) -> list[float]
 def jumpFinder(array: np.ndarray[float])-> np.ndarray[int]:
     return np.nonzero(np.abs(array) > 0.2)[0]
 
-def interpretData(result, filename: str, bmInput: dict[str, float]):
-    v1ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][0]) )
-    v2ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][1]) )
-    v3ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][2]) )
-    
-    jumpv1 = jumpFinder(v1ListRenormDiff)
-    jumpv2 = jumpFinder(v2ListRenormDiff)
-    jumpv3 = jumpFinder(v3ListRenormDiff)
+def interpretData(result, bmInput: dict[str, float]):
     interpResult = {"bBoundFromBelow": result["bBoundFromBelow"],
                     "bIsPerturbative": result["bIsPerturbative"],
                     "bad": False, 
@@ -22,6 +15,14 @@ def interpretData(result, filename: str, bmInput: dict[str, float]):
                     "jumpsv3": [],
                     "UltraSoftTemp": result["UltraSoftTemp"],
                     "bmInput": bmInput}
+    
+    v1ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][0]) )
+    v2ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][1]) )
+    v3ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][2]) )
+    
+    jumpv1 = jumpFinder(v1ListRenormDiff)
+    jumpv2 = jumpFinder(v2ListRenormDiff)
+    jumpv3 = jumpFinder(v3ListRenormDiff)
 
     if len(jumpv1) == 0 and len(jumpv2) == 0 and len(jumpv3)==1: ##Standard one step case
         interpResult["jumpsv3"].append(( v3ListRenormDiff[int(jumpv3)], 
@@ -51,6 +52,5 @@ def interpretData(result, filename: str, bmInput: dict[str, float]):
         for val in jumpv3:
             interpResult["jumpsv3"].append(( v1ListRenormDiff[int(jumpv3)], 
                                              result["T"][int(jumpv3)] ))
-    from json import dumps
-    open(f"{filename}_interp.json", "w").write(dumps(interpResult, indent = 4))
+    return interpResult
     
