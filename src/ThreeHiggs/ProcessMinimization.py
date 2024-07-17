@@ -23,7 +23,6 @@ def interpretData(result, bmInput: dict[str, float]):
     jumpv1 = jumpFinder(v1ListRenormDiff)
     jumpv2 = jumpFinder(v2ListRenormDiff)
     jumpv3 = jumpFinder(v3ListRenormDiff)
-    print (jumpv3)
 
     if len(jumpv1) == 0 and len(jumpv2) == 0 and len(jumpv3) == 1: ##Standard one step case
         interpResult["jumpsv3"].append(( v3ListRenormDiff[int(jumpv3)], 
@@ -53,6 +52,5 @@ def interpretData(result, bmInput: dict[str, float]):
         for val in jumpv3:
             interpResult["jumpsv3"].append(( v3ListRenormDiff[int(val)], 
                                              result["T"][int(val)] ))
-    print (interpResult)
     return interpResult
     
