@@ -36,7 +36,7 @@ def interpretData(result, bmInput: dict[str, float]):
             interpResult["jumpsv1"].append(( v1ListRenormDiff[int(jumpv1)], 
                                              result["T"][int(jumpv1)] ))
         for val in jumpv2:
-            interpResult["jumpsv2"].append(( v1ListRenormDiff[int(jumpv2)], 
+            interpResult["jumpsv2"].append(( v2ListRenormDiff[int(jumpv2)], 
                                              result["T"][int(jumpv2)] ))
         for val in jumpv3:
             interpResult["jumpsv3"].append(( v3ListRenormDiff[int(jumpv3)], 
@@ -47,7 +47,7 @@ def interpretData(result, bmInput: dict[str, float]):
             interpResult["jumpsv1"].append(( v1ListRenormDiff[int(jumpv1)], 
                                              result["T"][int(jumpv1)] ))
         for val in jumpv2:
-            interpResult["jumpsv2"].append(( v1ListRenormDiff[int(jumpv2)], 
+            interpResult["jumpsv2"].append(( v2ListRenormDiff[int(jumpv2)], 
                                              result["T"][int(jumpv2)] ))
         for val in jumpv3:
             interpResult["jumpsv3"].append(( v1ListRenormDiff[int(jumpv3)], 
