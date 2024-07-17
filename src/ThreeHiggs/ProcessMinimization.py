@@ -32,7 +32,7 @@ def interpretData(result, bmInput: dict[str, float]):
     
     elif len(jumpv1) >0 and len(jumpv2) >0 and len(jumpv3) >0: ## 2 step case
     ## If v1 and v2 are large by our lowest temp (i.e. the 0th element T~50GeV) then v3 might not be global min or transition might happen too late
-        if result["fields"][0][0] + result["fields"][1][0] > 0.1:
+        if result["minimumLocation"][0][0] + result["minimumLocation"][1][0] > 0.1:
             result["bad"] = True
         for val in jumpv1:
             interpResult["jumpsv1"].append(( v1ListRenormDiff[int(val)], 
