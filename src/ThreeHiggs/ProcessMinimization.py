@@ -23,8 +23,9 @@ def interpretData(result, bmInput: dict[str, float]):
     jumpv1 = jumpFinder(v1ListRenormDiff)
     jumpv2 = jumpFinder(v2ListRenormDiff)
     jumpv3 = jumpFinder(v3ListRenormDiff)
+    print (jumpv3)
 
-    if len(jumpv1) == 0 and len(jumpv2) == 0 and len(jumpv3)==1: ##Standard one step case
+    if len(jumpv1) == 0 and len(jumpv2) == 0 and len(jumpv3) == 1: ##Standard one step case
         interpResult["jumpsv3"].append(( v3ListRenormDiff[int(jumpv3)], 
                                          result["T"][int(jumpv3)] ))
     
@@ -33,24 +34,25 @@ def interpretData(result, bmInput: dict[str, float]):
         if result["fields"][0][0] + result["fields"][1][0] > 0.1:
             result["bad"] = True
         for val in jumpv1:
-            interpResult["jumpsv1"].append(( v1ListRenormDiff[int(jumpv1)], 
-                                             result["T"][int(jumpv1)] ))
+            interpResult["jumpsv1"].append(( v1ListRenormDiff[int(val)], 
+                                             result["T"][int(val)] ))
         for val in jumpv2:
-            interpResult["jumpsv2"].append(( v2ListRenormDiff[int(jumpv2)], 
-                                             result["T"][int(jumpv2)] ))
+            interpResult["jumpsv2"].append(( v2ListRenormDiff[int(val)], 
+                                             result["T"][int(val)] ))
         for val in jumpv3:
-            interpResult["jumpsv3"].append(( v3ListRenormDiff[int(jumpv3)], 
-                                             result["T"][int(jumpv3)] ))
+            interpResult["jumpsv3"].append(( v3ListRenormDiff[int(val)], 
+                                             result["T"][int(val)] ))
     else: ## Something has probably gone wrong if this gets hit
         result["bad"] = True
         for val in jumpv1:
-            interpResult["jumpsv1"].append(( v1ListRenormDiff[int(jumpv1)], 
-                                             result["T"][int(jumpv1)] ))
+            interpResult["jumpsv1"].append(( v1ListRenormDiff[int(val)], 
+                                             result["T"][int(val)] ))
         for val in jumpv2:
-            interpResult["jumpsv2"].append(( v2ListRenormDiff[int(jumpv2)], 
-                                             result["T"][int(jumpv2)] ))
+            interpResult["jumpsv2"].append(( v2ListRenormDiff[int(val)], 
+                                             result["T"][int(val)] ))
         for val in jumpv3:
-            interpResult["jumpsv3"].append(( v3ListRenormDiff[int(jumpv3)], 
-                                             result["T"][int(jumpv3)] ))
+            interpResult["jumpsv3"].append(( v3ListRenormDiff[int(val)], 
+                                             result["T"][int(val)] ))
+    print (interpResult)
     return interpResult
     
