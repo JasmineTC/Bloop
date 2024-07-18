@@ -1,3 +1,4 @@
+from json import dumps
 def doMinimization(indexAndBenchMark):
   index, benchMark = indexAndBenchMark
   if not args.firstBenchmark <= index <= args.lastBenchmark:
@@ -17,7 +18,6 @@ def doMinimization(indexAndBenchMark):
   Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
   
   if args.save == True:
-      from json import dumps
       open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
       
   if args.plot == True:
@@ -26,7 +26,9 @@ def doMinimization(indexAndBenchMark):
 
   if args.ProcessMin == True:
       from ThreeHiggs.ProcessMinimization import interpretData
-      interpretData(minimizationResult, filename, benchMark["bmInput"])
+      open(f"{filename}_interp.json", "w").write(dumps(interpretData(minimizationResult,
+                                                                     benchMark["bmInput"]),
+                                                       indent = 4))
 
 def getLines(relativePathToResource):
     ## fallback to hardcoded package name if the __package__ call fails
