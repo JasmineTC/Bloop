@@ -20,7 +20,7 @@ lam33 = ((125.00)**2 / (2.*v**2)) ## Higgs mass^2 / 2*vev**2
 
 lamx = lam12 + min(0, lam12p - 2*m.sqrt(lam1Re**2 + lam1Im**2) )
 
-def theoreticalConstraints(lamy, lamz) -> bool:
+def theoreticalConstraints() -> bool:
     return lam11 > 0 and \
            lam22 > 0 and \
            lam33 > 0 and \
@@ -71,7 +71,10 @@ for mS1 in range(63, 100, 5):
                         lam31 = lam23
                         lam31p = lam23p
                         
-                        if theoreticalConstraints and experimentalConstraints:
+                        lamy = lam31 + min(0, lam31p - 2*m.sqrt(lam3Re**2 + lam3Im**2) )
+                        lamz = lam23 + min(0, lam23p - 2*m.sqrt(lam2Re**2 + lam2Im**2) )
+                        
+                        if theoreticalConstraints() and experimentalConstraints():
                             ThreeHiggsBMDictList.append({
                                 "bmNumber": count,
                                 "bPreCalculated": True,
@@ -109,7 +112,6 @@ for mS1 in range(63, 100, 5):
                                 
                             })
                             count+=1 
-                            
-with open("3HDMScanBM.json", "w") as outfile: 
+              
+with open("3HDMScanBMTest.json", "w") as outfile: 
     json.dump(ThreeHiggsBMDictList, outfile, indent = 4)
-
