@@ -34,7 +34,7 @@ def experimentalConstraints() -> bool:
     return mSpm1 >= 90 and \
            mSpm2 >= 90
 
-count = 0
+bmNumber = 0
 ThreeHiggsBMDictList = []
 
 for mS1 in range(63, 100, 5):
@@ -43,7 +43,7 @@ for mS1 in range(63, 100, 5):
             for delta12 in range(5, 100, 5):
                 for delta1c in range(5, 100, 5):
                     for deltac in range(5, 100, 5):
-                        # if  count >= 1:                            
+                        # if  bmNumber >= 1:                            
                         #     break
                         mS2 = delta12 + mS1
                         mSpm1 = delta1c + mS1
@@ -76,7 +76,7 @@ for mS1 in range(63, 100, 5):
                         
                         if theoreticalConstraints() and experimentalConstraints():
                             ThreeHiggsBMDictList.append({
-                                "bmNumber": count,
+                                "bmNumber": bmNumber,
                                 "bPreCalculated": True,
                                 "bMassSplittingInput": False,
                                 "RGScale" : 91.1876,
@@ -111,7 +111,7 @@ for mS1 in range(63, 100, 5):
                                                     "lam33": lam33}
                                 
                             })
-                            count+=1 
+                            bmNumber+=1 
               
 with open("3HDMScanBMTest.json", "w") as outfile: 
     json.dump(ThreeHiggsBMDictList, outfile, indent = 4)
