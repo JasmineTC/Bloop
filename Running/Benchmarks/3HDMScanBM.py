@@ -20,7 +20,7 @@ lam33 = ((125.00)**2 / (2.*v**2)) ## Higgs mass^2 / 2*vev**2
 
 lamx = lam12 + min(0, lam12p - 2*m.sqrt(lam1Re**2 + lam1Im**2) )
 
-def theoreticalConstraints(lamy, lamz) -> bool:
+def theoreticalConstraints() -> bool:
     return lam11 > 0 and \
            lam22 > 0 and \
            lam33 > 0 and \
@@ -34,7 +34,7 @@ def experimentalConstraints() -> bool:
     return mSpm1 >= 90 and \
            mSpm2 >= 90
 
-count = 0
+bmNumber = 0
 ThreeHiggsBMDictList = []
 
 for mS1 in range(63, 100, 5):
@@ -43,7 +43,7 @@ for mS1 in range(63, 100, 5):
             for delta12 in range(5, 100, 5):
                 for delta1c in range(5, 100, 5):
                     for deltac in range(5, 100, 5):
-                        # if  count >= 1:                            
+                        # if  bmNumber >= 1:                            
                         #     break
                         mS2 = delta12 + mS1
                         mSpm1 = delta1c + mS1
@@ -71,9 +71,12 @@ for mS1 in range(63, 100, 5):
                         lam31 = lam23
                         lam31p = lam23p
                         
-                        if theoreticalConstraints and experimentalConstraints:
+                        lamy = lam31 + min(0, lam31p - 2*m.sqrt(lam3Re**2 + lam3Im**2) )
+                        lamz = lam23 + min(0, lam23p - 2*m.sqrt(lam2Re**2 + lam2Im**2) )
+                        
+                        if theoreticalConstraints() and experimentalConstraints():
                             ThreeHiggsBMDictList.append({
-                                "bmNumber": count,
+                                "bmNumber": bmNumber,
                                 "bPreCalculated": True,
                                 "bMassSplittingInput": False,
                                 "RGScale" : 91.1876,
@@ -108,8 +111,7 @@ for mS1 in range(63, 100, 5):
                                                     "lam33": lam33}
                                 
                             })
-                            count+=1 
-                            
-with open("3HDMScanBM.json", "w") as outfile: 
+                            bmNumber+=1 
+              
+with open("3HDMScanBMTest.json", "w") as outfile: 
     json.dump(ThreeHiggsBMDictList, outfile, indent = 4)
-
