@@ -6,8 +6,9 @@ def makeFieldDimensionless(temp: list[float], field: list[float]) -> list[float]
 def jumpFinder(array: np.ndarray[float])-> np.ndarray[int]:
     return np.nonzero(np.abs(array) > 0.2)[0]
 
-def interpretData(result, bmInput: dict[str, float]):
-    interpResult = {"bBoundFromBelow": result["bBoundFromBelow"],
+def interpretData(result,index: int, bmInput: dict[str, float]):
+    interpResult = {"bmNumber": index,
+                    "bBoundFromBelow": result["bBoundFromBelow"],
                     "bIsPerturbative": result["bIsPerturbative"],
                     "bad": False, 
                     "jumpsv1": [],
