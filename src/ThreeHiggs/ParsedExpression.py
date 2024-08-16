@@ -1,4 +1,4 @@
-from math import pi, log, sqrt
+from numpy import pi, log, sqrt
 EulerGamma = 0.5772156649015329
 Glaisher = 1.28242712910062
 
