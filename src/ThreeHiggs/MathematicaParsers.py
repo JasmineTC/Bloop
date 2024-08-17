@@ -87,6 +87,12 @@ def parseRotationMatrix(lines):
 
 from unittest import TestCase
 class MathematicaParsersUnitTests(TestCase):
+    def test_replaceGreekSymbols(self):
+        reference = ["lam", "lam lam", "mu", "mu mu", "lam mu", "mu lam"]
+        source = ["λ", "λ λ", "μ", "μ μ", "λ μ", "μ λ"]
+
+        self.assertEqual(reference, [replaceGreekSymbols(sourceString) for sourceString in source])
+
     def test_removeSuffices(self):
         reference = ["myVarsq", "sqmyVar",
                      "myVarsq", "myVar", "3dsqmyVar", "3dmyVar",
