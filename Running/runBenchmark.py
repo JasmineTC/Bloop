@@ -4,13 +4,14 @@ def doMinimization(indexAndBenchMark):
   if not args.firstBenchmark <= index <= args.lastBenchmark:
       return
 
-  from ThreeHiggs.TransitionFinder import TransitionFinder
-  transitionFinder = TransitionFinder(model=model3HDM)
-  model3HDM.setInputParams(benchMark)
-  minimizationResult = transitionFinder.traceFreeEnergyMinimum(args.TRangeStart,
-                                                               args.TRangeEnd,
-                                                               args.TRangeStepSize,
-                                                               verbose = args.verbose)
+  from ThreeHiggs.TransitionFinder import traceFreeEnergyMinimum
+  minimizationResult = traceFreeEnergyMinimum(effectivePotential, 
+                                              dimensionalReduction, 
+                                              benchMark,
+                                              args.TRangeStart,
+                                              args.TRangeEnd,
+                                              args.TRangeStepSize,
+                                              verbose = args.verbose)
 
   filename = f"{args.resultsDirectory}/BM_{index}"
   
@@ -84,6 +85,7 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                  MassMatrix,
                                                  RotationMatrix)
 
+        # TODO: This should not need to be treated as global in 3HDM.
         effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                                 args.bAbsMass,
                                                 ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
@@ -111,9 +113,6 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                 verbose = True)
 
     ## Model object setup + load matching relations
-    from ThreeHiggs.GenericModel import GenericModel
-    # TODO: This should not need to be treated as global in 3HDM.
-    model3HDM = GenericModel(effectivePotential, dimensionalReduction)
     with open(args.benchMarkFile) as benchMarkFile:
       from multiprocessing import Pool
       with Pool(args.cores) as pool:
