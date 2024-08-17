@@ -242,3 +242,52 @@ class TransitionFinder:
                 "bIsPerturbative": all([result[3] for result in minimizationResults]),
                 "UltraSoftTemp": TUltraSoft,
                 "bBoundFromBelow": all([result[5] for result in minimizationResults]) }
+
+from unittest import TestCase
+class TransitionFinderUnitTests(TestCase):
+    def test_bIsPerturbativeTrue(self):
+        reference = True
+        source = {"lam11": 0,
+                  "lam12": 0,
+                  "lam12p": 0,
+                  "lam1Im": 0,
+                  "lam1Re": 0,
+                  "lam22": 0,
+                  "lam23": 0,
+                  "lam23p": 0,
+                  "lam2Im": 0,
+                  "lam2Re": 0,
+                  "lam31": 0,
+                  "lam31p": 0,
+                  "lam33": 0,
+                  "lam3Im": 0,
+                  "lam3Re": 0,
+                  "g1": 0,
+                  "g2": 0,
+                  "g3": 0}
+
+        self.assertEqual(reference, bIsPerturbative(source))
+
+    def test_bIsPerturbativeFalse(self):
+        reference = False
+        source = {"lam11": -999,
+                  "lam12": 0,
+                  "lam12p": 0,
+                  "lam1Im": 0,
+                  "lam1Re": 0,
+                  "lam22": 0,
+                  "lam23": 0,
+                  "lam23p": 0,
+                  "lam2Im": 0,
+                  "lam2Re": 0,
+                  "lam31": 0,
+                  "lam31p": 0,
+                  "lam33": 0,
+                  "lam3Im": 0,
+                  "lam3Re": 0,
+                  "g1": 0,
+                  "g2": 0,
+                  "g3": 0}
+
+        self.assertEqual(reference, bIsPerturbative(source))
+
