@@ -60,15 +60,15 @@ class SystemOfEquations(ParsedExpressionSystem):
         self.otherVariables = filteredArguments
 
 class MassMatrix:
-    def __init__(self, matrix, definitions):
-        self.matrixElementExpressions = definitions
-        self.matrix = matrix 
+    def __init__(self, massMatrix):
+        self.definitions = ParsedExpressionSystem(massMatrix["definitions"])
+        self.matrix = massMatrix["matrix"]
 
     def __call__(self, arguments):
         """Evaluates the matrix element expressions and puts them in a 2D np.ndarray.
         The input dict needs to contain keys for all function arguments needed by the expressions. 
         """
-        arguments |= self.matrixElementExpressions(arguments, bReturnDict = True)
+        arguments |= self.definitions(arguments, bReturnDict = True)
         return eval(self.matrix, arguments | {"log": log, 
                                               "sqrt": sqrt, 
                                               "pi": pi, 
@@ -123,11 +123,13 @@ class ParsedExpressionUnitTests(TestCase):
         self.assertEqual(reference, ParsedExpressionSystem(source)({"lam": 100, "mssq": 100}))
 
     def test_MassMatrix(self):
-        source = [{"matrix": "[[1, 0], [0, mssq]]"}["matrix"],
-                  ParsedExpressionSystem([{"identifier": "mssq", "symbols": [], "expression": "1"}])]
+        source = {"definitions": [{"expression": "1",
+                                   "identifier":"mssq",
+                                   "symbols": []}],
+                  "matrix": "[[1, 0], [0, mssq]]"}
 
         reference = [[1, 0], [0, 1]]
-        self.assertEqual(reference, MassMatrix(*source)({}))
+        self.assertEqual(reference, MassMatrix(source)({}))
 
     def test_RotationMatrix(self):
         source = {"matrix": {"mssq00": [0, 0], "mssq11": [1, 1]}}

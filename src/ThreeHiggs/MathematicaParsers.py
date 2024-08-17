@@ -60,9 +60,15 @@ def parseConstantMatrix(lines):
     from numpy import array, float64
     return {"matrix": array(sympyMatrix.tolist()).astype(float64).tolist()}
 
-def parseMassMatrix(lines):
+def parseMassMatrix(definitionsLines, matrixLines):
+    matrix = parseMatrix(matrixLines)
+
     from sympy import Matrix
-    return {"matrix": str(Matrix(parseMatrix(lines)).tolist())}
+    sympyMatrix = Matrix(matrix)
+
+    from numpy import array, float64
+    return {"definitions": parseExpressionSystem(definitionsLines),
+            "matrix": str(array(sympyMatrix.tolist()).tolist())}
 
 def parseRotationMatrix(lines):
     from sympy import Matrix
@@ -135,11 +141,11 @@ class MathematicaParsersUnitTests(TestCase):
         self.assertEqual(reference, parseConstantMatrix(source))
 
     def test_parseMassMatrix(self):
-        reference = {"matrix": "[[1, 0], [0, mssq]]"}
+        reference = {'definitions': [], 'matrix': "[[1, 0], [0, mssq]]"}
         source = ["{1, 0}", "{0, mssq}"]
 
         from ThreeHiggs.MathematicaParsers import parseMassMatrix
-        self.assertEqual(reference, parseMassMatrix(source))
+        self.assertEqual(reference, parseMassMatrix([], source))
 
     def test_parseRotationMatrix(self):
         reference = {"matrix": {"mssq00": [0, 0], "mssq11": [1, 1]}}
