@@ -316,3 +316,36 @@ class EffectivePotential:
     # just calls self.evaluate
     def __call__(self, temperature: np.ndarray, fields: np.ndarray) -> complex:
         self.evaluate(temperature, fields)
+
+from unittest import TestCase
+class EffectivePotentialUnitTests(TestCase):
+    def test_diagonalizeSymmetricNumpy(self):
+        reference = [[-1, 1], [[-0.7071067811865475, 0.7071067811865475], 
+                               [0.7071067811865475, 0.7071067811865475]]]
+
+        source = [[0, 1], [1, 0]]
+
+        self.assertEqual(reference, 
+                         list(map(lambda x: x.tolist(), 
+                                  diagonalizeSymmetric(source, "numpy"))))
+
+    def test_diagonalizeSymmetricMp(self):
+        reference = [[[-1], [1]], [[0.7071067811865476, 0.7071067811865476], 
+                                   [-0.7071067811865476, 0.7071067811865476]]]
+
+        source = [[0, 1], [1, 0]]
+
+        self.assertEqual(reference, 
+                         list(map(lambda x: x.tolist(), 
+                                  diagonalizeSymmetric(source, "mp"))))
+
+    def test_diagonalizeSymmetricScipy(self):
+        reference = [[-1, 1], [[-0.7071067811865475, 0.7071067811865475], 
+                               [0.7071067811865475, 0.7071067811865475]]]
+
+        source = [[0, 1], [1, 0]]
+
+        self.assertEqual(reference, 
+                         list(map(lambda x: x.tolist(), 
+                                  diagonalizeSymmetric(source, "scipy"))))
+
