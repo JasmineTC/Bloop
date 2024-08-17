@@ -133,9 +133,9 @@ def calculateRenormalizedParameters(inputParams: dict[str, float]) -> dict[str, 
 def threeDimFieldtoDimensionless(temp: list[float], field: list[float]) -> list[float]:
     return field/np.sqrt(temp)
 
-"""Class TransitionFinder -- This handles all logic for tracking the temperature dependence of a model,
-identifying phase transitions, determining physical parameters of a transition etc. 
-"""
+# Handles all logic for tracking the temperature dependence of a model, 
+# identifying phase transitions, determining physical parameters of a transition 
+# etc. 
 def traceFreeEnergyMinimum(effectivePotential,
                            dimensionalReduction,
                            benchmark,
@@ -154,7 +154,9 @@ def traceFreeEnergyMinimum(effectivePotential,
     endScale = 7.3 * TRange[-1] ## largest T in our range is T[-1] 
     muRange = np.linspace( startScale, endScale, TRange.size*10 )
 
-    betas = BetaFunctions4D(muRange, renormalizedParams) ## TODO Are the beta function routines safe if endScale is smaller than startScale?
+    ## TODO Are the beta function routines safe if endScale is smaller than startScale?
+    ## If you want this behaviour then it should be unit tested.
+    betas = BetaFunctions4D(muRange, renormalizedParams) 
     
     EulerGamma = 0.5772156649
     EulerGammaPrime = 2.*(math.log(4.*np.pi) - EulerGamma)
