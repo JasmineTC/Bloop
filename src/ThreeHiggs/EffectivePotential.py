@@ -23,30 +23,6 @@ def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.nda
         print(f"{method} is not assigned to a method in diagonalizeSymmetric, exiting program.")
         exit(-1)
 
-@dataclass(slots=True)
-class VeffConfig:
-    # Names of the background-field variables that the Veff depends on
-    fieldNames: list[str]
-    # 0 = tree etc
-    loopOrder: int
-    # list of file names from where we parse expressions for the Veff. These get added together when evaluating Veff(fields)
-    veffFiles: list[str]
-    # Vector boson mass squares
-    vectorMassFile: str
-    # Shorthand symbols for vectors. Gets evaluated before masses
-    vectorShorthandFile: str
-
-    # Constant matrix transformation that brings the mass matrix into block diagonal form
-    scalarPermutationMatrix: np.ndarray
-    # Specify scalar mass matrices to diagonalize, can have many. The full mass matrix should be block diagonal in these (after the permutation transform)
-    # Full rotation from unpermutated basis to diagonal basis
-    scalarRotationMatrixFile: str
-
-    # Take absolute value of mass squares?
-    ## TODO Didn't we set this to true in the config?
-    bAbsoluteMsq: bool = False
-    
-
 ## everything we need to evaluate the potential. this is very WIP
 class VeffParams:
     """ Usage after initialization: 
