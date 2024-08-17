@@ -46,4 +46,3 @@ python3 runBenchmark.py -l 2 \
 
 diff TestComplexMassResults/BM_1.json ReferenceTestComplexMassResults/BM_1.json
 
-
