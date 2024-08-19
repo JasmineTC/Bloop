@@ -1,4 +1,4 @@
-from math import pi, log, sqrt
+from cmath import pi, log, sqrt
 EulerGamma = 0.5772156649015329
 Glaisher = 1.28242712910062
 
@@ -96,6 +96,16 @@ class ParsedExpressionUnitTests(TestCase):
         reference = 5.400944901447568
 
         self.assertEqual(reference, ParsedExpression(source)({"lam": 100, "mssq": 100}))
+
+    def test_ParsedExpressionComplex(self):
+        source = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+                  "identifier": "Identifier",
+                  "symbols": ['lam', 'mssq']}
+
+        reference = complex(5.826048814042759, 1.1475471676948477)
+
+        self.assertEqual(reference, ParsedExpression(source)({"lam": complex(100, 100), 
+                                                              "mssq": complex(100, 100)}))
 
     def test_ParsedExpressionSystem(self):
         source = [{"expression": "sqrt(lam)/(4*pi) + log(mssq)",
