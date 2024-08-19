@@ -42,23 +42,6 @@ class ParsedExpressionSystem:
     def getExpressionNames(self) -> list[str]:
         return [ expr.identifier for expr in self.parsedExpressions ]
 
-"""Class SystemOfEquations -- System of parsed expression that we interpret as a set of equation. 
-Each expression is interpreted as an equation of form ``expr == 0``. We also distinguish between symbols 
-that describe the unknowns versus symbols that are known inputs to the expressions.
-"""
-class SystemOfEquations(ParsedExpressionSystem):
-    def __init__(self, fileName, unknownVariables):
-        super().__init__(fileName)
-
-        ## what we solve for
-        self.unknownVariables = unknownVariables
-
-        filteredArguments = [item for item in self.functionArguments if item not in self.unknownVariables]
-        rearrangedArguments = self.unknownVariables + filteredArguments
-
-        ## "known" inputs
-        self.otherVariables = filteredArguments
-
 class MassMatrix:
     def __init__(self, massMatrix):
         self.definitions = ParsedExpressionSystem(massMatrix["definitions"])
