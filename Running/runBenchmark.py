@@ -28,6 +28,7 @@ def doMinimization(indexAndBenchMark):
   if args.ProcessMin == True:
       from ThreeHiggs.ProcessMinimization import interpretData
       open(f"{filename}_interp.json", "w").write(dumps(interpretData(minimizationResult,
+                                                                     index,
                                                                      benchMark["bmInput"]),
                                                        indent = 4))
 
