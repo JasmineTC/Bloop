@@ -222,8 +222,7 @@ def traceFreeEnergyMinimum(effectivePotential,
             if counter == 3:
                 break
             counter += 1
-    for result in minimizationResults:
-        print (result)
+            
     return convertResultsToDict(minimizationResults)
 
 def convertResultsToDict(minimizationResults):
