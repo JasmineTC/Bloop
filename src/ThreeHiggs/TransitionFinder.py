@@ -178,7 +178,7 @@ def traceFreeEnergyMinimum(effectivePotential,
         paramsForMatching = betas.RunCoupling(matchingScale)
         
         if not bIsBounded(paramsForMatching):
-            minimizationResults.append( [1, 0, [[0],[0],[0]], False, False, False] )
+            minimizationResults.append( [1, 0, np.array([0,0,0]), False, False, False] )
             break
         
         ## These need to be in the dict
@@ -222,7 +222,8 @@ def traceFreeEnergyMinimum(effectivePotential,
             if counter == 3:
                 break
             counter += 1
-
+    for result in minimizationResults:
+        print (result)
     return convertResultsToDict(minimizationResults)
 
 def convertResultsToDict(minimizationResults):
