@@ -211,7 +211,6 @@ def traceFreeEnergyMinimum(effectivePotential,
         minimumLocation, valueVeff = effectivePotential.findGlobalMinimum(initialGuesses)
 
         if not all(minimumLocation) or not valueVeff:
-            print("if not reached")
             minimizationResults.append( [1, 0, np.array([0,0,0]), False, False, False] )
             break
         bReachedUltraSoftScale = effectivePotential.bReachedUltraSoftScale(minimumLocation, 
