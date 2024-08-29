@@ -264,10 +264,8 @@ class EffectivePotential:
                 if result[1] < bestResult[1]:
                     bestResult = result
         if any(np.isnan(bestResult[0])) or np.isinf(bestResult[1]):
-            print("Failed min")
             return ((np.full(3, None)), None)
         else:
-            print("SuccessfulMin")
             return bestResult
     
     
