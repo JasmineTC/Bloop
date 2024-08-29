@@ -229,13 +229,9 @@ class EffectivePotential:
 
         location, value = self.minimizer.minimize(VeffWrapper, initialGuess, algo)
 
-        if np.any(np.isnan(location)):
-            location = np.full(len[initialGuess], np.nan )
-            value = np.inf
-        else:
-            value = self.evaluatePotential(location, verbose = verbose) ## evaluate once more to get the possible imag parts
-            if abs(value.imag)/abs(value.real) > 1e-8: ## If the imaginary part of the potential is large then minimisation has found unphysical
-                value = np.inf ##Set the value to inf so it won't be ever be smaller than best result
+        value = self.evaluatePotential(location, verbose = verbose) ## evaluate once more to get the possible imag parts
+        if abs(value.imag)/abs(value.real) > 1e-8: ## If the imaginary part of the potential is large then minimisation has found unphysical
+            value = np.inf ##Set the value to inf so it won't be ever be smaller than best result
         return location, value.real ## Taking the real part so compactiable with json
 
     def findGlobalMinimum(self, minimumCandidates: list[list[float]] = None, verbose = False) -> tuple[list[float], complex]:
@@ -263,6 +259,7 @@ class EffectivePotential:
                 result = self.findLocalMinimum(candidate, self.minimizationAlgo, verbose = verbose)
                 if result[1] < bestResult[1]:
                     bestResult = result
+                    
         if any(np.isnan(bestResult[0])) or np.isinf(bestResult[1]):
             return ((np.full(3, None)), None)
         else:
