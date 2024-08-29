@@ -104,7 +104,7 @@ class VeffParams:
         # Diagonalize blocks separately
         subRotationMatrix = []
         subMassMatrix = []
-        
+
         for matrix in self.scalarMassMatrices:
             numericalM = matrix(params)
             eigenValue, vects = diagonalizeSymmetric( numericalM, self.diagonalizationAlgo)
@@ -231,24 +231,22 @@ class EffectivePotential:
 
         if np.any(np.isnan(location)):
             location = np.full(len[initialGuess], np.nan )
-            value = np.nan
+            value = np.inf
         else:
             value = self.evaluatePotential(location, verbose = verbose) ## evaluate once more to get the possible imag parts
-            if value.imag > 1e-6: ## If the imaginary part of the potential is large then minimisation has found unphysical min, throw it out
-                value = np.inf
-        ## Taking the real part so compactiable with json (case where imaginary part is non-neligable has already been dealt with)
-        return location, np.real(value) 
+            if abs(value.imag)/abs(value.real) > 1e-8: ## If the imaginary part of the potential is large then minimisation has found unphysical
+                value = np.inf ##Set the value to inf so it won't be ever be smaller than best result
+        return location, value.real ## Taking the real part so compactiable with json
 
     def findGlobalMinimum(self, minimumCandidates: list[list[float]] = None, verbose = False) -> tuple[list[float], complex]:
         """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
-        Generally will not work very well if no candidates minima are given. 
         Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
         """
         
         if not minimumCandidates:
             minimumCandidates = [ [1e-4, 1e-4, 1e-4] ]
 
-        bestResult = ((np.nan, np.nan, np.nan), np.inf)
+        bestResult = ((np.full(3, np.nan)), np.inf)
         
         if self.minimizationAlgo == "combo":
             result = self.findLocalMinimum(minimumCandidates[0], "directGlobal", verbose = verbose)
@@ -265,7 +263,10 @@ class EffectivePotential:
                 result = self.findLocalMinimum(candidate, self.minimizationAlgo, verbose = verbose)
                 if result[1] < bestResult[1]:
                     bestResult = result
-        return bestResult
+        if any(np.isnan(bestResult[0])) or np.isinf(bestResult[1]):
+            return ((np.full(3, None)), None)
+        else:
+            return bestResult
     
     
     def getUltraSoftScale(self, paramDict, T: float) -> float:

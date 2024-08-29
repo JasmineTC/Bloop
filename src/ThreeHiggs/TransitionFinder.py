@@ -144,7 +144,6 @@ def traceFreeEnergyMinimum(effectivePotential,
                            TRangeStepSize: float,
                            verbose = False) -> tuple[np.ndarray, np.ndarray]:
     renormalizedParams = calculateRenormalizedParameters(benchmark)
-    
     """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale like 7T.
     To make this work nicely, integrate the beta functions here up to some high enough scale and store the resulting couplings
     in interpolated functions.
@@ -153,7 +152,7 @@ def traceFreeEnergyMinimum(effectivePotential,
     startScale = renormalizedParams["RGScale"]
     endScale = 7.3 * TRange[-1] ## largest T in our range is T[-1] 
     muRange = np.linspace( startScale, endScale, TRange.size*10 )
-
+    
     ## TODO Are the beta function routines safe if endScale is smaller than startScale?
     ## If you want this behaviour then it should be unit tested.
     betas = BetaFunctions4D(muRange, renormalizedParams) 
@@ -210,6 +209,11 @@ def traceFreeEnergyMinimum(effectivePotential,
                           [59,59,59], 
                           [-59,59,59]]
         minimumLocation, valueVeff = effectivePotential.findGlobalMinimum(initialGuesses)
+
+        if not all(minimumLocation) or not valueVeff:
+            print("if not reached")
+            minimizationResults.append( [1, 0, np.array([0,0,0]), False, False, False] )
+            break
         bReachedUltraSoftScale = effectivePotential.bReachedUltraSoftScale(minimumLocation, 
                                                                                       T, 
                                                                                       verbose = verbose)
