@@ -238,9 +238,6 @@ class EffectivePotential:
         """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
         Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
         """
-        
-        if not minimumCandidates:
-            minimumCandidates = [ [1e-4, 1e-4, 1e-4] ]
 
         bestResult = ((np.full(3, np.nan)), np.inf)
         
