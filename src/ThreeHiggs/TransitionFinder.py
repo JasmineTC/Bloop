@@ -172,14 +172,13 @@ def traceFreeEnergyMinimum(effectivePotential,
     for T in TRange:
         if verbose:
             print (f'Start of temp = {T} loop')
-            
+        minimizationResults["T"].append(T)
         goalRGScale =  T ## Final scale in 3D -check if goalRGscale is ever different from just T
 
         matchingScale = 4.0*np.pi*math.exp(-EulerGamma) * T ## Scale that minimises T dependent logs
         paramsForMatching = betas.RunCoupling(matchingScale)
         
         if not bIsBounded(paramsForMatching):
-            minimizationResults["T"].append(T)
             minimizationResults["failureReason"] = "Unbounded"
             break
         
@@ -192,8 +191,8 @@ def traceFreeEnergyMinimum(effectivePotential,
 
         ##Take the 4D params (at the matching scale) and match them to the 3D params
         params3D = dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
-        
         effectivePotential.setModelParameters(params3D)
+        
         initialGuesses = [[0.1,0.1,0.1], ## TODO This should go in a config file or something
                           [-0.1,0.1,0.1],
                           [1e-3,1e-3,4],
@@ -209,15 +208,12 @@ def traceFreeEnergyMinimum(effectivePotential,
                           [-40,40,40], 
                           [59,59,59], 
                           [-59,59,59]]
-
         minimumLocation, valueVeff = effectivePotential.findGlobalMinimum(initialGuesses)
 
         if not all(minimumLocation) or not valueVeff: ## Checks if minimumLocation contains nan/Noneor Veff is None
-            minimizationResults["T"].append(T)
             minimizationResults["failureReason"] = "MinimisationFailed"
             break
         
-        minimizationResults["T"].append(T)
         minimizationResults["valueVeff"].append(valueVeff)
         minimizationResults["minimumLocation"].append(minimumLocation)
         
