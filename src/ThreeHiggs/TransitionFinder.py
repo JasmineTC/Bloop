@@ -161,39 +161,39 @@ def traceFreeEnergyMinimum(effectivePotential,
     EulerGammaPrime = 2.*(math.log(4.*np.pi) - EulerGamma)
     Lfconst = 4.*np.log(2.)
     
-    minimizationResults = []
+    minimizationResults = {"T": [],
+                           "valueVeff": [], 
+                           "minimumLocation": [], 
+                           "bIsPerturbative": True, 
+                           "UltraSoftTemp": None, 
+                           "failureReason": None}
 
     counter = 0
     for T in TRange:
         if verbose:
             print (f'Start of temp = {T} loop')
-                   
-        ## Final scale in 3D
-        ## TODO ask Lauri if goalRGscale is ever different from just T
-        goalRGScale =  T
+        minimizationResults["T"].append(T)
+        goalRGScale =  T ## Final scale in 3D -check if goalRGscale is ever different from just T
 
-        matchingScale = 4.0*np.pi*math.exp(-EulerGamma) * T
-        
+        matchingScale = 4.0*np.pi*math.exp(-EulerGamma) * T ## Scale that minimises T dependent logs
         paramsForMatching = betas.RunCoupling(matchingScale)
         
         if not bIsBounded(paramsForMatching):
-            minimizationResults.append( [1, 0, np.array([0,0,0]), False, False, False] )
+            minimizationResults["failureReason"] = "Unbounded"
             break
         
-        ## These need to be in the dict
+        ## T dependent Variables needed to compute the 2 loop EP but aren't Lagranian params 
         paramsForMatching["RGScale"] = matchingScale
         paramsForMatching["T"] = T
-
-        ## Put T-dependent logs in the dict too. Not a particularly nice solution...
         Lb = 2. * math.log(matchingScale / T) - EulerGammaPrime
         paramsForMatching["Lb"] = Lb
         paramsForMatching["Lf"] = Lb + Lfconst
 
-        ##This has every coupling needed to compute the EP, computed at the matching scale (I think)
+        ##Take the 4D params (at the matching scale) and match them to the 3D params
         params3D = dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
-        
         effectivePotential.setModelParameters(params3D)
-        initialGuesses = [[0.1,0.1,0.1],
+        
+        initialGuesses = [[0.1,0.1,0.1], ## TODO This should go in a config file or something
                           [-0.1,0.1,0.1],
                           [1e-3,1e-3,4],
                           [1e-3,1e-3,10],
@@ -210,14 +210,22 @@ def traceFreeEnergyMinimum(effectivePotential,
                           [-59,59,59]]
         minimumLocation, valueVeff = effectivePotential.findGlobalMinimum(initialGuesses)
 
-        if not all(minimumLocation) or not valueVeff:
-            minimizationResults.append( [1, 0, np.array([0,0,0]), False, False, False] )
+        if not all(minimumLocation) or not valueVeff: ## Checks if minimumLocation contains nan/Noneor Veff is None
+            minimizationResults["failureReason"] = "MinimisationFailed"
             break
-        bReachedUltraSoftScale = effectivePotential.bReachedUltraSoftScale(minimumLocation, 
-                                                                                      T, 
-                                                                                      verbose = verbose)
-
-        minimizationResults.append( [T, valueVeff, minimumLocation, bIsPerturbative(paramsForMatching), bReachedUltraSoftScale, 1] )
+        
+        minimizationResults["valueVeff"].append(valueVeff)
+        minimizationResults["minimumLocation"].append(minimumLocation)
+        
+        if not minimizationResults["UltraSoftTemp"]: ## If the ultra soft temp has not yet been set
+            if effectivePotential.bReachedUltraSoftScale(minimumLocation, ## Check if ultra soft scale reached
+                                                         T, 
+                                                         verbose = verbose): 
+                minimizationResults["UltraSoftTemp"] = T ## If reached then set that as the ultra soft temp
+                                                         ##- this will stop the first if statement from passing
+        
+        if minimizationResults["bIsPerturbative"]: ##If the potential was perturbative check if it still is
+            minimizationResults["bIsPerturbative"] = bIsPerturbative(paramsForMatching) ## If non-pert then value set to false and won't be updated
 
         if np.all(minimumLocation < 1e-3):
             if verbose:
@@ -225,22 +233,9 @@ def traceFreeEnergyMinimum(effectivePotential,
             if counter == 3:
                 break
             counter += 1
-            
-    return convertResultsToDict(minimizationResults)
 
-def convertResultsToDict(minimizationResults):
-    tempList = [float(result[0]) for result in minimizationResults]
-    bReachedUltraSoftScaleList = [result[4] for result in minimizationResults]
-    ##Gives the first index where the ultrasoft condition is True or -1 is none is found
-    ultraSoftWarning: int = next((i for i, val in enumerate(bReachedUltraSoftScaleList) if val == True), -1) 
-    TUltraSoft = tempList[ultraSoftWarning] if ultraSoftWarning >=0 else -1
-
-    return {"T": tempList,
-            "valueVeff": [result[1] for result in minimizationResults],
-            "minimumLocation": np.transpose([result[2] for result in minimizationResults]).tolist(),
-            "bIsPerturbative": all([result[3] for result in minimizationResults]),
-            "UltraSoftTemp": TUltraSoft,
-            "bBoundFromBelow": all([result[5] for result in minimizationResults]) }
+    minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
+    return minimizationResults
 
 from unittest import TestCase
 class TransitionFinderUnitTests(TestCase):

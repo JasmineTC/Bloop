@@ -37,6 +37,6 @@
         ]
     ],
     "bIsPerturbative": true,
-    "UltraSoftTemp": -1,
-    "bBoundFromBelow": true
+    "UltraSoftTemp": null,
+    "failureReason": null
 }
