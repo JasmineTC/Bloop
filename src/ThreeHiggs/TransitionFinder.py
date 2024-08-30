@@ -161,39 +161,41 @@ def traceFreeEnergyMinimum(effectivePotential,
     EulerGammaPrime = 2.*(math.log(4.*np.pi) - EulerGamma)
     Lfconst = 4.*np.log(2.)
     
-    minimizationResults = []
+    minimizationResults = {"T": [],
+                           "valueVeff": [], 
+                           "minimumLocation": [], 
+                           "bIsPerturbative": True, 
+                           "UltraSoftTemp": None, 
+                           "failureReason": None}
 
     counter = 0
+    bReachedUltraSoftScaleList = []
     for T in TRange:
         if verbose:
             print (f'Start of temp = {T} loop')
-                   
-        ## Final scale in 3D
-        ## TODO ask Lauri if goalRGscale is ever different from just T
-        goalRGScale =  T
+            
+        goalRGScale =  T ## Final scale in 3D -check if goalRGscale is ever different from just T
 
-        matchingScale = 4.0*np.pi*math.exp(-EulerGamma) * T
-        
+        matchingScale = 4.0*np.pi*math.exp(-EulerGamma) * T ## Scale that minimises T dependent logs
         paramsForMatching = betas.RunCoupling(matchingScale)
         
         if not bIsBounded(paramsForMatching):
-            minimizationResults.append( [1, 0, np.array([0,0,0]), False, False, False] )
+            minimizationResults["T"].append(T)
+            minimizationResults["failureReason"] = "Unbounded"
             break
         
-        ## These need to be in the dict
+        ## T dependent Variables needed to compute the 2 loop EP but aren't Lagranian params 
         paramsForMatching["RGScale"] = matchingScale
         paramsForMatching["T"] = T
-
-        ## Put T-dependent logs in the dict too. Not a particularly nice solution...
         Lb = 2. * math.log(matchingScale / T) - EulerGammaPrime
         paramsForMatching["Lb"] = Lb
         paramsForMatching["Lf"] = Lb + Lfconst
 
-        ##This has every coupling needed to compute the EP, computed at the matching scale (I think)
+        ##Take the 4D params (at the matching scale) and match them to the 3D params
         params3D = dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
         
         effectivePotential.setModelParameters(params3D)
-        initialGuesses = [[0.1,0.1,0.1],
+        initialGuesses = [[0.1,0.1,0.1], ## TODO This should go in a config file or something
                           [-0.1,0.1,0.1],
                           [1e-3,1e-3,4],
                           [1e-3,1e-3,10],
@@ -210,14 +212,22 @@ def traceFreeEnergyMinimum(effectivePotential,
                           [-59,59,59]]
         minimumLocation, valueVeff = effectivePotential.findGlobalMinimum(initialGuesses)
 
-        if not all(minimumLocation) or not valueVeff:
-            minimizationResults.append( [1, 0, np.array([0,0,0]), False, False, False] )
+        if not all(minimumLocation) or not valueVeff: ## Checks if minimumLocation or Veff contains None
+            minimizationResults["T"].append(T)
+            minimizationResults["failureReason"] = "complexMin" ##If true then minimisation prob failed
             break
-        bReachedUltraSoftScale = effectivePotential.bReachedUltraSoftScale(minimumLocation, 
+        
+        minimizationResults["valueVeff"].append(valueVeff)
+        minimizationResults["minimumLocation"].append(minimumLocation)  
+        bReachedUltraSoftScaleList.append(effectivePotential.bReachedUltraSoftScale(minimumLocation, 
                                                                                       T, 
-                                                                                      verbose = verbose)
-
-        minimizationResults.append( [T, valueVeff, minimumLocation, bIsPerturbative(paramsForMatching), bReachedUltraSoftScale, 1] )
+                                                                                      verbose = verbose))
+        
+        if minimizationResults["bIsPerturbative"]: ##If the potential is perterbative check that it remains pert
+            if not bIsPerturbative(paramsForMatching): ## If the potential becomes non-pert
+                minimizationResults["bIsPerturbative"] = False ## Update the pert key- this will stop the pert check from happening
+        
+        # minimizationResults.append( [T, valueVeff, minimumLocation, bIsPerturbative(paramsForMatching), bReachedUltraSoftScale, 1] )
 
         if np.all(minimumLocation < 1e-3):
             if verbose:
