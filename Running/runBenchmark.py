@@ -113,9 +113,15 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                 verbose = True)
 
     with open(args.benchMarkFile) as benchMarkFile:
-      from multiprocessing import Pool
-      if args.bPool:
-          with Pool(args.cores) as pool:
-              from ijson import items
-              pool.map(doMinimization, enumerate(items(benchMarkFile, "item", use_float = True)))
+        if args.bPool:
+            from multiprocessing import Pool
+            with Pool(args.cores) as pool:
+                from ijson import items
+                pool.map(doMinimization, enumerate(items(benchMarkFile, "item", use_float = True)))
+        else:
+            from json import load
+            benchMarkFile = load(benchMarkFile)
+            for indexAndBenchMark in enumerate(benchMarkFile):
+                doMinimization( indexAndBenchMark )
+    
 
