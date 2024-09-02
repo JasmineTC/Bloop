@@ -53,7 +53,6 @@ def massSplittingsToMasses(mS1: float, delta12: float, delta1c: float, deltac: f
 
 def calculateRenormalizedParameters(inputParams: dict[str, float]) -> dict[str, float]:
     from math import sqrt, sin, cos, pi
-
     """Take inputs from the BM file and convert them to parameters in the action.
     With tree-level matching the renormalization scale does not directly show up in the expressions, but
     needs to be specified for later loop calculations."""
@@ -221,7 +220,7 @@ def traceFreeEnergyMinimum(effectivePotential,
             if effectivePotential.bReachedUltraSoftScale(minimumLocation, ## Check if ultra soft scale reached
                                                          T, 
                                                          verbose = verbose): 
-                minimizationResults["UltraSoftTemp"] = T ## If reached then set that as the ultra soft temp
+                minimizationResults["UltraSoftTemp"] = int(T) ## If reached then set that as the ultra soft temp
                                                          ##- this will stop the first if statement from passing
         
         if minimizationResults["bIsPerturbative"]: ##If the potential was perturbative check if it still is
