@@ -110,8 +110,8 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
     dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(parsedExpressions["hardToSoft"]),
                                                 ParsedExpressionSystem(parsedExpressions["softScaleRGE"]),
                                                 ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]),
-                                                verbose = True)
-
+                                                verbose = args.verbose)
+    
     with open(args.benchMarkFile) as benchMarkFile:
         if args.bPool:
             from multiprocessing import Pool
