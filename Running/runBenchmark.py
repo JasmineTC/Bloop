@@ -1,35 +1,36 @@
 def doMinimization(indexAndBenchMark):
-  index, benchMark = indexAndBenchMark
-  if not args.firstBenchmark <= index <= args.lastBenchmark:
-      return
+    index, benchMark = indexAndBenchMark
+    index = None ##Lucy pls remove enumerate method I cba
+    if not args.firstBenchmark <= benchMark['bmNumber'] <= args.lastBenchmark:
+        return
 
-  from ThreeHiggs.TransitionFinder import traceFreeEnergyMinimum
-  minimizationResult = traceFreeEnergyMinimum(effectivePotential, 
-                                              dimensionalReduction, 
-                                              benchMark,
-                                              args.TRangeStart,
-                                              args.TRangeEnd,
-                                              args.TRangeStepSize,
-                                              verbose = args.verbose)
-
-  filename = f"{args.resultsDirectory}/BM_{index}"
+    from ThreeHiggs.TransitionFinder import traceFreeEnergyMinimum
+    minimizationResult = traceFreeEnergyMinimum(effectivePotential, 
+                                                dimensionalReduction, 
+                                                benchMark,
+                                                args.TRangeStart,
+                                                args.TRangeEnd,
+                                                args.TRangeStepSize,
+                                                verbose = args.verbose)
   
-  from pathlib import Path
-  Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
-  from json import dumps
-  if args.bSave:
-      open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
+    filename = f"{args.resultsDirectory}/BM_{benchMark['bmNumber']}"
+    
+    from pathlib import Path
+    Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
+    from json import dumps
+    if args.bSave:
+        open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
       
-  if args.bPlot:
-      from PlotResult import PlotResult
-      PlotResult.PlotData(minimizationResult, args.benchMarkNumber,args.loopOrder, filename)
+    if args.bPlot:
+        from PlotResult import PlotResult
+        PlotResult.PlotData(minimizationResult, benchMark['bmNumber'], args.loopOrder, filename)
 
-  if args.bProcessMin:
-      from ThreeHiggs.ProcessMinimization import interpretData
-      open(f"{filename}_interp.json", "w").write(dumps(interpretData(minimizationResult,
-                                                                     index,
-                                                                     benchMark["bmInput"]),
-                                                       indent = 4))
+    if args.bProcessMin:
+        from ThreeHiggs.ProcessMinimization import interpretData
+        open(f"{filename}_interp.json", "w").write(dumps(interpretData(minimizationResult,
+                                                                        benchMark["bmNumber"],
+                                                                        benchMark["bmInput"]),
+                                                         indent = 4))
 
 def getLines(relativePathToResource):
     ## fallback to hardcoded package name if the __package__ call fails
