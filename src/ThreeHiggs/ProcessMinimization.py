@@ -27,16 +27,16 @@ def interpretData(result: dict, index: int, bmInput: dict[str, float]):
     jumpv2 = jumpFinder(v2ListRenormDiff)
     jumpv3 = jumpFinder(v3ListRenormDiff)
     
-    if jumpv1:
+    if len(jumpv1) > 0:
         for val in jumpv1:
             interpResult["jumpsv1"].append(( v1ListRenormDiff[int(val)], 
                                              result["T"][int(val)] ))
-            
-    if jumpv2:
+    
+    if len(jumpv2) > 0:
         for val in jumpv2:
             interpResult["jumpsv2"].append(( v2ListRenormDiff[int(val)], 
                                              result["T"][int(val)] ))
-    if jumpv3:
+    if len(jumpv3) > 0:
         for val in jumpv3:
             interpResult["jumpsv3"].append(( v3ListRenormDiff[int(val)], 
                                              result["T"][int(val)] ))
