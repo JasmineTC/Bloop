@@ -1,4 +1,3 @@
-from json import dumps
 def doMinimization(indexAndBenchMark):
   index, benchMark = indexAndBenchMark
   if not args.firstBenchmark <= index <= args.lastBenchmark:
@@ -17,15 +16,15 @@ def doMinimization(indexAndBenchMark):
   
   from pathlib import Path
   Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
-  
-  if args.save == True:
+  from json import dumps
+  if args.save:
       open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
       
-  if args.plot == True:
+  if args.plot:
       from PlotResult import PlotResult
       PlotResult.PlotData(minimizationResult, args.benchMarkNumber,args.loopOrder, filename)
 
-  if args.ProcessMin == True:
+  if args.ProcessMin:
       from ThreeHiggs.ProcessMinimization import interpretData
       open(f"{filename}_interp.json", "w").write(dumps(interpretData(minimizationResult,
                                                                      index,
