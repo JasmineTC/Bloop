@@ -113,7 +113,7 @@ class VeffParams:
             if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
                 diagonalBlock = np.transpose(vects) @ numericalM @ vects
                 offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
-                if np.any(diagonalBlock[offDiagonalIndex]) > 1e-8:
+                if np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
                     print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
    
                             
