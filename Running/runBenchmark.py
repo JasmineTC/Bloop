@@ -17,14 +17,14 @@ def doMinimization(indexAndBenchMark):
   from pathlib import Path
   Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
   from json import dumps
-  if args.save:
+  if args.bSave:
       open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
       
-  if args.plot:
+  if args.bPlot:
       from PlotResult import PlotResult
       PlotResult.PlotData(minimizationResult, args.benchMarkNumber,args.loopOrder, filename)
 
-  if args.ProcessMin:
+  if args.bProcessMin:
       from ThreeHiggs.ProcessMinimization import interpretData
       open(f"{filename}_interp.json", "w").write(dumps(interpretData(minimizationResult,
                                                                      index,
@@ -112,10 +112,10 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                 ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]),
                                                 verbose = True)
 
-    ## Model object setup + load matching relations
     with open(args.benchMarkFile) as benchMarkFile:
       from multiprocessing import Pool
-      with Pool(args.cores) as pool:
-          from ijson import items
-          pool.map(doMinimization, enumerate(items(benchMarkFile, "item", use_float = True)))
+      if args.bPool:
+          with Pool(args.cores) as pool:
+              from ijson import items
+              pool.map(doMinimization, enumerate(items(benchMarkFile, "item", use_float = True)))
 
