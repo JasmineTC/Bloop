@@ -1,5 +1,5 @@
 from cmath import pi, log, sqrt
-EulerGamma = 0.5772156649015329
+from numpy import euler_gamma
 Glaisher = 1.28242712910062
 
 class ParsedExpression:
@@ -15,7 +15,7 @@ class ParsedExpression:
                     functionArguments | {"log": log, 
                                          "sqrt": sqrt, 
                                          "pi": pi, 
-                                         "EulerGamma": EulerGamma,
+                                         "EulerGamma": euler_gamma,
                                          "Glaisher": Glaisher})
 
 """ class ParsedExpressionSystem -- Describes a collection of ParsedExpressions that are to be evaluated simultaneously with same input.
@@ -30,7 +30,7 @@ class ParsedExpressionSystem:
         """
         ## Collect inputs from the dict and put them in correct order. I do this by taking the right order from our first expression.
         ## This is fine since all our expressions use the same input list. 
-        outList = [None] * len(self.parsedExpressions)
+        outList = [None] * len(self.parsedExpressions)    
         for i in range(len(outList)):
             outList[i] = self.parsedExpressions[i](inputDict)
 
@@ -55,7 +55,7 @@ class MassMatrix:
         return eval(self.matrix, arguments | {"log": log, 
                                               "sqrt": sqrt, 
                                               "pi": pi, 
-                                              "EulerGamma": EulerGamma,
+                                              "EulerGamma": euler_gamma,
                                               "Glaisher": Glaisher})
 
 class RotationMatrix:

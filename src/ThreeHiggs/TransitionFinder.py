@@ -143,8 +143,7 @@ def traceFreeEnergyMinimum(effectivePotential,
     from .BetaFunctions import BetaFunctions4D
     betas = BetaFunctions4D(muRange, renormalizedParams) 
     
-    EulerGamma = 0.5772156649
-    EulerGammaPrime = 2.*(log(4.*pi) - EulerGamma)
+    EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
     
     minimizationResults = {"T": [],
@@ -161,7 +160,7 @@ def traceFreeEnergyMinimum(effectivePotential,
         minimizationResults["T"].append(float(T))
         goalRGScale =  T ## Final scale in 3D -check if goalRGscale is ever different from just T
 
-        matchingScale = 4.0*pi*exp(-EulerGamma) * T ## Scale that minimises T dependent logs
+        matchingScale = 4.0*pi*exp(-np.euler_gamma) * T ## Scale that minimises T dependent logs
         paramsForMatching = betas.RunCoupling(matchingScale)
         
         if not bIsBounded(paramsForMatching):
