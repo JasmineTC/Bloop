@@ -1,6 +1,5 @@
 def doMinimization(indexAndBenchMark):
-    index, benchMark = indexAndBenchMark
-    index = None ##Lucy pls remove enumerate method I cba
+    _, benchMark = indexAndBenchMark
     if not args.firstBenchmark <= benchMark['bmNumber'] <= args.lastBenchmark:
         return
 
