@@ -1,11 +1,7 @@
 import numpy as np
-import math
-
-from .BetaFunctions import BetaFunctions4D
+from math import sqrt, sin, cos, pi, log, exp
 
 def bIsBounded(param : dict[str, float]) -> bool:
-    from math import sqrt
-
     ## Taking equations 26-31 from the draft that ensure the potential is bounded from below.
     lamx = param["lam12"] + min(0, param["lam12p"] - 2*sqrt(param["lam1Re"]**2 + param["lam1Im"]**2) )
     lamy = param["lam31"] + min(0, param["lam31p"] - 2*sqrt(param["lam3Re"]**2 + param["lam3Im"]**2) )
@@ -21,10 +17,7 @@ def bIsBounded(param : dict[str, float]) -> bool:
            param["lam33"]*lamx**2 + param["lam11"]*lamz**2 + param["lam22"]*lamy**2 -param["lam11"]*param["lam22"]*param["lam33"] - 2*lamx*lamy*lamz < 0)
 
 def bIsPerturbative(param : dict[str, float]) -> bool:
-    from math import pi
-
-    ## One massive if statement (meant to be faster than lots of small checks) to check if indiviual couplings are less than 4 pi
-    ## Should actually check vertices but this isn't a feature (yet) in DRalgo
+    ## Should actually check vertices but not a feature in DRalgo at time of writting
     return abs(param["lam11"]) < 4*pi and \
        abs(param["lam12"]) < 4*pi and \
        abs(param["lam12p"]) < 4*pi and \
@@ -52,7 +45,6 @@ def massSplittingsToMasses(mS1: float, delta12: float, delta1c: float, deltac: f
     return mS2, mSpm1, mSpm2
 
 def calculateRenormalizedParameters(inputParams: dict[str, float]) -> dict[str, float]:
-    from math import sqrt, sin, cos, pi
     """Take inputs from the BM file and convert them to parameters in the action.
     With tree-level matching the renormalization scale does not directly show up in the expressions, but
     needs to be specified for later loop calculations."""
@@ -132,33 +124,27 @@ def calculateRenormalizedParameters(inputParams: dict[str, float]) -> dict[str, 
 def threeDimFieldtoDimensionless(temp: list[float], field: list[float]) -> list[float]:
     return field/np.sqrt(temp)
 
-# Handles all logic for tracking the temperature dependence of a model, 
-# identifying phase transitions, determining physical parameters of a transition 
-# etc. 
 def traceFreeEnergyMinimum(effectivePotential,
                            dimensionalReduction,
                            benchmark,
                            TRangeStart: float, 
                            TRangeEnd: float, 
                            TRangeStepSize: float,
-                           verbose = False) -> tuple[np.ndarray, np.ndarray]:
+                           verbose = False) -> dict[str: ]:
     renormalizedParams = calculateRenormalizedParameters(benchmark)
-    """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale like 7T.
-    To make this work nicely, integrate the beta functions here up to some high enough scale and store the resulting couplings
-    in interpolated functions.
-    """
+    """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale ~7T.
+    To make this work nicely we integrate the beta functions here up to the largest temp used 
+    then interpolate over the beta function."""
     TRange = np.arange(TRangeStart, TRangeEnd, TRangeStepSize )
     startScale = renormalizedParams["RGScale"]
-    endScale = 7.3 * TRange[-1] ## largest T in our range is T[-1] 
+    endScale = 7.3 * TRange[-1] 
     muRange = np.linspace( startScale, endScale, TRange.size*10 )
     
-    ## TODO Are the beta function routines safe if endScale is smaller than startScale?
-    ## If you want this behaviour then it should be unit tested.
+    from .BetaFunctions import BetaFunctions4D
     betas = BetaFunctions4D(muRange, renormalizedParams) 
     
-    EulerGamma = 0.5772156649
-    EulerGammaPrime = 2.*(math.log(4.*np.pi) - EulerGamma)
-    Lfconst = 4.*np.log(2.)
+    EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
+    Lfconst = 4.*log(2.)
     
     minimizationResults = {"T": [],
                            "valueVeff": [], 
@@ -174,7 +160,7 @@ def traceFreeEnergyMinimum(effectivePotential,
         minimizationResults["T"].append(float(T))
         goalRGScale =  T ## Final scale in 3D -check if goalRGscale is ever different from just T
 
-        matchingScale = 4.0*np.pi*math.exp(-EulerGamma) * T ## Scale that minimises T dependent logs
+        matchingScale = 4.0*pi*exp(-np.euler_gamma) * T ## Scale that minimises T dependent logs
         paramsForMatching = betas.RunCoupling(matchingScale)
         
         if not bIsBounded(paramsForMatching):
@@ -184,7 +170,7 @@ def traceFreeEnergyMinimum(effectivePotential,
         ## T dependent Variables needed to compute the 2 loop EP but aren't Lagranian params 
         paramsForMatching["RGScale"] = matchingScale
         paramsForMatching["T"] = T
-        Lb = 2. * math.log(matchingScale / T) - EulerGammaPrime
+        Lb = 2. * log(matchingScale / T) - EulerGammaPrime
         paramsForMatching["Lb"] = Lb
         paramsForMatching["Lf"] = Lb + Lfconst
 
@@ -235,6 +221,8 @@ def traceFreeEnergyMinimum(effectivePotential,
 
     minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
     return minimizationResults
+
+
 
 from unittest import TestCase
 class TransitionFinderUnitTests(TestCase):
