@@ -6,13 +6,21 @@
         80.0,
         90.0
     ],
-    "valueVeff": [
+    "valueVeffReal": [
         -2056171.9131155633,
         -1635969.6511821635,
         -1296787.7822542253,
         -1015206.824901112,
         -778914.4280501852
     ],
+    "valueVeffImag": [
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    "complex": false,
     "minimumLocation": [
         [
             1e-06,

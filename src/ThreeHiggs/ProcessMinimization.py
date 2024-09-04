@@ -9,7 +9,8 @@ def jumpFinder(array: np.ndarray[float])-> np.ndarray[int]:
 def interpretData(result: dict, index: int, bmInput: dict[str, float]):
     interpResult = {"bmNumber": index,
                     "failureReason": result["failureReason"],
-                    "bIsPerturbative": result["bIsPerturbative"], 
+                    "bIsPerturbative": result["bIsPerturbative"],
+                    "complexMin": True if result["complex"] =="complex" else False,
                     "jumpsv1": [],
                     "jumpsv2": [],
                     "jumpsv3": [],

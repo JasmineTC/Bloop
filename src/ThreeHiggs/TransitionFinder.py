@@ -147,7 +147,9 @@ def traceFreeEnergyMinimum(effectivePotential,
     Lfconst = 4.*log(2.)
     
     minimizationResults = {"T": [],
-                           "valueVeff": [], 
+                           "valueVeffReal": [],
+                           "valueVeffImag": [],
+                           "complex": False,
                            "minimumLocation": [], 
                            "bIsPerturbative": True, 
                            "UltraSoftTemp": None, 
@@ -155,12 +157,13 @@ def traceFreeEnergyMinimum(effectivePotential,
 
     counter = 0
     for T in TRange:
+        T = float(T) ## To make compatible with JSON
         if verbose:
             print (f'Start of temp = {T} loop')
-        minimizationResults["T"].append(float(T))
+        minimizationResults["T"].append(T)
         goalRGScale =  T ## Final scale in 3D -check if goalRGscale is ever different from just T
 
-        matchingScale = 4.0*pi*exp(-np.euler_gamma) * T ## Scale that minimises T dependent logs
+        matchingScale = 4.*pi*exp(-np.euler_gamma) * T ## Scale that minimises T dependent logs
         paramsForMatching = betas.RunCoupling(matchingScale)
         
         if not bIsBounded(paramsForMatching):
@@ -193,20 +196,23 @@ def traceFreeEnergyMinimum(effectivePotential,
                           [-40,40,40], 
                           [59,59,59], 
                           [-59,59,59]]
-        minimumLocation, valueVeff = effectivePotential.findGlobalMinimum(initialGuesses)
+        minimumLocation, minimumValueReal, minimumValueImag, status = effectivePotential.findGlobalMinimum(initialGuesses)
 
-        if not all(minimumLocation) or not valueVeff: ## Checks if minimumLocation contains nan/Noneor Veff is None
+        if status == "NaN": 
             minimizationResults["failureReason"] = "MinimisationFailed"
             break
         
-        minimizationResults["valueVeff"].append(valueVeff)
+        minimizationResults["valueVeffReal"].append(minimumValueReal)
+        minimizationResults["valueVeffImag"].append(minimumValueImag)
         minimizationResults["minimumLocation"].append(minimumLocation)
+        if not minimizationResults["complex"]:
+            minimizationResults["complex"] = status == "complex"
         
         if not minimizationResults["UltraSoftTemp"]: ## If the ultra soft temp has not yet been set
             if effectivePotential.bReachedUltraSoftScale(minimumLocation, ## Check if ultra soft scale reached
                                                          T, 
                                                          verbose = verbose): 
-                minimizationResults["UltraSoftTemp"] = float(T) ## If reached then set that as the ultra soft temp
+                minimizationResults["UltraSoftTemp"] = T ## If reached then set that as the ultra soft temp
                                                          ##- this will stop the first if statement from passing
         
         if minimizationResults["bIsPerturbative"]: ##If the potential was perturbative check if it still is

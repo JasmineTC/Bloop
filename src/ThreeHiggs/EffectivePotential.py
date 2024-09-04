@@ -199,8 +199,7 @@ class EffectivePotential:
                                        v3Bounds)
 
     def setModelParameters(self, modelParameters: dict) -> None:
-        """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate 
-        """
+        """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate """
         self.params.setActionParams(modelParameters)
 
 
@@ -210,9 +209,7 @@ class EffectivePotential:
 
 
     def evaluatePotential(self, fields: list[float], verbose = False) -> complex:
-        """Evaluate Veff at specified field values. Uses the currently set model parameters.
-        """
-        
+        """Evaluate Veff at specified field values. Uses the currently set model parameters."""
         self.params.fields = fields
     
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
@@ -223,22 +220,14 @@ class EffectivePotential:
         return sum(self.expressions(paramDict)) ## Sum because the result is a list of tree, 1loop etc 
 
     def findLocalMinimum(self, initialGuess: list[float], algo, verbose = False) -> tuple[list[float], complex]:
-        
+        ## Minimize real part only:
         VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields, 
-                                                                      verbose = verbose) ) ## Minimize real part only:
+                                                                      verbose = verbose) )
+        return self.minimizer.minimize(VeffWrapper, initialGuess, algo)
 
-        location, value = self.minimizer.minimize(VeffWrapper, initialGuess, algo)
-
-        value = self.evaluatePotential(location, verbose = verbose) ## evaluate once more to get the possible imag parts
-        if abs(value.imag)/abs(value.real) > 1e-8: ## If the imaginary part of the potential is large then minimisation has found unphysical
-            value = np.inf ##Set the value to inf so it won't be ever be smaller than best result
-        return location, value.real ## Taking the real part so compactiable with json
-
-    def findGlobalMinimum(self, minimumCandidates: list[list[float]] = None, verbose = False) -> tuple[list[float], complex]:
-        """This calls findLocalMinimum with a bunch of initial guesses and figures out the deepest solution.
-        Return value is location, value. value can be complex (but this is probably a sign of failed minimization)
-        """
-
+    def findGlobalMinimum(self, minimumCandidates: list[list[float]] = None, 
+                          verbose = False) -> tuple[list[float], float, float, str]:
+        
         bestResult = ((np.full(3, np.nan)), np.inf)
         
         if self.minimizationAlgo == "combo":
@@ -256,11 +245,14 @@ class EffectivePotential:
                 result = self.findLocalMinimum(candidate, self.minimizationAlgo, verbose = verbose)
                 if result[1] < bestResult[1]:
                     bestResult = result
-                    
+        
         if any(np.isnan(bestResult[0])) or np.isinf(bestResult[1]):
-            return ((np.full(3, None)), None)
-        else:
-            return bestResult
+            return (np.full(3, None)), None, None, "NaN"
+        
+        potentialAtMin = self.evaluatePotential(bestResult[0], verbose = verbose) ## Compute the potential at minimum to check if its complex
+        if abs(potentialAtMin.imag)/abs(potentialAtMin.real) > 1e-8: 
+            return bestResult[0], potentialAtMin.real, potentialAtMin.imag, "complex" ## Flag minimum with imag > tol
+        return bestResult[0], potentialAtMin.real, None, None
     
     
     def getUltraSoftScale(self, paramDict, T: float) -> float:
@@ -282,15 +274,11 @@ class EffectivePotential:
         return np.max(np.abs(couplings))**2 * T / (16*np.pi)
 
     def bReachedUltraSoftScale(self, fields: list[complex], T: float, verbose = False) -> bool:
-        '''
-        Check if we can trust the results by comparing the masses we find at the minimum to the ultra soft scale i.e.
+        '''Check if we can trust the results by comparing the masses we find at the minimum to the ultra soft scale i.e.
         Are all physical masses > g^2 T/16pi, we use the largest coupling in the theory to do the comparrsion 
         --Note we expect some goldstone bosons from the symmetry breaking so we check the number of light modes = goldstone modes
         ----Get someone to check the logic of this
         2) Return true if # of light modes is less than the # of goldstone modes'''
-        ## If all field values are close to zero then we are probably in the symmetric phase with no goldstone bosons
-        ## TODO: the symmetric phase cannot be described by pert theory so shouldn't be trusted, so should prob just return False right away
-        ## But get someone to check this
         goldStone = 0 if np.all(np.abs(fields) < 0.1) else 3
         paramDict = self.params.evaluateAll(fields, 
                                             bNeedsDiagonalization=self.bNeedsDiagonalization,
