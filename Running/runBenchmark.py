@@ -21,8 +21,8 @@ def doMinimization(indexAndBenchMark):
         open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
       
     if args.bPlot:
-        from PlotResult import PlotResult
-        PlotResult.PlotData(minimizationResult, benchMark['bmNumber'], args.loopOrder, filename)
+        from ThreeHiggs.PlotResult import plotData
+        plotData(minimizationResult, benchMark['bmNumber'], args.loopOrder, filename)
 
     if args.bProcessMin:
         from ThreeHiggs.ProcessMinimization import interpretData
