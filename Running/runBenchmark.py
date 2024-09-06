@@ -119,9 +119,8 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                 from ijson import items
                 pool.map(doMinimization, items(benchMarkFile, "item", use_float = True))
         else:
-            from json import load
             benchMarkFile = load(benchMarkFile)
             for BenchMark in benchMarkFile:
-                doMinimization( BenchMark )
+                doMinimization(BenchMark)
     
 
