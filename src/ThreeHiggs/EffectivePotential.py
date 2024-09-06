@@ -1,6 +1,5 @@
 import numpy as np
 from scipy import linalg
-from dataclasses import dataclass
 
 from .VeffMinimizer import VeffMinimizer
 
@@ -17,27 +16,23 @@ def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.nda
         eigenValue, eigenVector = mp.eigsy(mp.matrix(matrix), eigvals_only = False)
         return (np.array(eigenValue.tolist(),dtype=np.float64), np.array(eigenVector.tolist(),dtype=np.float64))
     elif method == "scipy":
-        import scipy
-        return scipy.linalg.eigh(matrix, check_finite = False)
+        return linalg.eigh(matrix, check_finite = False)
     else:
         print(f"{method} is not assigned to a method in diagonalizeSymmetric, exiting program.")
         exit(-1)
 
-## everything we need to evaluate the potential. this is very WIP
 class VeffParams:
     """ Usage after initialization: 
         1. call setActionParams(dict)
         2. call evaluateAll
-    """
-
-    """ Order of computations:
+        
+        Order of computations:
         1. Fix action params (and possibly temperature). This needs to be done via setActionParams() before evaluateAll(fields) 
         2. Fix background fields 
         3. Solve diagonalization conditions
         4. Evaluate post-diagonalization shorthand symbols
         5. Evaluate masses
-        6. Evaluate pre-Veff shorthand symbols (so stuff that does into rotation matrices)
-    """
+        6. Evaluate pre-Veff shorthand symbols (so stuff that does into rotation matrices)"""
 
     def __init__(self, 
                  fieldNames, 
@@ -69,10 +64,7 @@ class VeffParams:
 
 
     def evaluateAll(self, fields: list[float], bNeedsDiagonalization=True, verbose = False) -> dict[str, float]:
-        """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation.
-        """
-        # Gradually build a dict containing (key, val) for all needed symbols
-        # TODO this will need to be optimized
+        """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation."""
         knownParamsDict = self.actionParams.copy()
 
         ## Background fields
@@ -99,8 +91,7 @@ class VeffParams:
 
     def diagonalizeScalars(self, params: dict[str, float], verbose = False) -> dict[str, float]:
         """Finds a rotation matrix that diagonalizes the scalar mass matrix
-        and returns a dict with diagonalization-specific params
-        """
+        and returns a dict with diagonalization-specific params"""
         # Diagonalize blocks separately
         subRotationMatrix = []
         subMassMatrix = []
@@ -204,7 +195,6 @@ class EffectivePotential:
 
 
     def initExpressions(self, filesToParse: list[str]) -> None:
-
         self.expressions = []
 
 
