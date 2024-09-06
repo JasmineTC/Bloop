@@ -1,5 +1,5 @@
-def doMinimization(indexAndBenchMark):
-    _, benchMark = indexAndBenchMark
+def doMinimization(BenchMark):
+    benchMark = BenchMark
     if not args.firstBenchmark <= benchMark['bmNumber'] <= args.lastBenchmark:
         return
 
@@ -117,11 +117,11 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
             from multiprocessing import Pool
             with Pool(args.cores) as pool:
                 from ijson import items
-                pool.map(doMinimization, enumerate(items(benchMarkFile, "item", use_float = True)))
+                pool.map(doMinimization, items(benchMarkFile, "item", use_float = True))
         else:
             from json import load
             benchMarkFile = load(benchMarkFile)
-            for indexAndBenchMark in enumerate(benchMarkFile):
-                doMinimization( indexAndBenchMark )
+            for BenchMark in benchMarkFile:
+                doMinimization( BenchMark )
     
 
