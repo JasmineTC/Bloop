@@ -1,5 +1,4 @@
-def doMinimization(BenchMark):
-    benchMark = BenchMark
+def doMinimization(benchMark):
     if not args.firstBenchmark <= benchMark['bmNumber'] <= args.lastBenchmark:
         return
 
