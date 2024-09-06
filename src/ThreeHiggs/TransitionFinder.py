@@ -156,8 +156,6 @@ def traceFreeEnergyMinimum(effectivePotential,
                            "UltraSoftTemp": None, 
                            "failureReason": None}
 
-    effectivePotential.diagonalizeScalars()
-
     counter = 0
     for T in TRange:
         T = float(T) ## To make compatible with JSON
