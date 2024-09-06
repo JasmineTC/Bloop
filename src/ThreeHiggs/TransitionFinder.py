@@ -165,7 +165,6 @@ def traceFreeEnergyMinimum(effectivePotential,
         goalRGScale =  T ## Final scale in 3D -check if goalRGscale is ever different from just T
 
         matchingScale = 4.*pi*exp(-np.euler_gamma) * T ## Scale that minimises T dependent logs
-
         paramsForMatching = betasFunctions.runCoupling(matchingScale)
         
         if not bIsBounded(paramsForMatching):
