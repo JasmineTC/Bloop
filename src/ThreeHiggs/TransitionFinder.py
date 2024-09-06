@@ -44,7 +44,7 @@ def massSplittingsToMasses(mS1: float, delta12: float, delta1c: float, deltac: f
     mSpm2 = deltac + mSpm1
     return mS2, mSpm1, mSpm2
 
-def calculateRenormalizedParameters(inputParams: dict[str, float]) -> dict[str, float]:
+def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
     """Take inputs from the BM file and convert them to parameters in the action.
     With tree-level matching the renormalization scale does not directly show up in the expressions, but
     needs to be specified for later loop calculations."""
@@ -131,17 +131,18 @@ def traceFreeEnergyMinimum(effectivePotential,
                            TRangeEnd: float, 
                            TRangeStepSize: float,
                            verbose = False) -> dict[str: ]:
-    renormalizedParams = calculateRenormalizedParameters(benchmark)
     """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale ~7T.
     To make this work nicely we integrate the beta functions here up to the largest temp used 
     then interpolate over the beta function."""
-    TRange = np.arange(TRangeStart, TRangeEnd, TRangeStepSize )
-    startScale = renormalizedParams["RGScale"]
+    TRange = np.arange(TRangeStart, TRangeEnd, TRangeStepSize)
+    
+    LagranianParams4D = get4DLagranianParams(benchmark)
+    startScale = LagranianParams4D["RGScale"]
     endScale = 7.3 * TRange[-1] 
-    muRange = np.linspace( startScale, endScale, TRange.size*10 )
+    muRange = np.linspace(startScale, endScale, TRange.size*10)
     
     from .BetaFunctions import BetaFunctions4D
-    betas = BetaFunctions4D(muRange, renormalizedParams) 
+    betasFunctions = BetaFunctions4D(muRange, LagranianParams4D) 
     
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
@@ -155,6 +156,8 @@ def traceFreeEnergyMinimum(effectivePotential,
                            "UltraSoftTemp": None, 
                            "failureReason": None}
 
+    effectivePotential.diagonalizeScalars()
+
     counter = 0
     for T in TRange:
         T = float(T) ## To make compatible with JSON
@@ -164,7 +167,7 @@ def traceFreeEnergyMinimum(effectivePotential,
         goalRGScale =  T ## Final scale in 3D -check if goalRGscale is ever different from just T
 
         matchingScale = 4.*pi*exp(-np.euler_gamma) * T ## Scale that minimises T dependent logs
-        paramsForMatching = betas.RunCoupling(matchingScale)
+        paramsForMatching = betasFunctions.runCoupling(matchingScale)
         
         if not bIsBounded(paramsForMatching):
             minimizationResults["failureReason"] = "Unbounded"

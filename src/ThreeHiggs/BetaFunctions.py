@@ -27,10 +27,10 @@ class BetaFunctions4D():
         self.pi16 = __class__.pi16
 
         ## Need to unpack the param dict for odeint
-        paramsList = self.UnpackParamDict(initialParams)
+        paramsList = self.unpackParamDict(initialParams)
         
         ## Solve the beta functions over muRange and interpolate over the results -- store the interpolations within beta functions to be called later
-        solution = odeint(self.HardCodeBetaFunction, paramsList, self.muRange)
+        solution = odeint(self.hardCodeBetaFunction, paramsList, self.muRange)
 
         ##To make solution slightly nicer to work with we take the transpose so that each coupling is inside its own array,
         ##as oppossed to each mu step being its own array
@@ -43,7 +43,7 @@ class BetaFunctions4D():
         
         self.interpDict = interpDict
 
-    def UnpackParamDict(self, params: dict[str, float]) -> np.ndarray:
+    def unpackParamDict(self, params: dict[str, float]) -> np.ndarray:
         """Puts a 3HDM parameter dict in array format that odeint understands.
         Also produces a name <-> index mapping for easier access to the params in beta function expressions."""
         indexMapping = {}
@@ -62,7 +62,7 @@ class BetaFunctions4D():
         self._keyMapping = keyMapping
         return paramsList    
         
-    def HardCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float) -> np.ndarray:
+    def hardCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float) -> np.ndarray:
         ## Pick params from the input array since they are appear as hardcoded symbols below
         g1 = InitialConditions[ self._indexMapping["g1"] ]
         g2 = InitialConditions[ self._indexMapping["g2"] ]
@@ -149,7 +149,7 @@ class BetaFunctions4D():
         
         return betaArray/mu
 
-    def RunCoupling(self, muEvaulate: float):
+    def runCoupling(self, muEvaulate: float):
         
         runCoupling = {}
         ##Loop over the dict, for each key compute the spline at muEvaulate, ignore the RGScale in the dict
