@@ -5,6 +5,8 @@ def makeFieldDimensionless(temp: list[float], field: list[float]) -> list[float]
     return field/np.sqrt(temp)
 
 def plotData(result: dict, index : int, loopOrder : int, filename : str): #->png
+    if result["failureReason"]:
+        return
     tempList = result["T"]
 
     v1List = makeFieldDimensionless(tempList, result["minimumLocation"][0])
