@@ -36,7 +36,7 @@ def bIsBounded() -> bool:
            lamx > -2*m.sqrt(lam11*lam22) and \
            lamy > -2*m.sqrt(lam11*lam33) and \
            lamz > -2*m.sqrt(lam22*lam33) and \
-           (m.sqrt(lam33)*lamx + m.sqrt(lam11)*lamz + m.sqrt(lam22)*lamy <0 or \
+           (m.sqrt(lam33)*lamx + m.sqrt(lam11)*lamz + m.sqrt(lam22)*lamy >=0 or \
            lam33*lamx**2 + lam11*lamz**2 + lam22*lamy**2 -lam11*lam22*lam33 - 2*lamx*lamy*lamz   < 0)
 
 def bNoLightCharged() -> bool:
