@@ -7,14 +7,15 @@ def jumpFinder(array: np.ndarray[float])-> np.ndarray[int]:
     return np.nonzero(np.abs(array) > 0.2)[0]
 
 def interpretData(result: dict, index: int, bmInput: dict[str, float]):
-    interpResult = {"bmNumber": index,
-                    "failureReason": result["failureReason"],
+    interpResult = {"failureReason": result["failureReason"],
                     "bIsPerturbative": result["bIsPerturbative"],
                     "complexMin": True if result["complex"] =="complex" else False,
                     "jumpsv1": [],
                     "jumpsv2": [],
                     "jumpsv3": [],
+                    "Type": None,
                     "UltraSoftTemp": result["UltraSoftTemp"],
+                    "bmNumber": index,
                     "bmInput": bmInput}
 
     if result["failureReason"]:
@@ -41,5 +42,9 @@ def interpretData(result: dict, index: int, bmInput: dict[str, float]):
         for val in jumpv3:
             interpResult["jumpsv3"].append(( v3ListRenormDiff[int(val)], 
                                              result["T"][int(val)] ))
+    
+    if len(jumpv1) == 1 and jumpv1 > 0.7 and not jumpv2 and not jumpv3:
+        interpResult["Type"] = "1SSFOPT"
+            
     return interpResult
     
