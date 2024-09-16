@@ -1,4 +1,5 @@
 import numpy as np
+from math import sqrt
 
 def makeFieldDimensionless(temp: list[float], field: list[float]) -> list[float]:
     return field/np.sqrt(temp)
@@ -13,7 +14,7 @@ def interpretData(result: dict, index: int, bmInput: dict[str, float]):
                     "jumpsv1": [],
                     "jumpsv2": [],
                     "jumpsv3": [],
-                    "Type": None,
+                    "strong": False,
                     "UltraSoftTemp": result["UltraSoftTemp"],
                     "bmNumber": index,
                     "bmInput": bmInput}
@@ -21,30 +22,40 @@ def interpretData(result: dict, index: int, bmInput: dict[str, float]):
     if result["failureReason"]:
         return interpResult 
     
-    v1ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][0]) )
-    v2ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][1]) )
-    v3ListRenormDiff = np.diff( makeFieldDimensionless(result["T"], result["minimumLocation"][2]) )
+    v1Dimless = makeFieldDimensionless(result["T"], result["minimumLocation"][0])
+    v2Dimless = makeFieldDimensionless(result["T"], result["minimumLocation"][1])
+    v3Dimless = makeFieldDimensionless(result["T"], result["minimumLocation"][2])
     
-    jumpv1 = jumpFinder(v1ListRenormDiff)
-    jumpv2 = jumpFinder(v2ListRenormDiff)
-    jumpv3 = jumpFinder(v3ListRenormDiff)
+    v1DimlessDiff = np.diff( v1Dimless )
+    v2DimlessDiff = np.diff( v2Dimless )
+    v3DimlessDiff = np.diff( v3Dimless )
     
-    if len(jumpv1) > 0:
+    jumpv1 = jumpFinder( v1DimlessDiff )
+    jumpv2 = jumpFinder( v2DimlessDiff )
+    jumpv3 = jumpFinder( v3DimlessDiff )
+    
+    if jumpv1:
         for val in jumpv1:
-            interpResult["jumpsv1"].append(( v1ListRenormDiff[int(val)], 
-                                             result["T"][int(val)] ))
-    
-    if len(jumpv2) > 0:
+            interpResult["jumpsv1"].append(( v1DimlessDiff[val], 
+                                             result["T"][val] ))
+    if jumpv2:
         for val in jumpv2:
-            interpResult["jumpsv2"].append(( v2ListRenormDiff[int(val)], 
-                                             result["T"][int(val)] ))
-    if len(jumpv3) > 0:
+            interpResult["jumpsv2"].append(( v2DimlessDiff[val], 
+                                             result["T"][val] ))
+    if jumpv3:
         for val in jumpv3:
-            interpResult["jumpsv3"].append(( v3ListRenormDiff[int(val)], 
-                                             result["T"][int(val)] ))
-    
-    if len(jumpv1) == 1 and jumpv1 > 0.7 and not jumpv2 and not jumpv3:
-        interpResult["Type"] = "1SSFOPT"
-            
+            interpResult["jumpsv3"].append(( v3DimlessDiff[val], 
+                                             result["T"][val] ))
+
+    if max(abs(v3DimlessDiff[jumpv3]), default = 0) > 0.6: 
+        phaseJumpIdx = jumpv3[ np.argmax( abs( v3DimlessDiff[jumpv3] ) ) ]
+        strength = sqrt( v1Dimless[phaseJumpIdx]**2 +\
+                                       v2Dimless[phaseJumpIdx]**2 + \
+                                       v3Dimless[phaseJumpIdx]**2) - \
+                                 sqrt( v1Dimless[phaseJumpIdx+1]**2 +\
+                                       v2Dimless[phaseJumpIdx+1]**2 + \
+                                       v3Dimless[phaseJumpIdx+1]**2)
+        interpResult["strong"] = strength if strength > 0.6 else False
+        
     return interpResult
     
