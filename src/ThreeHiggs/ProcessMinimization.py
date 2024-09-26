@@ -5,7 +5,7 @@ def makeFieldDimensionless(temp: list[float], field: list[float]) -> list[float]
     return field/np.sqrt(temp)
 
 def jumpFinder(array: np.ndarray[float])-> np.ndarray[int]:
-    return np.nonzero(np.abs(array) > 0.2)[0]
+    return np.nonzero(np.abs(array) > 0.4)[0]
 
 def interpretData(result: dict, index: int, bmInput: dict[str, float]):
     interpResult = {"failureReason": result["failureReason"],
