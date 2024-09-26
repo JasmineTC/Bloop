@@ -230,7 +230,6 @@ def traceFreeEnergyMinimum(effectivePotential,
             counter += 1
 
     minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
-    print (minimizationResults)
     return minimizationResults
 
 
