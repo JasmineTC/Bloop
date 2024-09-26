@@ -162,8 +162,8 @@ def traceFreeEnergyMinimum(effectivePotential,
         if verbose:
             print (f'Start of temp = {T} loop')
         minimizationResults["T"].append(T)
+        
         goalRGScale =  T ## Final scale in 3D -check if goalRGscale is ever different from just T
-
         matchingScale = 4.*pi*exp(-np.euler_gamma) * T ## Scale that minimises T dependent logs
         paramsForMatching = betasFunctions.runCoupling(matchingScale)
         
@@ -198,7 +198,10 @@ def traceFreeEnergyMinimum(effectivePotential,
                           [59,59,59], 
                           [-59,59,59]]
         minimumLocation, minimumValueReal, minimumValueImag, status = effectivePotential.findGlobalMinimum(initialGuesses)
-
+        if T == TRangeStart and (minimumLocation[0] > 1 or minimumLocation[1] > 1): ## This is a hack to remove bad benchmark points
+            minimizationResults["failureReason"] = "v3NotGlobalMin"
+            break
+            
         if status == "NaN": 
             minimizationResults["failureReason"] = "MinimisationFailed"
             break
@@ -227,6 +230,7 @@ def traceFreeEnergyMinimum(effectivePotential,
             counter += 1
 
     minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
+    print (minimizationResults)
     return minimizationResults
 
 
