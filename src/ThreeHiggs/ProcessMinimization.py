@@ -34,15 +34,15 @@ def interpretData(result: dict, index: int, bmInput: dict[str, float]):
     jumpv2 = jumpFinder( v2DimlessDiff )
     jumpv3 = jumpFinder( v3DimlessDiff )
     
-    if jumpv1:
+    if len(jumpv1) > 0: 
         for val in jumpv1:
             interpResult["jumpsv1"].append(( v1DimlessDiff[val], 
                                              result["T"][val] ))
-    if jumpv2:
+    if len(jumpv2) > 0:
         for val in jumpv2:
             interpResult["jumpsv2"].append(( v2DimlessDiff[val], 
                                              result["T"][val] ))
-    if jumpv3:
+    if len(jumpv3) > 0:
         for val in jumpv3:
             interpResult["jumpsv3"].append(( v3DimlessDiff[val], 
                                              result["T"][val] ))
