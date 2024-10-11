@@ -222,7 +222,7 @@ def traceFreeEnergyMinimum(effectivePotential,
         if minimizationResults["bIsPerturbative"]: ##If the potential was perturbative check if it still is
             minimizationResults["bIsPerturbative"] = bIsPerturbative(paramsForMatching) ## If non-pert then value set to false and won't be updated
 
-        if np.all(minimumLocation < 1e-3):
+        if np.all(minimumLocation < 1e-2):
             if verbose:
                 print (f"Symmetric phase found at temp {T}")
             if counter == 3:
