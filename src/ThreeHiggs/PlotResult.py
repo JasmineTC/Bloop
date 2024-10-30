@@ -17,8 +17,9 @@ def plotData(result: dict, index : int, loopOrder : int, filename : str): #->png
     plt.plot(tempList, v2List, '^', label = "v2", color = 'black')
     plt.plot(tempList, v3List, '.', label = "v3", color = 'blue')
     plt.legend(loc = 'best')
-    plt.title(f"Field values at global minimum for benchmark {index} at loop order {loopOrder}")
-    plt.ylabel("Dimenstionless field value")
-    plt.xlabel("T")
+    #plt.title(f"Field values at global minimum for benchmark {index} at loop order {loopOrder}")
+    plt.ylabel(r"$\dfrac{v}{\sqrt{T}}$", rotation = 0, labelpad = 10)
+    plt.xlabel("T (GeV)")
+    plt.savefig(f"{filename}.png")
     plt.show()
-    # plt.savefig(f"{filename}.png")
+
