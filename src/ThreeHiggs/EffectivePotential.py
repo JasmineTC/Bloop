@@ -97,7 +97,6 @@ class VeffParams:
         subEigenValues = []
 
         for matrix in self.scalarMassMatrices:
-            # numericalM = matrix(params)
             numericalM = np.asarray(matrix(params))/T**2
             eigenValue, vects = diagonalizeSymmetric( numericalM, self.diagonalizationAlgo)
             eigenValue *=T**2
