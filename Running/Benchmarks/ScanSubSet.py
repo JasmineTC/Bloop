@@ -46,7 +46,7 @@ def bNoLightCharged() -> bool:
 bmNumber = 0
 ThreeHiggsBMDictList = []
 
-subSet = set(json.load(open("StrongBM2", "r")))
+subSet = set(json.load(open("StrongBM.txt", "r")))
 
 for mS1 in range(63, 100, 5):
     for thetaCPV in np.linspace(np.pi/2, 3*np.pi/2, 6):
@@ -123,5 +123,5 @@ for mS1 in range(63, 100, 5):
                                     
                                 })
                             bmNumber+=1
-with open("Benchmarks/SubSet2.json", "w") as outfile: 
+with open("Benchmarks/StrongSubSet.json", "w") as outfile: 
     json.dump(ThreeHiggsBMDictList, outfile, indent = 4)

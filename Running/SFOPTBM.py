@@ -1,3 +1,6 @@
+'''Creates a txt file containing all the bm numbers that are strong, 
+to passed to Benchmarks/ScanSubSet.py '''
+
 from os.path import join
 from glob import glob ## I think glob lets you do the * thingy
 from json import load, dump
@@ -12,6 +15,5 @@ for fileName in glob(join('Results', '*.json')):
 
 print(f"The number of benchmark files tagged as strong is: {len(strongBmList)}")
 
-with open("StrongBM2", "w") as fp:
+with open("Benchmarks/StrongBMList.txt", "w") as fp:
     dump(strongBmList, fp)
-

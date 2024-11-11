@@ -449,5 +449,5 @@ bm19 = {
 bmList.append(bm19)
 
 import json
-with open('Running/Benchmarks/Benchmarks_3HDM.json', 'w') as file:
+with open('Benchmarks_3HDM.json', 'w') as file:
     json.dump(bmList, file, indent=4)
