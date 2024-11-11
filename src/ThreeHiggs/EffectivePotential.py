@@ -212,11 +212,7 @@ class EffectivePotential:
         VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields,
                                                                       T,
                                                                       verbose = verbose) )
-        print(VeffWrapper([1e-4, 1e-4, 1e-4]))
-        print(VeffWrapper([1e-4, 1e-4, 5]))
-        print(VeffWrapper([1e-4, 1e-4, 15]))
-        print(VeffWrapper([1e-4, 1e-4, 25]))
-        exit()
+
         return self.minimizer.minimize(VeffWrapper, initialGuess, algo)
 
     def findGlobalMinimum(self,T:float, 
