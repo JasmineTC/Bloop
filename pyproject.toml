@@ -20,7 +20,8 @@ dependencies = [
     "numpy>=1.21.5",
     "scipy>=1.9.0",
     "sympy>=1.12",
-    "ijson"
+    "ijson",
+    "itertools"
 ]
 readme = "README.md"
 
@@ -41,4 +42,4 @@ ThreeHiggs = ["Data/*", "Benchmarks/*"]
 
 [project.urls]
 #"Homepage" = ""
-"Repository" = "https://github.com/niemilau/ThreeHiggs"
+"Repository" = "https://github.com/JasmineTC/ThreeHiggs"

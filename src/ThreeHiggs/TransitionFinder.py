@@ -197,7 +197,7 @@ def traceFreeEnergyMinimum(effectivePotential,
                           [-40,40,40], 
                           [59,59,59], 
                           [-59,59,59]]
-        minimumLocation, minimumValueReal, minimumValueImag, status = effectivePotential.findGlobalMinimum(initialGuesses)
+        minimumLocation, minimumValueReal, minimumValueImag, status = effectivePotential.findGlobalMinimum(T, initialGuesses)
         if T == TRangeStart and (minimumLocation[0] > 1 or minimumLocation[1] > 1): ## This is a hack to remove bad benchmark points
             minimizationResults["failureReason"] = "v3NotGlobalMin"
             break
