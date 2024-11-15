@@ -59,13 +59,14 @@ class VeffParams:
 
         self.scalarRotationMatrix = scalarRotationMatrix
 
-    def setActionParams(self, inputParams: dict[str, float]) -> None:
-        self.actionParams = inputParams
+    # BEFORE MERGE: REMOVE
+    #def setActionParams(self, inputParams: dict[str, float]) -> None:
+    #    self.actionParams = inputParams
 
 
-    def evaluateAll(self, fields: list[float], T:float, bNeedsDiagonalization=True, verbose = False) -> dict[str, float]:
+    def evaluateAll(self, fields: list[float], T:float, params3D, bNeedsDiagonalization=True, verbose = False) -> dict[str, float]:
         """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation."""
-        knownParamsDict = self.actionParams.copy()
+        knownParamsDict = params3D.copy()
 
         ## Background fields
         for i, value in enumerate(fields):
@@ -185,61 +186,65 @@ class EffectivePotential:
                                        v2Bounds,
                                        v3Bounds)
 
-    def setModelParameters(self, modelParameters: dict) -> None:
-        """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate """
-        self.params.setActionParams(modelParameters)
+    # BEFORE MERGE: REMOVE
+    #def setModelParameters(self, modelParameters: dict) -> None:
+    #    """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate """
+    #    self.params.setActionParams(modelParameters)
 
 
     def initExpressions(self, filesToParse: list[str]) -> None:
         self.expressions = []
 
 
-    def evaluatePotential(self, fields: list[float], T:float, verbose = False) -> complex:
+    def evaluatePotential(self, fields: list[float], T:float, params3D, verbose = False) -> complex:
         """Evaluate Veff at specified field values. Uses the currently set model parameters."""
         self.params.fields = fields
     
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
         paramDict = self.params.evaluateAll(fields,
                                             T,
+                                            params3D,
                                             bNeedsDiagonalization=self.bNeedsDiagonalization, 
                                             verbose = verbose)
 
         return sum(self.expressions(paramDict)) ## Sum because the result is a list of tree, 1loop etc 
 
-    def findLocalMinimum(self, initialGuess: list[float],T:float, algo, verbose = False) -> tuple[list[float], complex]:
+    def findLocalMinimum(self, initialGuess: list[float],T:float, params3D, algo, verbose = False) -> tuple[list[float], complex]:
         ## Minimize real part only:
         VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields,
                                                                       T,
+                                                                      params3D,
                                                                       verbose = verbose) )
 
         return self.minimizer.minimize(VeffWrapper, initialGuess, algo)
 
     def findGlobalMinimum(self,T:float, 
+                          params3D,
                           minimumCandidates: list[list[float]] = None,
                           verbose = False) -> tuple[list[float], float, float, str]:
         
         bestResult = ((np.full(3, np.nan)), np.inf)
         
         if self.minimizationAlgo == "combo":
-            result = self.findLocalMinimum(minimumCandidates[0], T, "directGlobal", verbose = verbose)
+            result = self.findLocalMinimum(minimumCandidates[0], T, params3D, "directGlobal", verbose = verbose)
             if result[1] < bestResult[1]:
                 bestResult = result
             
             for candidate in minimumCandidates:
-                result = self.findLocalMinimum(candidate, T, "BOBYQA", verbose = verbose)
+                result = self.findLocalMinimum(candidate, T, params3D, "BOBYQA", verbose = verbose)
                 if result[1] < bestResult[1]:
                     bestResult = result
                     
         else:
             for candidate in minimumCandidates:
-                result = self.findLocalMinimum(candidate,T, self.minimizationAlgo, verbose = verbose)
+                result = self.findLocalMinimum(candidate,T, params3D, self.minimizationAlgo, verbose = verbose)
                 if result[1] < bestResult[1]:
                     bestResult = result
         
         if any(np.isnan(bestResult[0])) or np.isinf(bestResult[1]):
             return (np.full(3, None)), None, None, "NaN"
         
-        potentialAtMin = self.evaluatePotential(bestResult[0], T, verbose = verbose) ## Compute the potential at minimum to check if its complex
+        potentialAtMin = self.evaluatePotential(bestResult[0], T, params3D, verbose = verbose) ## Compute the potential at minimum to check if its complex
         if abs(potentialAtMin.imag)/abs(potentialAtMin.real) > 1e-8: 
             return bestResult[0], potentialAtMin.real, potentialAtMin.imag, "complex" ## Flag minimum with imag > tol
         return bestResult[0], potentialAtMin.real, None, None
@@ -263,7 +268,7 @@ class EffectivePotential:
                               paramDict['lam31'], paramDict['lam31p']]) 
         return np.max(np.abs(couplings))**2 * T / (16*np.pi)
 
-    def bReachedUltraSoftScale(self, fields: list[complex], T: float, verbose = False) -> bool:
+    def bReachedUltraSoftScale(self, fields: list[complex], T: float, params3D, verbose = False) -> bool:
         '''Check if we can trust the results by comparing the masses we find at the minimum to the ultra soft scale i.e.
         Are all physical masses > g^2 T/16pi, we use the largest coupling in the theory to do the comparrsion 
         --Note we expect some goldstone bosons from the symmetry breaking so we check the number of light modes = goldstone modes
@@ -272,6 +277,7 @@ class EffectivePotential:
         goldStone = 0 if np.all(np.abs(fields) < 0.1) else 3
         paramDict = self.params.evaluateAll(fields,
                                             T,
+                                            params3D,
                                             bNeedsDiagonalization=self.bNeedsDiagonalization,
                                             verbose = verbose)
 
