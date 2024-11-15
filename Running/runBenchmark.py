@@ -1,5 +1,11 @@
 def doMinimization(benchMark):
+    if args.verbose:
+        print(f"Starting {benchMark['bmNumber']}")
+
     if not args.firstBenchmark <= benchMark['bmNumber'] <= args.lastBenchmark:
+        if args.verbose:
+            print(f"Rejecting {benchMark['bmNumber']}")
+
         return
 
     from ThreeHiggs.TransitionFinder import traceFreeEnergyMinimum
@@ -20,6 +26,9 @@ def doMinimization(benchMark):
         open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
       
     if args.bPlot:
+        if args.verbose:
+            print(f"Saving {benchmark['bmNumber']} to {filename}")
+
         from ThreeHiggs.PlotResult import plotData
         plotData(minimizationResult, benchMark['bmNumber'], args.loopOrder, filename)
 
