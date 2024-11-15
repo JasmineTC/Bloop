@@ -115,21 +115,32 @@ class VeffParams:
         we need to undo that permutation before we give the rotation matrix to the effectivate potential or something. 
         I am not 100% on this"""
         drAlgoRot = np.transpose(fullRotationMatrix) @ self.scalarPermutationMatrix
-
+nu         # drAlgoRot = self.scalarPermutationMatrix @ fullRotationMatrix
+        # print(drAlgoRot)
+        # print()
+        # print(self.scalarPermutationMatrix @ fullRotationMatrix)
+        # print()
+        # print(drAlgoRot - self.scalarPermutationMatrix @ fullRotationMatrix)
+        # exit()
         ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
         ## matrix element symbol in the Veff expressions. This is currently very hacky 
         outDict = self.scalarRotationMatrix(drAlgoRot)
 
         ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
         ##But should probably be handled by a file given from mathematica
+
         massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
         from itertools import chain
+        # print(tuple(chain(*subEigenValues)))
+        # exit()
         if self.bAbsoluteMsq:
             for i, msq in enumerate(tuple(chain(*subEigenValues))):
                 outDict[massNames[i]] = abs(msq)
         else:
             for i, msq in enumerate(tuple(chain(*subEigenValues))):
+                # print(msq)
                 outDict[massNames[i]] = complex(msq)
+        # exit()
         return outDict
     
 
@@ -211,7 +222,11 @@ class EffectivePotential:
         VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields,
                                                                       T,
                                                                       verbose = verbose) )
-
+        print(VeffWrapper([1e-4, 1e-4, 1e-4]))
+        print(VeffWrapper([1e-4, 1e-4, 1]))
+        print(VeffWrapper([1e-4, 1e-4, 10]))
+        print(VeffWrapper([1e-4, 1e-4, 30]))
+        exit()
         return self.minimizer.minimize(VeffWrapper, initialGuess, algo)
 
     def findGlobalMinimum(self,T:float, 
