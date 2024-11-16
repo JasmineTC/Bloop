@@ -109,61 +109,14 @@ def diagonalizeScalars(params: dict[str, float],
 
     return outDict 
 
-class VeffParams:
-    """ Usage after initialization: 
-        1. call setActionParams(dict)
-        2. call evaluateAll
-        
-        Order of computations:
-        1. Fix action params (and possibly temperature). This needs to be done via setActionParams() before evaluateAll(fields) 
-        2. Fix background fields 
-        3. Solve diagonalization conditions
-        4. Evaluate post-diagonalization shorthand symbols
-        5. Evaluate masses
-        6. Evaluate pre-Veff shorthand symbols (so stuff that does into rotation matrices)"""
-
-    def __init__(self, 
+class EffectivePotential:
+    def __init__(self,
                  fieldNames, 
                  bAbsoluteMsq, 
                  vectorMassesSquared, 
                  vectorShortHands, 
                  scalarPermutationMatrix, 
                  scalarMassMatrices, 
-                 scalarRotationMatrix,
-                 diagonalizationAlgo):
-        
-        self.fieldNames = fieldNames
-        self.bAbsoluteMsq = bAbsoluteMsq
-        self.diagonalizationAlgo = diagonalizationAlgo
-
-        self.vectorMassesSquared = vectorMassesSquared
-        self.vectorShortHands = vectorShortHands
-
-        self.scalarPermutationMatrix = scalarPermutationMatrix
-        ## can have many matrices if we've block-diagonalized already
-        ## ASSUME: the blocks are given in order: upper left to lower right. 
-        ##TODO improve this
-        self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
-
-        self.scalarRotationMatrix = scalarRotationMatrix
-
-    # BEFORE MERGE: REMOVE
-    #def setActionParams(self, inputParams: dict[str, float]) -> None:
-    #    self.actionParams = inputParams
-
-""" Evaluating the potential: 
-1. Call setModelParameters() with a dict that sets all parameters in the action. 
-This is assumed to be using 3D EFT, so the params are temperature dependent.
-2. Call evaluate() with a list that specifies values of background fields. Fields are in 3D units, ie. have dimension GeV^(1/2)
-"""
-class EffectivePotential:
-    def __init__(self,
-                 fieldNames, 
-                 bAbsoluteMsq, 
-                 vectorMassesSquared, 
-                 vectorShorthands, 
-                 scalarPermutationMatrix, 
-                 scalerMassMatrices, 
                  scalarRotationMatrix,
                  loopOrder,
                  veff,
@@ -180,14 +133,19 @@ class EffectivePotential:
         self.fieldNames = fieldNames
         self.nbrFields = len(self.fieldNames)
 
-        self.params = VeffParams(fieldNames, 
-                                 bAbsoluteMsq, 
-                                 vectorMassesSquared, 
-                                 vectorShorthands, 
-                                 scalarPermutationMatrix, 
-                                 scalerMassMatrices, 
-                                 scalarRotationMatrix,
-                                 diagonalizationAlgo)
+        self.bAbsoluteMsq = bAbsoluteMsq
+        self.diagonalizationAlgo = diagonalizationAlgo
+
+        self.vectorMassesSquared = vectorMassesSquared
+        self.vectorShortHands = vectorShortHands
+
+        self.scalarPermutationMatrix = scalarPermutationMatrix
+        ## can have many matrices if we've block-diagonalized already
+        ## ASSUME: the blocks are given in order: upper left to lower right. 
+        ##TODO improve this
+        self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
+
+        self.scalarRotationMatrix = scalarRotationMatrix
         
         self.loopOrder = loopOrder
         self.minimizationAlgo = minimizationAlgo
@@ -202,36 +160,25 @@ class EffectivePotential:
                                        v2Bounds,
                                        v3Bounds)
 
-    # BEFORE MERGE: REMOVE
-    #def setModelParameters(self, modelParameters: dict) -> None:
-    #    """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate """
-    #    self.params.setActionParams(modelParameters)
-
-
     def initExpressions(self, filesToParse: list[str]) -> None:
         self.expressions = []
 
-
     def evaluatePotential(self, fields: list[float], T:float, params3D, verbose = False) -> complex:
-        """Evaluate Veff at specified field values. Uses the currently set model parameters."""
-        self.params.fields = fields
-    
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
-        paramDict = evaluateAll(fields,
-                                T,
-                                params3D,
-                                self.fieldNames,
-                                self.params.scalarPermutationMatrix, 
-                                self.params.scalarMassMatrices, 
-                                self.params.scalarRotationMatrix,
-                                self.params.diagonalizationAlgo,
-                                self.params.vectorShortHands,
-                                self.params.vectorMassesSquared,
-                                self.params.bAbsoluteMsq,
-                                bNeedsDiagonalization=self.bNeedsDiagonalization, 
-                                verbose = verbose)
-
-        return sum(self.expressions(paramDict)) ## Sum because the result is a list of tree, 1loop etc 
+        ## Sum because the result is a list of tree, 1loop etc 
+        return sum(self.expressions(evaluateAll(fields,
+                                                T,
+                                                params3D,
+                                                self.fieldNames,
+                                                self.scalarPermutationMatrix, 
+                                                self.scalarMassMatrices, 
+                                                self.scalarRotationMatrix,
+                                                self.diagonalizationAlgo,
+                                                self.vectorShortHands,
+                                                self.vectorMassesSquared,
+                                                self.bAbsoluteMsq,
+                                                bNeedsDiagonalization=self.bNeedsDiagonalization, 
+                                                verbose = verbose)))
 
     def findLocalMinimum(self, initialGuess: list[float],T:float, params3D, algo, verbose = False) -> tuple[list[float], complex]:
         ## Minimize real part only:
@@ -246,7 +193,6 @@ class EffectivePotential:
                           params3D,
                           minimumCandidates: list[list[float]] = None,
                           verbose = False) -> tuple[list[float], float, float, str]:
-        
         bestResult = ((np.full(3, np.nan)), np.inf)
         
         if self.minimizationAlgo == "combo":
@@ -303,13 +249,13 @@ class EffectivePotential:
                                 T,
                                 params3D,
                                 self.fieldNames,
-                                self.params.scalarPermutationMatrix, 
-                                self.params.scalarMassMatrices, 
-                                self.params.scalarRotationMatrix,
-                                self.params.diagonalizationAlgo,
-                                self.params.vectorShortHands,
-                                self.params.vectorMassesSquared,
-                                self.params.bAbsoluteMsq,
+                                self.scalarPermutationMatrix, 
+                                self.scalarMassMatrices, 
+                                self.scalarRotationMatrix,
+                                self.diagonalizationAlgo,
+                                self.vectorShortHands,
+                                self.vectorMassesSquared,
+                                self.bAbsoluteMsq,
                                 bNeedsDiagonalization=self.bNeedsDiagonalization,
                                 verbose = verbose)
 
