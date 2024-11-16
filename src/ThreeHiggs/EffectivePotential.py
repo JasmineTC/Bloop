@@ -21,6 +21,94 @@ def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.nda
         print(f"{method} is not assigned to a method in diagonalizeSymmetric, exiting program.")
         exit(-1)
 
+def evaluateAll(fields: list[float], 
+                T:float, 
+                params3D, 
+                fieldNames, 
+                scalarPermutationMatrix,
+                scalarMassMatrices,
+                scalarRotationMatrix,
+                diagonalizationAlgo,
+                vectorShortHands,
+                vectorMassesSquared,
+                bAbsoluteMsq,
+                bNeedsDiagonalization=True, 
+                verbose = False) -> dict[str, float]:
+    """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation."""
+    knownParamsDict = params3D.copy()
+
+    ## Background fields
+    for i, value in enumerate(fields):
+        knownParamsDict[fieldNames[i]] = value
+
+    ## Vectors
+    knownParamsDict |= vectorShortHands(knownParamsDict, bReturnDict=True)
+    vectorMasses = vectorMassesSquared(knownParamsDict, bReturnDict=True)
+
+    for key, val in vectorMasses.items():
+        vectorMasses[key] = np.abs(val) if bAbsoluteMsq else complex(val)
+
+    knownParamsDict |= vectorMasses
+
+    ## Scalars       
+    knownParamsDict |= diagonalizeScalars(knownParamsDict, 
+                                          T, 
+                                          diagonalizationAlgo, 
+                                          scalarPermutationMatrix,
+                                          scalarMassMatrices,
+                                          scalarRotationMatrix,
+                                          bAbsoluteMsq,
+                                          verbose)
+
+    return knownParamsDict
+
+def diagonalizeScalars(params: dict[str, float], 
+                       T: float, 
+                       diagonalizationAlgo, 
+                       scalarPermutationMatrix,
+                       scalarMassMatrices,
+                       scalarRotationMatrix,
+                       bAbsoluteMsq,
+                       verbose = False) -> dict[str, float]:
+    """Finds a rotation matrix that diagonalizes the scalar mass matrix
+    and returns a dict with diagonalization-specific params"""
+    # Diagonalize blocks separatey
+    subRotationMatrix = []
+    subEigenValues = []
+
+    for matrix in scalarMassMatrices:
+        numericalM = np.asarray(matrix(params))/T**2
+        eigenValue, vects = diagonalizeSymmetric(numericalM, diagonalizationAlgo)
+        eigenValue *=T**2
+        ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
+        if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
+            diagonalBlock = np.transpose(vects) @ numericalM @ vects
+            offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
+            if np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
+                print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
+
+        subEigenValues.append(eigenValue)                    
+        subRotationMatrix.append(vects)
+    fullRotationMatrix = linalg.block_diag(*subRotationMatrix)
+
+    """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
+    we need to undo that permutation before we give the rotation matrix to the effectivate potential or something. 
+    I am not 100% on this"""
+    drAlgoRot = np.transpose(fullRotationMatrix) @ scalarPermutationMatrix
+
+    ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
+    ## matrix element symbol in the Veff expressions. This is currently very hacky 
+    outDict = scalarRotationMatrix(drAlgoRot)
+
+    ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
+    ##But should probably be handled by a file given from mathematica
+    massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
+    from itertools import chain
+    for i, msq in enumerate(tuple(chain(*subEigenValues))):
+        outDict[massNames[i]] = abs(msq) if bAbsoluteMsq else complex(msq)
+
+    return outDict 
+
 class VeffParams:
     """ Usage after initialization: 
         1. call setActionParams(dict)
@@ -63,84 +151,12 @@ class VeffParams:
     #def setActionParams(self, inputParams: dict[str, float]) -> None:
     #    self.actionParams = inputParams
 
-
-    def evaluateAll(self, fields: list[float], T:float, params3D, bNeedsDiagonalization=True, verbose = False) -> dict[str, float]:
-        """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation."""
-        knownParamsDict = params3D.copy()
-
-        ## Background fields
-        for i, value in enumerate(fields):
-            knownParamsDict[self.fieldNames[i]] = value
-
-        ## Vectors
-        knownParamsDict |= self.vectorShortHands(knownParamsDict, bReturnDict=True)
-        vectorMasses = self.vectorMassesSquared(knownParamsDict, bReturnDict=True)
-
-        if (self.bAbsoluteMsq):
-            for key, val in vectorMasses.items():
-                vectorMasses[key] = np.abs(val)
-        else:
-            for key, val in vectorMasses.items():
-                vectorMasses[key] = complex(val)
-
-        knownParamsDict |= vectorMasses
-
-        ## Scalars       
-        knownParamsDict |= self.diagonalizeScalars(knownParamsDict, T, verbose)
-
-        return knownParamsDict
-
-    def diagonalizeScalars(self, params: dict[str, float], T: float, verbose = False) -> dict[str, float]:
-        """Finds a rotation matrix that diagonalizes the scalar mass matrix
-        and returns a dict with diagonalization-specific params"""
-        # Diagonalize blocks separately
-        subRotationMatrix = []
-        subEigenValues = []
-
-        for matrix in self.scalarMassMatrices:
-            numericalM = np.asarray(matrix(params))/T**2
-            eigenValue, vects = diagonalizeSymmetric( numericalM, self.diagonalizationAlgo)
-            eigenValue *=T**2
-            ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
-            if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
-                diagonalBlock = np.transpose(vects) @ numericalM @ vects
-                offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
-                if np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
-                    print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
-   
-            subEigenValues.append(eigenValue)                    
-            subRotationMatrix.append(vects)
-        fullRotationMatrix = linalg.block_diag(*subRotationMatrix)
-
-        """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
-        we need to undo that permutation before we give the rotation matrix to the effectivate potential or something. 
-        I am not 100% on this"""
-        drAlgoRot = np.transpose(fullRotationMatrix) @ self.scalarPermutationMatrix
-
-        ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
-        ## matrix element symbol in the Veff expressions. This is currently very hacky 
-        outDict = self.scalarRotationMatrix(drAlgoRot)
-
-        ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
-        ##But should probably be handled by a file given from mathematica
-        massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
-        from itertools import chain
-        if self.bAbsoluteMsq:
-            for i, msq in enumerate(tuple(chain(*subEigenValues))):
-                outDict[massNames[i]] = abs(msq)
-        else:
-            for i, msq in enumerate(tuple(chain(*subEigenValues))):
-                outDict[massNames[i]] = complex(msq)
-        return outDict
-    
-
 """ Evaluating the potential: 
 1. Call setModelParameters() with a dict that sets all parameters in the action. 
 This is assumed to be using 3D EFT, so the params are temperature dependent.
 2. Call evaluate() with a list that specifies values of background fields. Fields are in 3D units, ie. have dimension GeV^(1/2)
 """
 class EffectivePotential:
-
     def __init__(self,
                  fieldNames, 
                  bAbsoluteMsq, 
@@ -201,11 +217,19 @@ class EffectivePotential:
         self.params.fields = fields
     
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
-        paramDict = self.params.evaluateAll(fields,
-                                            T,
-                                            params3D,
-                                            bNeedsDiagonalization=self.bNeedsDiagonalization, 
-                                            verbose = verbose)
+        paramDict = evaluateAll(fields,
+                                T,
+                                params3D,
+                                self.fieldNames,
+                                self.params.scalarPermutationMatrix, 
+                                self.params.scalarMassMatrices, 
+                                self.params.scalarRotationMatrix,
+                                self.params.diagonalizationAlgo,
+                                self.params.vectorShortHands,
+                                self.params.vectorMassesSquared,
+                                self.params.bAbsoluteMsq,
+                                bNeedsDiagonalization=self.bNeedsDiagonalization, 
+                                verbose = verbose)
 
         return sum(self.expressions(paramDict)) ## Sum because the result is a list of tree, 1loop etc 
 
@@ -275,11 +299,19 @@ class EffectivePotential:
         ----Get someone to check the logic of this
         2) Return true if # of light modes is less than the # of goldstone modes'''
         goldStone = 0 if np.all(np.abs(fields) < 0.1) else 3
-        paramDict = self.params.evaluateAll(fields,
-                                            T,
-                                            params3D,
-                                            bNeedsDiagonalization=self.bNeedsDiagonalization,
-                                            verbose = verbose)
+        paramDict = evaluateAll(fields,
+                                T,
+                                params3D,
+                                self.fieldNames,
+                                self.params.scalarPermutationMatrix, 
+                                self.params.scalarMassMatrices, 
+                                self.params.scalarRotationMatrix,
+                                self.params.diagonalizationAlgo,
+                                self.params.vectorShortHands,
+                                self.params.vectorMassesSquared,
+                                self.params.bAbsoluteMsq,
+                                bNeedsDiagonalization=self.bNeedsDiagonalization,
+                                verbose = verbose)
 
         ultraSoftScale = self.getUltraSoftScale(paramDict, T)
     
