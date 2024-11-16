@@ -180,9 +180,6 @@ def traceFreeEnergyMinimum(effectivePotential,
 
         ##Take the 4D params (at the matching scale) and match them to the 3D params
         params3D = dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
-
-        # BEFORE MERGE: REMOVE
-        # effectivePotential.setModelParameters(params3D)
         
         initialGuesses = [[0.1,0.1,0.1], ## TODO This should go in a config file or something
                           [-0.1,0.1,0.1],
