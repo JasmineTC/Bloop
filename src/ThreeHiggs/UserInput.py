@@ -48,7 +48,7 @@ class UserInput(argparse.ArgumentParser):
                           help = "Str: Location to save files")
         
         self.add_argument('--bAbsMass', action = 'store_true', default = False, dest = 'bAbsMass',
-                          help = "If turned on then take the abs value of masses to avoid negative mass inside sqrts, off by default")
+                          help = "Bool: If activated the abs value of masses is used")
         
         self.add_argument('--absGlobalTolerance', action = 'store', default = 0.5, type = float, dest = 'absGlobalTolerance')
         self.add_argument('--relGlobalTolerance', action = 'store', default = 0.5, type = float, dest = 'relGlobalTolerance')
@@ -63,8 +63,9 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--TRangeEnd', action = 'store', default = 200, type = float, dest = 'TRangeEnd')
         self.add_argument('--TRangeStepSize', action = 'store', default = 1, type = float, dest = 'TRangeStepSize')
         
-        self.add_argument('--DiagAlgo', action = 'store', default = "numpy", type = str, dest = 'DiagAlgo',
-                          help = 'String value used to pick a diagonalisation method used for mass matrices, options are numpy, scipy and mpmath')
+        self.add_argument('--diagAlgo', action = 'store', default = "numpy", type = str, dest = 'diagAlgo',
+                          help = 'Str: Specify what diagonalisation algorithm used for mass matrices, \
+                          options are numpy, scipy and mpmath')
         self.add_argument('--minimizationAlgo', action = 'store', default="combo", dest = 'minimizationAlgo',  
                           help = "Used to specify which algothrym the minimizer uses, options are combo, directGlobal, BOBYQA and scipy")    
 
@@ -72,10 +73,10 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--lastStage', type = Stages.fromString, default = "plot", dest = 'lastStage')
 
 
-        self.add_argument('--benchMarkFile', 
+        self.add_argument('--benchmarkFile', 
                   action = 'store', 
                   default = "Benchmarks/Benchmarks_3HDM.json",#"Benchmarks/ScanDict.json",
-                  dest = 'benchMarkFile')
+                  dest = 'benchmarkFile')
         
         self.add_argument('--firstBenchmark', type = int, default = 0, dest = 'firstBenchmark')
         from sys import maxsize

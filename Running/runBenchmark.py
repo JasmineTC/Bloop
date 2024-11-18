@@ -1,46 +1,46 @@
-def doMinimization(benchMark):
+def doMinimization(benchmark):
     if args.bVerbose:
-        print(f"Starting benchmark: {benchMark['bmNumber']}")
+        print(f"Starting benchmark: {benchmark['bmNumber']}")
 
-    if not args.firstBenchmark <= benchMark['bmNumber'] <= args.lastBenchmark:
+    if not args.firstBenchmark <= benchmark['bmNumber'] <= args.lastBenchmark:
         if args.bVerbose:
-            print(f"Benchmark {benchMark['bmNumber']} has been rejected as outside benchmark range.")
+            print(f"Benchmark {benchmark['bmNumber']} has been rejected as outside benchmark range.")
 
         return
 
     from ThreeHiggs.TransitionFinder import traceFreeEnergyMinimum
     minimizationResult = traceFreeEnergyMinimum(effectivePotential, 
                                                 dimensionalReduction, 
-                                                benchMark,
+                                                benchmark,
                                                 args.TRangeStart,
                                                 args.TRangeEnd,
                                                 args.TRangeStepSize,
                                                 bVerbose = args.bVerbose)
   
-    filename = f"{args.resultsDirectory}/BM_{benchMark['bmNumber']}"
+    filename = f"{args.resultsDirectory}/BM_{benchmark['bmNumber']}"
     
     from pathlib import Path
     Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
     from json import dumps
     if args.bSave:
         if args.bVerbose:
-            print(f"Saving {benchMark['bmNumber']} to {filename}")
+            print(f"Saving {benchmark['bmNumber']} to {filename}")
         open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
       
     if args.bPlot:
         if args.bVerbose:
-            print(f"Plotting {benchMark['bmNumber']}")
+            print(f"Plotting {benchmark['bmNumber']}")
 
         from ThreeHiggs.PlotResult import plotData
-        plotData(minimizationResult, benchMark['bmNumber'], args.loopOrder, filename)
+        plotData(minimizationResult, benchmark['bmNumber'], args.loopOrder, filename)
 
     if args.bProcessMin:
         if args.bVerbose:
-            print(f"Processing {benchMark['bmNumber']} to {filename+'_interp'}")
+            print(f"Processing {benchmark['bmNumber']} to {filename+'_interp'}")
         from ThreeHiggs.ProcessMinimization import interpretData
         open(f"{filename}_interp.json", "w").write(dumps(interpretData(minimizationResult,
-                                                                        benchMark["bmNumber"],
-                                                                        benchMark["bmInput"]),
+                                                                        benchmark["bmNumber"],
+                                                                        benchmark["bmInput"]),
                                                          indent = 4))
 
 def getLines(relativePathToResource):
@@ -124,15 +124,15 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                 ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]),
                                                 bVerbose = args.bVerbose)
     
-    with open(args.benchMarkFile) as benchMarkFile:
+    with open(args.benchmarkFile) as benchmarkFile:
         if args.bPool:
             from multiprocessing import Pool
             with Pool(args.cores) as pool:
                 from ijson import items
-                pool.map(doMinimization, items(benchMarkFile, "item", use_float = True))
+                pool.map(doMinimization, items(benchmarkFile, "item", use_float = True))
         else:
-            benchMarkFile = load(benchMarkFile)
-            for BenchMark in benchMarkFile:
+            benchmarkFile = load(benchmarkFile)
+            for BenchMark in benchmarkFile:
                 doMinimization(BenchMark)
     
 
