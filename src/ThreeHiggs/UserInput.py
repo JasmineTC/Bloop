@@ -38,17 +38,14 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('-s', '--bSave', action = 'store_true', default=False, dest = 'bSave',  
                           help = "Bool: If activated the results of the minimisation will be saved")
         
+        self.add_argument('--bPlot', action = 'store_true', default = False, dest = 'bPlot',
+                          help = 'Bool: If activated a plot of the global min of the potential vs T is made')
+        
+        self.add_argument('--bProcessMin', action = 'store_true', default = False, dest = 'bProcessMin',
+                          help = 'Bool: If activated phase transitions are identified from the minimisation results')
+        
         self.add_argument('--resultsDirectory', action = 'store', default="Results", dest = 'resultsDirectory',  
                           help = "Str: Location to save files")
-        
-        
-        
-        
-        self.add_argument('--plot', action = 'store_true', default = False, dest = 'bPlot',
-                          help = 'Bool value, if turned on basic plotting tools are used to plot data from the minimisation')
-        
-        self.add_argument('--ProcessMin', action = 'store_true', default = False, dest = 'bProcessMin',
-                          help = 'Bool value, if turned on basic processing tools are used to identify phase transitions from the minimisation results')
         
         self.add_argument('--bAbsMass', action = 'store_true', default = False, dest = 'bAbsMass',
                           help = "If turned on then take the abs value of masses to avoid negative mass inside sqrts, off by default")
