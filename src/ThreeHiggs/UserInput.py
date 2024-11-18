@@ -20,9 +20,9 @@ class UserInput(argparse.ArgumentParser):
         super().__init__()
         self.add_argument('-l', '--loopOrder', action = 'store', default = 2, dest = 'loopOrder', type = int, choices = [0, 1, 2],
                           help = "Used to specify if the effective potential should be calculated to zero, one or two loop")
-        
-        self.add_argument('-v', '--verbose', action = 'store_true', default = False, dest = 'verbose',
-                          help = 'bool, if turned on some debugging and printing statements turned on ')
+        ## Should probably be made into a int rather than bool to allow for levels of verbosisty 
+        self.add_argument('-v', '--bVerbose', action = 'store_true', default = False, dest = 'bVerbose',
+                          help = 'bool, if turned on code will print as it progresses and do consistency checks')
         
         
         self.add_argument('-p', '--pool', action = 'store_false', default = True, dest = 'bPool', 

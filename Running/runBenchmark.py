@@ -1,9 +1,9 @@
 def doMinimization(benchMark):
-    if args.verbose:
+    if args.bVerbose:
         print(f"Starting benchmark: {benchMark['bmNumber']}")
 
     if not args.firstBenchmark <= benchMark['bmNumber'] <= args.lastBenchmark:
-        if args.verbose:
+        if args.bVerbose:
             print(f"Benchmark {benchMark['bmNumber']} has been rejected as outside benchmark range.")
 
         return
@@ -15,7 +15,7 @@ def doMinimization(benchMark):
                                                 args.TRangeStart,
                                                 args.TRangeEnd,
                                                 args.TRangeStepSize,
-                                                verbose = args.verbose)
+                                                bVerbose = args.bVerbose)
   
     filename = f"{args.resultsDirectory}/BM_{benchMark['bmNumber']}"
     
@@ -23,19 +23,19 @@ def doMinimization(benchMark):
     Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
     from json import dumps
     if args.bSave:
-        if args.verbose:
+        if args.bVerbose:
             print(f"Saving {benchMark['bmNumber']} to {filename}")
         open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
       
     if args.bPlot:
-        if args.verbose:
+        if args.bVerbose:
             print(f"Plotting {benchMark['bmNumber']}")
 
         from ThreeHiggs.PlotResult import plotData
         plotData(minimizationResult, benchMark['bmNumber'], args.loopOrder, filename)
 
     if args.bProcessMin:
-        if args.verbose:
+        if args.bVerbose:
             print(f"Processing {benchMark['bmNumber']} to {filename+'_interp'}")
         from ThreeHiggs.ProcessMinimization import interpretData
         open(f"{filename}_interp.json", "w").write(dumps(interpretData(minimizationResult,
@@ -122,7 +122,7 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
     dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(parsedExpressions["hardToSoft"]),
                                                 ParsedExpressionSystem(parsedExpressions["softScaleRGE"]),
                                                 ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]),
-                                                verbose = args.verbose)
+                                                bVerbose = args.bVerbose)
     
     with open(args.benchMarkFile) as benchMarkFile:
         if args.bPool:

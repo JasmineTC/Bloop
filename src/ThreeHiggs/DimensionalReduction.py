@@ -1,12 +1,12 @@
 ## Collects all needed matching relations to go from 4D params to 3D ultrasoft EFT
 class DimensionalReduction():
 
-    def __init__(self, hardToSoft, softScaleRGE, softToUltraSoft, verbose = False):
+    def __init__(self, hardToSoft, softScaleRGE, softToUltraSoft, bVerbose = False):
         self.matchToSoft = hardToSoft
         self.softScaleRGE = softScaleRGE
         self.matchToUltrasoft = softToUltraSoft
 
-        if verbose:
+        if bVerbose:
             print("Setup Hard -> Soft matching relations.")
             print("-- Inputs:")
             from functools import reduce
