@@ -1,8 +1,6 @@
 import numpy as np
 from scipy import linalg
 
-from .VeffMinimizer import VeffMinimizer
-
 def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.ndarray, np.ndarray]:
     """Diagonalizes a symmetric matrix. 
     Returns eigvalues, eigvectors in a matrix form
@@ -109,6 +107,69 @@ def diagonalizeScalars(params: dict[str, float],
 
     return outDict 
 
+import nlopt
+def minimize(function: callable, 
+             initialGuess: np.ndarray, 
+             minimizationAlgo: str,
+             numVariables: int, 
+             globalAbs: float,
+             globalRel: float,
+             localAbs: float,
+             localRel: float,
+             v1Bounds: float,
+             v2Bounds: float,
+             v3Bounds: float) -> tuple[np.ndarray, float]:
+    """Give bounds in format ((min1, max1), (min2, max2)) etc, one pair for each variable.
+    Returns: 
+    location, Veff(location)
+    Note on notation for NLopt Algorithms, G/L refer to global/local and N/D refer to no gradient/gradient based, we want N methods
+    Even though we don't use the gradient, nlopt still tries to pass a grad arguemet to the function, so the function needs to be 
+    wrapped a second time to give it room for the useless grad arguement"""
+
+    if minimizationAlgo == "scipy":
+            import scipy.optimize
+            bounds = ((v1Bounds[0], v1Bounds[1]), (v2Bounds[0], v2Bounds[1]), (v3Bounds[0], v3Bounds[1]))
+            minimizationResult = scipy.optimize.minimize(function, initialGuess, bounds=bounds, tol = 1e-6)
+            location, value = minimizationResult.x, minimizationResult.fun
+               
+    elif minimizationAlgo == "directGlobal":
+            ##The idea of this case is to use a global minimiser to get the ballpark of the global minimum
+            ##then use that as initial guess for a local solver
+            opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, numVariables)
+            functionWrapper = lambda fields, grad: function(fields) 
+            opt.set_min_objective(functionWrapper)
+            opt.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
+            opt.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
+            opt.set_xtol_abs(globalAbs)
+            opt.set_xtol_rel(globalRel)
+            location = opt.optimize(initialGuess)
+            
+            opt2 = nlopt.opt(nlopt.LN_BOBYQA, numVariables)
+            opt2.set_min_objective(functionWrapper)
+            opt2.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
+            opt2.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
+            opt2.set_xtol_abs(localAbs)
+            opt2.set_xtol_rel(localRel)
+            
+            location, value = opt2.optimize(location),  opt2.last_optimum_value()
+            
+    elif minimizationAlgo == "BOBYQA":
+            opt = nlopt.opt(nlopt.LN_BOBYQA, numVariables)
+            functionWrapper = lambda fields, grad: function(fields) 
+            opt.set_min_objective(functionWrapper)
+            opt.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
+            opt.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
+            opt.set_xtol_abs(localAbs)
+            opt.set_xtol_rel(localRel)
+            
+            location, value = opt.optimize(initialGuess),  opt.last_optimum_value()
+    
+    else:
+        print(f"ERROR: {minimizationAlgo} does not match any of our minimzationAlgos, attempting to exit")
+        exit()
+           
+    return location, value
+
 class EffectivePotential:
     def __init__(self,
                  fieldNames, 
@@ -151,14 +212,13 @@ class EffectivePotential:
         self.minimizationAlgo = minimizationAlgo
         self.expressions = veff
         self.bNeedsDiagonalization = (self.loopOrder > 0)
-        self.minimizer = VeffMinimizer(self.nbrFields,                 
-                                       absGlobalTolerance,
-                                       relGlobalTolerance, 
-                                       absLocalTolerance, 
-                                       relLocalTolerance,
-                                       v1Bounds,
-                                       v2Bounds,
-                                       v3Bounds)
+        self.absGlobalTolerance = absGlobalTolerance
+        self.relGlobalTolerance = relGlobalTolerance
+        self.absLocalTolerance = absLocalTolerance
+        self.relLocalTolerance = relLocalTolerance
+        self.v1Bounds = v1Bounds
+        self.v2Bounds = v2Bounds
+        self.v3Bounds = v3Bounds
 
     def initExpressions(self, filesToParse: list[str]) -> None:
         self.expressions = []
@@ -187,7 +247,17 @@ class EffectivePotential:
                                                                       params3D,
                                                                       verbose = verbose) )
 
-        return self.minimizer.minimize(VeffWrapper, initialGuess, algo)
+        return minimize(VeffWrapper, 
+                        initialGuess, 
+                        algo,
+                        self.nbrFields,
+                        self.absGlobalTolerance,
+                        self.relGlobalTolerance,
+                        self.absLocalTolerance,
+                        self.relLocalTolerance,
+                        self.v1Bounds,
+                        self.v2Bounds,
+                        self.v3Bounds)
 
     def findGlobalMinimum(self,T:float, 
                           params3D,
