@@ -1,8 +1,6 @@
 import numpy as np
 from scipy import linalg
 
-from .VeffMinimizer import VeffMinimizer
-
 def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.ndarray, np.ndarray]:
     """Diagonalizes a symmetric matrix. 
     Returns eigvalues, eigvectors in a matrix form
@@ -21,20 +19,166 @@ def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.nda
         print(f"{method} is not assigned to a method in diagonalizeSymmetric, exiting program.")
         exit(-1)
 
-class VeffParams:
-    """ Usage after initialization: 
-        1. call setActionParams(dict)
-        2. call evaluateAll
-        
-        Order of computations:
-        1. Fix action params (and possibly temperature). This needs to be done via setActionParams() before evaluateAll(fields) 
-        2. Fix background fields 
-        3. Solve diagonalization conditions
-        4. Evaluate post-diagonalization shorthand symbols
-        5. Evaluate masses
-        6. Evaluate pre-Veff shorthand symbols (so stuff that does into rotation matrices)"""
+def evaluateAll(fields: list[float], 
+                T:float, 
+                params3D, 
+                fieldNames, 
+                scalarPermutationMatrix,
+                scalarMassMatrices,
+                scalarRotationMatrix,
+                diagonalizationAlgo,
+                vectorShortHands,
+                vectorMassesSquared,
+                bAbsoluteMsq,
+                bNeedsDiagonalization=True, 
+                verbose = False) -> dict[str, float]:
+    """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation."""
+    knownParamsDict = params3D.copy()
 
-    def __init__(self, 
+    ## Background fields
+    for i, value in enumerate(fields):
+        knownParamsDict[fieldNames[i]] = value
+
+    ## Vectors
+    knownParamsDict |= vectorShortHands(knownParamsDict, bReturnDict=True)
+    vectorMasses = vectorMassesSquared(knownParamsDict, bReturnDict=True)
+
+    for key, val in vectorMasses.items():
+        vectorMasses[key] = np.abs(val) if bAbsoluteMsq else complex(val)
+
+    knownParamsDict |= vectorMasses
+
+    ## Scalars       
+    knownParamsDict |= diagonalizeScalars(knownParamsDict, 
+                                          T, 
+                                          diagonalizationAlgo, 
+                                          scalarPermutationMatrix,
+                                          scalarMassMatrices,
+                                          scalarRotationMatrix,
+                                          bAbsoluteMsq,
+                                          verbose)
+
+    return knownParamsDict
+
+def diagonalizeScalars(params: dict[str, float], 
+                       T: float, 
+                       diagonalizationAlgo, 
+                       scalarPermutationMatrix,
+                       scalarMassMatrices,
+                       scalarRotationMatrix,
+                       bAbsoluteMsq,
+                       verbose = False) -> dict[str, float]:
+    """Finds a rotation matrix that diagonalizes the scalar mass matrix
+    and returns a dict with diagonalization-specific params"""
+    # Diagonalize blocks separatey
+    subRotationMatrix = []
+    subEigenValues = []
+
+    for matrix in scalarMassMatrices:
+        numericalM = np.asarray(matrix(params))/T**2
+        eigenValue, vects = diagonalizeSymmetric(numericalM, diagonalizationAlgo)
+        eigenValue *=T**2
+        ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
+        if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
+            diagonalBlock = np.transpose(vects) @ numericalM @ vects
+            offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
+            if np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
+                print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
+
+        subEigenValues.append(eigenValue)                    
+        subRotationMatrix.append(vects)
+    fullRotationMatrix = linalg.block_diag(*subRotationMatrix)
+
+    """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
+    we need to undo that permutation before we give the rotation matrix to the effectivate potential or something. 
+    I am not 100% on this"""
+    drAlgoRot = np.transpose(fullRotationMatrix) @ scalarPermutationMatrix
+
+    ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
+    ## matrix element symbol in the Veff expressions. This is currently very hacky 
+    outDict = scalarRotationMatrix(drAlgoRot)
+
+    ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
+    ##But should probably be handled by a file given from mathematica
+    massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
+    from itertools import chain
+    for i, msq in enumerate(tuple(chain(*subEigenValues))):
+        outDict[massNames[i]] = abs(msq) if bAbsoluteMsq else complex(msq)
+
+    return outDict 
+
+import nlopt
+def minimize(function: callable, 
+             initialGuess: np.ndarray, 
+             minimizationAlgo: str,
+             numVariables: int, 
+             globalAbs: float,
+             globalRel: float,
+             localAbs: float,
+             localRel: float,
+             v1Bounds: float,
+             v2Bounds: float,
+             v3Bounds: float) -> tuple[np.ndarray, float]:
+    """Give bounds in format ((min1, max1), (min2, max2)) etc, one pair for each variable.
+    Returns: 
+    location, Veff(location)
+    Note on notation for NLopt Algorithms, G/L refer to global/local and N/D refer to no gradient/gradient based, we want N methods
+    Even though we don't use the gradient, nlopt still tries to pass a grad arguemet to the function, so the function needs to be 
+    wrapped a second time to give it room for the useless grad arguement"""
+
+    if minimizationAlgo == "scipy":
+            import scipy.optimize
+            bounds = ((v1Bounds[0], v1Bounds[1]), (v2Bounds[0], v2Bounds[1]), (v3Bounds[0], v3Bounds[1]))
+            minimizationResult = scipy.optimize.minimize(function, initialGuess, bounds=bounds, tol = 1e-6)
+            location, value = minimizationResult.x, minimizationResult.fun
+               
+    elif minimizationAlgo == "directGlobal":
+            ##The idea of this case is to use a global minimiser to get the ballpark of the global minimum
+            ##then use that as initial guess for a local solver
+            opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, numVariables)
+            functionWrapper = lambda fields, grad: function(fields) 
+            opt.set_min_objective(functionWrapper)
+            opt.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
+            opt.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
+            opt.set_xtol_abs(globalAbs)
+            opt.set_xtol_rel(globalRel)
+            location = opt.optimize(initialGuess)
+            
+            opt2 = nlopt.opt(nlopt.LN_BOBYQA, numVariables)
+            opt2.set_min_objective(functionWrapper)
+            opt2.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
+            opt2.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
+            opt2.set_xtol_abs(localAbs)
+            opt2.set_xtol_rel(localRel)
+            
+            location, value = opt2.optimize(location),  opt2.last_optimum_value()
+            
+    elif minimizationAlgo == "BOBYQA":
+            opt = nlopt.opt(nlopt.LN_BOBYQA, numVariables)
+            functionWrapper = lambda fields, grad: function(fields) 
+            opt.set_min_objective(functionWrapper)
+            opt.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
+            opt.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
+            opt.set_xtol_abs(localAbs)
+            opt.set_xtol_rel(localRel)
+            
+            location, value = opt.optimize(initialGuess),  opt.last_optimum_value()
+    
+    else:
+        print(f"ERROR: {minimizationAlgo} does not match any of our minimzationAlgos, attempting to exit")
+        exit()
+           
+    return location, value
+
+
+    
+""" Evaluating the potential: 
+1. Call setModelParameters() with a dict that sets all parameters in the action. 
+This is assumed to be using 3D EFT, so the params are temperature dependent.
+2. Call evaluate() with a list that specifies values of background fields. Fields are in 3D units, ie. have dimension GeV^(1/2)
+"""
+class EffectivePotential:
+    def __init__(self,
                  fieldNames, 
                  bAbsoluteMsq, 
                  vectorMassesSquared, 
@@ -42,9 +186,20 @@ class VeffParams:
                  scalarPermutationMatrix, 
                  scalarMassMatrices, 
                  scalarRotationMatrix,
-                 diagonalizationAlgo):
-        
+                 loopOrder,
+                 veff,
+                 minimizationAlgo,
+                 diagonalizationAlgo,
+                 absGlobalTolerance,
+                 relGlobalTolerance, 
+                 absLocalTolerance, 
+                 relLocalTolerance,
+                 v1Bounds,
+                 v2Bounds,
+                 v3Bounds):
         self.fieldNames = fieldNames
+        self.nbrFields = len(self.fieldNames)
+
         self.bAbsoluteMsq = bAbsoluteMsq
         self.diagonalizationAlgo = diagonalizationAlgo
 
@@ -58,203 +213,84 @@ class VeffParams:
         self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
 
         self.scalarRotationMatrix = scalarRotationMatrix
-
-    def setActionParams(self, inputParams: dict[str, float]) -> None:
-        self.actionParams = inputParams
-
-
-    def evaluateAll(self, fields: list[float], T:float, bNeedsDiagonalization=True, verbose = False) -> dict[str, float]:
-        """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation."""
-        knownParamsDict = self.actionParams.copy()
-
-        ## Background fields
-        for i, value in enumerate(fields):
-            knownParamsDict[self.fieldNames[i]] = value
-
-        ## Vectors
-        knownParamsDict |= self.vectorShortHands(knownParamsDict, bReturnDict=True)
-        vectorMasses = self.vectorMassesSquared(knownParamsDict, bReturnDict=True)
-
-        if (self.bAbsoluteMsq):
-            for key, val in vectorMasses.items():
-                vectorMasses[key] = np.abs(val)
-        else:
-            for key, val in vectorMasses.items():
-                vectorMasses[key] = complex(val)
-
-        knownParamsDict |= vectorMasses
-
-        ## Scalars       
-        knownParamsDict |= self.diagonalizeScalars(knownParamsDict, T, verbose)
-
-        return knownParamsDict
-
-    def diagonalizeScalars(self, params: dict[str, float], T: float, verbose = False) -> dict[str, float]:
-        """Finds a rotation matrix that diagonalizes the scalar mass matrix
-        and returns a dict with diagonalization-specific params"""
-        # Diagonalize blocks separately
-        subRotationMatrix = []
-        subEigenValues = []
-
-        for matrix in self.scalarMassMatrices:
-            numericalM = np.asarray(matrix(params))/T**2
-            eigenValue, vects = diagonalizeSymmetric( numericalM, self.diagonalizationAlgo)
-            eigenValue *=T**2
-            ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
-            if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
-                diagonalBlock = np.transpose(vects) @ numericalM @ vects
-                offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
-                if np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
-                    print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
-   
-            subEigenValues.append(eigenValue)                    
-            subRotationMatrix.append(vects)
-        fullRotationMatrix = linalg.block_diag(*subRotationMatrix)
-
-        """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
-        we need to undo that permutation before we give the rotation matrix to the effectivate potential or something. 
-        I am not 100% on this"""
-        drAlgoRot = np.transpose(fullRotationMatrix) @ self.scalarPermutationMatrix
-nu         # drAlgoRot = self.scalarPermutationMatrix @ fullRotationMatrix
-        # print(drAlgoRot)
-        # print()
-        # print(self.scalarPermutationMatrix @ fullRotationMatrix)
-        # print()
-        # print(drAlgoRot - self.scalarPermutationMatrix @ fullRotationMatrix)
-        # exit()
-        ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
-        ## matrix element symbol in the Veff expressions. This is currently very hacky 
-        outDict = self.scalarRotationMatrix(drAlgoRot)
-
-        ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
-        ##But should probably be handled by a file given from mathematica
-
-        massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
-        from itertools import chain
-        # print(tuple(chain(*subEigenValues)))
-        # exit()
-        if self.bAbsoluteMsq:
-            for i, msq in enumerate(tuple(chain(*subEigenValues))):
-                outDict[massNames[i]] = abs(msq)
-        else:
-            for i, msq in enumerate(tuple(chain(*subEigenValues))):
-                # print(msq)
-                outDict[massNames[i]] = complex(msq)
-        # exit()
-        return outDict
-    
-
-""" Evaluating the potential: 
-1. Call setModelParameters() with a dict that sets all parameters in the action. 
-This is assumed to be using 3D EFT, so the params are temperature dependent.
-2. Call evaluate() with a list that specifies values of background fields. Fields are in 3D units, ie. have dimension GeV^(1/2)
-"""
-class EffectivePotential:
-
-    def __init__(self,
-                 fieldNames, 
-                 bAbsoluteMsq, 
-                 vectorMassesSquared, 
-                 vectorShorthands, 
-                 scalarPermutationMatrix, 
-                 scalerMassMatrices, 
-                 scalarRotationMatrix,
-                 loopOrder,
-                 veff,
-                 minimizationAlgo,
-                 diagonalizationAlgo,
-                 absGlobalTolerance,
-                 relGlobalTolerance, 
-                 absLocalTolerance, 
-                 relLocalTolerance,
-                 v1Bounds,
-                 v2Bounds,
-                 v3Bounds):
-        ## How many background fields do we depend on
-        self.fieldNames = fieldNames
-        self.nbrFields = len(self.fieldNames)
-
-        self.params = VeffParams(fieldNames, 
-                                 bAbsoluteMsq, 
-                                 vectorMassesSquared, 
-                                 vectorShorthands, 
-                                 scalarPermutationMatrix, 
-                                 scalerMassMatrices, 
-                                 scalarRotationMatrix,
-                                 diagonalizationAlgo)
         
         self.loopOrder = loopOrder
         self.minimizationAlgo = minimizationAlgo
         self.expressions = veff
         self.bNeedsDiagonalization = (self.loopOrder > 0)
-        self.minimizer = VeffMinimizer(self.nbrFields,                 
-                                       absGlobalTolerance,
-                                       relGlobalTolerance, 
-                                       absLocalTolerance, 
-                                       relLocalTolerance,
-                                       v1Bounds,
-                                       v2Bounds,
-                                       v3Bounds)
-
-    def setModelParameters(self, modelParameters: dict) -> None:
-        """ This just reads action parameters from a dict and sets them internally for easier/faster(?) access in evaluate """
-        self.params.setActionParams(modelParameters)
-
+        self.absGlobalTolerance = absGlobalTolerance
+        self.relGlobalTolerance = relGlobalTolerance
+        self.absLocalTolerance = absLocalTolerance
+        self.relLocalTolerance = relLocalTolerance
+        self.v1Bounds = v1Bounds
+        self.v2Bounds = v2Bounds
+        self.v3Bounds = v3Bounds
 
     def initExpressions(self, filesToParse: list[str]) -> None:
         self.expressions = []
 
-
-    def evaluatePotential(self, fields: list[float], T:float, verbose = False) -> complex:
-        """Evaluate Veff at specified field values. Uses the currently set model parameters."""
-        self.params.fields = fields
-    
+    def evaluatePotential(self, fields: list[float], T:float, params3D, verbose = False) -> complex:
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
-        paramDict = self.params.evaluateAll(fields,
-                                            T,
-                                            bNeedsDiagonalization=self.bNeedsDiagonalization, 
-                                            verbose = verbose)
+        ## Sum because the result is a list of tree, 1loop etc 
+        return sum(self.expressions(evaluateAll(fields,
+                                                T,
+                                                params3D,
+                                                self.fieldNames,
+                                                self.scalarPermutationMatrix, 
+                                                self.scalarMassMatrices, 
+                                                self.scalarRotationMatrix,
+                                                self.diagonalizationAlgo,
+                                                self.vectorShortHands,
+                                                self.vectorMassesSquared,
+                                                self.bAbsoluteMsq,
+                                                bNeedsDiagonalization=self.bNeedsDiagonalization, 
+                                                verbose = verbose)))
 
-        return sum(self.expressions(paramDict)) ## Sum because the result is a list of tree, 1loop etc 
-
-    def findLocalMinimum(self, initialGuess: list[float],T:float, algo, verbose = False) -> tuple[list[float], complex]:
+    def findLocalMinimum(self, initialGuess: list[float],T:float, params3D, algo, verbose = False) -> tuple[list[float], complex]:
         ## Minimize real part only:
         VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields,
                                                                       T,
+                                                                      params3D,
                                                                       verbose = verbose) )
-        print(VeffWrapper([1e-4, 1e-4, 1e-4]))
-        print(VeffWrapper([1e-4, 1e-4, 1]))
-        print(VeffWrapper([1e-4, 1e-4, 10]))
-        print(VeffWrapper([1e-4, 1e-4, 30]))
-        exit()
-        return self.minimizer.minimize(VeffWrapper, initialGuess, algo)
+
+        return minimize(VeffWrapper, 
+                        initialGuess, 
+                        algo,
+                        self.nbrFields,
+                        self.absGlobalTolerance,
+                        self.relGlobalTolerance,
+                        self.absLocalTolerance,
+                        self.relLocalTolerance,
+                        self.v1Bounds,
+                        self.v2Bounds,
+                        self.v3Bounds)
 
     def findGlobalMinimum(self,T:float, 
+                          params3D,
                           minimumCandidates: list[list[float]] = None,
                           verbose = False) -> tuple[list[float], float, float, str]:
-        
         bestResult = ((np.full(3, np.nan)), np.inf)
         
         if self.minimizationAlgo == "combo":
-            result = self.findLocalMinimum(minimumCandidates[0], T, "directGlobal", verbose = verbose)
+            result = self.findLocalMinimum(minimumCandidates[0], T, params3D, "directGlobal", verbose = verbose)
             if result[1] < bestResult[1]:
                 bestResult = result
             
             for candidate in minimumCandidates:
-                result = self.findLocalMinimum(candidate, T, "BOBYQA", verbose = verbose)
+                result = self.findLocalMinimum(candidate, T, params3D, "BOBYQA", verbose = verbose)
                 if result[1] < bestResult[1]:
                     bestResult = result
                     
         else:
             for candidate in minimumCandidates:
-                result = self.findLocalMinimum(candidate,T, self.minimizationAlgo, verbose = verbose)
+                result = self.findLocalMinimum(candidate,T, params3D, self.minimizationAlgo, verbose = verbose)
                 if result[1] < bestResult[1]:
                     bestResult = result
         
         if any(np.isnan(bestResult[0])) or np.isinf(bestResult[1]):
             return (np.full(3, None)), None, None, "NaN"
         
-        potentialAtMin = self.evaluatePotential(bestResult[0], T, verbose = verbose) ## Compute the potential at minimum to check if its complex
+        potentialAtMin = self.evaluatePotential(bestResult[0], T, params3D, verbose = verbose) ## Compute the potential at minimum to check if its complex
         if abs(potentialAtMin.imag)/abs(potentialAtMin.real) > 1e-8: 
             return bestResult[0], potentialAtMin.real, potentialAtMin.imag, "complex" ## Flag minimum with imag > tol
         return bestResult[0], potentialAtMin.real, None, None
@@ -278,17 +314,26 @@ class EffectivePotential:
                               paramDict['lam31'], paramDict['lam31p']]) 
         return np.max(np.abs(couplings))**2 * T / (16*np.pi)
 
-    def bReachedUltraSoftScale(self, fields: list[complex], T: float, verbose = False) -> bool:
+    def bReachedUltraSoftScale(self, fields: list[complex], T: float, params3D, verbose = False) -> bool:
         '''Check if we can trust the results by comparing the masses we find at the minimum to the ultra soft scale i.e.
         Are all physical masses > g^2 T/16pi, we use the largest coupling in the theory to do the comparrsion 
         --Note we expect some goldstone bosons from the symmetry breaking so we check the number of light modes = goldstone modes
         ----Get someone to check the logic of this
         2) Return true if # of light modes is less than the # of goldstone modes'''
         goldStone = 0 if np.all(np.abs(fields) < 0.1) else 3
-        paramDict = self.params.evaluateAll(fields,
-                                            T,
-                                            bNeedsDiagonalization=self.bNeedsDiagonalization,
-                                            verbose = verbose)
+        paramDict = evaluateAll(fields,
+                                T,
+                                params3D,
+                                self.fieldNames,
+                                self.scalarPermutationMatrix, 
+                                self.scalarMassMatrices, 
+                                self.scalarRotationMatrix,
+                                self.diagonalizationAlgo,
+                                self.vectorShortHands,
+                                self.vectorMassesSquared,
+                                self.bAbsoluteMsq,
+                                bNeedsDiagonalization=self.bNeedsDiagonalization,
+                                verbose = verbose)
 
         ultraSoftScale = self.getUltraSoftScale(paramDict, T)
     

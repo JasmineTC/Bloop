@@ -180,7 +180,6 @@ def traceFreeEnergyMinimum(effectivePotential,
 
         ##Take the 4D params (at the matching scale) and match them to the 3D params
         params3D = dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
-        effectivePotential.setModelParameters(params3D)
         
         initialGuesses = [[0.1,0.1,0.1], ## TODO This should go in a config file or something
                           [-0.1,0.1,0.1],
@@ -197,7 +196,7 @@ def traceFreeEnergyMinimum(effectivePotential,
                           [-40,40,40], 
                           [59,59,59], 
                           [-59,59,59]]
-        minimumLocation, minimumValueReal, minimumValueImag, status = effectivePotential.findGlobalMinimum(T, initialGuesses)
+        minimumLocation, minimumValueReal, minimumValueImag, status = effectivePotential.findGlobalMinimum(T, params3D, initialGuesses)
         if T == TRangeStart and (minimumLocation[0] > 1 or minimumLocation[1] > 1): ## This is a hack to remove bad benchmark points
             minimizationResults["failureReason"] = "v3NotGlobalMin"
             break
@@ -215,6 +214,7 @@ def traceFreeEnergyMinimum(effectivePotential,
         if not minimizationResults["UltraSoftTemp"]: ## If the ultra soft temp has not yet been set
             if effectivePotential.bReachedUltraSoftScale(minimumLocation, ## Check if ultra soft scale reached
                                                          T, 
+                                                         params3D,
                                                          verbose = verbose): 
                 minimizationResults["UltraSoftTemp"] = T ## If reached then set that as the ultra soft temp
                                                          ##- this will stop the first if statement from passing
@@ -231,7 +231,6 @@ def traceFreeEnergyMinimum(effectivePotential,
 
     minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
     return minimizationResults
-
 
 
 from unittest import TestCase
