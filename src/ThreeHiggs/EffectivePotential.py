@@ -111,12 +111,12 @@ import nlopt
 def callNlopt(method: nlopt, 
               numVariables: int, 
               function: callable, 
-              v1Bounds: tuple(float), 
-              v2Bounds: tuple(float), 
-              v3Bounds: tuple(float), 
+              v1Bounds: tuple[float], 
+              v2Bounds: tuple[float], 
+              v3Bounds: tuple[float], 
               AbsTol: float, 
               relTol: float, 
-              initialGuess: list(float)):
+              initialGuess: list[float]):
     
     opt = nlopt.opt(method, numVariables)
     functionWrapper = lambda fields, grad: function(fields) 
@@ -135,9 +135,9 @@ def minimize(function: callable,
              globalRel: float,
              localAbs: float,
              localRel: float,
-             v1Bounds: tuple(float),
-             v2Bounds: tuple(float),
-             v3Bounds: tuple(float)) -> tuple[np.ndarray, float]:
+             v1Bounds: tuple[float],
+             v2Bounds: tuple[float],
+             v3Bounds: tuple[float]) -> tuple[np.ndarray, float]:
     """Even though we don't use the gradient, nlopt still tries to pass a grad arguemet to the function, so the function needs to be 
     wrapped to give it room for the grad arguement"""
 
