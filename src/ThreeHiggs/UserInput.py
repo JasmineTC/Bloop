@@ -19,14 +19,11 @@ class UserInput(argparse.ArgumentParser):
     def __init__(self):
         super().__init__()
         self.add_argument('--loopOrder', action = 'store', default = 2, dest = 'loopOrder', type = int, choices = [0, 1, 2],
-                          help = "Int: Specify the order to compute the effective potential to")#,
-                          # metavar='')
+                          help = "Int: Specify the order to compute the effective potential to")
         
         ## Should probably be made into a int rather than bool to allow for levels of verbosisty 
         self.add_argument('--bVerbose', action = 'store_true', default = False, dest = 'bVerbose',
                           help = 'Bool: If activated code will print as it progresses and do consistency checks')
-        
-        
         
         self.add_argument('--bPool', action = 'store_true', default = False, dest = 'bPool', 
                           help = "Bool: Specify if pool should be used to compute benchmarks in parellel")
@@ -34,8 +31,6 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--cores', action = 'store', default = 1, dest = 'cores', type = int, choices = list(range(1, multiprocessing.cpu_count() + 1)),
                           help = "Int: Specify how many cores pool uses to compute benchmarks",
                           metavar='')
-
-
 
         self.add_argument('--bSave', action = 'store_true', default=False, dest = 'bSave',  
                           help = "Bool: If activated the results of the minimisation will be saved")
@@ -88,7 +83,6 @@ class UserInput(argparse.ArgumentParser):
         metavar='')
         self.add_argument('--lastStage', type = Stages.fromString, default = "plot", dest = 'lastStage',
         metavar='')
-
 
         self.add_argument('--benchmarkFile', 
                   action = 'store', 
