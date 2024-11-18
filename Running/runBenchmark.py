@@ -1,46 +1,46 @@
-def doMinimization(benchMark):
-    if args.verbose:
-        print(f"Starting benchmark: {benchMark['bmNumber']}")
+def doMinimization(benchmark):
+    if args.bVerbose:
+        print(f"Starting benchmark: {benchmark['bmNumber']}")
 
-    if not args.firstBenchmark <= benchMark['bmNumber'] <= args.lastBenchmark:
-        if args.verbose:
-            print(f"Benchmark {benchMark['bmNumber']} has been rejected as outside benchmark range.")
+    if not args.firstBenchmark <= benchmark['bmNumber'] <= args.lastBenchmark:
+        if args.bVerbose:
+            print(f"Benchmark {benchmark['bmNumber']} has been rejected as outside benchmark range.")
 
         return
 
     from ThreeHiggs.TransitionFinder import traceFreeEnergyMinimum
     minimizationResult = traceFreeEnergyMinimum(effectivePotential, 
                                                 dimensionalReduction, 
-                                                benchMark,
+                                                benchmark,
                                                 args.TRangeStart,
                                                 args.TRangeEnd,
                                                 args.TRangeStepSize,
-                                                verbose = args.verbose)
+                                                bVerbose = args.bVerbose)
   
-    filename = f"{args.resultsDirectory}/BM_{benchMark['bmNumber']}"
+    filename = f"{args.resultsDirectory}/BM_{benchmark['bmNumber']}"
     
     from pathlib import Path
     Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
     from json import dumps
     if args.bSave:
-        if args.verbose:
-            print(f"Saving {benchMark['bmNumber']} to {filename}")
+        if args.bVerbose:
+            print(f"Saving {benchmark['bmNumber']} to {filename}")
         open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
       
     if args.bPlot:
-        if args.verbose:
-            print(f"Plotting {benchMark['bmNumber']}")
+        if args.bVerbose:
+            print(f"Plotting {benchmark['bmNumber']}")
 
         from ThreeHiggs.PlotResult import plotData
-        plotData(minimizationResult, benchMark['bmNumber'], args.loopOrder, filename)
+        plotData(minimizationResult, benchmark['bmNumber'], args.loopOrder, filename)
 
     if args.bProcessMin:
-        if args.verbose:
-            print(f"Processing {benchMark['bmNumber']} to {filename+'_interp'}")
+        if args.bVerbose:
+            print(f"Processing {benchmark['bmNumber']} to {filename+'_interp'}")
         from ThreeHiggs.ProcessMinimization import interpretData
         open(f"{filename}_interp.json", "w").write(dumps(interpretData(minimizationResult,
-                                                                        benchMark["bmNumber"],
-                                                                        benchMark["bmInput"]),
+                                                                        benchmark["bmNumber"],
+                                                                        benchmark["bmInput"]),
                                                          indent = 4))
 
 def getLines(relativePathToResource):
@@ -109,7 +109,7 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                 args.loopOrder,
                                                 ParsedExpressionSystem(parsedExpressions["veff"]),
                                                 args.minimizationAlgo, ## Set algorithm to use for Veff minimization
-                                                args.DiagAlgo, ## Set algorithm for scalar mass diag to use
+                                                args.diagAlgo, ## Set algorithm for scalar mass diag to use
                                                 args.absGlobalTolerance,
                                                 args.relGlobalTolerance, 
                                                 args.absLocalTolerance, 
@@ -122,17 +122,17 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
     dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(parsedExpressions["hardToSoft"]),
                                                 ParsedExpressionSystem(parsedExpressions["softScaleRGE"]),
                                                 ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]),
-                                                verbose = args.verbose)
+                                                bVerbose = args.bVerbose)
     
-    with open(args.benchMarkFile) as benchMarkFile:
+    with open(args.benchmarkFile) as benchmarkFile:
         if args.bPool:
             from multiprocessing import Pool
             with Pool(args.cores) as pool:
                 from ijson import items
-                pool.map(doMinimization, items(benchMarkFile, "item", use_float = True))
+                pool.map(doMinimization, items(benchmarkFile, "item", use_float = True))
         else:
-            benchMarkFile = load(benchMarkFile)
-            for BenchMark in benchMarkFile:
+            benchmarkFile = load(benchmarkFile)
+            for BenchMark in benchmarkFile:
                 doMinimization(BenchMark)
     
 

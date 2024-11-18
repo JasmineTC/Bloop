@@ -130,7 +130,7 @@ def traceFreeEnergyMinimum(effectivePotential,
                            TRangeStart: float, 
                            TRangeEnd: float, 
                            TRangeStepSize: float,
-                           verbose = False) -> dict[str: ]:
+                           bVerbose = False) -> dict[str: ]:
     """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale ~7T.
     To make this work nicely we integrate the beta functions here up to the largest temp used 
     then interpolate over the beta function."""
@@ -159,7 +159,7 @@ def traceFreeEnergyMinimum(effectivePotential,
     counter = 0
     for T in TRange:
         T = float(T) ## To make compatible with JSON
-        if verbose:
+        if bVerbose:
             print (f'Start of temp = {T} loop')
         minimizationResults["T"].append(T)
         
@@ -215,7 +215,7 @@ def traceFreeEnergyMinimum(effectivePotential,
             if effectivePotential.bReachedUltraSoftScale(minimumLocation, ## Check if ultra soft scale reached
                                                          T, 
                                                          params3D,
-                                                         verbose = verbose): 
+                                                         bVerbose = bVerbose): 
                 minimizationResults["UltraSoftTemp"] = T ## If reached then set that as the ultra soft temp
                                                          ##- this will stop the first if statement from passing
         
@@ -223,7 +223,7 @@ def traceFreeEnergyMinimum(effectivePotential,
             minimizationResults["bIsPerturbative"] = bIsPerturbative(paramsForMatching) ## If non-pert then value set to false and won't be updated
 
         if np.all(minimumLocation < 1e-2):
-            if verbose:
+            if bVerbose:
                 print (f"Symmetric phase found at temp {T}")
             if counter == 3:
                 break

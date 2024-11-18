@@ -26,12 +26,12 @@ def evaluateAll(fields: list[float],
                 scalarPermutationMatrix,
                 scalarMassMatrices,
                 scalarRotationMatrix,
-                diagonalizationAlgo,
+                diagAlgo,
                 vectorShortHands,
                 vectorMassesSquared,
                 bAbsoluteMsq,
                 bNeedsDiagonalization=True, 
-                verbose = False) -> dict[str, float]:
+                bVerbose = False) -> dict[str, float]:
     """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation."""
     knownParamsDict = params3D.copy()
 
@@ -51,23 +51,23 @@ def evaluateAll(fields: list[float],
     ## Scalars       
     knownParamsDict |= diagonalizeScalars(knownParamsDict, 
                                           T, 
-                                          diagonalizationAlgo, 
+                                          diagAlgo, 
                                           scalarPermutationMatrix,
                                           scalarMassMatrices,
                                           scalarRotationMatrix,
                                           bAbsoluteMsq,
-                                          verbose)
+                                          bVerbose)
 
     return knownParamsDict
 
 def diagonalizeScalars(params: dict[str, float], 
                        T: float, 
-                       diagonalizationAlgo, 
+                       diagAlgo, 
                        scalarPermutationMatrix,
                        scalarMassMatrices,
                        scalarRotationMatrix,
                        bAbsoluteMsq,
-                       verbose = False) -> dict[str, float]:
+                       bVerbose = False) -> dict[str, float]:
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
     # Diagonalize blocks separatey
@@ -76,10 +76,10 @@ def diagonalizeScalars(params: dict[str, float],
 
     for matrix in scalarMassMatrices:
         numericalM = np.asarray(matrix(params))/T**2
-        eigenValue, vects = diagonalizeSymmetric(numericalM, diagonalizationAlgo)
+        eigenValue, vects = diagonalizeSymmetric(numericalM, diagAlgo)
         eigenValue *=T**2
-        ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
-        if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
+        ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
+        if bVerbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
             diagonalBlock = np.transpose(vects) @ numericalM @ vects
             offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
             if np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
@@ -166,7 +166,7 @@ def minimize(function: callable,
     
     else:
         print(f"ERROR: {minimizationAlgo} does not match any of our minimzationAlgos, attempting to exit")
-        exit()
+        exit(-1)
            
     return location, value
 
@@ -189,7 +189,7 @@ class EffectivePotential:
                  loopOrder,
                  veff,
                  minimizationAlgo,
-                 diagonalizationAlgo,
+                 diagAlgo,
                  absGlobalTolerance,
                  relGlobalTolerance, 
                  absLocalTolerance, 
@@ -201,7 +201,7 @@ class EffectivePotential:
         self.nbrFields = len(self.fieldNames)
 
         self.bAbsoluteMsq = bAbsoluteMsq
-        self.diagonalizationAlgo = diagonalizationAlgo
+        self.diagAlgo = diagAlgo
 
         self.vectorMassesSquared = vectorMassesSquared
         self.vectorShortHands = vectorShortHands
@@ -229,7 +229,7 @@ class EffectivePotential:
     def initExpressions(self, filesToParse: list[str]) -> None:
         self.expressions = []
 
-    def evaluatePotential(self, fields: list[float], T:float, params3D, verbose = False) -> complex:
+    def evaluatePotential(self, fields: list[float], T:float, params3D, bVerbose = False) -> complex:
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
         ## Sum because the result is a list of tree, 1loop etc 
         return sum(self.expressions(evaluateAll(fields,
@@ -239,19 +239,19 @@ class EffectivePotential:
                                                 self.scalarPermutationMatrix, 
                                                 self.scalarMassMatrices, 
                                                 self.scalarRotationMatrix,
-                                                self.diagonalizationAlgo,
+                                                self.diagAlgo,
                                                 self.vectorShortHands,
                                                 self.vectorMassesSquared,
                                                 self.bAbsoluteMsq,
                                                 bNeedsDiagonalization=self.bNeedsDiagonalization, 
-                                                verbose = verbose)))
+                                                bVerbose = bVerbose)))
 
-    def findLocalMinimum(self, initialGuess: list[float],T:float, params3D, algo, verbose = False) -> tuple[list[float], complex]:
+    def findLocalMinimum(self, initialGuess: list[float],T:float, params3D, algo, bVerbose = False) -> tuple[list[float], complex]:
         ## Minimize real part only:
         VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields,
                                                                       T,
                                                                       params3D,
-                                                                      verbose = verbose) )
+                                                                      bVerbose = bVerbose) )
 
         return minimize(VeffWrapper, 
                         initialGuess, 
@@ -268,29 +268,29 @@ class EffectivePotential:
     def findGlobalMinimum(self,T:float, 
                           params3D,
                           minimumCandidates: list[list[float]] = None,
-                          verbose = False) -> tuple[list[float], float, float, str]:
+                          bVerbose = False) -> tuple[list[float], float, float, str]:
         bestResult = ((np.full(3, np.nan)), np.inf)
         
         if self.minimizationAlgo == "combo":
-            result = self.findLocalMinimum(minimumCandidates[0], T, params3D, "directGlobal", verbose = verbose)
+            result = self.findLocalMinimum(minimumCandidates[0], T, params3D, "directGlobal", bVerbose = bVerbose)
             if result[1] < bestResult[1]:
                 bestResult = result
             
             for candidate in minimumCandidates:
-                result = self.findLocalMinimum(candidate, T, params3D, "BOBYQA", verbose = verbose)
+                result = self.findLocalMinimum(candidate, T, params3D, "BOBYQA", bVerbose = bVerbose)
                 if result[1] < bestResult[1]:
                     bestResult = result
                     
         else:
             for candidate in minimumCandidates:
-                result = self.findLocalMinimum(candidate,T, params3D, self.minimizationAlgo, verbose = verbose)
+                result = self.findLocalMinimum(candidate,T, params3D, self.minimizationAlgo, bVerbose = bVerbose)
                 if result[1] < bestResult[1]:
                     bestResult = result
         
         if any(np.isnan(bestResult[0])) or np.isinf(bestResult[1]):
             return (np.full(3, None)), None, None, "NaN"
         
-        potentialAtMin = self.evaluatePotential(bestResult[0], T, params3D, verbose = verbose) ## Compute the potential at minimum to check if its complex
+        potentialAtMin = self.evaluatePotential(bestResult[0], T, params3D, bVerbose = bVerbose) ## Compute the potential at minimum to check if its complex
         if abs(potentialAtMin.imag)/abs(potentialAtMin.real) > 1e-8: 
             return bestResult[0], potentialAtMin.real, potentialAtMin.imag, "complex" ## Flag minimum with imag > tol
         return bestResult[0], potentialAtMin.real, None, None
@@ -314,7 +314,7 @@ class EffectivePotential:
                               paramDict['lam31'], paramDict['lam31p']]) 
         return np.max(np.abs(couplings))**2 * T / (16*np.pi)
 
-    def bReachedUltraSoftScale(self, fields: list[complex], T: float, params3D, verbose = False) -> bool:
+    def bReachedUltraSoftScale(self, fields: list[complex], T: float, params3D, bVerbose = False) -> bool:
         '''Check if we can trust the results by comparing the masses we find at the minimum to the ultra soft scale i.e.
         Are all physical masses > g^2 T/16pi, we use the largest coupling in the theory to do the comparrsion 
         --Note we expect some goldstone bosons from the symmetry breaking so we check the number of light modes = goldstone modes
@@ -328,12 +328,12 @@ class EffectivePotential:
                                 self.scalarPermutationMatrix, 
                                 self.scalarMassMatrices, 
                                 self.scalarRotationMatrix,
-                                self.diagonalizationAlgo,
+                                self.diagAlgo,
                                 self.vectorShortHands,
                                 self.vectorMassesSquared,
                                 self.bAbsoluteMsq,
                                 bNeedsDiagonalization=self.bNeedsDiagonalization,
-                                verbose = verbose)
+                                bVerbose = bVerbose)
 
         ultraSoftScale = self.getUltraSoftScale(paramDict, T)
     

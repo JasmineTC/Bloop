@@ -8,16 +8,16 @@ echo Intergration tests...
 
 # Super coarse test providing full coverage
 echo Intergration test: Running code at NNLO, abs mass mode on...
-rm TestResults/*
+#rm TestResults/*
 python3 runBenchmark.py -l 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
-                        --save \
+                        --bSave \
                         --resultsDirectory TestResults \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
-                        --DiagAlgo scipy \
+                        --diagAlgo scipy \
                         --minimizationAlgo directGlobal \
                         --v1Bounds 1e-6 1e-6 \
                         --v2Bounds 1e-6 1e-6 \
@@ -26,22 +26,23 @@ python3 runBenchmark.py -l 2 \
                         --relGlobalTolerance 0.1 \
                         --absLocalTolerance 0.00001 \
                         --relLocalTolerance 0.00001 \
-                        --bAbsMass
+                        --bAbsMass \
+                        --bPool
 
 diff TestResults/BM_1.json ReferenceTestResults/BM_1.json
 
 # Super coarse test providing full coverage, permit complex mass
 echo Intergration test: Running code at NNLO, complex mass mode on...
-rm TestComplexMassResults/*
+#rm TestComplexMassResults/*
 python3 runBenchmark.py -l 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
-                        --save \
+                        --bSave \
                         --resultsDirectory TestComplexMassResults \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
-                        --DiagAlgo scipy \
+                        --diagAlgo scipy \
                         --minimizationAlgo directGlobal \
                         --v1Bounds 1e-6 1e-6 \
                         --v2Bounds 1e-6 1e-6 \
@@ -49,7 +50,8 @@ python3 runBenchmark.py -l 2 \
                         --absGlobalTolerance 0.1 \
                         --relGlobalTolerance 0.1 \
                         --absLocalTolerance 0.00001 \
-                        --relLocalTolerance 0.00001
+                        --relLocalTolerance 0.00001 \
+                        --bPool
 
 diff TestComplexMassResults/BM_1.json ReferenceTestComplexMassResults/BM_1.json
 
