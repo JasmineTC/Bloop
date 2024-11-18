@@ -1,10 +1,10 @@
 def doMinimization(benchMark):
     if args.verbose:
-        print(f"Starting {benchMark['bmNumber']}")
+        print(f"Starting benchmark: {benchMark['bmNumber']}")
 
     if not args.firstBenchmark <= benchMark['bmNumber'] <= args.lastBenchmark:
         if args.verbose:
-            print(f"Rejecting {benchMark['bmNumber']}")
+            print(f"Benchmark {benchMark['bmNumber']} has been rejected as outside benchmark range.")
 
         return
 
