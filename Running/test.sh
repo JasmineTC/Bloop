@@ -9,7 +9,7 @@ echo Intergration tests...
 # Super coarse test providing full coverage
 echo Intergration test: Running code at NNLO, abs mass mode on...
 #rm TestResults/*
-python3 runBenchmark.py -l 2 \
+python3 runBenchmark.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
                         --bSave \
@@ -34,7 +34,7 @@ diff TestResults/BM_1.json ReferenceTestResults/BM_1.json
 # Super coarse test providing full coverage, permit complex mass
 echo Intergration test: Running code at NNLO, complex mass mode on...
 #rm TestComplexMassResults/*
-python3 runBenchmark.py -l 2 \
+python3 runBenchmark.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
                         --bSave \
