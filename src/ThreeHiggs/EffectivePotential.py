@@ -109,7 +109,7 @@ def diagonalizeScalars(params: dict[str, float],
 
 import nlopt
 def nloptFunction(method, numVariables, function, v1Bounds, v2Bounds, v3Bounds, AbsTol, relTol, initialGuess):
-    opt = nlopt.opt(nlopt.LN_BOBYQA, numVariables)
+    opt = nlopt.opt(method, numVariables)
     functionWrapper = lambda fields, grad: function(fields) 
     opt.set_min_objective(functionWrapper)
     opt.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
@@ -146,7 +146,7 @@ def minimize(function: callable,
             ##The idea of this case is to use a global minimiser to get the ballpark of the global minimum
             ##then use that as initial guess for a local solver
             # opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, numVariables)
-            # functionWrapper = lambda fields, grad: function(fields) 
+            functionWrapper = lambda fields, grad: function(fields) 
             # opt.set_min_objective(functionWrapper)
             # opt.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
             # opt.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
@@ -155,15 +155,14 @@ def minimize(function: callable,
             # location = opt.optimize(initialGuess)
             location, _ = nloptFunction(nlopt.GN_DIRECT_NOSCAL, numVariables, function, v1Bounds, v2Bounds, v3Bounds, globalAbs, globalRel, initialGuess)
             
-            # opt2 = nlopt.opt(nlopt.LN_BOBYQA, numVariables)
-            # opt2.set_min_objective(functionWrapper)
-            # opt2.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
-            # opt2.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
-            # opt2.set_xtol_abs(localAbs)
-            # opt2.set_xtol_rel(localRel)
+            opt2 = nlopt.opt(nlopt.LN_BOBYQA, numVariables)
+            opt2.set_min_objective(functionWrapper)
+            opt2.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
+            opt2.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
+            opt2.set_xtol_abs(localAbs)
+            opt2.set_xtol_rel(localRel)
             
-            location, value = nloptFunction(nlopt.LN_BOBYQA, numVariables, function, v1Bounds, v2Bounds, v3Bounds, localAbs, localRel, initialGuess)
-            
+            location, value = opt2.optimize(location),  opt2.last_optimum_value()
     elif minimizationAlgo == "BOBYQA":
             # opt = nlopt.opt(nlopt.LN_BOBYQA, numVariables)
             # functionWrapper = lambda fields, grad: function(fields) 
