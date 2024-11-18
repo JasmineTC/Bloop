@@ -25,10 +25,10 @@ class UserInput(argparse.ArgumentParser):
                           help = 'bool, if turned on code will print as it progresses and do consistency checks')
         
         
-        self.add_argument('-p', '--pool', action = 'store_false', default = True, dest = 'bPool', 
-                          help = "Used to specify if pool should be used to compute benchmarks in parellel")
+        self.add_argument('-p', '--bPool', action = 'store_true', default = False, dest = 'bPool', 
+                          help = "bool, specify if pool should be used to compute benchmarks in parellel")
         self.add_argument('-c', '--cores', action = 'store', default = 1, dest = 'cores', type = int, choices = list(range(1, multiprocessing.cpu_count() + 1)),
-                          help = "Used to specify how many cores to run the bench mark list on, assumed to be an int")
+                          help = "Used to specify how many cores pool uses to compute benchmarks, assumed to be an int")
 
         self.add_argument('-s', '--save', action = 'store_true', default=False, dest = 'bSave',  
                           help = "Used to specify if the results of the minimisation should be saved")
