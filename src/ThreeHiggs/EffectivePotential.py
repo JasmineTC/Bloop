@@ -26,7 +26,7 @@ def evaluateAll(fields: list[float],
                 scalarPermutationMatrix,
                 scalarMassMatrices,
                 scalarRotationMatrix,
-                diagonalizationAlgo,
+                diagAlgo,
                 vectorShortHands,
                 vectorMassesSquared,
                 bAbsoluteMsq,
@@ -51,7 +51,7 @@ def evaluateAll(fields: list[float],
     ## Scalars       
     knownParamsDict |= diagonalizeScalars(knownParamsDict, 
                                           T, 
-                                          diagonalizationAlgo, 
+                                          diagAlgo, 
                                           scalarPermutationMatrix,
                                           scalarMassMatrices,
                                           scalarRotationMatrix,
@@ -62,7 +62,7 @@ def evaluateAll(fields: list[float],
 
 def diagonalizeScalars(params: dict[str, float], 
                        T: float, 
-                       diagonalizationAlgo, 
+                       diagAlgo, 
                        scalarPermutationMatrix,
                        scalarMassMatrices,
                        scalarRotationMatrix,
@@ -76,7 +76,7 @@ def diagonalizeScalars(params: dict[str, float],
 
     for matrix in scalarMassMatrices:
         numericalM = np.asarray(matrix(params))/T**2
-        eigenValue, vects = diagonalizeSymmetric(numericalM, diagonalizationAlgo)
+        eigenValue, vects = diagonalizeSymmetric(numericalM, diagAlgo)
         eigenValue *=T**2
         ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
         if bVerbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
@@ -189,7 +189,7 @@ class EffectivePotential:
                  loopOrder,
                  veff,
                  minimizationAlgo,
-                 diagonalizationAlgo,
+                 diagAlgo,
                  absGlobalTolerance,
                  relGlobalTolerance, 
                  absLocalTolerance, 
@@ -201,7 +201,7 @@ class EffectivePotential:
         self.nbrFields = len(self.fieldNames)
 
         self.bAbsoluteMsq = bAbsoluteMsq
-        self.diagonalizationAlgo = diagonalizationAlgo
+        self.diagAlgo = diagAlgo
 
         self.vectorMassesSquared = vectorMassesSquared
         self.vectorShortHands = vectorShortHands
@@ -239,7 +239,7 @@ class EffectivePotential:
                                                 self.scalarPermutationMatrix, 
                                                 self.scalarMassMatrices, 
                                                 self.scalarRotationMatrix,
-                                                self.diagonalizationAlgo,
+                                                self.diagAlgo,
                                                 self.vectorShortHands,
                                                 self.vectorMassesSquared,
                                                 self.bAbsoluteMsq,
@@ -328,7 +328,7 @@ class EffectivePotential:
                                 self.scalarPermutationMatrix, 
                                 self.scalarMassMatrices, 
                                 self.scalarRotationMatrix,
-                                self.diagonalizationAlgo,
+                                self.diagAlgo,
                                 self.vectorShortHands,
                                 self.vectorMassesSquared,
                                 self.bAbsoluteMsq,
