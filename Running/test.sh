@@ -7,7 +7,7 @@ python3 ../src/ThreeHiggs/UnitTests.py
 echo Intergration tests...
 
 # Super coarse test providing full coverage
-echo Intergration test nominal nnlo...
+echo Intergration test: Running code at NNLO, abs mass mode on...
 rm TestResults/*
 python3 runBenchmark.py -l 2 \
                         --firstBenchmark 1 \
@@ -31,7 +31,7 @@ python3 runBenchmark.py -l 2 \
 diff TestResults/BM_1.json ReferenceTestResults/BM_1.json
 
 # Super coarse test providing full coverage, permit complex mass
-echo Intergration test complex mass nnlo...
+echo Intergration test: Running code at NNLO, complex mass mode on...
 rm TestComplexMassResults/*
 python3 runBenchmark.py -l 2 \
                         --firstBenchmark 1 \

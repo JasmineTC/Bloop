@@ -170,6 +170,13 @@ def minimize(function: callable,
            
     return location, value
 
+
+    
+""" Evaluating the potential: 
+1. Call setModelParameters() with a dict that sets all parameters in the action. 
+This is assumed to be using 3D EFT, so the params are temperature dependent.
+2. Call evaluate() with a list that specifies values of background fields. Fields are in 3D units, ie. have dimension GeV^(1/2)
+"""
 class EffectivePotential:
     def __init__(self,
                  fieldNames, 
@@ -190,7 +197,6 @@ class EffectivePotential:
                  v1Bounds,
                  v2Bounds,
                  v3Bounds):
-        ## How many background fields do we depend on
         self.fieldNames = fieldNames
         self.nbrFields = len(self.fieldNames)
 
