@@ -108,6 +108,25 @@ def diagonalizeScalars(params: dict[str, float],
     return outDict 
 
 import nlopt
+def callNlopt(method: nlopt, 
+              numVariables: int, 
+              function: callable, 
+              v1Bounds: tuple(float), 
+              v2Bounds: tuple(float), 
+              v3Bounds: tuple(float), 
+              AbsTol: float, 
+              relTol: float, 
+              initialGuess: list(float)):
+    
+    opt = nlopt.opt(method, numVariables)
+    functionWrapper = lambda fields, grad: function(fields) 
+    opt.set_min_objective(functionWrapper)
+    opt.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
+    opt.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
+    opt.set_xtol_abs(AbsTol)
+    opt.set_xtol_rel(relTol)
+    return opt.optimize(initialGuess),  opt.last_optimum_value()
+
 def minimize(function: callable, 
              initialGuess: np.ndarray, 
              minimizationAlgo: str,
@@ -116,15 +135,11 @@ def minimize(function: callable,
              globalRel: float,
              localAbs: float,
              localRel: float,
-             v1Bounds: float,
-             v2Bounds: float,
-             v3Bounds: float) -> tuple[np.ndarray, float]:
-    """Give bounds in format ((min1, max1), (min2, max2)) etc, one pair for each variable.
-    Returns: 
-    location, Veff(location)
-    Note on notation for NLopt Algorithms, G/L refer to global/local and N/D refer to no gradient/gradient based, we want N methods
-    Even though we don't use the gradient, nlopt still tries to pass a grad arguemet to the function, so the function needs to be 
-    wrapped a second time to give it room for the useless grad arguement"""
+             v1Bounds: tuple(float),
+             v2Bounds: tuple(float),
+             v3Bounds: tuple(float)) -> tuple[np.ndarray, float]:
+    """Even though we don't use the gradient, nlopt still tries to pass a grad arguemet to the function, so the function needs to be 
+    wrapped to give it room for the grad arguement"""
 
     if minimizationAlgo == "scipy":
             import scipy.optimize
@@ -133,36 +148,35 @@ def minimize(function: callable,
             location, value = minimizationResult.x, minimizationResult.fun
                
     elif minimizationAlgo == "directGlobal":
-            ##The idea of this case is to use a global minimiser to get the ballpark of the global minimum
-            ##then use that as initial guess for a local solver
-            opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, numVariables)
-            functionWrapper = lambda fields, grad: function(fields) 
-            opt.set_min_objective(functionWrapper)
-            opt.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
-            opt.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
-            opt.set_xtol_abs(globalAbs)
-            opt.set_xtol_rel(globalRel)
-            location = opt.optimize(initialGuess)
-            
-            opt2 = nlopt.opt(nlopt.LN_BOBYQA, numVariables)
-            opt2.set_min_objective(functionWrapper)
-            opt2.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
-            opt2.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
-            opt2.set_xtol_abs(localAbs)
-            opt2.set_xtol_rel(localRel)
-            
-            location, value = opt2.optimize(location),  opt2.last_optimum_value()
-            
-    elif minimizationAlgo == "BOBYQA":
-            opt = nlopt.opt(nlopt.LN_BOBYQA, numVariables)
-            functionWrapper = lambda fields, grad: function(fields) 
-            opt.set_min_objective(functionWrapper)
-            opt.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
-            opt.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
-            opt.set_xtol_abs(localAbs)
-            opt.set_xtol_rel(localRel)
-            
-            location, value = opt.optimize(initialGuess),  opt.last_optimum_value()
+            location, _ = callNlopt(nlopt.GN_DIRECT_NOSCAL, 
+                                        numVariables, 
+                                        function, 
+                                        v1Bounds, 
+                                        v2Bounds, 
+                                        v3Bounds, 
+                                        globalAbs, 
+                                        globalRel, 
+                                        initialGuess)
+                        
+            location, value = callNlopt(nlopt.LN_BOBYQA, 
+                                            numVariables, 
+                                            function, 
+                                            v1Bounds, 
+                                            v2Bounds, 
+                                            v3Bounds, 
+                                            localAbs, 
+                                            localRel, 
+                                            location)
+    elif minimizationAlgo == "BOBYQA":            
+            location, value = callNlopt(nlopt.LN_BOBYQA, 
+                                            numVariables, 
+                                            function, 
+                                            v1Bounds, 
+                                            v2Bounds, 
+                                            v3Bounds, 
+                                            localAbs, 
+                                            localRel, 
+                                            initialGuess)
     
     else:
         print(f"ERROR: {minimizationAlgo} does not match any of our minimzationAlgos, attempting to exit")
