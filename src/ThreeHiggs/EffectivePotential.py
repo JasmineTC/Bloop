@@ -78,7 +78,7 @@ def diagonalizeScalars(params: dict[str, float],
         numericalM = np.asarray(matrix(params))/T**2
         eigenValue, vects = diagonalizeSymmetric(numericalM, diagonalizationAlgo)
         eigenValue *=T**2
-        ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V is diagonal
+        ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
         if verbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
             diagonalBlock = np.transpose(vects) @ numericalM @ vects
             offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
@@ -166,7 +166,7 @@ def minimize(function: callable,
     
     else:
         print(f"ERROR: {minimizationAlgo} does not match any of our minimzationAlgos, attempting to exit")
-        exit()
+        exit(-1)
            
     return location, value
 
