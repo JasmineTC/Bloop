@@ -17,7 +17,7 @@ python3 runBenchmark.py -l 2 \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
-                        --DiagAlgo scipy \
+                        --diagAlgo scipy \
                         --minimizationAlgo directGlobal \
                         --v1Bounds 1e-6 1e-6 \
                         --v2Bounds 1e-6 1e-6 \
@@ -37,7 +37,7 @@ echo Intergration test: Running code at NNLO, complex mass mode on...
 python3 runBenchmark.py -l 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
-                        --bsave \
+                        --bSave \
                         --resultsDirectory TestComplexMassResults \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
