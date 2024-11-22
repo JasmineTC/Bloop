@@ -27,7 +27,6 @@ python3 runBenchmark.py --loopOrder 2 \
                         --absLocalTolerance 0.00001 \
                         --relLocalTolerance 0.00001 \
                         --bAbsMass \
-                        --bPool
 
 diff TestResults/BM_1.json ReferenceTestResults/BM_1.json
 
@@ -51,7 +50,6 @@ python3 runBenchmark.py --loopOrder 2 \
                         --relGlobalTolerance 0.1 \
                         --absLocalTolerance 0.00001 \
                         --relLocalTolerance 0.00001 \
-                        --bPool
 
 diff TestComplexMassResults/BM_1.json ReferenceTestComplexMassResults/BM_1.json
 
