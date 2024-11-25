@@ -21,7 +21,8 @@ dependencies = [
     "scipy>=1.9.0",
     "sympy>=1.12",
     "ijson",
-    "itertools"
+    "itertools",
+    "Numba"
 ]
 readme = "README.md"
 

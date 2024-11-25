@@ -1,6 +1,17 @@
 import numpy as np
 from scipy import linalg
 
+from numba import njit
+
+@njit
+def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
+    ##Gives complex cast warning
+    subEigenValues = np.empty( (matrixNumber, matrixSize) ) 
+    subRotationMatrix = np.empty( (matrixNumber, matrixSize, matrixSize) )
+    for idx, matrix in enumerate(matrices):
+         subEigenValues[idx], subRotationMatrix[idx] = np.linalg.eigh(matrix)
+    return subEigenValues*T**2, subRotationMatrix
+
 def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.ndarray, np.ndarray]:
     """Diagonalizes a symmetric matrix. 
     Returns eigvalues, eigvectors in a matrix form
@@ -30,6 +41,7 @@ def evaluateAll(fields: list[float],
                 vectorShortHands,
                 vectorMassesSquared,
                 bAbsoluteMsq,
+                bNumba,
                 bNeedsDiagonalization=True, 
                 bVerbose = False) -> dict[str, float]:
     """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation."""
@@ -50,12 +62,13 @@ def evaluateAll(fields: list[float],
 
     ## Scalars       
     knownParamsDict |= diagonalizeScalars(knownParamsDict, 
-                                          T, 
+                                          T,
                                           diagAlgo, 
                                           scalarPermutationMatrix,
                                           scalarMassMatrices,
                                           scalarRotationMatrix,
                                           bAbsoluteMsq,
+                                          bNumba,
                                           bVerbose)
 
     return knownParamsDict
@@ -67,26 +80,34 @@ def diagonalizeScalars(params: dict[str, float],
                        scalarMassMatrices,
                        scalarRotationMatrix,
                        bAbsoluteMsq,
+                       bNumba,
                        bVerbose = False) -> dict[str, float]:
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
-    # Diagonalize blocks separatey
-    subRotationMatrix = []
-    subEigenValues = []
-
+    subMassMatrix = []
+    
     for matrix in scalarMassMatrices:
-        numericalM = np.asarray(matrix(params))/T**2
-        eigenValue, vects = diagonalizeSymmetric(numericalM, diagAlgo)
-        eigenValue *=T**2
-        ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
-        if bVerbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
-            diagonalBlock = np.transpose(vects) @ numericalM @ vects
-            offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
-            if np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
-                print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
-
-        subEigenValues.append(eigenValue)                    
-        subRotationMatrix.append(vects)
+        subMassMatrix.append(np.asarray(matrix(params))/T**2)
+    subMassMatrix = np.array(subMassMatrix, dtype = "float64")  ## Gives complex cast warning
+    if bNumba:
+        ## Having the number and size of matrices set dyamically does hamper perfomance (2seconds on ~3min run 1 loop)
+        subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, len(subMassMatrix), len(subMassMatrix[0][0]), T)
+    else:
+        subRotationMatrix = []
+        subEigenValues = []
+        for matrix in subMassMatrix:
+            eigenValue, vects = diagonalizeSymmetric(matrix, diagAlgo)
+            eigenValue *=T**2
+            ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
+            if bVerbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
+                diagonalBlock = np.transpose(vects) @ matrix @ vects
+                offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
+                if np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
+                    print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
+    
+            subEigenValues.append(eigenValue)                    
+            subRotationMatrix.append(vects)
+            
     fullRotationMatrix = linalg.block_diag(*subRotationMatrix)
 
     """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
@@ -208,7 +229,8 @@ class EffectivePotential:
                  relLocalTolerance,
                  v1Bounds,
                  v2Bounds,
-                 v3Bounds):
+                 v3Bounds,
+                 bNumba):
         self.fieldNames = fieldNames
         self.nbrFields = len(self.fieldNames)
 
@@ -237,6 +259,7 @@ class EffectivePotential:
         self.v1Bounds = v1Bounds
         self.v2Bounds = v2Bounds
         self.v3Bounds = v3Bounds
+        self.bNumba = bNumba
 
     def initExpressions(self, filesToParse: list[str]) -> None:
         self.expressions = []
@@ -255,6 +278,7 @@ class EffectivePotential:
                                                 self.vectorShortHands,
                                                 self.vectorMassesSquared,
                                                 self.bAbsoluteMsq,
+                                                self.bNumba,
                                                 bNeedsDiagonalization=self.bNeedsDiagonalization, 
                                                 bVerbose = bVerbose)))
 
@@ -344,6 +368,7 @@ class EffectivePotential:
                                 self.vectorShortHands,
                                 self.vectorMassesSquared,
                                 self.bAbsoluteMsq,
+                                self.bNumba,
                                 bNeedsDiagonalization=self.bNeedsDiagonalization,
                                 bVerbose = bVerbose)
 
@@ -394,4 +419,18 @@ class EffectivePotentialUnitTests(TestCase):
         self.assertEqual(reference, 
                          list(map(lambda x: x.tolist(), 
                                   diagonalizeSymmetric(source, "scipy"))))
-
+      
+    def test_diagonalizeNumba(self):
+        reference = [[[-4., 4.], [-4.649110640673516, 20.64911064067352]], 
+                     [[[-0.7071067811865475, 0.7071067811865475],                                                                                                                                        
+                       [0.7071067811865475, 0.7071067811865475]],                                                                                                                                        
+                      [[-0.9870874576374967, -0.1601822430069672],                                                                                                                                       
+                       [-0.1601822430069672, 0.9870874576374967]]]  ]
+        
+        source = np.array( [ [[0, 1], [1, 0]], 
+                             [[-1, 5], [-1, 5.0]] ] )
+      
+        self.assertEqual(reference, 
+                         list(map(lambda x: x.tolist(), 
+                                  diagonalizeNumba(source, 2, 2, 2))))   
+    

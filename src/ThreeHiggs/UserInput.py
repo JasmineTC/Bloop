@@ -25,6 +25,9 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--bVerbose', action = 'store_true', default = False, dest = 'bVerbose',
                           help = 'Bool: If activated code will print as it progresses and do consistency checks')
         
+        self.add_argument('--bNumba', action = 'store_true', default = False, dest = 'bNumba',
+                          help = 'Bool: If activated parts of the code will be compiled using Numba')
+        
         self.add_argument('--bPool', action = 'store_true', default = False, dest = 'bPool', 
                           help = "Bool: Specify if pool should be used to compute benchmarks in parellel")
         
