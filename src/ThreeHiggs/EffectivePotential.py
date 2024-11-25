@@ -419,4 +419,18 @@ class EffectivePotentialUnitTests(TestCase):
         self.assertEqual(reference, 
                          list(map(lambda x: x.tolist(), 
                                   diagonalizeSymmetric(source, "scipy"))))
+      
+    def test_diagonalizeNumba(self):
+        reference = [[[-4., 4.], [-4.649110640673516, 20.64911064067352]], 
+                     [[[-0.7071067811865475, 0.7071067811865475],                                                                                                                                        
+                       [0.7071067811865475, 0.7071067811865475]],                                                                                                                                        
+                      [[-0.9870874576374967, -0.1601822430069672],                                                                                                                                       
+                       [-0.1601822430069672, 0.9870874576374967]]]  ]
+        
+        source = np.array( [ [[0, 1], [1, 0]], 
+                             [[-1, 5], [-1, 5.0]] ] )
+      
+        self.assertEqual(reference, 
+                         list(map(lambda x: x.tolist(), 
+                                  diagonalizeNumba(source, 2, 2, 2))))   
     
