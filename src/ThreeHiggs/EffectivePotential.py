@@ -89,6 +89,10 @@ def diagonalizeScalars(params: dict[str, float],
     for matrix in scalarMassMatrices:
         subMassMatrix.append(np.asarray(matrix(params))/T**2)
     subMassMatrix = np.array(subMassMatrix, dtype = "float64")  ## Gives complex cast warning
+    matrixNumber = len(subMassMatrix)
+    matrixSize = len(subMassMatrix[0][0])
+    print(matrixNumber, matrixSize)
+    exit()
     if bNumba:
         subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, T)
     else:
