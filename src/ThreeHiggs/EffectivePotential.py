@@ -89,6 +89,7 @@ def diagonalizeScalars(params: dict[str, float],
     bNumba = True
     if bNumba:
         subEigenValues, subRotationMatrix = eigenVectorLoopAll(subMassMatrix)
+        subEigenValues *=T**2
     else:
         subRotationMatrix = []
         subEigenValues = []
