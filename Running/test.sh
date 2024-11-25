@@ -8,7 +8,7 @@ echo Intergration tests...
 
 # Super coarse test providing full coverage
 echo Intergration test: Running code at NNLO, abs mass mode on...
-#rm TestResults/*
+rm TestResults/*
 python3 runBenchmark.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
@@ -32,7 +32,7 @@ diff TestResults/BM_1.json ReferenceTestResults/BM_1.json
 
 # Super coarse test providing full coverage, permit complex mass
 echo Intergration test: Running code at NNLO, complex mass mode on...
-#rm TestComplexMassResults/*
+rm TestComplexMassResults/*
 python3 runBenchmark.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
@@ -53,3 +53,25 @@ python3 runBenchmark.py --loopOrder 2 \
 
 diff TestComplexMassResults/BM_1.json ReferenceTestComplexMassResults/BM_1.json
 
+# Super coarse test providing full coverage, complex mass+numba
+echo Intergration test: Running code at NNLO, complex mass mode on with Numba...
+rm TestComplexMassResults/*
+python3 runBenchmark.py --loopOrder 2 \
+                        --firstBenchmark 1 \
+                        --lastBenchmark 1 \
+                        --bSave \
+                        --resultsDirectory NumbaResults \
+                        --TRangeStart 50 \
+                        --TRangeEnd 100 \
+                        --TRangeStepSize 10 \
+                        --bNumba \
+                        --minimizationAlgo directGlobal \
+                        --v1Bounds 1e-6 1e-6 \
+                        --v2Bounds 1e-6 1e-6 \
+                        --v3Bounds 1e-6 100 \
+                        --absGlobalTolerance 0.1 \
+                        --relGlobalTolerance 0.1 \
+                        --absLocalTolerance 0.00001 \
+                        --relLocalTolerance 0.00001 \
+
+diff NumbaResults/BM_1.json ReferenceNumbaResults/BM_1.json
