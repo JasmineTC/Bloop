@@ -4,7 +4,7 @@ from scipy import linalg
 from numba import njit
 
 @njit
-def eigenVectorLoopAll(matrices, T):
+def diagonalizeNumba(matrices, T):
     ##Gives complex cast warning
     subEigenValues = np.empty( (2,6) ) 
     subRotationMatrix = np.empty( (2,6,6) )
@@ -90,7 +90,7 @@ def diagonalizeScalars(params: dict[str, float],
         subMassMatrix.append(np.asarray(matrix(params))/T**2)
     subMassMatrix = np.array(subMassMatrix, dtype = "float64")  ## Gives complex cast warning
     if bNumba:
-        subEigenValues, subRotationMatrix = eigenVectorLoopAll(subMassMatrix, T)
+        subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, T)
     else:
         subRotationMatrix = []
         subEigenValues = []
@@ -418,4 +418,24 @@ class EffectivePotentialUnitTests(TestCase):
         self.assertEqual(reference, 
                          list(map(lambda x: x.tolist(), 
                                   diagonalizeSymmetric(source, "scipy"))))
+    
+    # def test_diagonalizeNumba(self):
+    #     reference = 1 
+        
+    #     source = np.array( [[[3.54609098e+01, 0, 0, 0, 0, 0]
+    #                          [0, -4.53621401e-01, 0, 0, 0, 2.16323491e-03]
+    #                          [0, 0, 3.54609098e+01, 0, 0, 0]
+    #                          [0, 0, 0, -4.53621401e-01, 2.16323491e-03, 0]
+    #                          [0, 0, 0, 2.16323491e-03, 3.54634889e+01, 0]
+    #                          [0, 2.16323491e-03, 0, 0, 0, 3.54634889e+01]]
 
+    #                         [[3.54938544e+01,0, 0, 2.80951367e-02, 0, 0]
+    #                          [0, 3.54656521e+01, 0, 0, 0, 0]
+    #                          [0, 0, 3.54656521e+01, 0, 1.73728877e-11, 0]
+    #                          [2.80951367e-02, 0, 0,  4.07105810e+00, 0, 0]
+    #                          [0, 0, 1.73728877e-11, 0, 3.54656521e+01, 0]
+    #                          [0,0,0,0,0, -4.51458166e-01]]] )
+      
+    #     self.assertEqual(reference, 
+    #                      list(map(lambda x: x.tolist(), 
+    #                               diagonalizeNumba(source, 50))))                         
