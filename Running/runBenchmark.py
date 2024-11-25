@@ -116,7 +116,8 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                 args.relLocalTolerance,
                                                 args.v1Bounds,
                                                 args.v2Bounds,
-                                                args.v3Bounds) 
+                                                args.v3Bounds,
+                                                args.bNumba) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
     dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(parsedExpressions["hardToSoft"]),

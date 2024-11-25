@@ -5,6 +5,7 @@ from numba import njit
 
 @njit
 def eigenVectorLoopAll(matrices, T):
+    ##Gives complex cast warning
     subEigenValues = np.empty( (2,6) ) 
     subRotationMatrix = np.empty( (2,6,6) )
     for idx, matrix in enumerate(matrices):
@@ -40,6 +41,7 @@ def evaluateAll(fields: list[float],
                 vectorShortHands,
                 vectorMassesSquared,
                 bAbsoluteMsq,
+                bNumba,
                 bNeedsDiagonalization=True, 
                 bVerbose = False) -> dict[str, float]:
     """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation."""
@@ -60,12 +62,13 @@ def evaluateAll(fields: list[float],
 
     ## Scalars       
     knownParamsDict |= diagonalizeScalars(knownParamsDict, 
-                                          T, 
+                                          T,
                                           diagAlgo, 
                                           scalarPermutationMatrix,
                                           scalarMassMatrices,
                                           scalarRotationMatrix,
                                           bAbsoluteMsq,
+                                          bNumba,
                                           bVerbose)
 
     return knownParamsDict
@@ -77,6 +80,7 @@ def diagonalizeScalars(params: dict[str, float],
                        scalarMassMatrices,
                        scalarRotationMatrix,
                        bAbsoluteMsq,
+                       bNumba,
                        bVerbose = False) -> dict[str, float]:
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
@@ -84,8 +88,7 @@ def diagonalizeScalars(params: dict[str, float],
     
     for matrix in scalarMassMatrices:
         subMassMatrix.append(np.asarray(matrix(params))/T**2)
-    subMassMatrix = np.array(subMassMatrix, dtype = "float64")
-    bNumba = True
+    subMassMatrix = np.array(subMassMatrix, dtype = "float64")  ## Gives complex cast warning
     if bNumba:
         subEigenValues, subRotationMatrix = eigenVectorLoopAll(subMassMatrix, T)
     else:
@@ -225,7 +228,8 @@ class EffectivePotential:
                  relLocalTolerance,
                  v1Bounds,
                  v2Bounds,
-                 v3Bounds):
+                 v3Bounds,
+                 bNumba):
         self.fieldNames = fieldNames
         self.nbrFields = len(self.fieldNames)
 
@@ -254,6 +258,7 @@ class EffectivePotential:
         self.v1Bounds = v1Bounds
         self.v2Bounds = v2Bounds
         self.v3Bounds = v3Bounds
+        self.bNumba = bNumba
 
     def initExpressions(self, filesToParse: list[str]) -> None:
         self.expressions = []
@@ -272,6 +277,7 @@ class EffectivePotential:
                                                 self.vectorShortHands,
                                                 self.vectorMassesSquared,
                                                 self.bAbsoluteMsq,
+                                                self.bNumba,
                                                 bNeedsDiagonalization=self.bNeedsDiagonalization, 
                                                 bVerbose = bVerbose)))
 
@@ -361,6 +367,7 @@ class EffectivePotential:
                                 self.vectorShortHands,
                                 self.vectorMassesSquared,
                                 self.bAbsoluteMsq,
+                                self.bNumba,
                                 bNeedsDiagonalization=self.bNeedsDiagonalization,
                                 bVerbose = bVerbose)
 
