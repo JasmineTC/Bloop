@@ -4,10 +4,10 @@ from scipy import linalg
 from numba import njit
 
 @njit
-def diagonalizeNumba(matrices, T):
+def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
     ##Gives complex cast warning
-    subEigenValues = np.empty( (2,6) ) 
-    subRotationMatrix = np.empty( (2,6,6) )
+    subEigenValues = np.empty( (matrixNumber, matrixSize) ) 
+    subRotationMatrix = np.empty( (matrixNumber, matrixSize, matrixSize) )
     for idx, matrix in enumerate(matrices):
          subEigenValues[idx], subRotationMatrix[idx] = np.linalg.eigh(matrix)
     return subEigenValues*T**2, subRotationMatrix
@@ -89,12 +89,9 @@ def diagonalizeScalars(params: dict[str, float],
     for matrix in scalarMassMatrices:
         subMassMatrix.append(np.asarray(matrix(params))/T**2)
     subMassMatrix = np.array(subMassMatrix, dtype = "float64")  ## Gives complex cast warning
-    matrixNumber = len(subMassMatrix)
-    matrixSize = len(subMassMatrix[0][0])
-    print(matrixNumber, matrixSize)
-    exit()
     if bNumba:
-        subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, T)
+        ## Having the number and size of matrices set dyamically does hamper perfomance (2seconds on ~3min run 1 loop)
+        subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, len(subMassMatrix), len(subMassMatrix[0][0]), T)
     else:
         subRotationMatrix = []
         subEigenValues = []
