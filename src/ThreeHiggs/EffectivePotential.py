@@ -4,12 +4,12 @@ from scipy import linalg
 from numba import njit
 
 @njit
-def eigenVectorLoopAll(matrices):
+def eigenVectorLoopAll(matrices, T):
     subEigenValues = np.empty( (2,6) ) 
     subRotationMatrix = np.empty( (2,6,6) )
     for idx, matrix in enumerate(matrices):
          subEigenValues[idx], subRotationMatrix[idx] = np.linalg.eigh(matrix)
-    return subEigenValues, subRotationMatrix
+    return subEigenValues*T**2, subRotationMatrix
 
 def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.ndarray, np.ndarray]:
     """Diagonalizes a symmetric matrix. 
@@ -69,8 +69,7 @@ def evaluateAll(fields: list[float],
                                           bVerbose)
 
     return knownParamsDict
-bNumba = True
-print(f"{bNumba=}")
+
 def diagonalizeScalars(params: dict[str, float], 
                        T: float, 
                        diagAlgo, 
@@ -86,10 +85,9 @@ def diagonalizeScalars(params: dict[str, float],
     for matrix in scalarMassMatrices:
         subMassMatrix.append(np.asarray(matrix(params))/T**2)
     subMassMatrix = np.array(subMassMatrix, dtype = "float64")
-    
+    bNumba = True
     if bNumba:
-        subEigenValues, subRotationMatrix = eigenVectorLoopAll(subMassMatrix)
-        subEigenValues *=T**2
+        subEigenValues, subRotationMatrix = eigenVectorLoopAll(subMassMatrix, T)
     else:
         subRotationMatrix = []
         subEigenValues = []
