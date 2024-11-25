@@ -69,7 +69,8 @@ def evaluateAll(fields: list[float],
                                           bVerbose)
 
     return knownParamsDict
-
+bNumba = True
+print(f"{bNumba=}")
 def diagonalizeScalars(params: dict[str, float], 
                        T: float, 
                        diagAlgo, 
@@ -86,7 +87,6 @@ def diagonalizeScalars(params: dict[str, float],
         subMassMatrix.append(np.asarray(matrix(params))/T**2)
     subMassMatrix = np.array(subMassMatrix, dtype = "float64")
     
-    bNumba = True
     if bNumba:
         subEigenValues, subRotationMatrix = eigenVectorLoopAll(subMassMatrix)
         subEigenValues *=T**2
