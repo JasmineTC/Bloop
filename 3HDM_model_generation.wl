@@ -448,7 +448,7 @@ Order is now
 Re\[Phi]1, Im\[Phi]3, Im\[Phi]1, Re\[Phi]3, Re\[Phi]2, Im\[Phi]2 (charged dof)
 Re\[Phi]2, Im\[Phi]2, Im\[Phi]1, Re\[Phi]3, Re\[Phi]1, Im\[Phi]3  (neutral dof)*)
 If[!OrthogonalMatrixQ[scalarPermutationMatrix], Print["Error, permutation matrix is not orthogonal"]];
-
+(*Our case has Transpose[scalarPermutationMatrix] = scalarPermutationMatrix but taking transpose anyway for consistency/future proofing*)
 blockDiagonalMM = Transpose[scalarPermutationMatrix] . scalarMM . scalarPermutationMatrix;
 Print["Block diagonal mass matrix:"];
 blockDiagonalMM//MatrixForm
@@ -463,7 +463,7 @@ If[!SymmetricMatrixQ[upperLeftMM] || !SymmetricMatrixQ[bottomRightMM], Print["Er
 ExportUTF8[effectivePotentialDirectory<>"/scalarPermutationMatrix.txt", scalarPermutationMatrix];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Export scalar mass matrix*)
 
 
@@ -485,31 +485,28 @@ ExportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_bottomRight_definitio
 
 blockSize = 6;
 (** Diagonalizing rotation, this will be SO(N) with N=12. But we know a permutation transformation to reduce it to two SO(6) matrices,
-so we first construct those and invert the permutation. 
-There's no easy way of generating a symbolic orthogonal matrix so just use a generic 6x6 **)
+so we first construct the two SO(6) and apply the inverse permutation. 
+There's no easy way of generating a symbolic orthogonal matrix so just use a generic 6x6
+This was done before DRalgo's fast rotate mode -TODO investigate fast rotate **)
 rotUpperLeft = Table[ toIndexedSymbol2[ "RUL", i, j, Total[DigitCount[blockSize]] ], {i, 1, blockSize}, {j, 1, blockSize}];
 rotBottomRight = Table[ toIndexedSymbol2[ "RBR", i, j, Total[DigitCount[blockSize]] ], {i, 1, blockSize}, {j, 1, blockSize}];
 
-DSRot = ArrayFlatten[{
+DSRotBlock = ArrayFlatten[{
 {rotUpperLeft, 0},
 {0, rotBottomRight}
 }];
-(* M = A^T.A.M.A^T.A  A in SO(n) 
-	D = A.M.A^T
-	B = P.M.P^T
-	R.B.R^T = D'
-	D' = D if A = R.P
-	V = \[Phi]^T.M.\[Phi] = \[Phi]^T.P^T.P.M.P^T.P.\[Phi] = \[Phi]^T.P^T.B.P.\[Phi] = \[Phi]^T.P^T.R^T.R.B.R^T.R.P.\[Phi] =  \[Phi]^T.P^T.R^T.D'.R.P.\[Phi]
-	P^T.R^T.D'.R.P = R.P.P^T.R^T.D'.R.P.P^T.R^T = R.P.M.P^T.R^T 
+(* V = \[Phi]^T.M.\[Phi] 
+	 = \[Phi]^T.P.P^T.M.P.P^T.\[Phi] = \[Phi]^T.P.B.P^T.\[Phi], make the mass matrix block diagonal, with some permutation matrix P: P^T.M.P = B
+	 = \[Phi]^T.P.S.S^T.B.S.S^T.P^T.\[Phi] = \[Phi]^T.P.S.B.S^T.P^T.\[Phi], make the block diagonal mass matrix diagonal, with some similarity transform S: S^T.B.P = D'
+Note P = scalarPermutationMatrix, S = DSRotBlock
+Since we give DRalgo an arbitrary diagonal matrix and rotation matrix we have
+V = \[Phi]^T.M.\[Phi]
+  = \[Phi]^T.R.R^T.M.R.R^T.\[Phi] = \[Phi]^T.R.D.R^T.\[Phi]
+We impose D = D' so R = P.S
+We compute D' and S in the python code numerically
 *)
-(** V = \[Phi]^T.M.\[Phi] = \[Phi]^T.A^T.D.A.\[Phi] so that D is diagonal. DRalgo needs the matrix A. In our case:
-	V = \[Phi]^T.M.\[Phi] = \[Phi]^T.P^T.B.P.\[Phi] = \[Phi]^T.P^T.R^T.D.R.P.\[Phi]
-where P is the permutation matrix, B is the block-diagonal mass matrix and R is the rotation constructed above.
-So we give DRalgo A = R.P. We also give it the diagonal D that just has symbols like mSsq1 etc.
-In the numerical program we first solve R by diagonalizing two 6x6 matrices, then compute A = R.P and D = A.M.A^T.
-This way the D is always ordered correctly.
-**)
-DSRot = DSRot . scalarPermutationMatrix;
+
+DSRot = scalarPermutationMatrix . DSRotBlock;
 Print["Scalar diagonalizing rotation:"];
 DSRot//MatrixForm
 
@@ -517,12 +514,6 @@ ExportUTF8[effectivePotentialDirectory<>"/scalarRotationMatrix.txt", DSRot];
 
 (** Diagonal mass matrix, unknown symbols **)
 ScalarMassDiag = DiagonalMatrix[ Table[toIndexedSymbol["MSsq", i, Total[DigitCount[12]]], {i, 1, 12}] ];
-
-
-DSRot//MatrixForm
-
-
-ScalarMassDiag//MatrixForm
 
 
 (* ::Subsection::Closed:: *)
