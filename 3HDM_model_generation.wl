@@ -177,7 +177,7 @@ YsffC=SparseArray[Simplify[Conjugate[Ysff]//Normal,Assumptions->{yt3>0}]];
 (*However Mode->0 does not really work ATM,  it doesn't give couplings etc...*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Helper function for combining LO and NLO substitution rules*)
 
 
@@ -197,7 +197,7 @@ CombineSubstRules[list1_, list2_] := Block[{combinedList,groupedRules},
 ];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*LO matching. TODO: currently Mode -> 0 is broken...*)
 
 
@@ -430,7 +430,6 @@ toSymbolicMatrix[matrix_, elementSymbol_, bIsSymmetric_: False] := Block[
 (*Permute scalars to make mass matrix block-diagonal *)
 
 
-(** Permutation found by Jasmine: **)
 scalarPermutationMatrix = {
 {1,0,0,0,0,0,0,0,0,0,0,0},
 {0,0,0,0,0,0,0,0,0,0,1,0},
@@ -444,19 +443,18 @@ scalarPermutationMatrix = {
 {0,0,0,0,0,0,0,0,0,1,0,0},
 {0,1,0,0,0,0,0,0,0,0,0,0},
 {0,0,0,0,0,0,0,0,0,0,0,1}};
-(* Permutation matrix swaps the following rows and colums: 2<->11, 4<->9,6<->7  to get a block diagonal matrix*)
-(*Order is now 
+(* Permutation matrix swaps the following rows and colums: 2<->11, 4<->9,6<->7  to get a block diagonal matrix
+Order is now 
 Re\[Phi]1, Im\[Phi]3, Im\[Phi]1, Re\[Phi]3, Re\[Phi]2, Im\[Phi]2 (charged dof)
-Re\[Phi]2, Im\[Phi]2, Im\[Phi]1, Re\[Phi]3, Re\[Phi]1, Im\[Phi]3  (neutral dof)
-*)
-(* take transpose because I want M = P^T.B.P where B is the block diagonal matrix (actually it's symmetric lol) *)
-scalarPermutationMatrix = Transpose[scalarPermutationMatrix];
+Re\[Phi]2, Im\[Phi]2, Im\[Phi]1, Re\[Phi]3, Re\[Phi]1, Im\[Phi]3  (neutral dof)*)
 If[!OrthogonalMatrixQ[scalarPermutationMatrix], Print["Error, permutation matrix is not orthogonal"]];
 
-blockDiagonalMM = scalarPermutationMatrix . scalarMM . Transpose[scalarPermutationMatrix];
+blockDiagonalMM = Transpose[scalarPermutationMatrix] . scalarMM . scalarPermutationMatrix;
 Print["Block diagonal mass matrix:"];
 blockDiagonalMM//MatrixForm
 
+
+(*Extract permutation matrix and do consistency check*)
 upperLeftMM = Take[blockDiagonalMM,{1,6},{1,6}];
 bottomRightMM = Take[blockDiagonalMM,{7,12},{7,12}];
 
@@ -483,12 +481,6 @@ ExportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_bottomRight_definitio
 
 (* ::Subsubsection:: *)
 (*Construct scalar rotation matrix *)
-
-
-DSRot2 = ArrayFlatten[{
-{rotUpperLeft, 0},
-{0, rotBottomRight}
-}]//MatrixForm
 
 
 blockSize = 6;
