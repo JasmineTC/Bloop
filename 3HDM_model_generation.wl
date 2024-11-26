@@ -589,28 +589,22 @@ ExportUTF8[effectivePotentialDirectory<>"/extremaPolynomials.txt", extremaPolyno
 (*Calculating the effective potential*)
 
 
-(*(** NB! RotateTensorsCustomMass[] is very very slow, this can run for hours!
+(** NB! RotateTensorsCustomMass[] is very very slow, this can run for hours!
 It's because our scalar rotation matrix is so large. **)
 AbsoluteTiming[
 	(** Tell DRalgo to rotate the fields to mass diagonal basis **)
 	RotateTensorsCustomMass[DSRot,DVRot,ScalarMassDiag,VectorMassDiagSimple];
 	CalculatePotentialUS[]
-]*)
+]
 
 
-(*VeffLO = PrintEffectivePotential["LO"]//Simplify; (* simplify to get rid of possible imaginary units *)
-VeffNLO = PrintEffectivePotential["NLO"];
-VeffNNLO = PrintEffectivePotential["NNLO"];
+VeffLO = PrintEffectivePotential["LO"]//Simplify; (* Simplify to get rid of possible imaginary units *)
+VeffNLO = PrintEffectivePotential["NLO"]//Simplify; (* Simplify to factor 1/pi division for tiny speed up *)
+VeffNNLO = PrintEffectivePotential["NNLO"]; (* NOT simplified as seems to change numerical result for unknown reasons *)
 
 ExportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", VeffLO];
 ExportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", VeffNLO];
-ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", VeffNNLO];*)
-
-
-(*VeffNLOSIMP = PrintEffectivePotential["NLO"]//Simplify;
-VeffNNLOSIMP = PrintEffectivePotential["NNLO"]//Simplify;
-ExportUTF8[effectivePotentialDirectory<>"/Veff_NLOSIMP.txt", VeffNLOSIMP];
-ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLOSIMP.txt", VeffNNLOSIMP];*)
+ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", VeffNNLO];
 
 
 (*$Assumptions = _Symbol \[Element] Reals
