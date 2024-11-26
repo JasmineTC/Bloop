@@ -85,7 +85,6 @@ def diagonalizeScalars(params: dict[str, float],
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
     subMassMatrix = []
-    
     for matrix in scalarMassMatrices:
         subMassMatrix.append(np.asarray(matrix(params))/T**2)
     subMassMatrix = np.array(subMassMatrix, dtype = "float64")  ## Gives complex cast warning
@@ -108,19 +107,12 @@ def diagonalizeScalars(params: dict[str, float],
             subEigenValues.append(eigenValue)                    
             subRotationMatrix.append(vects)
             
-    fullRotationMatrix = linalg.block_diag(*subRotationMatrix)
-
     """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
-    we need to undo that permutation before we give the rotation matrix to the effectivate potential or something. 
-    I am not 100% on this"""
-    drAlgoRot = np.transpose(fullRotationMatrix) @ scalarPermutationMatrix
-
-    ## OK we have the matrices that DRalgo used. But we now need to assign a correct value to each
-    ## matrix element symbol in the Veff expressions. This is currently very hacky 
-    outDict = scalarRotationMatrix(drAlgoRot)
+    so we need to undo the permutatation"""
+    outDict = scalarRotationMatrix(scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix))
 
     ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
-    ##But should probably be handled by a file given from mathematica
+    ##But should probably be handled by a file given from mathematica (such a list is already made in mathematica)
     massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
     from itertools import chain
     for i, msq in enumerate(tuple(chain(*subEigenValues))):
