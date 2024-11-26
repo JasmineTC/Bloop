@@ -177,7 +177,7 @@ YsffC=SparseArray[Simplify[Conjugate[Ysff]//Normal,Assumptions->{yt3>0}]];
 (*However Mode->0 does not really work ATM,  it doesn't give couplings etc...*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Helper function for combining LO and NLO substitution rules*)
 
 
@@ -197,7 +197,7 @@ CombineSubstRules[list1_, list2_] := Block[{combinedList,groupedRules},
 ];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*LO matching. TODO: currently Mode -> 0 is broken...*)
 
 
@@ -430,7 +430,6 @@ toSymbolicMatrix[matrix_, elementSymbol_, bIsSymmetric_: False] := Block[
 (*Permute scalars to make mass matrix block-diagonal *)
 
 
-(** Permutation found by Jasmine: **)
 scalarPermutationMatrix = {
 {1,0,0,0,0,0,0,0,0,0,0,0},
 {0,0,0,0,0,0,0,0,0,0,1,0},
@@ -444,19 +443,18 @@ scalarPermutationMatrix = {
 {0,0,0,0,0,0,0,0,0,1,0,0},
 {0,1,0,0,0,0,0,0,0,0,0,0},
 {0,0,0,0,0,0,0,0,0,0,0,1}};
-(* Permutation matrix swaps the following rows and colums: 2<->11, 4<->9,6<->7  to get a block diagonal matrix*)
-(*Order is now 
+(* Permutation matrix swaps the following rows and colums: 2<->11, 4<->9,6<->7  to get a block diagonal matrix
+Order is now 
 Re\[Phi]1, Im\[Phi]3, Im\[Phi]1, Re\[Phi]3, Re\[Phi]2, Im\[Phi]2 (charged dof)
-Re\[Phi]2, Im\[Phi]2, Im\[Phi]1, Re\[Phi]3, Re\[Phi]1, Im\[Phi]3  (neutral dof)
-*)
-(* take transpose because I want M = P^T.B.P where B is the block diagonal matrix (actually it's symmetric lol) *)
-scalarPermutationMatrix = Transpose[scalarPermutationMatrix];
+Re\[Phi]2, Im\[Phi]2, Im\[Phi]1, Re\[Phi]3, Re\[Phi]1, Im\[Phi]3  (neutral dof)*)
 If[!OrthogonalMatrixQ[scalarPermutationMatrix], Print["Error, permutation matrix is not orthogonal"]];
-
-blockDiagonalMM = scalarPermutationMatrix . scalarMM . Transpose[scalarPermutationMatrix];
+(*Our case has Transpose[scalarPermutationMatrix] = scalarPermutationMatrix but taking transpose anyway for consistency/future proofing*)
+blockDiagonalMM = Transpose[scalarPermutationMatrix] . scalarMM . scalarPermutationMatrix;
 Print["Block diagonal mass matrix:"];
 blockDiagonalMM//MatrixForm
 
+
+(*Extract permutation matrix and do consistency check*)
 upperLeftMM = Take[blockDiagonalMM,{1,6},{1,6}];
 bottomRightMM = Take[blockDiagonalMM,{7,12},{7,12}];
 
@@ -465,7 +463,7 @@ If[!SymmetricMatrixQ[upperLeftMM] || !SymmetricMatrixQ[bottomRightMM], Print["Er
 ExportUTF8[effectivePotentialDirectory<>"/scalarPermutationMatrix.txt", scalarPermutationMatrix];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Export scalar mass matrix*)
 
 
@@ -485,39 +483,30 @@ ExportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_bottomRight_definitio
 (*Construct scalar rotation matrix *)
 
 
-DSRot2 = ArrayFlatten[{
-{rotUpperLeft, 0},
-{0, rotBottomRight}
-}]//MatrixForm
-
-
 blockSize = 6;
 (** Diagonalizing rotation, this will be SO(N) with N=12. But we know a permutation transformation to reduce it to two SO(6) matrices,
-so we first construct those and invert the permutation. 
-There's no easy way of generating a symbolic orthogonal matrix so just use a generic 6x6 **)
+so we first construct the two SO(6) and apply the inverse permutation. 
+There's no easy way of generating a symbolic orthogonal matrix so just use a generic 6x6
+This was done before DRalgo's fast rotate mode -TODO investigate fast rotate **)
 rotUpperLeft = Table[ toIndexedSymbol2[ "RUL", i, j, Total[DigitCount[blockSize]] ], {i, 1, blockSize}, {j, 1, blockSize}];
 rotBottomRight = Table[ toIndexedSymbol2[ "RBR", i, j, Total[DigitCount[blockSize]] ], {i, 1, blockSize}, {j, 1, blockSize}];
 
-DSRot = ArrayFlatten[{
+DSRotBlock = ArrayFlatten[{
 {rotUpperLeft, 0},
 {0, rotBottomRight}
 }];
-(* M = A^T.A.M.A^T.A  A in SO(n) 
-	D = A.M.A^T
-	B = P.M.P^T
-	R.B.R^T = D'
-	D' = D if A = R.P
-	V = \[Phi]^T.M.\[Phi] = \[Phi]^T.P^T.P.M.P^T.P.\[Phi] = \[Phi]^T.P^T.B.P.\[Phi] = \[Phi]^T.P^T.R^T.R.B.R^T.R.P.\[Phi] =  \[Phi]^T.P^T.R^T.D'.R.P.\[Phi]
-	P^T.R^T.D'.R.P = R.P.P^T.R^T.D'.R.P.P^T.R^T = R.P.M.P^T.R^T 
+(* V = \[Phi]^T.M.\[Phi] 
+	 = \[Phi]^T.P.P^T.M.P.P^T.\[Phi] = \[Phi]^T.P.B.P^T.\[Phi], make the mass matrix block diagonal, with some permutation matrix P: P^T.M.P = B
+	 = \[Phi]^T.P.S.S^T.B.S.S^T.P^T.\[Phi] = \[Phi]^T.P.S.B.S^T.P^T.\[Phi], make the block diagonal mass matrix diagonal, with some similarity transform S: S^T.B.P = D'
+Note P = scalarPermutationMatrix, S = DSRotBlock
+Since we give DRalgo an arbitrary diagonal matrix and rotation matrix we have
+V = \[Phi]^T.M.\[Phi]
+  = \[Phi]^T.R.R^T.M.R.R^T.\[Phi] = \[Phi]^T.R.D.R^T.\[Phi]
+We impose D = D' so R = P.S
+We compute D' and S in the python code numerically
 *)
-(** V = \[Phi]^T.M.\[Phi] = \[Phi]^T.A^T.D.A.\[Phi] so that D is diagonal. DRalgo needs the matrix A. In our case:
-	V = \[Phi]^T.M.\[Phi] = \[Phi]^T.P^T.B.P.\[Phi] = \[Phi]^T.P^T.R^T.D.R.P.\[Phi]
-where P is the permutation matrix, B is the block-diagonal mass matrix and R is the rotation constructed above.
-So we give DRalgo A = R.P. We also give it the diagonal D that just has symbols like mSsq1 etc.
-In the numerical program we first solve R by diagonalizing two 6x6 matrices, then compute A = R.P and D = A.M.A^T.
-This way the D is always ordered correctly.
-**)
-DSRot = DSRot . scalarPermutationMatrix;
+
+DSRot = scalarPermutationMatrix . DSRotBlock;
 Print["Scalar diagonalizing rotation:"];
 DSRot//MatrixForm
 
@@ -525,12 +514,6 @@ ExportUTF8[effectivePotentialDirectory<>"/scalarRotationMatrix.txt", DSRot];
 
 (** Diagonal mass matrix, unknown symbols **)
 ScalarMassDiag = DiagonalMatrix[ Table[toIndexedSymbol["MSsq", i, Total[DigitCount[12]]], {i, 1, 12}] ];
-
-
-DSRot//MatrixForm
-
-
-ScalarMassDiag//MatrixForm
 
 
 (* ::Subsection::Closed:: *)
@@ -606,28 +589,22 @@ ExportUTF8[effectivePotentialDirectory<>"/extremaPolynomials.txt", extremaPolyno
 (*Calculating the effective potential*)
 
 
-(*(** NB! RotateTensorsCustomMass[] is very very slow, this can run for hours!
+(** NB! RotateTensorsCustomMass[] is very very slow, this can run for hours!
 It's because our scalar rotation matrix is so large. **)
 AbsoluteTiming[
 	(** Tell DRalgo to rotate the fields to mass diagonal basis **)
 	RotateTensorsCustomMass[DSRot,DVRot,ScalarMassDiag,VectorMassDiagSimple];
 	CalculatePotentialUS[]
-]*)
+]
 
 
-(*VeffLO = PrintEffectivePotential["LO"]//Simplify; (* simplify to get rid of possible imaginary units *)
-VeffNLO = PrintEffectivePotential["NLO"];
-VeffNNLO = PrintEffectivePotential["NNLO"];
+VeffLO = PrintEffectivePotential["LO"]//Simplify; (* Simplify to get rid of possible imaginary units *)
+VeffNLO = PrintEffectivePotential["NLO"]//Simplify; (* Simplify to factor 1/pi division for tiny speed up *)
+VeffNNLO = PrintEffectivePotential["NNLO"]; (* NOT simplified as seems to change numerical result for unknown reasons *)
 
 ExportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", VeffLO];
 ExportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", VeffNLO];
-ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", VeffNNLO];*)
-
-
-(*VeffNLOSIMP = PrintEffectivePotential["NLO"]//Simplify;
-VeffNNLOSIMP = PrintEffectivePotential["NNLO"]//Simplify;
-ExportUTF8[effectivePotentialDirectory<>"/Veff_NLOSIMP.txt", VeffNLOSIMP];
-ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLOSIMP.txt", VeffNNLOSIMP];*)
+ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", VeffNNLO];
 
 
 (*$Assumptions = _Symbol \[Element] Reals
