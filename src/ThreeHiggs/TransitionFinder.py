@@ -182,14 +182,8 @@ def traceFreeEnergyMinimum(effectivePotential,
         params3D = dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
         
         initialGuesses = [[0.1,0.1,0.1], ## TODO This should go in a config file or something
-                          [-0.1,0.1,0.1],
-                          [1e-3,1e-3,4],
-                          [1e-3,1e-3,10],
-                          [1e-3,1e-3,25], 
-                          [5,5,1e-4],
-                          [-5,5,1e-4],
-                          [40,40,1e-4], 
-                          [-40,40,1e-4],
+                          [5,5,5],
+                          [-5,5,5], 
                           [5,5,5],
                           [-5,5,5], 
                           [40,40,40],
