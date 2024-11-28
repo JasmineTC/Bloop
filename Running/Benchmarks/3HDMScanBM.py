@@ -78,8 +78,6 @@ def lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy
         and bPositiveMassStates(mu2sq, mu12sq, lam23, lam23p, lambdaMinus, lambdaPlus, vsq):
         return{
             "bmNumber": bmNumber,
-            "bPreCalculated": True,
-            "bMassSplittingInput": False,
             "RGScale": 91.1876,
             
             "bmInput": {"thetaCPV" : thetaCPV,
@@ -116,8 +114,8 @@ def lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy
     return False
 
 def randomBmParam():
-    bmList = []
-    while len(bmList) < 3:
+    bmdictList = []
+    while len(bmdictList) < 1e6:
         mS1 = np.random.uniform(63, 100)
         delta12 = np.random.uniform(5, 100)
         delta1c = np.random.uniform(5, 100)
@@ -125,12 +123,18 @@ def randomBmParam():
         ghDM = np.random.uniform(0, 1)
         thetaCPV = np.random.uniform(np.pi/2, 3*np.pi/2)
         darkHieracy = 1
-        bmDict = lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, len(bmList))
+        bmDict = lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, len(bmdictList))
         if bmDict:
-            bmList.append(bmDict)
+            bmdictList.append(bmDict)
+    return bmdictList
+
+def notRandombmParam():
+    bmList = []
+    bmInputList = []
+    for bmInput in bmInputList:
+        2
     return bmList
 
-print(randomBmParam() )
 
 # from json import dump                       
 # with open("3HDMScanBMTest.json", "w") as outfile: 
