@@ -79,7 +79,6 @@ def lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy
         return{
             "bmNumber": bmNumber,
             "RGScale": 91.1876,
-            "bPreCalculated": True,
             
             "bmInput": {"thetaCPV" : thetaCPV,
                          "ghDM" : ghDM,
