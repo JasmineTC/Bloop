@@ -59,7 +59,7 @@ def lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy
     
     lambdaMinus = m.sqrt( mu12sq**2 + vsq**2*lam2Abs**2 - 2.*vsq*mu12sq*lam2Abs*cosTheta)
     lambdaPlus = m.sqrt( mu12sq**2 + vsq**2*lam2Abs**2 + 2.*vsq*mu12sq*lam2Abs*cosTheta)
-    alpha = (-mu12sq + vsq*lam2Abs*cosTheta - lambdaMinus) / ( (vsq*lam2Abs*sinTheta) )
+    alpha = (-mu12sq + vsq*lam2Abs*cosTheta - lambdaMinus) / ( (vsq*lam2Abs*sinTheta) +1e-100 )
     mu2sq = vsq/2. * ghDM - vsq / (alpha**2 + 1.) * (2.*alpha* sinTheta + (alpha**2 - 1.)*cosTheta) * lam2Abs - (mS2**2 + mS1**2)/2
     lam23 = (2.*mu2sq + mSpm2**2 + mSpm1**2)/vsq
     lam23p = (mS2**2 + mS1**2 - mSpm2**2 - mSpm1**2)/vsq
@@ -79,6 +79,7 @@ def lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy
         return{
             "bmNumber": bmNumber,
             "RGScale": 91.1876,
+            "bPreCalculated": True,
             
             "bmInput": {"thetaCPV" : thetaCPV,
                          "ghDM" : ghDM,
@@ -129,13 +130,26 @@ def randomBmParam():
     return bmdictList
 
 def notRandombmParam():
-    bmList = []
-    bmInputList = []
+    bmdictList = []
+    bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
+                   [67, 4.0, 50.0, 1.0, 0.0,  2.*np.pi/3, 1],
+                   [57, 8.0, 50.0, 1.0, 0.0,  2.*np.pi/3, 1],
+                   [70, 12.0, 50.0, 1.0, 0.0,  2.*np.pi/3, 1],
+                   [48, 20.0, 50.0, 1.0, 0.0, 5.*np.pi/6., 1],
+                   [75, 55.0, 50.0, 1.0, 0.0,  2.*np.pi/3, 1],
+                   [74, 55.0, 50.0, 15.0, 0.0,  2.*np.pi/3, 1],
+                   [90, 5.0, 1.0, 1.0, 0.0,  2.*np.pi/3, 1],
+                   [90, 55.0, 1.0, 1.0, 0.0,  2.*np.pi/3, 1],
+                   [90, 55.0, 1.0, 22.0, 0.0,  2.*np.pi/3, 1],
+                   [50, 55, 70, 25, 3/9, np.pi/2., 1]]
     for bmInput in bmInputList:
-        2
-    return bmList
+        mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy = bmInput
+        bmDict = lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, len(bmdictList))
+        if bmDict:
+            bmdictList.append(bmDict)
+    return bmdictList
 
 
-# from json import dump                       
-# with open("3HDMScanBMTest.json", "w") as outfile: 
-#     dump(bmListGen(), outfile, indent = 4)
+from json import dump                       
+with open("Test.json", "w") as outfile: 
+    dump(notRandombmParam(), outfile, indent = 4)
