@@ -1,20 +1,28 @@
 import numpy as np
-from math import sqrt, sin, cos, pi, log, exp
+from math import sqrt, pi, log, exp
 
 def bIsBounded(param : dict[str, float]) -> bool:
     ## Taking equations 26-31 from the draft that ensure the potential is bounded from below.
+    if not param["lam11"] > 0:
+        return False
+    if not param["lam22"] > 0:
+        return False
+    if not param["lam33"] > 0:
+        return False
+    
     lamx = param["lam12"] + min(0, param["lam12p"] - 2*sqrt(param["lam1Re"]**2 + param["lam1Im"]**2) )
     lamy = param["lam31"] + min(0, param["lam31p"] - 2*sqrt(param["lam3Re"]**2 + param["lam3Im"]**2) )
     lamz = param["lam23"] + min(0, param["lam23p"] - 2*sqrt(param["lam2Re"]**2 + param["lam2Im"]**2) )
-
-    return param["lam11"] > 0 and \
-           param["lam22"] > 0 and \
-           param["lam33"] > 0 and \
-           lamx > -2*sqrt(param["lam11"]*param["lam22"]) and \
-           lamy > -2*sqrt(param["lam11"]*param["lam33"]) and \
-           lamz > -2*sqrt(param["lam22"]*param["lam33"]) and \
-           (sqrt(param["lam33"])*lamx + sqrt(param["lam11"])*lamz + sqrt(param["lam22"])*lamy >= 0 or \
-           param["lam33"]*lamx**2 + param["lam11"]*lamz**2 + param["lam22"]*lamy**2 -param["lam11"]*param["lam22"]*param["lam33"] - 2*lamx*lamy*lamz < 0)
+    if not lamx > -2*sqrt(param["lam11"]*param["lam22"]):
+        return False
+    if not lamy > -2*sqrt(param["lam11"]*param["lam33"]):
+        return False
+    if not lamz > -2*sqrt(param["lam22"]*param["lam33"]):
+        return False
+    if not (sqrt(param["lam33"])*lamx + sqrt(param["lam11"])*lamz + sqrt(param["lam22"])*lamy >= 0 or \
+            param["lam33"]*lamx**2 + param["lam11"]*lamz**2 + param["lam22"]*lamy**2 -param["lam11"]*param["lam22"]*param["lam33"] - 2*lamx*lamy*lamz < 0):
+        return False
+    return True
 
 def bIsPerturbative(param : dict[str, float]) -> bool:
     ## Should actually check vertices but not a feature in DRalgo at time of writting
