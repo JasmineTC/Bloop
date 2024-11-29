@@ -27,7 +27,7 @@ ExportUTF8[fileName_, expr_] := Export[fileName, expr, CharacterEncoding -> "UTF
 (*See 1909.09234 [hep-ph], eq (1) *)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Specify file paths for exporting*)
 
 
@@ -250,7 +250,8 @@ softScaleParams = softScaleParamsIntermediate;
 ExportUTF8[hardToSoftDirectory<>"/softScaleParams_NLO.txt", softScaleParams]
 
 
-(*BetaFunctions4D[];*)
+BetaFunctions4D[];
+ExportUTF8[hardToSoftDirectory<>"/BetaFunctions4D[].txt", BetaFunctions4D[]];
 
 
 (* 3D RG equations can be solved exactly, so do that here. We will export subst rules analogous to the matching relations:
@@ -589,22 +590,22 @@ ExportUTF8[effectivePotentialDirectory<>"/extremaPolynomials.txt", extremaPolyno
 (*Calculating the effective potential*)
 
 
-(** NB! RotateTensorsCustomMass[] is very very slow, this can run for hours!
+(*(** NB! RotateTensorsCustomMass[] is very very slow, this can run for hours!
 It's because our scalar rotation matrix is so large. **)
 AbsoluteTiming[
 	(** Tell DRalgo to rotate the fields to mass diagonal basis **)
 	RotateTensorsCustomMass[DSRot,DVRot,ScalarMassDiag,VectorMassDiagSimple];
 	CalculatePotentialUS[]
-]
+]*)
 
 
-VeffLO = PrintEffectivePotential["LO"]//Simplify; (* Simplify to get rid of possible imaginary units *)
+(*VeffLO = PrintEffectivePotential["LO"]//Simplify; (* Simplify to get rid of possible imaginary units *)
 VeffNLO = PrintEffectivePotential["NLO"]//Simplify; (* Simplify to factor 1/pi division for tiny speed up *)
 VeffNNLO = PrintEffectivePotential["NNLO"]; (* NOT simplified as seems to change numerical result for unknown reasons *)
 
 ExportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", VeffLO];
 ExportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", VeffNLO];
-ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", VeffNNLO];
+ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", VeffNNLO];*)
 
 
 (*$Assumptions = _Symbol \[Element] Reals
