@@ -113,9 +113,9 @@ def __lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHiera
 
 from numpy.random import uniform
 from numpy import pi
-def __randomBmParam():
+def __randomBmParam(num):
     bmdictList = []
-    while len(bmdictList) < 1e6:
+    while len(bmdictList) < num:
         mS1 = uniform(63, 100)
         delta12 = uniform(5, 100)
         delta1c = uniform(5, 100)
@@ -127,7 +127,6 @@ def __randomBmParam():
         if bmDict:
             bmdictList.append(bmDict)
     return bmdictList
-
 def __notRandombmParam():
     bmdictList = []
     bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
@@ -148,9 +147,10 @@ def __notRandombmParam():
             bmdictList.append(bmDict)
     return bmdictList
 
+
 if __name__ == "__main__":
     from json import dump                       
-    dump(__randomBmParam(), open("Benchmarks_3HDM.json", "w"), indent = 4)
+    dump(__randomBmParam(1e6), open("Benchmarks_3HDM.json", "w"), indent = 4)
     
     
 # from unittest import TestCase
