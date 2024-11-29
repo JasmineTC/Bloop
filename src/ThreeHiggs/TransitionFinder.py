@@ -1,29 +1,6 @@
 import numpy as np
 from math import sqrt, pi, log, exp
 
-def bIsBounded(param : dict[str, float]) -> bool:
-    ## Taking equations 26-31 from the draft that ensure the potential is bounded from below.
-    if not param["lam11"] > 0:
-        return False
-    if not param["lam22"] > 0:
-        return False
-    if not param["lam33"] > 0:
-        return False
-    
-    lamx = param["lam12"] + min(0, param["lam12p"] - 2*sqrt(param["lam1Re"]**2 + param["lam1Im"]**2) )
-    lamy = param["lam31"] + min(0, param["lam31p"] - 2*sqrt(param["lam3Re"]**2 + param["lam3Im"]**2) )
-    lamz = param["lam23"] + min(0, param["lam23p"] - 2*sqrt(param["lam2Re"]**2 + param["lam2Im"]**2) )
-    if not lamx > -2*sqrt(param["lam11"]*param["lam22"]):
-        return False
-    if not lamy > -2*sqrt(param["lam11"]*param["lam33"]):
-        return False
-    if not lamz > -2*sqrt(param["lam22"]*param["lam33"]):
-        return False
-    if not (sqrt(param["lam33"])*lamx + sqrt(param["lam11"])*lamz + sqrt(param["lam22"])*lamy >= 0 or \
-            param["lam33"]*lamx**2 + param["lam11"]*lamz**2 + param["lam22"]*lamy**2 -param["lam11"]*param["lam22"]*param["lam33"] - 2*lamx*lamy*lamz < 0):
-        return False
-    return True
-
 def bIsPerturbative(param : dict[str, float]) -> bool:
     ## Should actually check vertices but not a feature in DRalgo at time of writting
     return abs(param["lam11"]) < 4*pi and \
@@ -45,12 +22,6 @@ def bIsPerturbative(param : dict[str, float]) -> bool:
        abs(param["g2"]) < 4*pi and \
        abs(param["g3"]) < 4*pi
 
-def massSplittingsToMasses(mS1: float, delta12: float, delta1c: float, deltac: float) -> tuple[float, float, float]:
-    ## 1909.09234 and eq (38) for mass splittings
-    mS2 = delta12 + mS1
-    mSpm1 = delta1c + mS1
-    mSpm2 = deltac + mSpm1
-    return mS2, mSpm1, mSpm2
 
 def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
     """Take inputs from the BM file.
@@ -110,6 +81,7 @@ def traceFreeEnergyMinimum(effectivePotential,
                            "failureReason": None}
 
     counter = 0
+    from ThreeHiggs.BmGenerator import bIsBounded
     for T in TRange:
         T = float(T) ## To make compatible with JSON
         if bVerbose:
@@ -119,7 +91,6 @@ def traceFreeEnergyMinimum(effectivePotential,
         goalRGScale =  T ## Final scale in 3D -check if goalRGscale is ever different from just T
         matchingScale = 4.*pi*exp(-np.euler_gamma) * T ## Scale that minimises T dependent logs
         paramsForMatching = betasFunctions.runCoupling(matchingScale)
-        
         if not bIsBounded(paramsForMatching):
             minimizationResults["failureReason"] = "Unbounded"
             break
