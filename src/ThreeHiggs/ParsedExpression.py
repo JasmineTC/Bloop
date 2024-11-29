@@ -26,8 +26,7 @@ class ParsedExpressionSystem:
                                   for parsedExpression in parsedExpressionSystem]
 
     def __call__(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
-        """Optional argument is a hack
-        """
+        """Optional argument is a hack"""
         ## Collect inputs from the dict and put them in correct order. I do this by taking the right order from our first expression.
         ## This is fine since all our expressions use the same input list. 
         outList = [None] * len(self.parsedExpressions)    
@@ -45,7 +44,7 @@ class ParsedExpressionSystem:
 class MassMatrix:
     def __init__(self, massMatrix):
         self.definitions = ParsedExpressionSystem(massMatrix["definitions"])
-        self.matrix = massMatrix["matrix"]
+        self.matrix = compile(massMatrix["matrix"], "<string>", mode = "eval")
 
     def __call__(self, arguments):
         """Evaluates the matrix element expressions and puts them in a 2D np.ndarray.
