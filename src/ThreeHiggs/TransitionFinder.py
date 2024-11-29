@@ -44,9 +44,6 @@ def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
 
     return langrianParams4D
 
-def threeDimFieldtoDimensionless(temp: list[float], field: list[float]) -> list[float]:
-    return field/np.sqrt(temp)
-
 def traceFreeEnergyMinimum(effectivePotential,
                            dimensionalReduction,
                            benchmark,
