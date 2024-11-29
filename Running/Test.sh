@@ -8,12 +8,12 @@ echo Intergration tests...
 
 # Super coarse test providing full coverage
 echo Intergration test: Running code at NNLO, abs mass mode on...
-rm TestResults/*
+rm IntegrationTests/AbsMass/OutputResult/* 
 python3 runBenchmark.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
                         --bSave \
-                        --resultsDirectory TestResults \
+                        --resultsDirectory IntegrationTests/AbsMass/OutputResult/  \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
@@ -28,16 +28,16 @@ python3 runBenchmark.py --loopOrder 2 \
                         --relLocalTolerance 0.00001 \
                         --bAbsMass \
 
-diff TestResults/BM_1.json ReferenceTestResults/BM_1.json
+diff IntegrationTests/AbsMass/OutputResult/BM_1.json IntegrationTests/AbsMass/ReferemceResult/BM_1.json
 
 # Super coarse test providing full coverage, permit complex mass
 echo Intergration test: Running code at NNLO, complex mass mode on...
-rm TestComplexMassResults/*
+rm IntegrationTests/ComplexMass/OutputResult/* 
 python3 runBenchmark.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
                         --bSave \
-                        --resultsDirectory TestComplexMassResults \
+                        --resultsDirectory IntegrationTests/ComplexMass/OutputResult/  \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
@@ -51,16 +51,16 @@ python3 runBenchmark.py --loopOrder 2 \
                         --absLocalTolerance 0.00001 \
                         --relLocalTolerance 0.00001 \
 
-diff TestComplexMassResults/BM_1.json ReferenceTestComplexMassResults/BM_1.json
+diff IntegrationTests/ComplexMass/OutputResult/BM_1.json IntegrationTests/ComplexMass/ReferemceResult/BM_1.json
 
 # Super coarse test providing full coverage, complex mass+numba
 echo Intergration test: Running code at NNLO, complex mass mode on with Numba...
-rm NumbaResults/*
+rm IntegrationTests/Numba/OutputResult/* 
 python3 runBenchmark.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
                         --bSave \
-                        --resultsDirectory NumbaResults \
+                        --resultsDirectory IntegrationTests/Numba/OutputResult/ \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
@@ -74,6 +74,4 @@ python3 runBenchmark.py --loopOrder 2 \
                         --absLocalTolerance 0.00001 \
                         --relLocalTolerance 0.00001 \
 
-diff NumbaResults/BM_1.json ReferenceNumbaResults/BM_1.json
-
-
+diff IntegrationTests/Numba/OutputResult/BM_1.json IntegrationTests/Numba/ReferemceResult/BM_1.json
