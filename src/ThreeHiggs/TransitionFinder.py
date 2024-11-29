@@ -39,8 +39,7 @@ def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
             "g3": sqrt(0.1183 * 4.0 * pi)}    # SU(3)
     
     ## --- BSM scalars ---
-    langrianParams4D |= inputParams["couplingValues"]
-    langrianParams4D |= inputParams["massTerms"]
+    langrianParams4D |= inputParams["couplingValues"] | inputParams["massTerms"]
     langrianParams4D["RGScale"] = inputParams["RGScale"]
 
     return langrianParams4D
