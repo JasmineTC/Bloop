@@ -73,11 +73,13 @@ def lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy
     lamy = lam31 + min(0, lam31p - 2*m.sqrt(lam3Re**2 + lam3Im**2) )
     lamz = lam23 + min(0, lam23p - 2*m.sqrt(lam2Re**2 + lam2Im**2) )
 
-    if bIsBounded(lam11, lam22, lam33, lamx, lamy, lamz) \
-        and bNoLightCharged(mSpm1, mSpm2) \
-        and bPositiveMassStates(mu2sq, mu12sq, lam23, lam23p, lambdaMinus, lambdaPlus, vsq):
-        return{
-            "bmNumber": bmNumber,
+    if not bIsBounded(lam11, lam22, lam33, lamx, lamy, lamz):
+        return False
+    if not bNoLightCharged(mSpm1, mSpm2):
+        return False
+    if not bPositiveMassStates(mu2sq, mu12sq, lam23, lam23p, lambdaMinus, lambdaPlus, vsq):
+        return False
+    return{"bmNumber": bmNumber,
             "RGScale": 91.1876,
             
             "bmInput": {"thetaCPV" : thetaCPV,
@@ -108,10 +110,7 @@ def lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy
                               "lam3Im": lam3Im,
                               "lam31": lam31,
                               "lam31p": lam31p,
-                              "lam33": lam33}
-            
-        }
-    return False
+                              "lam33": lam33}}
 
 def randomBmParam():
     bmdictList = []
@@ -131,15 +130,15 @@ def randomBmParam():
 def notRandombmParam():
     bmdictList = []
     bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
-                   [67, 4.0, 50.0, 1.0, 0.0,  2.*np.pi/3, 1],
-                   [57, 8.0, 50.0, 1.0, 0.0,  2.*np.pi/3, 1],
-                   [70, 12.0, 50.0, 1.0, 0.0,  2.*np.pi/3, 1],
+                   [67, 4.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
+                   [57, 8.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
+                   [70, 12.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
                    [48, 20.0, 50.0, 1.0, 0.0, 5.*np.pi/6., 1],
-                   [75, 55.0, 50.0, 1.0, 0.0,  2.*np.pi/3, 1],
-                   [74, 55.0, 50.0, 15.0, 0.0,  2.*np.pi/3, 1],
-                   [90, 5.0, 1.0, 1.0, 0.0,  2.*np.pi/3, 1],
-                   [90, 55.0, 1.0, 1.0, 0.0,  2.*np.pi/3, 1],
-                   [90, 55.0, 1.0, 22.0, 0.0,  2.*np.pi/3, 1],
+                   [75, 55.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
+                   [74, 55.0, 50.0, 15.0, 0.0, 2.*np.pi/3, 1],
+                   [90, 5.0, 1.0, 1.0, 0.0, 2.*np.pi/3, 1],
+                   [90, 55.0, 1.0, 1.0, 0.0, 2.*np.pi/3, 1],
+                   [90, 55.0, 1.0, 22.0, 0.0, 2.*np.pi/3, 1],
                    [50, 55, 70, 25, 3/9, np.pi/2., 1]]
     for bmInput in bmInputList:
         mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy = bmInput
@@ -148,7 +147,6 @@ def notRandombmParam():
             bmdictList.append(bmDict)
     return bmdictList
 
-
-from json import dump                       
-with open("Test.json", "w") as outfile: 
-    dump(notRandombmParam(), outfile, indent = 4)
+if __name__ == "__main__":
+    from json import dump                       
+    dump(notRandombmParam(), open("Benchmarks_3HDM.json", "w"), indent = 4)
