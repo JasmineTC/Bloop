@@ -28,7 +28,7 @@ python3 runBenchmark.py --loopOrder 2 \
                         --relLocalTolerance 0.00001 \
                         --bAbsMass \
 
-diff IntegrationTests/AbsMass/OutputResult/BM_1.json IntegrationTests/AbsMass/ReferemceResult/BM_1.json
+diff IntegrationTests/AbsMass/OutputResult/BM_1.json IntegrationTests/AbsMass/ReferenceResult/BM_1.json
 
 # Super coarse test providing full coverage, permit complex mass
 echo Intergration test: Running code at NNLO, complex mass mode on...
@@ -51,7 +51,7 @@ python3 runBenchmark.py --loopOrder 2 \
                         --absLocalTolerance 0.00001 \
                         --relLocalTolerance 0.00001 \
 
-diff IntegrationTests/ComplexMass/OutputResult/BM_1.json IntegrationTests/ComplexMass/ReferemceResult/BM_1.json
+diff IntegrationTests/ComplexMass/OutputResult/BM_1.json IntegrationTests/ComplexMass/ReferenceResult/BM_1.json
 
 # Super coarse test providing full coverage, complex mass+numba
 echo Intergration test: Running code at NNLO, complex mass mode on with Numba...
@@ -74,4 +74,4 @@ python3 runBenchmark.py --loopOrder 2 \
                         --absLocalTolerance 0.00001 \
                         --relLocalTolerance 0.00001 \
 
-diff IntegrationTests/Numba/OutputResult/BM_1.json IntegrationTests/Numba/ReferemceResult/BM_1.json
+diff IntegrationTests/Numba/OutputResult/BM_1.json IntegrationTests/Numba/ReferenceResult/BM_1.json
