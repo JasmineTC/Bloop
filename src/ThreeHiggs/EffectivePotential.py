@@ -129,14 +129,8 @@ def minimize(function: callable,
              v3Bounds: tuple[float]) -> tuple[np.ndarray, float]:
     """Even though we don't use the gradient, nlopt still tries to pass a grad arguemet to the function, so the function needs to be 
     wrapped to give it room for the grad arguement"""
-
-    if minimizationAlgo == "scipy":
-            import scipy.optimize
-            bounds = ((v1Bounds[0], v1Bounds[1]), (v2Bounds[0], v2Bounds[1]), (v3Bounds[0], v3Bounds[1]))
-            minimizationResult = scipy.optimize.minimize(function, initialGuess, bounds=bounds, tol = 1e-6)
-            return minimizationResult.x, minimizationResult.fun
                
-    elif minimizationAlgo == "directGlobal":
+    if minimizationAlgo == "directGlobal":
             location, _ = callNlopt(nlopt.GN_DIRECT_NOSCAL, 
                                         numVariables, 
                                         function, 
