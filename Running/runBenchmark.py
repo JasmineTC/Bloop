@@ -109,7 +109,6 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
                                                 args.loopOrder,
                                                 ParsedExpressionSystem(parsedExpressions["veff"]),
                                                 args.minimizationAlgo, ## Set algorithm to use for Veff minimization
-                                                args.diagAlgo, ## Set algorithm for scalar mass diag to use
                                                 args.absGlobalTolerance,
                                                 args.relGlobalTolerance, 
                                                 args.absLocalTolerance, 
