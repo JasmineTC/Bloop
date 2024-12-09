@@ -1,0 +1,37 @@
+{
+    "failureReason": null,
+    "bIsPerturbative": true,
+    "complexMin": false,
+    "jumpsv1": [],
+    "jumpsv2": [],
+    "jumpsv3": [
+        [
+            -0.8086026755504321,
+            50.0
+        ],
+        [
+            -0.6119466031416336,
+            60.0
+        ],
+        [
+            -0.4895674840204216,
+            70.0
+        ],
+        [
+            -0.4099680456849222,
+            80.0
+        ]
+    ],
+    "strong": 0.8086026749104858,
+    "UltraSoftTemp": null,
+    "bmNumber": 1,
+    "bmInput": {
+        "thetaCPV": 2.0943951023931953,
+        "ghDM": 0.0,
+        "mS1": 67,
+        "delta12": 4.0,
+        "delta1c": 50.0,
+        "deltac": 1.0,
+        "darkHieracy": 1
+    }
+}
