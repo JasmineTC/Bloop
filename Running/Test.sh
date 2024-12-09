@@ -20,7 +20,7 @@ python3 runBenchmark.py --loopOrder 2 \
                         --minimizationAlgo directGlobal \
                         --v1Bounds 1e-6 1e-6 \
                         --v2Bounds 1e-6 1e-6 \
-                        --v3Bounds 1e-6 100 \
+                        --v3Bounds 1e-6 60 \
                         --absGlobalTolerance 0.1 \
                         --relGlobalTolerance 0.1 \
                         --absLocalTolerance 0.00001 \
@@ -28,7 +28,6 @@ python3 runBenchmark.py --loopOrder 2 \
                         --bAbsMass \
 
 diff IntegrationTests/AbsMass/OutputResult/BM_1.json IntegrationTests/AbsMass/ReferenceResult/BM_1.json
-
 # Super coarse test providing full coverage, permit complex mass
 echo Intergration test: Running code at NNLO, complex mass mode on...
 rm IntegrationTests/ComplexMass/OutputResult/* 
@@ -43,7 +42,7 @@ python3 runBenchmark.py --loopOrder 2 \
                         --minimizationAlgo directGlobal \
                         --v1Bounds 1e-6 1e-6 \
                         --v2Bounds 1e-6 1e-6 \
-                        --v3Bounds 1e-6 100 \
+                        --v3Bounds 1e-6 60 \
                         --absGlobalTolerance 0.1 \
                         --relGlobalTolerance 0.1 \
                         --absLocalTolerance 0.00001 \
@@ -66,7 +65,7 @@ python3 runBenchmark.py --loopOrder 2 \
                         --minimizationAlgo combo \
                         --v1Bounds 1e-6 1e-6 \
                         --v2Bounds 1e-6 1e-6 \
-                        --v3Bounds 1e-6 100 \
+                        --v3Bounds 1e-6 60 \
                         --absGlobalTolerance 0.1 \
                         --relGlobalTolerance 0.1 \
                         --absLocalTolerance 0.00001 \
