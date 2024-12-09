@@ -53,6 +53,7 @@ def evaluateAll(fields: list[float],
 
     return knownParamsDict
 
+from itertools import chain
 def diagonalizeScalars(params: dict[str, float], 
                        T: float,  
                        scalarPermutationMatrix,
@@ -63,9 +64,8 @@ def diagonalizeScalars(params: dict[str, float],
                        bVerbose = False) -> dict[str, float]:
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
-    subMassMatrix = np.array( [np.asarray(matrix(params))/T**2 for matrix in scalarMassMatrices  ], dtype = "float64")
+    subMassMatrix = np.array( [np.asarray(matrix(params))/T**2 for matrix in scalarMassMatrices  ] )
     if bNumba:
-        ## Having the number and size of matrices set dyamically does hamper perfomance (2seconds on ~3min run 1 loop)
         subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, len(subMassMatrix), len(subMassMatrix[0][0]), T)
     else:
         subRotationMatrix = []
@@ -90,7 +90,6 @@ def diagonalizeScalars(params: dict[str, float],
     ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
     ##But should probably be handled by a file given from mathematica (such a list is already made in mathematica)
     massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
-    from itertools import chain
     for i, msq in enumerate(tuple(chain(*subEigenValues))):
         outDict[massNames[i]] = abs(msq) if bAbsoluteMsq else complex(msq)
 
