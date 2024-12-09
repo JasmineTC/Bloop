@@ -18,8 +18,10 @@ python3 runBenchmark.py --loopOrder 2 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
                         --bAbsMass \
+                        --bProcessMin
 
 diff IntegrationTests/AbsMass/OutputResult/BM_1.json IntegrationTests/AbsMass/ReferenceResult/BM_1.json
+diff IntegrationTests/AbsMass/OutputResult/BM_1_interp.json IntegrationTests/AbsMass/ReferenceResult/BM_1_interp.json
 # Super coarse test providing full coverage, permit complex mass
 echo Intergration test: Running code at NNLO, complex mass mode on...
 rm IntegrationTests/ComplexMass/OutputResult/* 
@@ -31,8 +33,9 @@ python3 runBenchmark.py --loopOrder 2 \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
-
+                        --bProcessMin
 diff IntegrationTests/ComplexMass/OutputResult/BM_1.json IntegrationTests/ComplexMass/ReferenceResult/BM_1.json
+diff IntegrationTests/ComplexMass/OutputResult/BM_1_interp.json IntegrationTests/ComplexMass/ReferenceResult/BM_1_interp.json
 
 # Super coarse test providing full coverage, complex mass+numba
 echo Intergration test: Running code at NNLO, complex mass mode on with Numba...
@@ -46,5 +49,7 @@ python3 runBenchmark.py --loopOrder 2 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
                         --bNumba \
-
+                        --bProcessMin
 diff IntegrationTests/Numba/OutputResult/BM_1.json IntegrationTests/Numba/ReferenceResult/BM_1.json
+diff IntegrationTests/Numba/OutputResult/BM_1_interp.json IntegrationTests/Numba/ReferenceResult/BM_1_interp.json
+
