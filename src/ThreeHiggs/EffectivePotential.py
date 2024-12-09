@@ -12,24 +12,6 @@ def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
          subEigenValues[idx], subRotationMatrix[idx] = np.linalg.eigh(matrix)
     return subEigenValues*T**2, subRotationMatrix
 
-def diagonalizeSymmetric(matrix: np.ndarray, method: str = "np") -> tuple[np.ndarray, np.ndarray]:
-    """Diagonalizes a symmetric matrix. 
-    Returns eigvalues, eigvectors in a matrix form
-    For a general model the vector masses will also need this so don't factorise too hard!
-    """
-    if method == "np" or method == "numpy":
-        return np.linalg.eigh(matrix)
-    elif method == "mp":
-        import mpmath as mp
-        mp.mp.dps = 30
-        eigenValue, eigenVector = mp.eigsy(mp.matrix(matrix), eigvals_only = False)
-        return (np.array(eigenValue.tolist(),dtype=np.float64), np.array(eigenVector.tolist(),dtype=np.float64))
-    elif method == "scipy":
-        return linalg.eigh(matrix, check_finite = False)
-    else:
-        print(f"{method} is not assigned to a method in diagonalizeSymmetric, exiting program.")
-        exit(-1)
-
 def evaluateAll(fields: list[float], 
                 T:float, 
                 params3D, 
@@ -37,7 +19,6 @@ def evaluateAll(fields: list[float],
                 scalarPermutationMatrix,
                 scalarMassMatrices,
                 scalarRotationMatrix,
-                diagAlgo,
                 vectorShortHands,
                 vectorMassesSquared,
                 bAbsoluteMsq,
@@ -63,7 +44,6 @@ def evaluateAll(fields: list[float],
     ## Scalars       
     knownParamsDict |= diagonalizeScalars(knownParamsDict, 
                                           T,
-                                          diagAlgo, 
                                           scalarPermutationMatrix,
                                           scalarMassMatrices,
                                           scalarRotationMatrix,
@@ -74,8 +54,7 @@ def evaluateAll(fields: list[float],
     return knownParamsDict
 
 def diagonalizeScalars(params: dict[str, float], 
-                       T: float, 
-                       diagAlgo, 
+                       T: float,  
                        scalarPermutationMatrix,
                        scalarMassMatrices,
                        scalarRotationMatrix,
@@ -92,7 +71,7 @@ def diagonalizeScalars(params: dict[str, float],
         subRotationMatrix = []
         subEigenValues = []
         for matrix in subMassMatrix:
-            eigenValue, vects = diagonalizeSymmetric(matrix, diagAlgo)
+            eigenValue, vects = np.linalg.eigh(matrix)
             eigenValue *=T**2
             ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
             if bVerbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
@@ -211,7 +190,6 @@ class EffectivePotential:
                  loopOrder,
                  veff,
                  minimizationAlgo,
-                 diagAlgo,
                  absGlobalTolerance,
                  relGlobalTolerance, 
                  absLocalTolerance, 
@@ -224,7 +202,6 @@ class EffectivePotential:
         self.nbrFields = len(self.fieldNames)
 
         self.bAbsoluteMsq = bAbsoluteMsq
-        self.diagAlgo = diagAlgo
 
         self.vectorMassesSquared = vectorMassesSquared
         self.vectorShortHands = vectorShortHands
@@ -263,7 +240,6 @@ class EffectivePotential:
                                                 self.scalarPermutationMatrix, 
                                                 self.scalarMassMatrices, 
                                                 self.scalarRotationMatrix,
-                                                self.diagAlgo,
                                                 self.vectorShortHands,
                                                 self.vectorMassesSquared,
                                                 self.bAbsoluteMsq,
@@ -353,7 +329,6 @@ class EffectivePotential:
                                 self.scalarPermutationMatrix, 
                                 self.scalarMassMatrices, 
                                 self.scalarRotationMatrix,
-                                self.diagAlgo,
                                 self.vectorShortHands,
                                 self.vectorMassesSquared,
                                 self.bAbsoluteMsq,
@@ -379,36 +354,6 @@ class EffectivePotential:
 
 from unittest import TestCase
 class EffectivePotentialUnitTests(TestCase):
-    def test_diagonalizeSymmetricNumpy(self):
-        reference = [[-1, 1], [[-0.7071067811865475, 0.7071067811865475], 
-                               [0.7071067811865475, 0.7071067811865475]]]
-
-        source = [[0, 1], [1, 0]]
-
-        self.assertEqual(reference, 
-                         list(map(lambda x: x.tolist(), 
-                                  diagonalizeSymmetric(source, "numpy"))))
-
-    def test_diagonalizeSymmetricMp(self):
-        reference = [[[-1], [1]], [[0.7071067811865476, 0.7071067811865476], 
-                                   [-0.7071067811865476, 0.7071067811865476]]]
-
-        source = [[0, 1], [1, 0]]
-
-        self.assertEqual(reference, 
-                         list(map(lambda x: x.tolist(), 
-                                  diagonalizeSymmetric(source, "mp"))))
-
-    def test_diagonalizeSymmetricScipy(self):
-        reference = [[-1, 1], [[-0.7071067811865475, 0.7071067811865475], 
-                               [0.7071067811865475, 0.7071067811865475]]]
-
-        source = [[0, 1], [1, 0]]
-
-        self.assertEqual(reference, 
-                         list(map(lambda x: x.tolist(), 
-                                  diagonalizeSymmetric(source, "scipy"))))
-      
     def test_diagonalizeNumba(self):
         reference = [[[-4., 4.], [-4.649110640673516, 20.64911064067352]], 
                      [[[-0.7071067811865475, 0.7071067811865475],                                                                                                                                        

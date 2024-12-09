@@ -74,10 +74,6 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--TRangeStepSize', action = 'store', default = 1, type = float, dest = 'TRangeStepSize',
         metavar='')
         
-        self.add_argument('--diagAlgo', action = 'store', default = "numpy", type = str, dest = 'diagAlgo',
-                          help = 'Str: Specify what diagonalisation algorithm used for mass matrices, \
-                          options are numpy, scipy and mpmath',
-                          metavar='')
         self.add_argument('--minimizationAlgo', action = 'store', default="combo", dest = 'minimizationAlgo',  
                           help = "Used to specify which algothrym the minimizer uses, options are combo, directGlobal, BOBYQA and scipy",
                           metavar='')    

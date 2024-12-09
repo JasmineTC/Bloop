@@ -17,7 +17,6 @@ python3 runBenchmark.py --loopOrder 2 \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
-                        --diagAlgo scipy \
                         --minimizationAlgo directGlobal \
                         --v1Bounds 1e-6 1e-6 \
                         --v2Bounds 1e-6 1e-6 \
@@ -41,7 +40,6 @@ python3 runBenchmark.py --loopOrder 2 \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
-                        --diagAlgo scipy \
                         --minimizationAlgo directGlobal \
                         --v1Bounds 1e-6 1e-6 \
                         --v2Bounds 1e-6 1e-6 \
