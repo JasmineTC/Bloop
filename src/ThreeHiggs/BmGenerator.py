@@ -170,12 +170,24 @@ def _strongSubSet():
                     ele["darkHieracy"],
                     ele["bmNumber"]))
     return bmDict
-
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--mode", action = "store",  dest = "mode", default = "handPicked",
+                    choices = ["handPicked", "random", "randomSSS"],
+                    help = "Str: Specify the mode to generate bm with.")
+    parser.add_argument("--randNum",type = int, action = "store",  dest = "randNum", default = 1_000_000,
+                    help = "Int: Specify how many random bm to generate.")
+    
+
+    args = parser.parse_args()
     from json import dump                       
-    #dump(_randomBmParam(1e6), open("Benchmarks/randomScan.json", "w"), indent = 4)
-    dump(_notRandomBmParam(), open("Benchmarks/handPicked.json", "w"), indent = 4)
-    #dump(strongSubSet(), open("Benchmarks/randomScanSSS.json", "w"), indent = 4)
+    if args.mode == "handPicked":
+        dump(_notRandomBmParam(), open("Benchmarks/handPicked.json", "w"), indent = 4)
+    elif args.mode == "random":
+        dump(_randomBmParam(args.randNum), open("Benchmarks/randomScan.json", "w"), indent = 4)
+    else:
+        dump(strongSubSet(), open("Benchmarks/randomScanSSS.json", "w"), indent = 4)
 
 
 
