@@ -185,9 +185,10 @@ if __name__ == "__main__":
     if args.mode == "handPicked":
         dump(_notRandomBmParam(), open("Benchmarks/handPicked.json", "w"), indent = 4)
     elif args.mode == "random":
-        dump(_randomBmParam(args.randNum), open("Benchmarks/randomScan.json", "w"), indent = 4)
+        print("no")
+        #dump(_randomBmParam(args.randNum), open("Benchmarks/randomScan.json", "w"), indent = 4)
     else:
-        dump(strongSubSet(), open("Benchmarks/randomScanSSS.json", "w"), indent = 4)
+        dump(_strongSubSet(), open("Benchmarks/randomScanSSS.json", "w"), indent = 4)
 
 
 
