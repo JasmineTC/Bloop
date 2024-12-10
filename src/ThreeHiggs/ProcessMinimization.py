@@ -46,7 +46,7 @@ def interpretData(result: dict, index: int, bmInput: dict[str, float]):
         for val in jumpv3:
             interpResult["jumpsv3"].append(( v3DimlessDiff[val], 
                                              result["T"][val] ))
-
+    strength = 0
     if max(abs(v3DimlessDiff[jumpv3]), default = 0) > 0.6:
         phaseJumpIdx = jumpv3[ np.argmax( abs( v3DimlessDiff[jumpv3] ) ) ]
         strength = sqrt( v1Dimless[phaseJumpIdx]**2 +\
