@@ -136,7 +136,7 @@ def _randomBmParam(num):
             bmdictList.append(bmDict)
     return bmdictList
 
-def _notRandombmParam():
+def _notRandomBmParam():
     bmdictList = []
     bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
                    [67, 4.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
@@ -156,11 +156,39 @@ def _notRandombmParam():
             bmdictList.append(bmDict)
     return bmdictList
 
-
+def _strongSubSet():
+    from json import load
+    dictList = load(open("Benchmarks/StrongBmList.json", "r"))
+    bmDict = []
+    for ele in dictList:
+        bmDict.append(_lagranianParamGen(ele["mS1"],
+                    ele["delta12"],
+                    ele["delta1c"], 
+                    ele["deltac"], 
+                    ele["ghDM"], 
+                    ele["thetaCPV"],
+                    ele["darkHieracy"],
+                    ele["bmNumber"]))
+    return bmDict
 if __name__ == "__main__":
-    from json import dump                       
-    dump(_randomBmParam(1e6), open("Benchmarks/Benchmarks_3HDM.json", "w"), indent = 4)
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--mode", action = "store",  dest = "mode", default = "handPicked",
+                    choices = ["handPicked", "random", "randomSSS"],
+                    help = "Str: Specify the mode to generate bm with.")
+    parser.add_argument("--randNum",type = int, action = "store",  dest = "randNum", default = 1_000_000,
+                    help = "Int: Specify how many random bm to generate.")
+    
 
+    args = parser.parse_args()
+    from json import dump                       
+    if args.mode == "handPicked":
+        dump(_notRandomBmParam(), open("Benchmarks/handPicked.json", "w"), indent = 4)
+    elif args.mode == "random":
+        print("no")
+        #dump(_randomBmParam(args.randNum), open("Benchmarks/randomScan.json", "w"), indent = 4)
+    else:
+        dump(_strongSubSet(), open("Benchmarks/randomScanSSS.json", "w"), indent = 4)
 
 
 
