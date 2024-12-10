@@ -33,5 +33,6 @@
         "delta1c": 50.0,
         "deltac": 1.0,
         "darkHieracy": 1
-    }
+    },
+    "step": 1
 }
