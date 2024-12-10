@@ -64,7 +64,7 @@ def diagonalizeScalars(params: dict[str, float],
                        bVerbose = False) -> dict[str, float]:
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
-    subMassMatrix = np.array( [np.asarray(matrix(params))/T**2 for matrix in scalarMassMatrices  ] )
+    subMassMatrix = np.array( [np.asarray(matrix(params))/T**2 for matrix in scalarMassMatrices  ],dtype = "float64" )
     if bNumba:
         subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, len(subMassMatrix), len(subMassMatrix[0][0]), T)
     else:
