@@ -136,7 +136,7 @@ def _randomBmParam(num):
             bmdictList.append(bmDict)
     return bmdictList
 
-def _notRandombmParam():
+def _notRandomBmParam():
     bmdictList = []
     bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
                    [67, 4.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
@@ -156,11 +156,26 @@ def _notRandombmParam():
             bmdictList.append(bmDict)
     return bmdictList
 
+def _strongSubSet():
+    from json import load
+    dictList = load(open("Benchmarks/StrongBmList.json", "r"))
+    bmDict = []
+    for ele in dictList:
+        bmDict.append(_lagranianParamGen(ele["mS1"],
+                    ele["delta12"],
+                    ele["delta1c"], 
+                    ele["deltac"], 
+                    ele["ghDM"], 
+                    ele["thetaCPV"],
+                    ele["darkHieracy"],
+                    ele["bmNumber"]))
+    return bmDict
 
 if __name__ == "__main__":
     from json import dump                       
-    dump(_randomBmParam(1e6), open("Benchmarks/Benchmarks_3HDM.json", "w"), indent = 4)
-
+    #dump(_randomBmParam(1e6), open("Benchmarks/randomScan.json", "w"), indent = 4)
+    dump(_notRandomBmParam(), open("Benchmarks/handPicked.json", "w"), indent = 4)
+    #dump(strongSubSet(), open("Benchmarks/randomScanSSS.json", "w"), indent = 4)
 
 
 
