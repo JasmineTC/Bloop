@@ -85,7 +85,7 @@ class UserInput(argparse.ArgumentParser):
 
         self.add_argument('--benchmarkFile', 
                   action = 'store', 
-                  default = "Benchmarks/Benchmarks_3HDM.json",#"Benchmarks/ScanDict.json",
+                  default = "Benchmarks/handPicked.json",
                   dest = 'benchmarkFile',
                   metavar='')
         
