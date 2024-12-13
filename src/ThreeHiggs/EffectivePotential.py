@@ -1,17 +1,6 @@
 import numpy as np
 from scipy import linalg
 
-from numba import njit
-
-@njit
-def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
-    ##Gives complex cast warning
-    subEigenValues = np.empty( (matrixNumber, matrixSize) ) 
-    subRotationMatrix = np.empty( (matrixNumber, matrixSize, matrixSize) )
-    for idx, matrix in enumerate(matrices):
-         subEigenValues[idx], subRotationMatrix[idx] = np.linalg.eigh(matrix)
-    return subEigenValues*T**2, subRotationMatrix
-
 def evaluateAll(fields: list[float], 
                 T:float, 
                 params3D, 
@@ -66,6 +55,7 @@ def diagonalizeScalars(params: dict[str, float],
     and returns a dict with diagonalization-specific params"""
     subMassMatrix = np.array( [np.asarray(matrix(params))/T**2 for matrix in scalarMassMatrices  ],dtype = "float64" )
     if bNumba:
+        from diagonalizeNumba import diagonalizeNumba
         subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, len(subMassMatrix), len(subMassMatrix[0][0]), T)
     else:
         subRotationMatrix = []
