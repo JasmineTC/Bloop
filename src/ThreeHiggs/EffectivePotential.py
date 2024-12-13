@@ -55,7 +55,7 @@ def diagonalizeScalars(params: dict[str, float],
     and returns a dict with diagonalization-specific params"""
     subMassMatrix = np.array( [np.asarray(matrix(params))/T**2 for matrix in scalarMassMatrices  ],dtype = "float64" )
     if bNumba:
-        from diagonalizeNumba import diagonalizeNumba
+        from ThreeHiggs.diagonalizeNumba import diagonalizeNumba
         subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, len(subMassMatrix), len(subMassMatrix[0][0]), T)
     else:
         subRotationMatrix = []
@@ -347,6 +347,7 @@ class EffectivePotentialUnitTests(TestCase):
         source = np.array( [ [[0, 1], [1, 0]], 
                              [[-1, 5], [-1, 5.0]] ] )
       
+        from ThreeHiggs.diagonalizeNumba import diagonalizeNumba
         self.assertEqual(reference, 
                          list(map(lambda x: x.tolist(), 
                                   diagonalizeNumba(source, 2, 2, 2))))   
