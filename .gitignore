@@ -5,3 +5,6 @@ build/
 
 .vscode/
 *.code-workspace
+
+**/OutputResult/*
+
