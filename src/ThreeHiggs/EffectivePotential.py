@@ -331,10 +331,6 @@ class EffectivePotential:
     
         return len([lowMass for lowMass in massList if lowMass < ultraSoftScale]) > goldStone
 
-    # just calls self.evaluate
-    def __call__(self, temperature: np.ndarray, fields: np.ndarray) -> complex:
-        self.evaluate(temperature, fields)
-
 from unittest import TestCase
 class EffectivePotentialUnitTests(TestCase):
     def test_diagonalizeNumba(self):
