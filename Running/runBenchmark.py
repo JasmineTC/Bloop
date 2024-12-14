@@ -109,9 +109,9 @@ def minimization(args):
                                              "relGlobalTol" :args.relGlobalTolerance, 
                                              "absLocalTol" : args.absLocalTolerance, 
                                              "relLocalTol" : args.relLocalTolerance,
-                                             "v1Bound" : args.v1Bounds,
-                                             "v2Bound" : args.v2Bounds,
-                                             "v3Bound" : args.v3Bounds},
+                                             "v1Bounds" : args.v1Bounds,
+                                             "v2Bounds" : args.v2Bounds,
+                                             "v3Bounds" : args.v3Bounds},
                                             args.bNumba) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
