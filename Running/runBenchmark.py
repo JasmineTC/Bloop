@@ -1,4 +1,8 @@
-def doMinimization(benchmark):
+def doMinimization(parameters):
+    benchmark = parameters["benchmark"] if "benchmark" in parameters else None
+    effectivePotential = parameters["effectivePotential"] if "effectivePotential" in parameters else None
+    dimensionalReduction = parameters["dimensionalReduction"] if "dimensionalReduction" in parameters else None
+
     if args.bVerbose:
         print(f"Starting benchmark: {benchmark['bmNumber']}")
 
@@ -52,71 +56,64 @@ def getLines(relativePathToResource):
 
     return open(path, encoding = "utf-8").readlines()
 
-from ThreeHiggs.UserInput import UserInput
-userinput = UserInput()
-args = userinput.parse()
+def convertMathematica(args):
+    veffLines = getLines(args.loFile)
+    if (args.loopOrder >= 1):
+        veffLines += getLines(args.nloFile)
+    if (args.loopOrder >= 2):
+        veffLines += getLines(args.nnloFile)
 
-from ThreeHiggs.UserInput import Stages
-if args.firstStage <= Stages.convertMathematica <= args.lastStage:
-    with open(args.parsedExpressionsFile, "w") as parsedExpressionsFile:
-        veffLines = getLines(args.loFile)
-        if (args.loopOrder >= 1):
-            veffLines += getLines(args.nloFile)
-        if (args.loopOrder >= 2):
-            veffLines += getLines(args.nnloFile)
-
-        from ThreeHiggs.MathematicaParsers import (parseExpressionSystem,
-                                                   parseConstantMatrix,
-                                                   parseMassMatrix,
-                                                   parseRotationMatrix)
+    from ThreeHiggs.MathematicaParsers import (parseExpressionSystem,
+                                               parseConstantMatrix,
+                                               parseMassMatrix,
+                                               parseRotationMatrix)
 
 
-        from json import dump
-        dump({"vectorMassesSquared": parseExpressionSystem(getLines(args.vectorMassesSquaredFile)),
-              "vectorShortHands": parseExpressionSystem(getLines(args.vectorShortHandsFile)),
-              "scalarPermutationMatrix": parseConstantMatrix(getLines(args.scalarPermutationFile)),
-              "scalarMassMatrixUpperLeft": parseMassMatrix(getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
-                                                           getLines(args.scalarMassMatrixUpperLeftFile)),
-              "scalarMassMatrixBottomRight": parseMassMatrix(getLines(args.scalarMassMatrixBottomRightDefinitionsFile),
-                                                             getLines(args.scalarMassMatrixBottomRightFile)),
-              "scalarRotationMatrix": parseRotationMatrix(getLines(args.scalarRotationFile)),
-              "veff": parseExpressionSystem(veffLines),
-              "hardToSoft": parseExpressionSystem(getLines(args.hardToSoftFile)),
-              "softScaleRGE": parseExpressionSystem(getLines(args.softScaleRGEFile)),
-              "softToUltraSoft": parseExpressionSystem(getLines(args.softToUltraSoftFile))},
-             parsedExpressionsFile,
-             indent = 4)
+    from json import dump
+    dump({"vectorMassesSquared": parseExpressionSystem(getLines(args.vectorMassesSquaredFile)),
+          "vectorShortHands": parseExpressionSystem(getLines(args.vectorShortHandsFile)),
+          "scalarPermutationMatrix": parseConstantMatrix(getLines(args.scalarPermutationFile)),
+          "scalarMassMatrixUpperLeft": parseMassMatrix(getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
+                                                       getLines(args.scalarMassMatrixUpperLeftFile)),
+          "scalarMassMatrixBottomRight": parseMassMatrix(getLines(args.scalarMassMatrixBottomRightDefinitionsFile),
+                                                         getLines(args.scalarMassMatrixBottomRightFile)),
+          "scalarRotationMatrix": parseRotationMatrix(getLines(args.scalarRotationFile)),
+          "veff": parseExpressionSystem(veffLines),
+          "hardToSoft": parseExpressionSystem(getLines(args.hardToSoftFile)),
+          "softScaleRGE": parseExpressionSystem(getLines(args.softScaleRGEFile)),
+          "softToUltraSoft": parseExpressionSystem(getLines(args.softToUltraSoftFile))},
+         open(args.parsedExpressionsFile, "w"),
+         indent = 4)
 
-if args.firstStage <= Stages.minimization <= args.lastStage:
-    with open(args.parsedExpressionsFile, "r") as parsedExpressionsFile:
-        from json import load
-        parsedExpressions = load(parsedExpressionsFile)
+def minimization(args):
+    from json import load
+    parsedExpressions = load(open(args.parsedExpressionsFile, "r"))
 
-        from ThreeHiggs.EffectivePotential import EffectivePotential
-        from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
-                                                 MassMatrix,
-                                                 RotationMatrix)
+    from ThreeHiggs.EffectivePotential import EffectivePotential
+    from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
+                                             MassMatrix,
+                                             RotationMatrix)
 
-        # TODO: This should not need to be treated as global in 3HDM.
-        effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
-                                                args.bAbsMass,
-                                                ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
-                                                ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
-                                                parsedExpressions["scalarPermutationMatrix"]["matrix"],
-                                                [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]), 
-                                                 MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"])],
-                                                RotationMatrix(parsedExpressions["scalarRotationMatrix"]),
-                                                args.loopOrder,
-                                                ParsedExpressionSystem(parsedExpressions["veff"]),
-                                                args.minimizationAlgo, ## Set algorithm to use for Veff minimization
-                                                args.absGlobalTolerance,
-                                                args.relGlobalTolerance, 
-                                                args.absLocalTolerance, 
-                                                args.relLocalTolerance,
-                                                args.v1Bounds,
-                                                args.v2Bounds,
-                                                args.v3Bounds,
-                                                args.bNumba) 
+    # TODO: This should not need to be treated as global in 3HDM.
+    effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
+                                            args.bAbsMass,
+                                            ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
+                                            ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
+                                            parsedExpressions["scalarPermutationMatrix"]["matrix"],
+                                            [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]), 
+                                             MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"])],
+                                            RotationMatrix(parsedExpressions["scalarRotationMatrix"]),
+                                            args.loopOrder,
+                                            ParsedExpressionSystem(parsedExpressions["veff"]),
+                                            args.minimizationAlgo, ## Set algorithm to use for Veff minimization
+                                            args.absGlobalTolerance,
+                                            args.relGlobalTolerance, 
+                                            args.absLocalTolerance, 
+                                            args.relLocalTolerance,
+                                            args.v1Bounds,
+                                            args.v2Bounds,
+                                            args.v3Bounds,
+                                            args.bNumba) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
     dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(parsedExpressions["hardToSoft"]),
@@ -126,13 +123,27 @@ if args.firstStage <= Stages.minimization <= args.lastStage:
     
     with open(args.benchmarkFile) as benchmarkFile:
         if args.bPool:
-            from multiprocessing import Pool
+            from pathos.multiprocessing import Pool
             with Pool(args.cores) as pool:
                 from ijson import items
-                pool.map(doMinimization, items(benchmarkFile, "item", use_float = True))
+                pool.map(doMinimization, ({"benchmark": item,
+                                           "effectivePotential": effectivePotential,
+                                           "dimensionalReduction": dimensionalReduction} for item in items(benchmarkFile, "item", use_float = True)))
+
         else:
-            benchmarkFile = load(benchmarkFile)
-            for BenchMark in benchmarkFile:
-                doMinimization(BenchMark)
-    
+            for parameters in ({"benchmark": item,
+                                "effectivePotential": effectivePotential,
+                                "dimensionalReduction": dimensionalReduction} for item in load(benchmarkFile)):
+                doMinimization(parameters)
+
+from ThreeHiggs.UserInput import UserInput
+userinput = UserInput()
+args = userinput.parse()
+
+from ThreeHiggs.UserInput import Stages
+if args.firstStage <= Stages.convertMathematica <= args.lastStage:
+    convertMathematica(args)
+
+if args.firstStage <= Stages.minimization <= args.lastStage:
+   minimization(args)
 
