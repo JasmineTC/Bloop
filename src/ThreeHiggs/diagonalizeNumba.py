@@ -1,5 +1,5 @@
 from numba import njit
-
+import numpy as np
 @njit
 def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
     ##Gives complex cast warning
