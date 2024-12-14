@@ -75,7 +75,8 @@ class UserInput(argparse.ArgumentParser):
         metavar='')
         
         self.add_argument('--minimizationAlgo', action = 'store', default="combo", dest = 'minimizationAlgo',  
-                          help = "Used to specify which algothrym the minimizer uses, options are combo, directGlobal, BOBYQA and scipy",
+							choices = ["combo", "directGlobal", "BOBYQA"],
+                          help = "Used to specify which algothrym the minimizer uses, options are combo, directGlobal, BOBYQA",
                           metavar='')    
 
         self.add_argument('--firstStage', type = Stages.fromString, default = "convertMathematica", dest = 'firstStage',
