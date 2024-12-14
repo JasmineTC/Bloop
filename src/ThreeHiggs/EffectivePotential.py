@@ -89,71 +89,34 @@ import nlopt
 def callNlopt(method: nlopt, 
               numVariables: int, 
               function: callable, 
-              v1Bounds: tuple[float], 
-              v2Bounds: tuple[float], 
-              v3Bounds: tuple[float], 
-              AbsTol: float, 
-              relTol: float, 
-              initialGuess: list[float]):
-    
-    opt = nlopt.opt(method, numVariables)
-    functionWrapper = lambda fields, grad: function(fields) 
-    opt.set_min_objective(functionWrapper)
-    opt.set_lower_bounds((v1Bounds[0], v2Bounds[0], v3Bounds[0]))
-    opt.set_upper_bounds((v1Bounds[1], v2Bounds[1], v3Bounds[1]))
-    opt.set_xtol_abs(AbsTol)
-    opt.set_xtol_rel(relTol)
-    return opt.optimize(initialGuess),  opt.last_optimum_value()
+              initialGuess: list[float],
+			  NNLODict: dict):
+	opt = nlopt.opt(method, numVariables)
+	functionWrapper = lambda fields, grad: function(fields) 
+	opt.set_min_objective(functionWrapper)
+	opt.set_lower_bounds((NNLODict["v1Bounds"][0], NNLODict["v2Bounds"][0], NNLODict["v3Bounds"][0]))
+	opt.set_upper_bounds((NNLODict["v1Bounds"][1], NNLODict["v2Bounds"][1], NNLODict["v3Bounds"][1]))
+	opt.set_xtol_abs(NNLODict["absLocalTol"]) if method == nlopt.LN_BOBYQA else opt.set_xtol_abs(NNLODict["absGlobalTol"])
+	opt.set_xtol_rel(NNLODict["absRelTol"]) if method == nlopt.LN_BOBYQA else opt.set_xtol_rel(NNLODict["absGlobalTol"])
+	return opt.optimize(initialGuess),  opt.last_optimum_value()
 
 def minimize(function: callable, 
              initialGuess: np.ndarray, 
-             minimizationAlgo: str,
              numVariables: int, 
-             globalAbs: float,
-             globalRel: float,
-             localAbs: float,
-             localRel: float,
-             v1Bounds: tuple[float],
-             v2Bounds: tuple[float],
-             v3Bounds: tuple[float]) -> tuple[np.ndarray, float]:
+             NNLOPTDic: dict) -> tuple[np.ndarray, float]:
     """Even though we don't use the gradient, nlopt still tries to pass a grad arguemet to the function, so the function needs to be 
     wrapped to give it room for the grad arguement"""
-               
     if minimizationAlgo == "directGlobal":
-            location, _ = callNlopt(nlopt.GN_DIRECT_NOSCAL, 
-                                        numVariables, 
-                                        function, 
-                                        v1Bounds, 
-                                        v2Bounds, 
-                                        v3Bounds, 
-                                        globalAbs, 
-                                        globalRel, 
-                                        initialGuess)
-                        
-            return callNlopt(nlopt.LN_BOBYQA, 
-                                            numVariables, 
-                                            function, 
-                                            v1Bounds, 
-                                            v2Bounds, 
-                                            v3Bounds, 
-                                            localAbs, 
-                                            localRel, 
-                                            location)
-    elif minimizationAlgo == "BOBYQA":            
-            return callNlopt(nlopt.LN_BOBYQA, 
-                                            numVariables, 
-                                            function, 
-                                            v1Bounds, 
-                                            v2Bounds, 
-                                            v3Bounds, 
-                                            localAbs, 
-                                            localRel, 
-                                            initialGuess)
-    
-    else:
-        print(f"ERROR: {minimizationAlgo} does not match any of our minimzationAlgos, attempting to exit")
-        exit(-1)
-
+		initialGuess, _ = callNlopt(nlopt.GN_DIRECT_NOSCAL,
+									numVariables, 
+									function, 
+									initialGuess,
+									NNLOPTDic)   
+	return callNlopt(nlopt.LN_BOBYQA, 
+                     numVariables, 
+                     function, 
+                     initialGuess
+                     NNLOPTDic) 
 
     
 """ Evaluating the potential: 

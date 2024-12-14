@@ -105,14 +105,14 @@ def minimization(args):
                                             RotationMatrix(parsedExpressions["scalarRotationMatrix"]),
                                             args.loopOrder,
                                             ParsedExpressionSystem(parsedExpressions["veff"]),
-                                            args.minimizationAlgo, ## Set algorithm to use for Veff minimization
-                                            args.absGlobalTolerance,
-                                            args.relGlobalTolerance, 
-                                            args.absLocalTolerance, 
-                                            args.relLocalTolerance,
-                                            args.v1Bounds,
-                                            args.v2Bounds,
-                                            args.v3Bounds,
+                                            {"minAlgo" : args.minimizationAlgo, 
+                                            "absGlobalTol" : args.absGlobalTolerance,\
+                                            "relGlobalTol" :args.relGlobalTolerance, 
+                                            "absLocalTol" : args.absLocalTolerance, 
+                                            "relLocalTol" : args.relLocalTolerance,
+                                            "v1Bound" : args.v1Bounds,
+                                            "v2Bound" : args.v2Bounds,
+                                            "v3Bound" : args.v3Bounds},
                                             args.bNumba) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
