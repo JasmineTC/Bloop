@@ -10,7 +10,7 @@ class ParsedExpression:
 
         self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
 
-    def __call__(self, functionArguments: list[float]) -> float:
+    def evaluate(self, functionArguments: list[float]) -> float:
         return eval(self.lambdaExpression, 
                     functionArguments | {"log": log, 
                                          "sqrt": sqrt, 
@@ -25,13 +25,13 @@ class ParsedExpressionSystem:
         self.parsedExpressions = [ParsedExpression(parsedExpression) 
                                   for parsedExpression in parsedExpressionSystem]
 
-    def __call__(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
+    def evaluate(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
         """Optional argument is a hack"""
         ## Collect inputs from the dict and put them in correct order. I do this by taking the right order from our first expression.
         ## This is fine since all our expressions use the same input list. 
         outList = [None] * len(self.parsedExpressions)    
         for i in range(len(outList)):
-            outList[i] = self.parsedExpressions[i](inputDict)
+            outList[i] = self.parsedExpressions[i].evaluate(inputDict)
 
         if not bReturnDict:
             return outList
@@ -46,11 +46,11 @@ class MassMatrix:
         self.definitions = ParsedExpressionSystem(massMatrix["definitions"])
         self.matrix = compile(massMatrix["matrix"], "<string>", mode = "eval")
 
-    def __call__(self, arguments):
+    def evaluate(self, arguments):
         """Evaluates the matrix element expressions and puts them in a 2D np.ndarray.
         The input dict needs to contain keys for all function arguments needed by the expressions. 
         """
-        arguments |= self.definitions(arguments, bReturnDict = True)
+        arguments |= self.definitions.evaluate(arguments, bReturnDict = True)
         return eval(self.matrix, arguments | {"log": log, 
                                               "sqrt": sqrt, 
                                               "pi": pi, 
@@ -61,7 +61,7 @@ class RotationMatrix:
     def __init__(self, symbolMap):
         self.symbolMap = symbolMap["matrix"]
 
-    def __call__(self, numericalM):
+    def evaluate(self, numericalM):
         """Evaluates our symbols by plugging in numbers from the input numerical matrix.
         Returns a dict with symbols names as keys.
         """
@@ -77,7 +77,7 @@ class ParsedExpressionUnitTests(TestCase):
 
         reference = 5.400944901447568
 
-        self.assertEqual(reference, ParsedExpression(source)({"lam": 100, "mssq": 100}))
+        self.assertEqual(reference, ParsedExpression(source).evaluate({"lam": 100, "mssq": 100}))
 
     def test_ParsedExpressionComplex(self):
         source = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
@@ -86,8 +86,9 @@ class ParsedExpressionUnitTests(TestCase):
 
         reference = complex(5.826048814042759, 1.1475471676948477)
 
-        self.assertEqual(reference, ParsedExpression(source)({"lam": complex(100, 100), 
-                                                              "mssq": complex(100, 100)}))
+        self.assertEqual(reference, 
+                         ParsedExpression(source).evaluate({"lam": complex(100, 100), 
+                                                            "mssq": complex(100, 100)}))
 
     def test_ParsedExpressionSystem(self):
         source = [{"expression": "sqrt(lam)/(4*pi) + log(mssq)",
@@ -102,7 +103,8 @@ class ParsedExpressionUnitTests(TestCase):
 
         reference = [5.400944901447568, 5.400944901447568, 5.400944901447568]
 
-        self.assertEqual(reference, ParsedExpressionSystem(source)({"lam": 100, "mssq": 100}))
+        self.assertEqual(reference, 
+                         ParsedExpressionSystem(source).evaluate({"lam": 100, "mssq": 100}))
 
     def test_MassMatrix(self):
         source = {"definitions": [{"expression": "1",
@@ -111,11 +113,11 @@ class ParsedExpressionUnitTests(TestCase):
                   "matrix": "[[1, 0], [0, mssq]]"}
 
         reference = [[1, 0], [0, 1]]
-        self.assertEqual(reference, MassMatrix(source)({}))
+        self.assertEqual(reference, MassMatrix(source).evaluate({}))
 
     def test_RotationMatrix(self):
         source = {"matrix": {"mssq00": [0, 0], "mssq11": [1, 1]}}
         reference = {"mssq00": 1, "mssq11": -1}
 
-        self.assertEqual(reference, RotationMatrix(source)([[1, 0], [0, -1]]))
+        self.assertEqual(reference, RotationMatrix(source).evaluate([[1, 0], [0, -1]]))
 

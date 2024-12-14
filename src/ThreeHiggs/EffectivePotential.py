@@ -1,17 +1,6 @@
 import numpy as np
 from scipy import linalg
 
-from numba import njit
-
-@njit
-def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
-    ##Gives complex cast warning
-    subEigenValues = np.empty( (matrixNumber, matrixSize) ) 
-    subRotationMatrix = np.empty( (matrixNumber, matrixSize, matrixSize) )
-    for idx, matrix in enumerate(matrices):
-         subEigenValues[idx], subRotationMatrix[idx] = np.linalg.eigh(matrix)
-    return subEigenValues*T**2, subRotationMatrix
-
 def evaluateAll(fields: list[float], 
                 T:float, 
                 params3D, 
@@ -33,8 +22,8 @@ def evaluateAll(fields: list[float],
         knownParamsDict[fieldNames[i]] = value
 
     ## Vectors
-    knownParamsDict |= vectorShortHands(knownParamsDict, bReturnDict=True)
-    vectorMasses = vectorMassesSquared(knownParamsDict, bReturnDict=True)
+    knownParamsDict |= vectorShortHands.evaluate(knownParamsDict, bReturnDict=True)
+    vectorMasses = vectorMassesSquared.evaluate(knownParamsDict, bReturnDict=True)
 
     for key, val in vectorMasses.items():
         vectorMasses[key] = np.abs(val) if bAbsoluteMsq else complex(val)
@@ -64,8 +53,9 @@ def diagonalizeScalars(params: dict[str, float],
                        bVerbose = False) -> dict[str, float]:
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
-    subMassMatrix = np.array( [np.asarray(matrix(params))/T**2 for matrix in scalarMassMatrices  ],dtype = "float64" )
+    subMassMatrix = np.array( [np.asarray(matrix.evaluate(params))/T**2 for matrix in scalarMassMatrices  ],dtype = "float64" )
     if bNumba:
+        from ThreeHiggs.diagonalizeNumba import diagonalizeNumba
         subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, len(subMassMatrix), len(subMassMatrix[0][0]), T)
     else:
         subRotationMatrix = []
@@ -85,7 +75,7 @@ def diagonalizeScalars(params: dict[str, float],
             
     """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
     so we need to undo the permutatation"""
-    outDict = scalarRotationMatrix(scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix))
+    outDict = scalarRotationMatrix.evaluate(scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix))
 
     ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
     ##But should probably be handled by a file given from mathematica (such a list is already made in mathematica)
@@ -226,19 +216,19 @@ class EffectivePotential:
     def evaluatePotential(self, fields: list[float], T:float, params3D, bVerbose = False) -> complex:
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
         ## Sum because the result is a list of tree, 1loop etc 
-        return sum(self.expressions(evaluateAll(fields,
-                                                T,
-                                                params3D,
-                                                self.fieldNames,
-                                                self.scalarPermutationMatrix, 
-                                                self.scalarMassMatrices, 
-                                                self.scalarRotationMatrix,
-                                                self.vectorShortHands,
-                                                self.vectorMassesSquared,
-                                                self.bAbsoluteMsq,
-                                                self.bNumba,
-                                                bNeedsDiagonalization=self.bNeedsDiagonalization, 
-                                                bVerbose = bVerbose)))
+        return sum(self.expressions.evaluate(evaluateAll(fields,
+                                                         T,
+                                                         params3D,
+                                                         self.fieldNames,
+                                                         self.scalarPermutationMatrix, 
+                                                         self.scalarMassMatrices, 
+                                                         self.scalarRotationMatrix,
+                                                         self.vectorShortHands,
+                                                         self.vectorMassesSquared,
+                                                         self.bAbsoluteMsq,
+                                                         self.bNumba,
+                                                         bNeedsDiagonalization=self.bNeedsDiagonalization, 
+                                                         bVerbose = bVerbose)))
 
     def findLocalMinimum(self, initialGuess: list[float],T:float, params3D, algo, bVerbose = False) -> tuple[list[float], complex]:
         ## Minimize real part only:
@@ -341,10 +331,6 @@ class EffectivePotential:
     
         return len([lowMass for lowMass in massList if lowMass < ultraSoftScale]) > goldStone
 
-    # just calls self.evaluate
-    def __call__(self, temperature: np.ndarray, fields: np.ndarray) -> complex:
-        self.evaluate(temperature, fields)
-
 from unittest import TestCase
 class EffectivePotentialUnitTests(TestCase):
     def test_diagonalizeNumba(self):
@@ -357,6 +343,7 @@ class EffectivePotentialUnitTests(TestCase):
         source = np.array( [ [[0, 1], [1, 0]], 
                              [[-1, 5], [-1, 5.0]] ] )
       
+        from ThreeHiggs.diagonalizeNumba import diagonalizeNumba
         self.assertEqual(reference, 
                          list(map(lambda x: x.tolist(), 
                                   diagonalizeNumba(source, 2, 2, 2))))   
