@@ -94,7 +94,6 @@ def minimization(args):
                                              MassMatrix,
                                              RotationMatrix)
 
-    # TODO: This should not need to be treated as global in 3HDM.
     effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                             args.bAbsMass,
                                             ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
@@ -105,14 +104,14 @@ def minimization(args):
                                             RotationMatrix(parsedExpressions["scalarRotationMatrix"]),
                                             args.loopOrder,
                                             ParsedExpressionSystem(parsedExpressions["veff"]),
-                                            args.minimizationAlgo, ## Set algorithm to use for Veff minimization
-                                            args.absGlobalTolerance,
-                                            args.relGlobalTolerance, 
-                                            args.absLocalTolerance, 
-                                            args.relLocalTolerance,
-                                            args.v1Bounds,
-                                            args.v2Bounds,
-                                            args.v3Bounds,
+                                            {"minAlgo" : args.minimizationAlgo, 
+                                             "absGlobalTol" : args.absGlobalTolerance,\
+                                             "relGlobalTol" :args.relGlobalTolerance, 
+                                             "absLocalTol" : args.absLocalTolerance, 
+                                             "relLocalTol" : args.relLocalTolerance,
+                                             "v1Bounds" : args.v1Bounds,
+                                             "v2Bounds" : args.v2Bounds,
+                                             "v3Bounds" : args.v3Bounds},
                                             args.bNumba) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
