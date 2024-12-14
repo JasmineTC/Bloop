@@ -97,7 +97,7 @@ def callNlopt(method: nlopt,
 	opt.set_lower_bounds((NNLODict["v1Bounds"][0], NNLODict["v2Bounds"][0], NNLODict["v3Bounds"][0]))
 	opt.set_upper_bounds((NNLODict["v1Bounds"][1], NNLODict["v2Bounds"][1], NNLODict["v3Bounds"][1]))
 	opt.set_xtol_abs(NNLODict["absLocalTol"]) if method == nlopt.LN_BOBYQA else opt.set_xtol_abs(NNLODict["absGlobalTol"])
-	opt.set_xtol_rel(NNLODict["absRelTol"]) if method == nlopt.LN_BOBYQA else opt.set_xtol_rel(NNLODict["absGlobalTol"])
+	opt.set_xtol_rel(NNLODict["relLocalTol"]) if method == nlopt.LN_BOBYQA else opt.set_xtol_rel(NNLODict["absGlobalTol"])
 	return opt.optimize(initialGuess),  opt.last_optimum_value()
 
 def minimize(function: callable, 
