@@ -94,7 +94,6 @@ def minimization(args):
                                              MassMatrix,
                                              RotationMatrix)
 
-    # TODO: This should not need to be treated as global in 3HDM.
     effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                             args.bAbsMass,
                                             ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
@@ -106,13 +105,13 @@ def minimization(args):
                                             args.loopOrder,
                                             ParsedExpressionSystem(parsedExpressions["veff"]),
                                             {"minAlgo" : args.minimizationAlgo, 
-                                            "absGlobalTol" : args.absGlobalTolerance,\
-                                            "relGlobalTol" :args.relGlobalTolerance, 
-                                            "absLocalTol" : args.absLocalTolerance, 
-                                            "relLocalTol" : args.relLocalTolerance,
-                                            "v1Bound" : args.v1Bounds,
-                                            "v2Bound" : args.v2Bounds,
-                                            "v3Bound" : args.v3Bounds},
+                                             "absGlobalTol" : args.absGlobalTolerance,\
+                                             "relGlobalTol" :args.relGlobalTolerance, 
+                                             "absLocalTol" : args.absLocalTolerance, 
+                                             "relLocalTol" : args.relLocalTolerance,
+                                             "v1Bound" : args.v1Bounds,
+                                             "v2Bound" : args.v2Bounds,
+                                             "v3Bound" : args.v3Bounds},
                                             args.bNumba) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
