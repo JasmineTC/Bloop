@@ -86,7 +86,7 @@ def convertMathematica(args):
          open(args.parsedExpressionsFile, "w"),
          indent = 4)
 
-def minimization(args):
+def doMinimization(args):
     from json import load
     parsedExpressions = load(open(args.parsedExpressionsFile, "r"))
 
@@ -121,8 +121,8 @@ def minimization(args):
                                                 ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]),
                                                 bVerbose = args.bVerbose)
     
-    from ThreeHiggs.BmGenerator import notRandomBmParam
-    benchmarks = notRandomBmParam() if args.benchmarkMode == "handPicked" else []
+    from ThreeHiggs.BmGenerator import mode
+    benchmarks = mode(args.benchmarkMode)
 
     if args.bPool:
         from pathos.multiprocessing import Pool
@@ -146,5 +146,5 @@ if args.firstStage <= Stages.convertMathematica <= args.lastStage:
     convertMathematica(args)
 
 if args.firstStage <= Stages.minimization <= args.lastStage:
-   minimization(args)
+   doMinimization(args)
 

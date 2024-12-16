@@ -137,7 +137,7 @@ def randomBmParam(num):
             benchmarkCounter += 1
             yield bmDict
 
-def notRandomBmParam():
+def handPicked():
     bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
                    [67, 4.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
                    [57, 8.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
@@ -173,21 +173,11 @@ def strongSubSet():
                     ele["bmNumber"]))
     return bmDict
 
-if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", action = "store",  dest = "mode", default = "handPicked",
-                    choices = ["handPicked", "random", "randomSSS"],
-                    help = "Str: Specify the mode to generate bm with.")
-    parser.add_argument("--randNum",type = int, action = "store",  dest = "randNum", default = 1_000_000,
-                    help = "Int: Specify how many random bm to generate.")
-    
-
-    args = parser.parse_args()
+def mode(mode)
     from json import dump                       
-    if args.mode == "handPicked":
-        dump(list(notRandomBmParam()), open("Benchmarks/handPicked.json", "w"), indent = 4)
-    elif args.mode == "random":
+    if mode == "handPicked":
+        dump(list(handPicked()), open("Benchmarks/handPicked.json", "w"), indent = 4)
+    elif mode == "random":
         print("no")
         #dump(list(randomBmParam(args.randNum)), open("Benchmarks/randomScan.json", "w"), indent = 4)
     else:
