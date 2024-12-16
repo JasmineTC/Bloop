@@ -121,9 +121,10 @@ def _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHierac
 
 
 import numpy as np
-def _randomBmParam(num):
-    bmdictList = []
-    while len(bmdictList) < num:
+def randomBmParam(num):
+    benchmarkCounter = 0
+
+    while benchmarkCounter < num:
         mS1 = np.random.uniform(63, 100)
         delta12 = np.random.uniform(5, 100)
         delta1c = np.random.uniform(5, 100)
@@ -131,13 +132,12 @@ def _randomBmParam(num):
         ghDM = np.random.uniform(0, 1)
         thetaCPV = np.random.uniform(np.pi/2, 3*np.pi/2)
         darkHieracy = 1
-        bmDict = _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, len(bmdictList))
+        bmDict = _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, benchmarkCounter)
         if bmDict:
-            bmdictList.append(bmDict)
-    return bmdictList
+            benchmarkCounter += 1
+            yield bmDict
 
-def _notRandomBmParam():
-    bmdictList = []
+def notRandomBmParam():
     bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
                    [67, 4.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
                    [57, 8.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
@@ -149,14 +149,16 @@ def _notRandomBmParam():
                    [90, 55.0, 1.0, 1.0, 0.0, 2.*np.pi/3, 1],
                    [90, 55.0, 1.0, 22.0, 0.0, 2.*np.pi/3, 1],
                    [50, 55, 70, 25, 3/9, np.pi/2., 1]]
+
+    benchmarkCounter = 0
     for bmInput in bmInputList:
         mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy = bmInput
-        bmDict = _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, len(bmdictList))
+        bmDict = _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, benchmarkCounter)
         if bmDict:
-            bmdictList.append(bmDict)
-    return bmdictList
+            benchmarkCounter += 1
+            yield bmDict
 
-def _strongSubSet():
+def strongSubSet():
     from json import load
     dictList = load(open("Benchmarks/StrongBmList.json", "r"))
     bmDict = []
@@ -170,6 +172,7 @@ def _strongSubSet():
                     ele["darkHieracy"],
                     ele["bmNumber"]))
     return bmDict
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
@@ -183,14 +186,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
     from json import dump                       
     if args.mode == "handPicked":
-        dump(_notRandomBmParam(), open("Benchmarks/handPicked.json", "w"), indent = 4)
+        dump(list(notRandomBmParam()), open("Benchmarks/handPicked.json", "w"), indent = 4)
     elif args.mode == "random":
         print("no")
-        #dump(_randomBmParam(args.randNum), open("Benchmarks/randomScan.json", "w"), indent = 4)
+        #dump(list(randomBmParam(args.randNum)), open("Benchmarks/randomScan.json", "w"), indent = 4)
     else:
-        dump(_strongSubSet(), open("Benchmarks/randomScanSSS.json", "w"), indent = 4)
-
-
+        dump(list(strongSubSet()), open("Benchmarks/randomScanSSS.json", "w"), indent = 4)
 
     
 from unittest import TestCase

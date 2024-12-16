@@ -120,20 +120,21 @@ def minimization(args):
                                                 ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]),
                                                 bVerbose = args.bVerbose)
     
-    with open(args.benchmarkFile) as benchmarkFile:
-        if args.bPool:
-            from pathos.multiprocessing import Pool
-            with Pool(args.cores) as pool:
-                from ijson import items
-                pool.map(doMinimization, ({"benchmark": item,
-                                           "effectivePotential": effectivePotential,
-                                           "dimensionalReduction": dimensionalReduction} for item in items(benchmarkFile, "item", use_float = True)))
+    from ThreeHiggs.BmGenerator import notRandomBmParam
+    benchmarks = notRandomBmParam() if args.benchmarkMode == "handPicked" else []
 
-        else:
-            for parameters in ({"benchmark": item,
-                                "effectivePotential": effectivePotential,
-                                "dimensionalReduction": dimensionalReduction} for item in load(benchmarkFile)):
-                doMinimization(parameters)
+    if args.bPool:
+        from pathos.multiprocessing import Pool
+        with Pool(args.cores) as pool:
+            pool.map(doMinimization, ({"benchmark": item,
+                                       "effectivePotential": effectivePotential,
+                                       "dimensionalReduction": dimensionalReduction} for item in benchmarks))
+
+    else:
+        for parameters in ({"benchmark": item,
+                            "effectivePotential": effectivePotential,
+                            "dimensionalReduction": dimensionalReduction} for item in benchmarks):
+            doMinimization(parameters)
 
 from ThreeHiggs.UserInput import UserInput
 userinput = UserInput()

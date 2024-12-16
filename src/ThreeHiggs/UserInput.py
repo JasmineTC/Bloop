@@ -84,10 +84,11 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--lastStage', type = Stages.fromString, default = "plot", dest = 'lastStage',
         metavar='')
 
-        self.add_argument('--benchmarkFile', 
+        self.add_argument('--benchmarkMode', 
                   action = 'store', 
-                  default = "Benchmarks/handPicked.json",
-                  dest = 'benchmarkFile',
+                  default = "handPicked",
+                  choices = ["handPicked"],
+                  dest = 'benchmarkMode',
                   metavar='')
         
         self.add_argument('--firstBenchmark', type = int, default = 0, dest = 'firstBenchmark',
