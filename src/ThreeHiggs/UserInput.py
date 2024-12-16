@@ -87,9 +87,12 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--benchmarkMode', 
                   action = 'store', 
                   default = "handPicked",
-                  choices = ["handPicked"],
-                  dest = 'benchmarkMode',
+                  choices = ["handPicked", "random", "randomSSS"],
+                  dest = 'benchmarkMode', 
+                  help = "Str: Specify the mode to generate bm with.",
                   metavar='')
+        self.add_argument("--randNum",type = int, action = "store",  dest = "randNum", default = 1_000_000,
+                    help = "Int: Specify how many random bm to generate.")
         
         self.add_argument('--firstBenchmark', type = int, default = 0, dest = 'firstBenchmark',
         metavar='')
