@@ -30,6 +30,7 @@ def doMinimization(parameters):
         if args.bVerbose:
             print(f"Saving {benchmark['bmNumber']} to {filename}")
         open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
+        open(f"{filename}.bm.json", "w").write(dumps(benchmark, indent = 4))
       
     if args.bPlot:
         if args.bVerbose:
