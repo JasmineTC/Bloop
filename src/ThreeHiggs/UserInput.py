@@ -74,7 +74,7 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--TRangeStepSize', action = 'store', default = 1, type = float, dest = 'TRangeStepSize',
         metavar='')
         
-        self.add_argument('--minimizationAlgo', action = 'store', default="combo", dest = 'minimizationAlgo',  
+        self.add_argument('--minAlgo', action = 'store', default="combo", dest = 'minAlgo',  
 							choices = ["combo", "directGlobal", "BOBYQA"],
                           help = "Used to specify which algothrym the minimizer uses, options are combo, directGlobal, BOBYQA",
                           metavar='')    
