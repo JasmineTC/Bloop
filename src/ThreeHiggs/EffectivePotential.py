@@ -127,6 +127,7 @@ class EffectivePotential:
                  bAbsoluteMsq,
                  loopOrder,
                  bNumba,
+                 bVerbose,
                  nnloptDict,
                  vectorMassesSquared, 
                  vectorShortHands, 
@@ -143,6 +144,7 @@ class EffectivePotential:
         self.bNeedsDiagonalization = (self.loopOrder > 0)
         
         self.bNumba = bNumba
+        self.bVerbose = bVerbose
         
         self.nnloptDict = nnloptDict
         self.nnloptDict["nbrFields"] = len(fieldNames)

@@ -98,6 +98,7 @@ def minimization(args):
                                             args.bAbsMass,
                                             args.loopOrder,
                                             args.bNumba,
+                                            args.bVerbose,
                                             {"minAlgo" : args.minimizationAlgo, 
                                              "absGlobalTol" : args.absGlobalTolerance,\
                                              "relGlobalTol" :args.relGlobalTolerance, 
