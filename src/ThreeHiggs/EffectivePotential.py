@@ -115,6 +115,49 @@ def minimize(function: callable,
                      initialGuess,
                      nnloptDict) 
 
+import nlopt
+from dataclasses import dataclass, InitVar
+@dataclass(frozen=True)
+class Nlopt:
+    nbrVar: int = 0
+    varLowerBound: list[float] = [0] 
+    varUpperBound: list[float] = [0] 
+    absLocalTol: float = 0
+    relLocalTol: float = 0
+    absGlobalTol: float = 0
+    relGlobalTol: float = 0
+    config: InitVar[dict] = None
+
+    def __post_init__(self, config: dict):
+        self.__init__(**config)
+
+    def runNlopt(self, method: nlopt, 
+                 function: callable, 
+                 initialGuess: list[float],
+    			 nnloptDict: dict):
+        opt = nlopt.opt(method, self.nbrVar)
+        """Even though we don't use the gradient,
+        nlopt still tries to pass a grad arguemet to the function,
+        so the function needs to be wrapped to give it room for the grad arguement"""
+        functionWrapper = lambda fields, grad: function(fields) 
+       	opt.set_min_objective(functionWrapper)
+       	opt.set_lower_bounds(self.varLowerBound)
+       	opt.set_upper_bounds(self.varUpperBound)
+       	opt.set_xtol_abs(self.absLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_abs(self.absGlobalTol)
+       	opt.set_xtol_rel(self.relLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_rel(self.relGlobalTol)
+       	return opt.optimize(initialGuess),  opt.last_optimum_value()
+    
+    def callNlopt(self, function: callable, 
+                 initialGuess: np.ndarray, 
+                 minimizationAlgo: str) -> tuple[np.ndarray, float]:
+        if minimizationAlgo == "directGlobal":
+            initialGuess, _ = self.runNlopt(function,
+                                        initialGuess,
+                                        nlopt.GN_DIRECT_NOSCAL)
+        return self.runNlopt(self, function, 
+                         initialGuess,
+                         nlopt.LN_BOBYQA) 
+
     
 """ Evaluating the potential: 
 1. Call setModelParameters() with a dict that sets all parameters in the action. 
