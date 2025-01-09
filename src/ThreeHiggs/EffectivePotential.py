@@ -124,21 +124,28 @@ This is assumed to be using 3D EFT, so the params are temperature dependent.
 class EffectivePotential:
     def __init__(self,
                  fieldNames, 
-                 bAbsoluteMsq, 
+                 bAbsoluteMsq,
+                 loopOrder,
+                 bNumba,
+                 nnloptDict,
                  vectorMassesSquared, 
                  vectorShortHands, 
                  scalarPermutationMatrix, 
                  scalarMassMatrices, 
                  scalarRotationMatrix,
-                 loopOrder,
-                 veff,
-                 nnloptDict,
-                 bNumba):
+                 veff):
+        
         self.fieldNames = fieldNames
+        
+        self.bAbsoluteMsq = bAbsoluteMsq
+        
+        self.loopOrder = loopOrder
+        self.bNeedsDiagonalization = (self.loopOrder > 0)
+        
+        self.bNumba = bNumba
+        
         self.nnloptDict = nnloptDict
         self.nnloptDict["nbrFields"] = len(fieldNames)
-
-        self.bAbsoluteMsq = bAbsoluteMsq
 
         self.vectorMassesSquared = vectorMassesSquared
         self.vectorShortHands = vectorShortHands
@@ -148,13 +155,8 @@ class EffectivePotential:
         ## ASSUME: the blocks are given in order: upper left to lower right. 
         ##TODO improve this
         self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
-
         self.scalarRotationMatrix = scalarRotationMatrix
-        
-        self.loopOrder = loopOrder
         self.expressions = veff
-        self.bNeedsDiagonalization = (self.loopOrder > 0)
-        self.bNumba = bNumba
 
     def initExpressions(self, filesToParse: list[str]) -> None:
         self.expressions = []
