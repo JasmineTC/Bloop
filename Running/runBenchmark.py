@@ -96,14 +96,9 @@ def minimization(args):
 
     effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                             args.bAbsMass,
-                                            ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
-                                            ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
-                                            parsedExpressions["scalarPermutationMatrix"]["matrix"],
-                                            [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]), 
-                                             MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"])],
-                                            RotationMatrix(parsedExpressions["scalarRotationMatrix"]),
                                             args.loopOrder,
-                                            ParsedExpressionSystem(parsedExpressions["veff"]),
+                                            args.bNumba,
+                                            args.bVerbose,
                                             {"minAlgo" : args.minimizationAlgo, 
                                              "absGlobalTol" : args.absGlobalTolerance,\
                                              "relGlobalTol" :args.relGlobalTolerance, 
@@ -112,7 +107,13 @@ def minimization(args):
                                              "v1Bounds" : args.v1Bounds,
                                              "v2Bounds" : args.v2Bounds,
                                              "v3Bounds" : args.v3Bounds},
-                                            args.bNumba) 
+                                            ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
+                                            ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
+                                            parsedExpressions["scalarPermutationMatrix"]["matrix"],
+                                            [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]), 
+                                             MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"])],
+                                            RotationMatrix(parsedExpressions["scalarRotationMatrix"]),
+                                            ParsedExpressionSystem(parsedExpressions["veff"])) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
     dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(parsedExpressions["hardToSoft"]),
@@ -145,4 +146,3 @@ if args.firstStage <= Stages.convertMathematica <= args.lastStage:
 
 if args.firstStage <= Stages.minimization <= args.lastStage:
    minimization(args)
-

@@ -128,8 +128,7 @@ def traceFreeEnergyMinimum(effectivePotential,
         if not minimizationResults["UltraSoftTemp"]: ## If the ultra soft temp has not yet been set
             if effectivePotential.bReachedUltraSoftScale(minimumLocation, ## Check if ultra soft scale reached
                                                          T, 
-                                                         params3D,
-                                                         bVerbose = bVerbose): 
+                                                         params3D): 
                 minimizationResults["UltraSoftTemp"] = T ## If reached then set that as the ultra soft temp
                                                          ##- this will stop the first if statement from passing
         
