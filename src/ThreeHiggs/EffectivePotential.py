@@ -85,35 +85,51 @@ def diagonalizeScalars(params: dict[str, float],
 
     return outDict 
 
-import nlopt
-def callNlopt(method: nlopt, 
-              function: callable, 
-              initialGuess: list[float],
-			  nnloptDict: dict):
-	opt = nlopt.opt(method, nnloptDict["nbrFields"])
-	functionWrapper = lambda fields, grad: function(fields) 
-	opt.set_min_objective(functionWrapper)
-	opt.set_lower_bounds((nnloptDict["v1Bounds"][0], nnloptDict["v2Bounds"][0], nnloptDict["v3Bounds"][0]))
-	opt.set_upper_bounds((nnloptDict["v1Bounds"][1], nnloptDict["v2Bounds"][1], nnloptDict["v3Bounds"][1]))
-	opt.set_xtol_abs(nnloptDict["absLocalTol"]) if method == nlopt.LN_BOBYQA else opt.set_xtol_abs(nnloptDict["absGlobalTol"])
-	opt.set_xtol_rel(nnloptDict["relLocalTol"]) if method == nlopt.LN_BOBYQA else opt.set_xtol_rel(nnloptDict["relGlobalTol"])
-	return opt.optimize(initialGuess),  opt.last_optimum_value()
+import nlopt ##Move inside class?
+from dataclasses import dataclass, InitVar
+@dataclass(frozen=True)
+class cNlopt: ##Don't wanna call this just nlopt (same name as module), dunno what else to call so added c prefix 
+    nbrVars: int = 0
+    varLowerBounds: tuple[float] = (0,) 
+    varUpperBounds: tuple[float] = (0,) 
+    absLocalTol: float = 0
+    relLocalTol: float = 0
+    absGlobalTol: float = 0
+    relGlobalTol: float = 0
+    config: InitVar[dict] = None
+    ##Regular init method doesn't work with frozen data classes,
+    ##Need to manually init by passing the class a dict i.e. class(config = dict)
+    def __post_init__(self, config: dict):
+        if config:
+            self.__init__(**config)
 
-def minimize(function: callable, 
-             initialGuess: np.ndarray, 
-             minimizationAlgo: str, 
-             nnloptDict: dict) -> tuple[np.ndarray, float]:
-    """Even though we don't use the gradient, nlopt still tries to pass a grad arguemet to the function, so the function needs to be 
-    wrapped to give it room for the grad arguement"""
-    if minimizationAlgo == "directGlobal":
-        initialGuess, _ = callNlopt(nlopt.GN_DIRECT_NOSCAL,
-                                    function,
-                                    initialGuess,
-                                    nnloptDict)
-    return callNlopt(nlopt.LN_BOBYQA, 
-                     function, 
-                     initialGuess,
-                     nnloptDict) 
+    def runNlopt(self, method: nlopt, 
+                 func: callable, 
+                 initialGuess: list[float]):
+        opt = nlopt.opt(method, self.nbrVars)
+        """Even though we don't use the gradient,
+        nlopt still tries to pass a grad arguemet to the func,
+        so the func needs to be wrapped to give it room for the grad arguement"""
+        funcWrapper = lambda fields, grad: func(fields) 
+       	opt.set_min_objective(funcWrapper)
+       	opt.set_lower_bounds(self.varLowerBounds)
+       	opt.set_upper_bounds(self.varUpperBounds)
+       	opt.set_xtol_abs(self.absLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_abs(self.absGlobalTol)
+       	opt.set_xtol_rel(self.relLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_rel(self.relGlobalTol)
+       	return opt.optimize(initialGuess),  opt.last_optimum_value()
+    
+    def callNlopt(self, func: callable, 
+                 initialGuess: np.ndarray, 
+                 minAlgo: str) -> tuple[np.ndarray, float]:
+        
+        if minAlgo == "directGlobal":
+            initialGuess, _ = self.runNlopt(nlopt.GN_DIRECT_NOSCAL, 
+                                            func,
+                                            initialGuess)
+            
+        return self.runNlopt(nlopt.LN_BOBYQA, 
+                             func, 
+                             initialGuess) 
 
     
 """ Evaluating the potential: 
@@ -128,7 +144,8 @@ class EffectivePotential:
                  loopOrder,
                  bNumba,
                  bVerbose,
-                 nnloptDict,
+                 minAlgo,
+                 nloptInst,
                  vectorMassesSquared, 
                  vectorShortHands, 
                  scalarPermutationMatrix, 
@@ -146,8 +163,8 @@ class EffectivePotential:
         self.bNumba = bNumba
         self.bVerbose = bVerbose
         
-        self.nnloptDict = nnloptDict
-        self.nnloptDict["nbrFields"] = len(fieldNames)
+        self.minAlgo = minAlgo
+        self.nloptInst = nloptInst
 
         self.vectorMassesSquared = vectorMassesSquared
         self.vectorShortHands = vectorShortHands
@@ -159,7 +176,7 @@ class EffectivePotential:
         self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
         self.scalarRotationMatrix = scalarRotationMatrix
         self.expressions = veff
-
+    
     def initExpressions(self, filesToParse: list[str]) -> None:
         self.expressions = []
 
@@ -180,23 +197,21 @@ class EffectivePotential:
                                                          self.bVerbose,
                                                          bNeedsDiagonalization=self.bNeedsDiagonalization)))
 
-    def findLocalMinimum(self, initialGuess: list[float],T:float, params3D, algo) -> tuple[list[float], complex]:
+    def findLocalMinimum(self, initialGuess: list[float],T:float, params3D, minAlgo) -> tuple[list[float], complex]:
         ## Minimize real part only:
         VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields,
                                                                       T,
                                                                       params3D) )
-
-        return minimize(VeffWrapper, 
+        return self.nloptInst.callNlopt(VeffWrapper, 
                         initialGuess, 
-                        algo,
-                        self.nnloptDict)
+                        minAlgo)
 
     def findGlobalMinimum(self,T:float, 
                           params3D,
                           minimumCandidates: list[list[float]] = None) -> tuple[list[float], float, float, str]:
         bestResult = ((np.full(3, np.nan)), np.inf)
         
-        if self.nnloptDict["minAlgo"] == "combo":
+        if self.minAlgo == "combo":
             result = self.findLocalMinimum(minimumCandidates[0], T, params3D, "directGlobal")
             if result[1] < bestResult[1]:
                 bestResult = result
@@ -208,7 +223,7 @@ class EffectivePotential:
                     
         else:
             for candidate in minimumCandidates:
-                result = self.findLocalMinimum(candidate,T, params3D, self.minimizationAlgo)
+                result = self.findLocalMinimum(candidate,T, params3D, self.minAlgo)
                 if result[1] < bestResult[1]:
                     bestResult = result
         
