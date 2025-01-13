@@ -176,9 +176,6 @@ class EffectivePotential:
         self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
         self.scalarRotationMatrix = scalarRotationMatrix
         self.expressions = veff
-    
-    def initExpressions(self, filesToParse: list[str]) -> None:
-        self.expressions = []
 
     def evaluatePotential(self, fields: list[float], T:float, params3D) -> complex:
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
