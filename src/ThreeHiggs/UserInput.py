@@ -60,11 +60,9 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--relLocalTolerance', action = 'store', default = 1e-3, type = float, dest = 'relLocalTolerance',
         metavar='')
         
-        self.add_argument('--v1Bounds', nargs = 2, action = 'store', default = [-60, 60], type = float, dest = 'v1Bounds',
+        self.add_argument('--varLowerBounds', nargs = "*", action = 'store', default = [-60, 1e-4, 1e-4], type = float, dest = 'varLowerBounds',
         metavar='')
-        self.add_argument('--v2Bounds', nargs = 2, action = 'store', default = [1e-4, 60], type = float, dest = 'v2Bounds',
-        metavar='')
-        self.add_argument('--v3Bounds', nargs = 2, action = 'store', default = [1e-4, 60], type = float, dest = 'v3Bounds',
+        self.add_argument('--varUpperBounds', nargs = "*", action = 'store', default = [60, 60, 60], type = float, dest = 'varUpperBounds',
         metavar='')
         
         self.add_argument('--TRangeStart', action = 'store', default = 50, type = float, dest = 'TRangeStart',
