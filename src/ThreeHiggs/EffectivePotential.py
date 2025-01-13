@@ -90,8 +90,8 @@ from dataclasses import dataclass, InitVar
 @dataclass(frozen=True)
 class cNlopt: ##Don't wanna call this just nlopt (same name as module), dunno what else to call so added c prefix 
     nbrVars: int = 0
-    varLowerBound: tuple[float] = (0,) 
-    varUpperBound: tuple[float] = (0,) 
+    varLowerBounds: tuple[float] = (0,) 
+    varUpperBounds: tuple[float] = (0,) 
     absLocalTol: float = 0
     relLocalTol: float = 0
     absGlobalTol: float = 0
@@ -112,8 +112,8 @@ class cNlopt: ##Don't wanna call this just nlopt (same name as module), dunno wh
         so the func needs to be wrapped to give it room for the grad arguement"""
         funcWrapper = lambda fields, grad: func(fields) 
        	opt.set_min_objective(funcWrapper)
-       	opt.set_lower_bounds(self.varLowerBound)
-       	opt.set_upper_bounds(self.varUpperBound)
+       	opt.set_lower_bounds(self.varLowerBounds)
+       	opt.set_upper_bounds(self.varUpperBounds)
        	opt.set_xtol_abs(self.absLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_abs(self.absGlobalTol)
        	opt.set_xtol_rel(self.relLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_rel(self.relGlobalTol)
        	return opt.optimize(initialGuess),  opt.last_optimum_value()

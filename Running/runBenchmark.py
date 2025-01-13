@@ -98,8 +98,8 @@ def minimization(args):
                                  "relGlobalTol" :args.relGlobalTolerance, 
                                  "absLocalTol" : args.absLocalTolerance, 
                                  "relLocalTol" : args.relLocalTolerance,
-                                 "varLowerBound" : (args.v1Bounds[0], args.v2Bounds[0], args.v3Bounds[0]),
-                                 "varUpperBound" : (args.v1Bounds[1], args.v2Bounds[1], args.v3Bounds[1])})
+                                 "varLowerBounds" : args.varLowerBounds,
+                                 "varUpperBounds" : args.varUpperBounds})
     effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                             args.bAbsMass,
                                             args.loopOrder,
