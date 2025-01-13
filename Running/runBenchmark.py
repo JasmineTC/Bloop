@@ -89,22 +89,24 @@ def minimization(args):
     from json import load
     parsedExpressions = load(open(args.parsedExpressionsFile, "r"))
 
-    from ThreeHiggs.EffectivePotential import EffectivePotential
     from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
                                              MassMatrix,
                                              RotationMatrix)
+    from ThreeHiggs.EffectivePotential import EffectivePotential, cNlopt
+    nloptInst = cNlopt(config = {"nbrVars": 3, ##TODO this should be len(fieldNames) 
+                                 "absGlobalTol" : args.absGlobalTolerance,
+                                 "relGlobalTol" :args.relGlobalTolerance, 
+                                 "absLocalTol" : args.absLocalTolerance, 
+                                 "relLocalTol" : args.relLocalTolerance,
+                                 "varLowerBound" : (args.v1Bounds[0], args.v2Bounds[0], args.v3Bounds[0]),
+                                 "varUpperBound" : (args.v1Bounds[1], args.v2Bounds[1], args.v3Bounds[1])})
     effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
                                             args.bAbsMass,
                                             args.loopOrder,
                                             args.bNumba,
                                             args.bVerbose,
                                             args.minAlgo,
-                                            {"absGlobalTol" : args.absGlobalTolerance,
-                                             "relGlobalTol" :args.relGlobalTolerance, 
-                                             "absLocalTol" : args.absLocalTolerance, 
-                                             "relLocalTol" : args.relLocalTolerance,
-                                             "varLowerBound" : (args.v1Bounds[0], args.v2Bounds[0], args.v3Bounds[0]),
-                                             "varUpperBound" : (args.v1Bounds[1], args.v2Bounds[1], args.v3Bounds[1])},
+                                            nloptInst,
                                             ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
                                             ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
                                             parsedExpressions["scalarPermutationMatrix"]["matrix"],

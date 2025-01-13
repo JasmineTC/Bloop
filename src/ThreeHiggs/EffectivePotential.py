@@ -85,10 +85,10 @@ def diagonalizeScalars(params: dict[str, float],
 
     return outDict 
 
-import nlopt
+import nlopt ##Move inside class?
 from dataclasses import dataclass, InitVar
 @dataclass(frozen=True)
-class Nlopt:
+class cNlopt: ##Don't wanna call this just nlopt (same name as module), dunno what else to call so added c prefix 
     nbrVars: int = 0
     varLowerBound: tuple[float] = (0,) 
     varUpperBound: tuple[float] = (0,) 
@@ -97,7 +97,8 @@ class Nlopt:
     absGlobalTol: float = 0
     relGlobalTol: float = 0
     config: InitVar[dict] = None
-
+    ##Regular init method doesn't work with frozen data classes,
+    ##Need to manually init by passing the class a dict i.e. class(config = dict)
     def __post_init__(self, config: dict):
         if config:
             self.__init__(**config)
@@ -144,7 +145,7 @@ class EffectivePotential:
                  bNumba,
                  bVerbose,
                  minAlgo,
-                 nloptDict,
+                 nloptInst,
                  vectorMassesSquared, 
                  vectorShortHands, 
                  scalarPermutationMatrix, 
@@ -163,9 +164,7 @@ class EffectivePotential:
         self.bVerbose = bVerbose
         
         self.minAlgo = minAlgo
-        self.nloptDict = nloptDict
-        self.nloptDict["nbrVars"] = len(fieldNames)
-        self.nlopt = Nlopt(config = self.nloptDict)
+        self.nloptInst = nloptInst
 
         self.vectorMassesSquared = vectorMassesSquared
         self.vectorShortHands = vectorShortHands
@@ -203,7 +202,7 @@ class EffectivePotential:
         VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields,
                                                                       T,
                                                                       params3D) )
-        return self.nlopt.callNlopt(VeffWrapper, 
+        return self.nloptInst.callNlopt(VeffWrapper, 
                         initialGuess, 
                         minAlgo)
 
