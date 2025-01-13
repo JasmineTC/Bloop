@@ -103,33 +103,32 @@ class Nlopt:
             self.__init__(**config)
 
     def runNlopt(self, method: nlopt, 
-                 function: callable, 
+                 func: callable, 
                  initialGuess: list[float]):
         opt = nlopt.opt(method, self.nbrVars)
-        print("hello")
         """Even though we don't use the gradient,
-        nlopt still tries to pass a grad arguemet to the function,
-        so the function needs to be wrapped to give it room for the grad arguement"""
-        functionWrapper = lambda fields, grad: function(fields) 
-       	opt.set_min_objective(functionWrapper)
+        nlopt still tries to pass a grad arguemet to the func,
+        so the func needs to be wrapped to give it room for the grad arguement"""
+        funcWrapper = lambda fields, grad: func(fields) 
+       	opt.set_min_objective(funcWrapper)
        	opt.set_lower_bounds(self.varLowerBound)
        	opt.set_upper_bounds(self.varUpperBound)
        	opt.set_xtol_abs(self.absLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_abs(self.absGlobalTol)
        	opt.set_xtol_rel(self.relLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_rel(self.relGlobalTol)
        	return opt.optimize(initialGuess),  opt.last_optimum_value()
     
-    def callNlopt(self, function: callable, 
+    def callNlopt(self, func: callable, 
                  initialGuess: np.ndarray, 
                  minAlgo: str) -> tuple[np.ndarray, float]:
         
         if minAlgo == "directGlobal":
-            initialGuess, _ = self.runNlopt(function,
-                                        initialGuess,
-                                        nlopt.GN_DIRECT_NOSCAL)
+            initialGuess, _ = self.runNlopt(nlopt.GN_DIRECT_NOSCAL, 
+                                            func,
+                                            initialGuess)
             
-        return self.runNlopt(self, function, 
-                         initialGuess,
-                         nlopt.LN_BOBYQA) 
+        return self.runNlopt(nlopt.LN_BOBYQA, 
+                             func, 
+                             initialGuess) 
 
     
 """ Evaluating the potential: 
