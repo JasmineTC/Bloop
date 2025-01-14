@@ -60,16 +60,22 @@ def diagonalizeScalars(params: dict[str, float],
         for matrix in subMassMatrix:
             eigenValue, vects = np.linalg.eigh(matrix)
             eigenValue *=T**2
-            ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
-            if bVerbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
-                diagonalBlock = np.transpose(vects) @ matrix @ vects
-                offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
-                if np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
-                    print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
-    
+            
             subEigenValues.append(eigenValue)                    
             subRotationMatrix.append(vects)
             
+            ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
+            ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
+            if not bVerbose:
+                continue
+            
+            diagonalBlock = np.transpose(vects) @ matrix @ vects
+            offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
+            
+            if np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
+                print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
+
+
     """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
     so we need to undo the permutatation"""
     outDict = scalarRotationMatrix.evaluate(scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix))
