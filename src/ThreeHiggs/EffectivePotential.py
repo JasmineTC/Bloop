@@ -144,7 +144,6 @@ class EffectivePotential:
                  loopOrder,
                  bNumba,
                  bVerbose,
-                 minAlgo,
                  nloptInst,
                  vectorMassesSquared, 
                  vectorShortHands, 
@@ -163,7 +162,6 @@ class EffectivePotential:
         self.bNumba = bNumba
         self.bVerbose = bVerbose
         
-        self.minAlgo = minAlgo
         self.nloptInst = nloptInst
 
         self.vectorMassesSquared = vectorMassesSquared
