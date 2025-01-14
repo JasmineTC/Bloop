@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import linalg
 
-def evaluateAll(fields: list[float], 
+def compFieldDependentParams(fields: list[float], 
                 T:float, 
                 params3D, 
                 fieldNames, 
@@ -178,7 +178,7 @@ class EffectivePotential:
     def evaluatePotential(self, fields: list[float], T:float, params3D) -> complex:
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
         ## Sum because the result is a list of tree, 1loop etc 
-        return sum(self.expressions.evaluate(evaluateAll(fields,
+        return sum(self.expressions.evaluate(compFieldDepParams(fields,
                                                          T,
                                                          params3D,
                                                          self.fieldNames,
@@ -246,7 +246,7 @@ class EffectivePotential:
         ----Get someone to check the logic of this
         2) Return true if # of light modes is less than the # of goldstone modes'''
         goldStone = 0 if np.all(np.abs(fields) < 0.1) else 3
-        paramDict = evaluateAll(fields,
+        paramDict = compFieldDepParams(fields,
                                 T,
                                 params3D,
                                 self.fieldNames,
