@@ -18,7 +18,7 @@ class Stages(IntEnum):
 class UserInput(argparse.ArgumentParser):
     def __init__(self):
         super().__init__()
-        self.add_argument('--loopOrder', action = 'store', default = 2, dest = 'loopOrder', type = int, choices = [0, 1, 2],
+        self.add_argument('--loopOrder', action = 'store', default = 2, dest = 'loopOrder', type = int, choices = [1, 2],
                           help = "Int: Specify the order to compute the effective potential to")
         
         ## Should probably be made into a int rather than bool to allow for levels of verbosisty 
@@ -47,9 +47,6 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--resultsDirectory', action = 'store', default="Results", dest = 'resultsDirectory',  
                           help = "Str: Location to save files",
                           metavar='')
-        
-        self.add_argument('--bAbsMass', action = 'store_true', default = False, dest = 'bAbsMass',
-                          help = "Bool: If activated the abs value of masses is used")
         
         self.add_argument('--absGlobalTolerance', action = 'store', default = 0.5, type = float, dest = 'absGlobalTolerance',
         metavar='')

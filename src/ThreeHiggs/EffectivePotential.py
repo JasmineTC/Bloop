@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import linalg
 
-def evaluateAll(fields: list[float], 
+def compFieldDepParams(fields: list[float], 
                 T:float, 
                 params3D, 
                 fieldNames, 
@@ -10,37 +10,27 @@ def evaluateAll(fields: list[float],
                 scalarRotationMatrix,
                 vectorShortHands,
                 vectorMassesSquared,
-                bAbsoluteMsq,
                 bNumba,
-                bVerbose,
-                bNeedsDiagonalization=True) -> dict[str, float]:
-    """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation."""
-    knownParamsDict = params3D.copy()
-
+                bVerbose) -> dict[str, float]:
     ## Background fields
     for i, value in enumerate(fields):
-        knownParamsDict[fieldNames[i]] = value
+        params3D[fieldNames[i]] = value
 
     ## Vectors
-    knownParamsDict |= vectorShortHands.evaluate(knownParamsDict, bReturnDict=True)
-    vectorMasses = vectorMassesSquared.evaluate(knownParamsDict, bReturnDict=True)
-
-    for key, val in vectorMasses.items():
-        vectorMasses[key] = np.abs(val) if bAbsoluteMsq else complex(val)
-
-    knownParamsDict |= vectorMasses
+    params3D |= vectorShortHands.evaluate(params3D, bReturnDict=True)
+    
+    params3D |= vectorMassesSquared.evaluate(params3D, bReturnDict=True)
 
     ## Scalars       
-    knownParamsDict |= diagonalizeScalars(knownParamsDict, 
-                                          T,
-                                          scalarPermutationMatrix,
-                                          scalarMassMatrices,
-                                          scalarRotationMatrix,
-                                          bAbsoluteMsq,
-                                          bNumba,
-                                          bVerbose)
+    params3D |= diagonalizeScalars(params3D, 
+                                   T,
+                                   scalarPermutationMatrix,
+                                   scalarMassMatrices,
+                                   scalarRotationMatrix,
+                                   bNumba,
+                                   bVerbose)
 
-    return knownParamsDict
+    return params3D
 
 from itertools import chain
 def diagonalizeScalars(params: dict[str, float], 
@@ -48,12 +38,11 @@ def diagonalizeScalars(params: dict[str, float],
                        scalarPermutationMatrix,
                        scalarMassMatrices,
                        scalarRotationMatrix,
-                       bAbsoluteMsq,
                        bNumba,
                        bVerbose) -> dict[str, float]:
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
-    subMassMatrix = np.array( [np.asarray(matrix.evaluate(params))/T**2 for matrix in scalarMassMatrices  ],dtype = "float64" )
+    subMassMatrix = np.array( [np.asarray(matrix.evaluate(params)).real /T**2 for matrix in scalarMassMatrices  ])
     if bNumba:
         from ThreeHiggs.diagonalizeNumba import diagonalizeNumba
         subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, len(subMassMatrix), len(subMassMatrix[0][0]), T)
@@ -63,16 +52,22 @@ def diagonalizeScalars(params: dict[str, float],
         for matrix in subMassMatrix:
             eigenValue, vects = np.linalg.eigh(matrix)
             eigenValue *=T**2
-            ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
-            if bVerbose: ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
-                diagonalBlock = np.transpose(vects) @ matrix @ vects
-                offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
-                if np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
-                    print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
-    
+            
             subEigenValues.append(eigenValue)                    
             subRotationMatrix.append(vects)
             
+            ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
+            ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
+            if not bVerbose:
+                continue
+            
+            diagonalBlock = np.transpose(vects) @ matrix @ vects
+            offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
+            
+            if not np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
+                continue
+            print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
+
     """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
     so we need to undo the permutatation"""
     outDict = scalarRotationMatrix.evaluate(scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix))
@@ -80,15 +75,13 @@ def diagonalizeScalars(params: dict[str, float],
     ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
     ##But should probably be handled by a file given from mathematica (such a list is already made in mathematica)
     massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
-    for i, msq in enumerate(tuple(chain(*subEigenValues))):
-        outDict[massNames[i]] = abs(msq) if bAbsoluteMsq else complex(msq)
 
-    return outDict 
+    return outDict | {name: float(msq) for name, msq in zip(massNames, chain(*subEigenValues))}
 
-import nlopt ##Move inside class?
+import nlopt
 from dataclasses import dataclass, InitVar
 @dataclass(frozen=True)
-class cNlopt: ##Don't wanna call this just nlopt (same name as module), dunno what else to call so added c prefix 
+class cNlopt:
     nbrVars: int = 0
     varLowerBounds: tuple[float] = (0,) 
     varUpperBounds: tuple[float] = (0,) 
@@ -97,41 +90,33 @@ class cNlopt: ##Don't wanna call this just nlopt (same name as module), dunno wh
     absGlobalTol: float = 0
     relGlobalTol: float = 0
     config: InitVar[dict] = None
+    
     ##Regular init method doesn't work with frozen data classes,
     ##Need to manually init by passing the class a dict i.e. class(config = dict)
     def __post_init__(self, config: dict):
         if config:
             self.__init__(**config)
 
-    def runNlopt(self, method: nlopt, 
-                 func: callable, 
+    def nloptGlobal(self, func: callable, 
                  initialGuess: list[float]):
-        opt = nlopt.opt(method, self.nbrVars)
-        """Even though we don't use the gradient,
-        nlopt still tries to pass a grad arguemet to the func,
-        so the func needs to be wrapped to give it room for the grad arguement"""
-        funcWrapper = lambda fields, grad: func(fields) 
-       	opt.set_min_objective(funcWrapper)
+        opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, self.nbrVars)
+       	opt.set_min_objective(func)
        	opt.set_lower_bounds(self.varLowerBounds)
        	opt.set_upper_bounds(self.varUpperBounds)
-       	opt.set_xtol_abs(self.absLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_abs(self.absGlobalTol)
-       	opt.set_xtol_rel(self.relLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_rel(self.relGlobalTol)
+        opt.set_xtol_abs(self.absGlobalTol)
+       	opt.set_xtol_rel(self.relGlobalTol)
+       	return self.nloptLocal(func, opt.optimize(initialGuess)) 
+       
+    def nloptLocal(self, func: callable, 
+                 initialGuess: list[float]):
+        opt = nlopt.opt(nlopt.LN_BOBYQA, self.nbrVars)
+       	opt.set_min_objective(func)
+       	opt.set_lower_bounds(self.varLowerBounds)
+       	opt.set_upper_bounds(self.varUpperBounds)
+       	opt.set_xtol_abs(self.absLocalTol) 
+       	opt.set_xtol_rel(self.relLocalTol)
        	return opt.optimize(initialGuess),  opt.last_optimum_value()
-    
-    def callNlopt(self, func: callable, 
-                 initialGuess: np.ndarray, 
-                 minAlgo: str) -> tuple[np.ndarray, float]:
-        
-        if minAlgo == "directGlobal":
-            initialGuess, _ = self.runNlopt(nlopt.GN_DIRECT_NOSCAL, 
-                                            func,
-                                            initialGuess)
-            
-        return self.runNlopt(nlopt.LN_BOBYQA, 
-                             func, 
-                             initialGuess) 
 
-    
 """ Evaluating the potential: 
 1. Call setModelParameters() with a dict that sets all parameters in the action. 
 This is assumed to be using 3D EFT, so the params are temperature dependent.
@@ -140,7 +125,6 @@ This is assumed to be using 3D EFT, so the params are temperature dependent.
 class EffectivePotential:
     def __init__(self,
                  fieldNames, 
-                 bAbsoluteMsq,
                  loopOrder,
                  bNumba,
                  bVerbose,
@@ -154,10 +138,7 @@ class EffectivePotential:
         
         self.fieldNames = fieldNames
         
-        self.bAbsoluteMsq = bAbsoluteMsq
-        
         self.loopOrder = loopOrder
-        self.bNeedsDiagonalization = (self.loopOrder > 0)
         
         self.bNumba = bNumba
         self.bVerbose = bVerbose
@@ -178,7 +159,7 @@ class EffectivePotential:
     def evaluatePotential(self, fields: list[float], T:float, params3D) -> complex:
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
         ## Sum because the result is a list of tree, 1loop etc 
-        return sum(self.expressions.evaluate(evaluateAll(fields,
+        return sum(self.expressions.evaluate(compFieldDepParams(fields,
                                                          T,
                                                          params3D,
                                                          self.fieldNames,
@@ -187,34 +168,26 @@ class EffectivePotential:
                                                          self.scalarRotationMatrix,
                                                          self.vectorShortHands,
                                                          self.vectorMassesSquared,
-                                                         self.bAbsoluteMsq,
                                                          self.bNumba,
-                                                         self.bVerbose,
-                                                         bNeedsDiagonalization=self.bNeedsDiagonalization)))
-
-    def findLocalMinimum(self, initialGuess: list[float],T:float, params3D, minAlgo) -> tuple[list[float], complex]:
-        ## Minimize real part only:
-        VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields,
-                                                                      T,
-                                                                      params3D) )
-        return self.nloptInst.callNlopt(VeffWrapper, 
-                        initialGuess, 
-                        minAlgo)
+                                                         self.bVerbose)))
 
     def findGlobalMinimum(self,T:float, 
                           params3D,
                           minimumCandidates: list[list[float]] = None) -> tuple[list[float], float, float, str]:
         
-        bestResult = self.findLocalMinimum(minimumCandidates[0], T, params3D, "directGlobal")
+        """For physics reasons we only minimise the real part,
+        for nlopt reasons we need to give a redunant grad arg"""
+        VeffWrapper = lambda fields, grad : np.real ( self.evaluatePotential(fields,
+                                                                      T,
+                                                                      params3D) )
+        
+        bestResult = self.nloptInst.nloptGlobal(VeffWrapper, minimumCandidates[0])
         
         for candidate in minimumCandidates:
-            result = self.findLocalMinimum(candidate, T, params3D, "BOBYQA")
+            result = self.nloptInst.nloptLocal(VeffWrapper, candidate)
             if result[1] < bestResult[1]:
                 bestResult = result
                     
-        if any(np.isnan(bestResult[0])) or np.isinf(bestResult[1]):
-            return (np.full(3, None)), None, None, "NaN"
-        
         potentialAtMin = self.evaluatePotential(bestResult[0], T, params3D) ## Compute the potential at minimum to check if its complex
         if abs(potentialAtMin.imag)/abs(potentialAtMin.real) > 1e-8: 
             return bestResult[0], potentialAtMin.real, potentialAtMin.imag, "complex" ## Flag minimum with imag > tol
@@ -222,11 +195,9 @@ class EffectivePotential:
     
     
     def getUltraSoftScale(self, paramDict, T: float) -> float:
-        '''Returns
-        -------
-        float
-            Given a field input and temperature compute the scale of ultra soft physics which is g^2 T/ 16 pi
-            g is taken to be the largest coupling in the theory to give the tightest constraint'''
+        '''Given a field input and temperature compute the scale of ultra soft physics 
+        which is g^2 T/ 16 pi, g is taken to be the largest coupling in the 
+        theory to give the tightest constraint'''
 
         couplings = np.array([paramDict['lam1Re'], paramDict['lam1Im'],
                               paramDict['lam11'], paramDict['lam22'],
@@ -246,7 +217,7 @@ class EffectivePotential:
         ----Get someone to check the logic of this
         2) Return true if # of light modes is less than the # of goldstone modes'''
         goldStone = 0 if np.all(np.abs(fields) < 0.1) else 3
-        paramDict = evaluateAll(fields,
+        paramDict = compFieldDepParams(fields,
                                 T,
                                 params3D,
                                 self.fieldNames,
@@ -255,13 +226,9 @@ class EffectivePotential:
                                 self.scalarRotationMatrix,
                                 self.vectorShortHands,
                                 self.vectorMassesSquared,
-                                self.bAbsoluteMsq,
                                 self.bNumba,
-                                self.bVerbose,
-                                bNeedsDiagonalization=self.bNeedsDiagonalization)
+                                self.bVerbose)
 
-        ultraSoftScale = self.getUltraSoftScale(paramDict, T)
-    
         ## Convert mass into real type to do comparisons 
         massList = np.real([paramDict["MSsq01"], paramDict["MSsq02"],
                             paramDict["MSsq03"], paramDict["MSsq04"],
@@ -270,7 +237,7 @@ class EffectivePotential:
                             paramDict["MSsq09"], paramDict["MSsq10"],
                             paramDict["MSsq11"], paramDict["MSsq12"]])
     
-        return len([lowMass for lowMass in massList if lowMass < ultraSoftScale]) > goldStone
+        return len([lowMass for lowMass in massList if lowMass < self.getUltraSoftScale(paramDict, T)]) > goldStone
 
 from unittest import TestCase
 class EffectivePotentialUnitTests(TestCase):

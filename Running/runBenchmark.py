@@ -101,7 +101,6 @@ def minimization(args):
                                  "varLowerBounds" : args.varLowerBounds,
                                  "varUpperBounds" : args.varUpperBounds})
     effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
-                                            args.bAbsMass,
                                             args.loopOrder,
                                             args.bNumba,
                                             args.bVerbose,
