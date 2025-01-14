@@ -100,33 +100,53 @@ class cNlopt: ##Don't wanna call this just nlopt (same name as module), dunno wh
         if config:
             self.__init__(**config)
 
-    def runNlopt(self, method: nlopt, 
-                 func: callable, 
+
+
+    def nloptGlobal(self, func: callable, 
                  initialGuess: list[float]):
-        opt = nlopt.opt(method, self.nbrVars)
-        """Even though we don't use the gradient,
-        nlopt still tries to pass a grad arguemet to the func,
-        so the func needs to be wrapped to give it room for the grad arguement"""
-        funcWrapper = lambda fields, grad: func(fields) 
-       	opt.set_min_objective(funcWrapper)
+        opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, self.nbrVars)
+       	opt.set_min_objective(func)
        	opt.set_lower_bounds(self.varLowerBounds)
        	opt.set_upper_bounds(self.varUpperBounds)
-       	opt.set_xtol_abs(self.absLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_abs(self.absGlobalTol)
-       	opt.set_xtol_rel(self.relLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_rel(self.relGlobalTol)
+        opt.set_xtol_abs(self.absGlobalTol)
+       	opt.set_xtol_rel(self.relGlobalTol)
+       	return self.nloptLocal(func, opt.optimize(initialGuess)) 
+       
+    def nloptLocal(self, func: callable, 
+                 initialGuess: list[float]):
+        opt = nlopt.opt(nlopt.LN_BOBYQA, self.nbrVars)
+       	opt.set_min_objective(func)
+       	opt.set_lower_bounds(self.varLowerBounds)
+       	opt.set_upper_bounds(self.varUpperBounds)
+       	opt.set_xtol_abs(self.absLocalTol) 
+       	opt.set_xtol_rel(self.relLocalTol)
        	return opt.optimize(initialGuess),  opt.last_optimum_value()
     
-    def callNlopt(self, func: callable, 
-                 initialGuess: np.ndarray, 
-                 minAlgo: str) -> tuple[np.ndarray, float]:
+    # def runNlopt(self, method: nlopt, 
+    #              func: callable, 
+    #              initialGuess: list[float]):
+    #     opt = nlopt.opt(method, self.nbrVars)
+    #    	opt.set_min_objective(func)
+    #    	opt.set_lower_bounds(self.varLowerBounds)
+    #    	opt.set_upper_bounds(self.varUpperBounds)
+    #    	opt.set_xtol_abs(self.absLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_abs(self.absGlobalTol)
+    #    	opt.set_xtol_rel(self.relLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_rel(self.relGlobalTol)
+    #    	return opt.optimize(initialGuess),  opt.last_optimum_value()
+       
+
+    
+    # def callNlopt(self, func: callable, 
+    #              initialGuess: np.ndarray, 
+    #              minAlgo: str) -> tuple[np.ndarray, float]:
         
-        if minAlgo == "directGlobal":
-            initialGuess, _ = self.runNlopt(nlopt.GN_DIRECT_NOSCAL, 
-                                            func,
-                                            initialGuess)
+    #     if minAlgo == "directGlobal":
+    #         initialGuess = self.runNlopt(nlopt.GN_DIRECT_NOSCAL, 
+    #                                         func,
+    #                                         initialGuess)
             
-        return self.runNlopt(nlopt.LN_BOBYQA, 
-                             func, 
-                             initialGuess) 
+    #     return self.runNlopt(nlopt.LN_BOBYQA, 
+    #                          func, 
+    #                          initialGuess) 
 
     
 """ Evaluating the potential: 
@@ -189,23 +209,20 @@ class EffectivePotential:
                                                          self.bVerbose,
                                                          bNeedsDiagonalization=self.bNeedsDiagonalization)))
 
-    def findLocalMinimum(self, initialGuess: list[float],T:float, params3D, minAlgo) -> tuple[list[float], complex]:
-        ## Minimize real part only:
-        VeffWrapper = lambda fields: np.real ( self.evaluatePotential(fields,
-                                                                      T,
-                                                                      params3D) )
-        return self.nloptInst.callNlopt(VeffWrapper, 
-                        initialGuess, 
-                        minAlgo)
-
     def findGlobalMinimum(self,T:float, 
                           params3D,
                           minimumCandidates: list[list[float]] = None) -> tuple[list[float], float, float, str]:
         
-        bestResult = self.findLocalMinimum(minimumCandidates[0], T, params3D, "directGlobal")
+        """For physics reasons we only minimise the real part,
+        for nlopt reasons we need to give a redunant grad arg"""
+        VeffWrapper = lambda fields, grad : np.real ( self.evaluatePotential(fields,
+                                                                      T,
+                                                                      params3D) )
+        
+        bestResult = self.nloptInst.nloptGlobal(VeffWrapper, minimumCandidates[0])
         
         for candidate in minimumCandidates:
-            result = self.findLocalMinimum(candidate, T, params3D, "BOBYQA")
+            result = self.nloptInst.nloptLocal(VeffWrapper, candidate)
             if result[1] < bestResult[1]:
                 bestResult = result
                     
@@ -219,11 +236,9 @@ class EffectivePotential:
     
     
     def getUltraSoftScale(self, paramDict, T: float) -> float:
-        '''Returns
-        -------
-        float
-            Given a field input and temperature compute the scale of ultra soft physics which is g^2 T/ 16 pi
-            g is taken to be the largest coupling in the theory to give the tightest constraint'''
+        '''Given a field input and temperature compute the scale of ultra soft physics 
+        which is g^2 T/ 16 pi, g is taken to be the largest coupling in the 
+        theory to give the tightest constraint'''
 
         couplings = np.array([paramDict['lam1Re'], paramDict['lam1Im'],
                               paramDict['lam11'], paramDict['lam22'],
