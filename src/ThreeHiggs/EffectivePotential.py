@@ -11,8 +11,7 @@ def compFieldDepParams(fields: list[float],
                 vectorShortHands,
                 vectorMassesSquared,
                 bNumba,
-                bVerbose,
-                bNeedsDiagonalization=True) -> dict[str, float]:
+                bVerbose) -> dict[str, float]:
     ## Background fields
     for i, value in enumerate(fields):
         params3D[fieldNames[i]] = value
@@ -140,7 +139,6 @@ class EffectivePotential:
         self.fieldNames = fieldNames
         
         self.loopOrder = loopOrder
-        self.bNeedsDiagonalization = (self.loopOrder > 0)
         
         self.bNumba = bNumba
         self.bVerbose = bVerbose
@@ -171,8 +169,7 @@ class EffectivePotential:
                                                          self.vectorShortHands,
                                                          self.vectorMassesSquared,
                                                          self.bNumba,
-                                                         self.bVerbose,
-                                                         bNeedsDiagonalization=self.bNeedsDiagonalization)))
+                                                         self.bVerbose)))
 
     def findGlobalMinimum(self,T:float, 
                           params3D,
@@ -233,8 +230,7 @@ class EffectivePotential:
                                 self.vectorShortHands,
                                 self.vectorMassesSquared,
                                 self.bNumba,
-                                self.bVerbose,
-                                bNeedsDiagonalization=self.bNeedsDiagonalization)
+                                self.bVerbose)
 
         ultraSoftScale = self.getUltraSoftScale(paramDict, T)
     
