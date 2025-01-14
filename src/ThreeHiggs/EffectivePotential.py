@@ -232,8 +232,6 @@ class EffectivePotential:
                                 self.bNumba,
                                 self.bVerbose)
 
-        ultraSoftScale = self.getUltraSoftScale(paramDict, T)
-    
         ## Convert mass into real type to do comparisons 
         massList = np.real([paramDict["MSsq01"], paramDict["MSsq02"],
                             paramDict["MSsq03"], paramDict["MSsq04"],
@@ -242,7 +240,7 @@ class EffectivePotential:
                             paramDict["MSsq09"], paramDict["MSsq10"],
                             paramDict["MSsq11"], paramDict["MSsq12"]])
     
-        return len([lowMass for lowMass in massList if lowMass < ultraSoftScale]) > goldStone
+        return len([lowMass for lowMass in massList if lowMass < self.getUltraSoftScale(paramDict, T)]) > goldStone
 
 from unittest import TestCase
 class EffectivePotentialUnitTests(TestCase):
