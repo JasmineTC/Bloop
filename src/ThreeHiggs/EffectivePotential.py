@@ -188,9 +188,6 @@ class EffectivePotential:
             if result[1] < bestResult[1]:
                 bestResult = result
                     
-        if any(np.isnan(bestResult[0])) or np.isinf(bestResult[1]):
-            return (np.full(3, None)), None, None, "NaN"
-        
         potentialAtMin = self.evaluatePotential(bestResult[0], T, params3D) ## Compute the potential at minimum to check if its complex
         if abs(potentialAtMin.imag)/abs(potentialAtMin.real) > 1e-8: 
             return bestResult[0], potentialAtMin.real, potentialAtMin.imag, "complex" ## Flag minimum with imag > tol
