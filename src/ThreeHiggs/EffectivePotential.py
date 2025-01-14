@@ -206,24 +206,14 @@ class EffectivePotential:
     def findGlobalMinimum(self,T:float, 
                           params3D,
                           minimumCandidates: list[list[float]] = None) -> tuple[list[float], float, float, str]:
-        bestResult = ((np.full(3, np.nan)), np.inf)
         
-        if self.minAlgo == "combo":
-            result = self.findLocalMinimum(minimumCandidates[0], T, params3D, "directGlobal")
+        bestResult = self.findLocalMinimum(minimumCandidates[0], T, params3D, "directGlobal")
+        
+        for candidate in minimumCandidates:
+            result = self.findLocalMinimum(candidate, T, params3D, "BOBYQA")
             if result[1] < bestResult[1]:
                 bestResult = result
-            
-            for candidate in minimumCandidates:
-                result = self.findLocalMinimum(candidate, T, params3D, "BOBYQA")
-                if result[1] < bestResult[1]:
-                    bestResult = result
                     
-        else:
-            for candidate in minimumCandidates:
-                result = self.findLocalMinimum(candidate,T, params3D, self.minAlgo)
-                if result[1] < bestResult[1]:
-                    bestResult = result
-        
         if any(np.isnan(bestResult[0])) or np.isinf(bestResult[1]):
             return (np.full(3, None)), None, None, "NaN"
         
