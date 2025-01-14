@@ -100,8 +100,6 @@ class cNlopt: ##Don't wanna call this just nlopt (same name as module), dunno wh
         if config:
             self.__init__(**config)
 
-
-
     def nloptGlobal(self, func: callable, 
                  initialGuess: list[float]):
         opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, self.nbrVars)
@@ -121,34 +119,7 @@ class cNlopt: ##Don't wanna call this just nlopt (same name as module), dunno wh
        	opt.set_xtol_abs(self.absLocalTol) 
        	opt.set_xtol_rel(self.relLocalTol)
        	return opt.optimize(initialGuess),  opt.last_optimum_value()
-    
-    # def runNlopt(self, method: nlopt, 
-    #              func: callable, 
-    #              initialGuess: list[float]):
-    #     opt = nlopt.opt(method, self.nbrVars)
-    #    	opt.set_min_objective(func)
-    #    	opt.set_lower_bounds(self.varLowerBounds)
-    #    	opt.set_upper_bounds(self.varUpperBounds)
-    #    	opt.set_xtol_abs(self.absLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_abs(self.absGlobalTol)
-    #    	opt.set_xtol_rel(self.relLocalTol) if method == nlopt.LN_BOBYQA else opt.set_xtol_rel(self.relGlobalTol)
-    #    	return opt.optimize(initialGuess),  opt.last_optimum_value()
-       
 
-    
-    # def callNlopt(self, func: callable, 
-    #              initialGuess: np.ndarray, 
-    #              minAlgo: str) -> tuple[np.ndarray, float]:
-        
-    #     if minAlgo == "directGlobal":
-    #         initialGuess = self.runNlopt(nlopt.GN_DIRECT_NOSCAL, 
-    #                                         func,
-    #                                         initialGuess)
-            
-    #     return self.runNlopt(nlopt.LN_BOBYQA, 
-    #                          func, 
-    #                          initialGuess) 
-
-    
 """ Evaluating the potential: 
 1. Call setModelParameters() with a dict that sets all parameters in the action. 
 This is assumed to be using 3D EFT, so the params are temperature dependent.
