@@ -105,7 +105,6 @@ def minimization(args):
                                             args.loopOrder,
                                             args.bNumba,
                                             args.bVerbose,
-                                            args.minAlgo,
                                             nloptInst,
                                             ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
                                             ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
