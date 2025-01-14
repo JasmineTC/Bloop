@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import linalg
 
-def compFieldDependentParams(fields: list[float], 
+def compFieldDepParams(fields: list[float], 
                 T:float, 
                 params3D, 
                 fieldNames, 
@@ -14,33 +14,30 @@ def compFieldDependentParams(fields: list[float],
                 bNumba,
                 bVerbose,
                 bNeedsDiagonalization=True) -> dict[str, float]:
-    """This should return a dict that fixes all symbols needed for Veff 2-loop evaluation."""
-    knownParamsDict = params3D.copy()
-
     ## Background fields
     for i, value in enumerate(fields):
-        knownParamsDict[fieldNames[i]] = value
+        params3D[fieldNames[i]] = value
 
     ## Vectors
-    knownParamsDict |= vectorShortHands.evaluate(knownParamsDict, bReturnDict=True)
-    vectorMasses = vectorMassesSquared.evaluate(knownParamsDict, bReturnDict=True)
+    params3D |= vectorShortHands.evaluate(params3D, bReturnDict=True)
+    vectorMasses = vectorMassesSquared.evaluate(params3D, bReturnDict=True)
 
     for key, val in vectorMasses.items():
         vectorMasses[key] = np.abs(val) if bAbsoluteMsq else complex(val)
 
-    knownParamsDict |= vectorMasses
+    params3D |= vectorMasses
 
     ## Scalars       
-    knownParamsDict |= diagonalizeScalars(knownParamsDict, 
-                                          T,
-                                          scalarPermutationMatrix,
-                                          scalarMassMatrices,
-                                          scalarRotationMatrix,
-                                          bAbsoluteMsq,
-                                          bNumba,
-                                          bVerbose)
+    params3D |= diagonalizeScalars(params3D, 
+                                   T,
+                                   scalarPermutationMatrix,
+                                   scalarMassMatrices,
+                                   scalarRotationMatrix,
+                                   bAbsoluteMsq,
+                                   bNumba,
+                                   bVerbose)
 
-    return knownParamsDict
+    return params3D
 
 from itertools import chain
 def diagonalizeScalars(params: dict[str, float], 
