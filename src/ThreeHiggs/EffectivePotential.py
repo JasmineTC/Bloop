@@ -50,7 +50,7 @@ def diagonalizeScalars(params: dict[str, float],
                        bVerbose) -> dict[str, float]:
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
-    subMassMatrix = np.array( [np.asarray(matrix.evaluate(params)).real /T**2 for matrix in scalarMassMatrices  ] )
+    subMassMatrix = np.array( [np.asarray(matrix.evaluate(params)).real /T**2 for matrix in scalarMassMatrices  ])
     if bNumba:
         from ThreeHiggs.diagonalizeNumba import diagonalizeNumba
         subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, len(subMassMatrix), len(subMassMatrix[0][0]), T)
