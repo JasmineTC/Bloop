@@ -7,24 +7,8 @@ python3 ../src/ThreeHiggs/UnitTests.py
 echo Intergration tests...
 
 # Super coarse test providing full coverage
-echo Intergration test: Running code at NNLO, abs mass mode on...
-rm IntegrationTests/AbsMass/OutputResult/* 
-python3 runBenchmark.py --loopOrder 2 \
-                        --firstBenchmark 1 \
-                        --lastBenchmark 1 \
-                        --bSave \
-                        --resultsDirectory IntegrationTests/AbsMass/OutputResult/  \
-                        --TRangeStart 50 \
-                        --TRangeEnd 100 \
-                        --TRangeStepSize 10 \
-                        --bAbsMass \
-                        --bProcessMin
-
-diff IntegrationTests/AbsMass/OutputResult/BM_1.json IntegrationTests/AbsMass/ReferenceResult/BM_1.json
-diff IntegrationTests/AbsMass/OutputResult/BM_1_interp.json IntegrationTests/AbsMass/ReferenceResult/BM_1_interp.json
-# Super coarse test providing full coverage, permit complex mass
 echo Intergration test: Running code at NNLO, complex mass mode on...
-rm IntegrationTests/ComplexMass/OutputResult/* 
+rm -f IntegrationTests/ComplexMass/OutputResult/* 
 python3 runBenchmark.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
@@ -39,7 +23,7 @@ diff IntegrationTests/ComplexMass/OutputResult/BM_1_interp.json IntegrationTests
 
 # Super coarse test providing full coverage, complex mass+numba
 echo Intergration test: Running code at NNLO, complex mass mode on with Numba...
-rm IntegrationTests/Numba/OutputResult/* 
+rm -f IntegrationTests/Numba/OutputResult/* 
 python3 runBenchmark.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \

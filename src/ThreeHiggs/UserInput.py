@@ -48,9 +48,6 @@ class UserInput(argparse.ArgumentParser):
                           help = "Str: Location to save files",
                           metavar='')
         
-        self.add_argument('--bAbsMass', action = 'store_true', default = False, dest = 'bAbsMass',
-                          help = "Bool: If activated the abs value of masses is used")
-        
         self.add_argument('--absGlobalTolerance', action = 'store', default = 0.5, type = float, dest = 'absGlobalTolerance',
         metavar='')
         self.add_argument('--relGlobalTolerance', action = 'store', default = 0.5, type = float, dest = 'relGlobalTolerance',

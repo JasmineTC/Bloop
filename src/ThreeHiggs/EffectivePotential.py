@@ -10,7 +10,6 @@ def compFieldDepParams(fields: list[float],
                 scalarRotationMatrix,
                 vectorShortHands,
                 vectorMassesSquared,
-                bAbsoluteMsq,
                 bNumba,
                 bVerbose,
                 bNeedsDiagonalization=True) -> dict[str, float]:
@@ -20,12 +19,8 @@ def compFieldDepParams(fields: list[float],
 
     ## Vectors
     params3D |= vectorShortHands.evaluate(params3D, bReturnDict=True)
-    vectorMasses = vectorMassesSquared.evaluate(params3D, bReturnDict=True)
-
-    for key, val in vectorMasses.items():
-        vectorMasses[key] = np.abs(val) if bAbsoluteMsq else complex(val)
-
-    params3D |= vectorMasses
+    
+    params3D |= vectorMassesSquared.evaluate(params3D, bReturnDict=True)
 
     ## Scalars       
     params3D |= diagonalizeScalars(params3D, 
@@ -33,7 +28,6 @@ def compFieldDepParams(fields: list[float],
                                    scalarPermutationMatrix,
                                    scalarMassMatrices,
                                    scalarRotationMatrix,
-                                   bAbsoluteMsq,
                                    bNumba,
                                    bVerbose)
 
@@ -45,7 +39,6 @@ def diagonalizeScalars(params: dict[str, float],
                        scalarPermutationMatrix,
                        scalarMassMatrices,
                        scalarRotationMatrix,
-                       bAbsoluteMsq,
                        bNumba,
                        bVerbose) -> dict[str, float]:
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
@@ -72,9 +65,9 @@ def diagonalizeScalars(params: dict[str, float],
             diagonalBlock = np.transpose(vects) @ matrix @ vects
             offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
             
-            if np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
-                print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
-
+            if not np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
+                continue
+            print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
 
     """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
     so we need to undo the permutatation"""
@@ -83,15 +76,13 @@ def diagonalizeScalars(params: dict[str, float],
     ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
     ##But should probably be handled by a file given from mathematica (such a list is already made in mathematica)
     massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
-    for i, msq in enumerate(tuple(chain(*subEigenValues))):
-        outDict[massNames[i]] = abs(msq) if bAbsoluteMsq else complex(msq)
 
-    return outDict 
+    return outDict | {name: float(msq) for name, msq in zip(massNames, chain(*subEigenValues))}
 
-import nlopt ##Move inside class?
+import nlopt
 from dataclasses import dataclass, InitVar
 @dataclass(frozen=True)
-class cNlopt: ##Don't wanna call this just nlopt (same name as module), dunno what else to call so added c prefix 
+class cNlopt:
     nbrVars: int = 0
     varLowerBounds: tuple[float] = (0,) 
     varUpperBounds: tuple[float] = (0,) 
@@ -100,6 +91,7 @@ class cNlopt: ##Don't wanna call this just nlopt (same name as module), dunno wh
     absGlobalTol: float = 0
     relGlobalTol: float = 0
     config: InitVar[dict] = None
+    
     ##Regular init method doesn't work with frozen data classes,
     ##Need to manually init by passing the class a dict i.e. class(config = dict)
     def __post_init__(self, config: dict):
@@ -134,7 +126,6 @@ This is assumed to be using 3D EFT, so the params are temperature dependent.
 class EffectivePotential:
     def __init__(self,
                  fieldNames, 
-                 bAbsoluteMsq,
                  loopOrder,
                  bNumba,
                  bVerbose,
@@ -147,8 +138,6 @@ class EffectivePotential:
                  veff):
         
         self.fieldNames = fieldNames
-        
-        self.bAbsoluteMsq = bAbsoluteMsq
         
         self.loopOrder = loopOrder
         self.bNeedsDiagonalization = (self.loopOrder > 0)
@@ -181,7 +170,6 @@ class EffectivePotential:
                                                          self.scalarRotationMatrix,
                                                          self.vectorShortHands,
                                                          self.vectorMassesSquared,
-                                                         self.bAbsoluteMsq,
                                                          self.bNumba,
                                                          self.bVerbose,
                                                          bNeedsDiagonalization=self.bNeedsDiagonalization)))
@@ -244,7 +232,6 @@ class EffectivePotential:
                                 self.scalarRotationMatrix,
                                 self.vectorShortHands,
                                 self.vectorMassesSquared,
-                                self.bAbsoluteMsq,
                                 self.bNumba,
                                 self.bVerbose,
                                 bNeedsDiagonalization=self.bNeedsDiagonalization)
