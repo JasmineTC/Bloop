@@ -65,11 +65,6 @@ class DimensionalReduction():
 
         return outParams
 
-    # Unused. Remove me.
-    def getUltrasoftScaleParams(self, softScaleParams: dict[str, float], goalRGScale: float) -> dict[str, float]:
-        return self.matchToUltrasoft.evaluate(softScaleParams)
-
-
 def getLines(relativePathToResource):
     ## fallback to hardcoded package name if the __package__ call fails
     packageName = __package__ or "ThreeHiggs"
