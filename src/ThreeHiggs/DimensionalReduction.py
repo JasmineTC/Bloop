@@ -36,34 +36,23 @@ class DimensionalReduction():
             print("")
 
     def getEFTParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
-        """This goes from input hard scale parameters to whatever the final EFT is.
-        """
-        softScaleParams = self.getSoftScaleParams(paramsForMatching, goalRGScale)
-        ultrasoftScaleParams = self.matchToUltrasoft.evaluate(softScaleParams, bReturnDict = True)
+        # Hard to soft:
+        outParams = self.matchToSoft.evaluate(paramsForMatching, bReturnDict = True)
+        ## TODO Talk to someone about this RGScale stuff!!!!!
+        outParams["RGScale"] = paramsForMatching["RGScale"]
+        outParams["goalScale"] = goalRGScale
+        outParams["startScale"] = outParams["RGScale"]
+        
+        outParams |= self.softScaleRGE.evaluate(outParams, bReturnDict = True)
+
+        outParams["RGScale"] = goalRGScale
+        # Soft to ultra soft:
+        ultrasoftScaleParams = self.matchToUltrasoft.evaluate(outParams, bReturnDict = True)
 
         ## HACK this is the RG scale name in Veff
         ultrasoftScaleParams["mu3US"] = goalRGScale
 
         return ultrasoftScaleParams
-
-
-
-    ## NB: T should be in the input dict
-    def getSoftScaleParams(self, paramsForMatching: dict[str, float], goalScale: float) -> dict[str, float]:
-        """Match hard scale --> soft scale theory
-        """
-        outParams = self.matchToSoft.evaluate(paramsForMatching, bReturnDict = True)
-
-        ## RG scale needs to be in the parameter dict
-        outParams["RGScale"] = paramsForMatching["RGScale"]
-        outParams["goalScale"] = goalScale
-        outParams["startScale"] = outParams["RGScale"]
-
-        ## The above gives masses only (usually). So merge it to the initial dict to get all params
-        outParams |= self.softScaleRGE.evaluate(outParams, bReturnDict = True)
-        outParams["RGScale"] = goalScale
-
-        return outParams
 
 def getLines(relativePathToResource):
     ## fallback to hardcoded package name if the __package__ call fails
