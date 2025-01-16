@@ -99,7 +99,7 @@ def traceFreeEnergyMinimum(effectivePotential,
         paramsForMatching["Lf"] = Lb + Lfconst
 
         ##Take the 4D params (at the matching scale) and match them to the 3D params
-        params3D = dimensionalReduction.getEFTParams(paramsForMatching, goalRGScale)
+        params3D = dimensionalReduction.getUltraSoftParams(paramsForMatching, goalRGScale)
         
         initialGuesses = [[0.1,0.1,0.1], ## TODO This should go in a config file or something
                           [5,5,5],

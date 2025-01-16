@@ -35,7 +35,7 @@ class DimensionalReduction():
 
             print("")
 
-    def getEFTParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
+    def getUltraSoftParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
         # Hard to soft:
         outParams = self.matchToSoft.evaluate(paramsForMatching, bReturnDict = True)
         ## TODO Talk to someone about this RGScale stuff!!!!!
