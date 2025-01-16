@@ -39,20 +39,17 @@ class DimensionalReduction():
         # Hard to soft:
         outParams = self.matchToSoft.evaluate(paramsForMatching, bReturnDict = True)
         ## TODO Talk to someone about this RGScale stuff!!!!!
-        outParams["RGScale"] = paramsForMatching["RGScale"]
-        outParams["goalScale"] = goalRGScale
-        outParams["startScale"] = outParams["RGScale"]
+        outParams |= {"RGScale": paramsForMatching["RGScale"],
+                      "goalScale": goalRGScale,
+                      "startScale": outParams["RGScale"]}
         
         outParams |= self.softScaleRGE.evaluate(outParams, bReturnDict = True)
-
+        ## For reasons unknown the RG scale is different for soft and ultra soft physics
         outParams["RGScale"] = goalRGScale
-        # Soft to ultra soft:
-        ultrasoftScaleParams = self.matchToUltrasoft.evaluate(outParams, bReturnDict = True)
-
         ## HACK this is the RG scale name in Veff
-        ultrasoftScaleParams["mu3US"] = goalRGScale
-
-        return ultrasoftScaleParams
+        ultraSoftScaleParams = {"mu3US": goalRGScale}
+        # Soft to ultra soft:
+        return ultraSoftScaleParams | self.matchToUltrasoft.evaluate(outParams, bReturnDict = True)
 
 def getLines(relativePathToResource):
     ## fallback to hardcoded package name if the __package__ call fails
