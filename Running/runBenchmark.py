@@ -116,8 +116,7 @@ def minimization(args):
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
     dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(parsedExpressions["hardToSoft"]),
                                                 ParsedExpressionSystem(parsedExpressions["softScaleRGE"]),
-                                                ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]),
-                                                bVerbose = args.bVerbose)
+                                                ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]))
     
     with open(args.benchmarkFile) as benchmarkFile:
         if args.bPool:
