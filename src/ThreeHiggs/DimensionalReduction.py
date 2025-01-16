@@ -1,55 +1,30 @@
-## Collects all needed matching relations to go from 4D params to 3D ultrasoft EFT
+from dataclasses import dataclass, InitVar
+@dataclass(frozen=True)
 class DimensionalReduction():
-
-    def __init__(self, hardToSoft, softScaleRGE, softToUltraSoft, bVerbose = False):
-        self.matchToSoft = hardToSoft
-        self.softScaleRGE = softScaleRGE
-        self.matchToUltrasoft = softToUltraSoft
-
-        if bVerbose:
-            print("Setup Hard -> Soft matching relations.")
-            print("-- Inputs:")
-            from functools import reduce
-            print(sorted(list(reduce(lambda a, b: a + [b],
-                                     [parsedExpression.identifier for parsedExpression in self.matchToSoft.parsedExpressions],
-                                     []))))
-
-            print("-- Outputs:")
-            print(sorted(list(set(reduce(lambda a, b: a | set(b),
-                                         [parsedExpression.symbols for parsedExpression in self.matchToSoft.parsedExpressions],
-                                         set())))))
-
-            print("")
-        
-            print("Setup Soft -> Ultrasoft matching relations.")
-            print("-- Inputs:")
-            from functools import reduce
-            print(sorted(list(reduce(lambda a, b: a + [b],
-                                     [parsedExpression.identifier for parsedExpression in self.matchToUltrasoft.parsedExpressions],
-                                     []))))
-
-            print("-- Outputs:")
-            print(sorted(list(set(reduce(lambda a, b: a | set(b),
-                                         [parsedExpression.symbols for parsedExpression in self.matchToUltrasoft.parsedExpressions],
-                                         set())))))
-
-            print("")
+    hardToSoft: callable = 0
+    softScaleRGE: callable = 0 
+    softToUltraSoft: callable = 0 
+    config: InitVar[dict] = None
+    
+    def __post_init__(self, config: dict):
+        if config:
+            self.__init__(**config)
 
     def getUltraSoftParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
         # Hard to soft:
-        outParams = self.matchToSoft.evaluate(paramsForMatching, bReturnDict = True)
+        outParams = self.hardToSoft.evaluate(paramsForMatching, bReturnDict = True)
         ## TODO Talk to someone about this RGScale stuff!!!!!
         outParams |= {"RGScale": paramsForMatching["RGScale"],
                       "goalScale": goalRGScale,
-                      "startScale": outParams["RGScale"]}
+                      "startScale": paramsForMatching["RGScale"]}
         
         outParams |= self.softScaleRGE.evaluate(outParams, bReturnDict = True)
         ## For reasons unknown the RG scale is different for soft and ultra soft physics
         outParams["RGScale"] = goalRGScale
-        ## HACK this is the RG scale name in Veff
-        ultraSoftScaleParams = {"mu3US": goalRGScale}
+        
         # Soft to ultra soft:
-        return ultraSoftScaleParams | self.matchToUltrasoft.evaluate(outParams, bReturnDict = True)
+        ## HACK this is the RG scale name in Veff
+        return {"mu3US": goalRGScale} | self.softToUltraSoft.evaluate(outParams, bReturnDict = True)
 
 def getLines(relativePathToResource):
     ## fallback to hardcoded package name if the __package__ call fails
