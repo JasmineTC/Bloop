@@ -254,10 +254,10 @@ twoPointSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Fla
 yukawaSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ Ysff]]
 
 
-ExportUTF8[variables<>"/scalar4PointSymbols.json", fourPointSymbols];
-ExportUTF8[variables<>"/scalarMassSymbols.json", twoPointSymbols];
-ExportUTF8[variables<>"/YukawaSymbols.json", yukawaSymbols];
-ExportUTF8[variables<>"/GaugeSymbols.json", String[GaugeCouplings]];
+ExportUTF8[variables<>"/scalar4PointSymbols.txt", fourPointSymbols];
+ExportUTF8[variables<>"/scalarMassSymbols.txt", twoPointSymbols];
+ExportUTF8[variables<>"/YukawaSymbols.txt", yukawaSymbols];
+ExportUTF8[variables<>"/GaugeSymbols.txt", String[GaugeCouplings]];
 
 
 couplingsSoft = PrintCouplings[];
