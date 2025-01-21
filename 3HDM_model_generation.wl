@@ -141,6 +141,7 @@ QuarticTerm5 = \[Lambda]1Conj*\[Phi]21^2 + \[Lambda]2Conj*\[Phi]32^2 + \[Lambda]
 
 
 VQuartic=QuarticTerm1 + QuarticTerm2 + QuarticTerm3 + QuarticTerm4 + QuarticTerm5 // Simplify // Expand; (* simplify to get rid of imag units *)
+\[CapitalLambda]4=GradQuartic[VQuartic];
 
 
 InputInv={{1,1,2},{False,False,True}}; 
@@ -253,10 +254,10 @@ twoPointSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Fla
 yukawaSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ Ysff]]
 
 
-ExportUTF8[variables<>"/scalar4PointSymbols.txt", fourPointSymbols];
-ExportUTF8[variables<>"/scalarMassSymbols.txt", twoPointSymbols];
-ExportUTF8[variables<>"/YukawaSymbols.txt", yukawaSymbols];
-ExportUTF8[variables<>"/GaugeSymbols.txt", GaugeCouplings];
+ExportUTF8[variables<>"/scalar4PointSymbols.json", fourPointSymbols];
+ExportUTF8[variables<>"/scalarMassSymbols.json", twoPointSymbols];
+ExportUTF8[variables<>"/YukawaSymbols.json", yukawaSymbols];
+ExportUTF8[variables<>"/GaugeSymbols.json", String[GaugeCouplings]];
 
 
 couplingsSoft = PrintCouplings[];
