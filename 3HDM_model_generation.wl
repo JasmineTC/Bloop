@@ -293,6 +293,9 @@ BetaFunctions4D[];
 ExportUTF8[hardToSoftDirectory<>"/BetaFunctions4D[].txt", BetaFunctions4D[]];
 
 
+BetaFunctions4DUnsquared[] = BetaFunctions4D[] /. {(x_^2 -> y_) :> (x -> y/(2*x))}
+
+
 (* 3D RG equations can be solved exactly, so do that here. We will export subst rules analogous to the matching relations:
 	msq -> msq + \[Beta][msq] Log[\[Mu]3/\[Mu]] where RHS msq is the 3D mass at scale \[Mu] and LHS msq is the mass at scale \[Mu]3 *)
 	
