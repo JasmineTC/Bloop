@@ -1,48 +1,16 @@
 import numpy as np
+## This is for the hard coded - remove later
 from numpy import pi as Pi
+import scipy
 
-from scipy.integrate import odeint
-from scipy.interpolate import CubicSpline
-
-"""Status:
-    Short term: Fine
-    Long term: How dict <-> array can probably be improved
-               Long these expressions from mathematica rather than hardcode 
-"""
 class BetaFunctions4D():
-    """ Currently called by TransitionFinder to compute the couplings at the matching scale: 
-    """
-
-    """ Order of computations:
-        1. Call SolveBetaFunction given a dictionary containing the coupling name and initial condition (the value of the coupling at 0T at the z mass)
-        2. Call UnpackParamDict to generate an array of initial conditions (needed for odeint), also stores a mapping for coupling <-> index
-           so that dictionaries/arrays can be generated with a consistent order
-        3. SolveBetaFunction takes the initial condition list from UnpackParamDict gives it to odeint to solve the beta function up to some scale
-        4. Interpolations of the odeint data are made and stored
-        5. Call RunCoupling to evaluate the interpolations and return a dict
-    """
-    pi16 = 16.*Pi**2
     def __init__(self, muRange, initialParams: dict[str, float]):
         self.muRange = muRange
-        self.pi16 = __class__.pi16
+        self.pi16 = 16.*Pi**2
 
         ## Need to unpack the param dict for odeint
-        paramsList = self.unpackParamDict(initialParams)
+        self.paramsList = self.unpackParamDict(initialParams)
         
-        ## Solve the beta functions over muRange and interpolate over the results -- store the interpolations within beta functions to be called later
-        solution = odeint(self.hardCodeBetaFunction, paramsList, self.muRange)
-
-        ##To make solution slightly nicer to work with we take the transpose so that each coupling is inside its own array,
-        ##as oppossed to each mu step being its own array
-        solution = np.transpose(solution)
-        
-        ##Construct a dict for the splines of the beta functions
-        interpDict = {}
-        for i, key in enumerate(self._keyMapping):
-            interpDict[key] =  CubicSpline(self.muRange, solution[i], extrapolate = False)
-        
-        self.interpDict = interpDict
-
     def unpackParamDict(self, params: dict[str, float]) -> np.ndarray:
         """Puts a 3HDM parameter dict in array format that odeint understands.
         Also produces a name <-> index mapping for easier access to the params in beta function expressions."""
@@ -61,6 +29,17 @@ class BetaFunctions4D():
         self._indexMapping = indexMapping
         self._keyMapping = keyMapping
         return paramsList    
+        
+    def constructSplineDict(self):
+        solution = np.transpose( scipy.integrate.odeint(self.hardCodeBetaFunction, 
+                                        self.paramsList, 
+                                        self.muRange) )
+
+        
+        ## This makes it non-trivial to make this a frozen class
+        self.interpDict = {}
+        for i, key in enumerate(self._keyMapping):
+            self.interpDict[key] =  scipy.interpolate.CubicSpline(self.muRange, solution[i], extrapolate = False)
         
     def hardCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float) -> np.ndarray:
         ## Pick params from the input array since they are appear as hardcoded symbols below
@@ -90,8 +69,6 @@ class BetaFunctions4D():
         mu3sq = InitialConditions[ self._indexMapping["mu3sq"] ]
         
         ## Each differential equation is copy and pasted from the DRalgo file - BetaFunctions4D[]//FortranForm, except
-        ## For a tiny speed up 16*pi**2 is computed in init and then called - another tiny speed up,  get rid of all the divisons
-        ## Note this does lead to floating point errors
         ## Except for the gauge couplings which need to be divided by 2 g as DRalgo gives the beta function as dg^2/dmu and odeint assumes dg/dmu
         ## TODO Is it better to work with g^2?
         dg1 = (43*g1**3)/(self.pi16*6)
@@ -149,6 +126,7 @@ class BetaFunctions4D():
         
         return betaArray/mu
 
+        
     def runCoupling(self, muEvaulate: float):
         
         runCoupling = {}
