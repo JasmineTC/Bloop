@@ -13,7 +13,6 @@ class BetaFunctions4D():
         4. Interpolations of the odeint data are made and stored
         5. Call RunCoupling to evaluate the interpolations and return a dict
     """
-    pi16 = 16.*Pi**2
     def __init__(self, muRange, initialParams: dict[str, float]):
         self.muRange = muRange
         self.pi16 = 16.*Pi**2
