@@ -19,22 +19,18 @@ class BetaFunctions4D():
         self.pi16 = 16.*Pi**2
 
         ## Need to unpack the param dict for odeint
-        paramsList = self.unpackParamDict(initialParams)
+        self.paramsList = self.unpackParamDict(initialParams)
         
-        ## Solve the beta functions over muRange and interpolate over the results -- store the interpolations within beta functions to be called later
-        solution = odeint(self.hardCodeBetaFunction, paramsList, self.muRange)
+    def constructSplineDict(self):
+        solution = odeint(self.hardCodeBetaFunction, self.paramsList, self.muRange)
 
-        ##To make solution slightly nicer to work with we take the transpose so that each coupling is inside its own array,
-        ##as oppossed to each mu step being its own array
         solution = np.transpose(solution)
         
-        ##Construct a dict for the splines of the beta functions
-        interpDict = {}
+        ## This makes it non-trivial to make this a frozen class
+        self.interpDict = {}
         for i, key in enumerate(self._keyMapping):
-            interpDict[key] =  CubicSpline(self.muRange, solution[i], extrapolate = False)
+            self.interpDict[key] =  CubicSpline(self.muRange, solution[i], extrapolate = False)
         
-        self.interpDict = interpDict
-
     def unpackParamDict(self, params: dict[str, float]) -> np.ndarray:
         """Puts a 3HDM parameter dict in array format that odeint understands.
         Also produces a name <-> index mapping for easier access to the params in beta function expressions."""
