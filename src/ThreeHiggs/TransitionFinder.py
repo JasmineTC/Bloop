@@ -63,7 +63,7 @@ def traceFreeEnergyMinimum(effectivePotential,
     
     from .BetaFunctions import BetaFunctions4D
     betasFunctions = BetaFunctions4D(muRange, LagranianParams4D) 
-    
+    betasFunctions.constructSplineDict()
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
     
