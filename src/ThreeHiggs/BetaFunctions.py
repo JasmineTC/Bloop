@@ -4,15 +4,7 @@ from numpy import pi as Pi
 from scipy.integrate import odeint
 from scipy.interpolate import CubicSpline
 
-"""Status:
-    Short term: Fine
-    Long term: How dict <-> array can probably be improved
-               Long these expressions from mathematica rather than hardcode 
-"""
 class BetaFunctions4D():
-    """ Currently called by TransitionFinder to compute the couplings at the matching scale: 
-    """
-
     """ Order of computations:
         1. Call SolveBetaFunction given a dictionary containing the coupling name and initial condition (the value of the coupling at 0T at the z mass)
         2. Call UnpackParamDict to generate an array of initial conditions (needed for odeint), also stores a mapping for coupling <-> index
@@ -24,7 +16,7 @@ class BetaFunctions4D():
     pi16 = 16.*Pi**2
     def __init__(self, muRange, initialParams: dict[str, float]):
         self.muRange = muRange
-        self.pi16 = __class__.pi16
+        self.pi16 = 16.*Pi**2
 
         ## Need to unpack the param dict for odeint
         paramsList = self.unpackParamDict(initialParams)
