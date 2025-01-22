@@ -4,12 +4,8 @@ from numpy import pi as Pi
 import scipy
 
 class BetaFunctions4D():
-    def __init__(self, muRange, initialParams: dict[str, float]):
-        self.muRange = muRange
+    def __init__(self):
         self.pi16 = 16.*Pi**2
-
-        ## Need to unpack the param dict for odeint
-        self.paramsList = self.unpackParamDict(initialParams)
         
     def unpackParamDict(self, params: dict[str, float]) -> np.ndarray:
         """Puts a 3HDM parameter dict in array format that odeint understands.
@@ -30,16 +26,18 @@ class BetaFunctions4D():
         self._keyMapping = keyMapping
         return paramsList    
         
-    def constructSplineDict(self):
+    def constructSplineDict(self, muRange, initialParams: dict[str, float]):
+        ## Need to unpack the param dict for odeint
+        paramsList = self.unpackParamDict(initialParams)
         solution = np.transpose( scipy.integrate.odeint(self.hardCodeBetaFunction, 
-                                        self.paramsList, 
-                                        self.muRange) )
+                                        paramsList, 
+                                        muRange) )
 
         
         ## This makes it non-trivial to make this a frozen class
         self.interpDict = {}
         for i, key in enumerate(self._keyMapping):
-            self.interpDict[key] =  scipy.interpolate.CubicSpline(self.muRange, solution[i], extrapolate = False)
+            self.interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[i], extrapolate = False)
         
     def hardCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float) -> np.ndarray:
         ## Pick params from the input array since they are appear as hardcoded symbols below
