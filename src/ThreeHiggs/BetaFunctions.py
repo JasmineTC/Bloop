@@ -4,8 +4,6 @@ from numpy import pi as Pi
 import scipy
 
 class BetaFunctions4D():
-    def __init__(self):
-        None
         
     def _unpackParamDict(self, params: dict[str, float]) -> tuple((np.ndarray,
                                                                    dict[str, float], 
