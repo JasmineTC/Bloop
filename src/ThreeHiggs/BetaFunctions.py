@@ -7,7 +7,7 @@ class BetaFunctions4D():
     def __init__(self):
         None
         
-    def unpackParamDict(self, params: dict[str, float]) -> np.ndarray:
+    def _unpackParamDict(self, params: dict[str, float]) -> np.ndarray:
         """Puts a 3HDM parameter dict in array format that odeint understands.
         Also produces a name <-> index mapping for easier access to the params in beta function expressions."""
         indexMapping = {}
@@ -26,21 +26,19 @@ class BetaFunctions4D():
         
     def constructSplineDict(self, muRange, initialParams: dict[str, float]):
         ## Need to unpack the param dict for odeint
-        paramsList, indexMapping, keyMapping = self.unpackParamDict(initialParams)
+        paramsList, indexMapping, keyMapping = self._unpackParamDict(initialParams)
         
-        solution = np.transpose( scipy.integrate.odeint(self.hardCodeBetaFunction, 
+        solution = np.transpose( scipy.integrate.odeint(self._hardCodeBetaFunction, 
                                         paramsList, 
                                         muRange,
                                         args = ( indexMapping, 16.*Pi**2) ) )
 
-        
-        ## This makes it non-trivial to make this a frozen class
         interpDict = {}
         for i, key in enumerate(keyMapping):
             interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[i], extrapolate = False)
         return interpDict, keyMapping
         
-    def hardCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float, indexMapping, pi16) -> np.ndarray:
+    def _hardCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float, indexMapping, pi16) -> np.ndarray:
 
         ## Pick params from the input array since they are appear as hardcoded symbols below
         g1 = InitialConditions[ indexMapping["g1"] ]
