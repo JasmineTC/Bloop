@@ -7,7 +7,9 @@ class BetaFunctions4D():
     def __init__(self):
         None
         
-    def _unpackParamDict(self, params: dict[str, float]) -> np.ndarray:
+    def _unpackParamDict(self, params: dict[str, float]) -> tuple((np.ndarray,
+                                                                   dict[str, float], 
+                                                                   list[str])):
         """Puts a 3HDM parameter dict in array format that odeint understands.
         Also produces a name <-> index mapping for easier access to the params in beta function expressions."""
         indexMapping = {}
@@ -21,10 +23,11 @@ class BetaFunctions4D():
             paramsList.append(val)
             indexMapping[key] = idx
             keyMapping.append(key)
-            
+
         return paramsList, indexMapping, keyMapping
         
-    def constructSplineDict(self, muRange, initialParams: dict[str, float]):
+    def constructSplineDict(self, muRange: float, initialParams: dict[str, float]) -> tuple((dict[str, scipy.interpolate.CubicSpline],
+                                                                                             list[str])):
         ## Need to unpack the param dict for odeint
         paramsList, indexMapping, keyMapping = self._unpackParamDict(initialParams)
         
