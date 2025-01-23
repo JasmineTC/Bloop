@@ -44,6 +44,14 @@ def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
 
     return langrianParams4D
 
+def runCoupling(dictt, keyMapping, muEvaulate: float):
+    runCoupling = {}
+    ##Loop over the dict, for each key compute the spline at muEvaulate, ignore the RGScale in the dict
+    for key in keyMapping:
+        ##RHS is an array of a single number, so add item() to extract that single number
+        runCoupling[key] = dictt[key](muEvaulate).item()
+    return runCoupling
+
 def traceFreeEnergyMinimum(effectivePotential,
                            dimensionalReduction,
                            benchmark,
@@ -63,7 +71,8 @@ def traceFreeEnergyMinimum(effectivePotential,
     
     from .BetaFunctions import BetaFunctions4D
     betasFunctions = BetaFunctions4D() 
-    betasFunctions.constructSplineDict(muRange, LagranianParams4D)
+    BetaSpline4D, keyMapping = betasFunctions.constructSplineDict(muRange, LagranianParams4D)
+    
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
     
@@ -86,7 +95,7 @@ def traceFreeEnergyMinimum(effectivePotential,
         
         goalRGScale =  T ## Final scale in 3D -check if goalRGscale is ever different from just T
         matchingScale = 4.*pi*exp(-np.euler_gamma) * T ## Scale that minimises T dependent logs
-        paramsForMatching = betasFunctions.runCoupling(matchingScale)
+        paramsForMatching = runCoupling(BetaSpline4D, keyMapping, matchingScale)
         if not bIsBounded(paramsForMatching):
             minimizationResults["failureReason"] = "Unbounded"
             break
