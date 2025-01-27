@@ -1,5 +1,0 @@
-μ1sq
-μ12sqRe
-μ12sqIm
-μ2sq
-μ3sq
