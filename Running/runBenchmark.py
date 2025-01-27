@@ -1,3 +1,5 @@
+import json 
+
 def doMinimization(parameters):
     benchmark = parameters["benchmark"] if "benchmark" in parameters else None
     effectivePotential = parameters["effectivePotential"] if "effectivePotential" in parameters else None
@@ -47,14 +49,17 @@ def doMinimization(parameters):
                                                                         benchmark["bmInput"]),
                                                          indent = 4))
 
-def getLines(relativePathToResource):
+## This is not ideal but idk what else to do
+def getLines(relativePathToResource, mode = "default"):
     ## fallback to hardcoded package name if the __package__ call fails
     packageName = __package__ or "ThreeHiggs"
 
     from importlib.resources import files
     path = files(packageName) / relativePathToResource
-
-    return open(path, encoding = "utf-8").readlines()
+    
+    if mode == "json":
+        return json.load(open(path, "r"))
+    return open(path, "r" , encoding = "utf-8").readlines()
 
 def convertMathematica(args):
     veffLines = getLines(args.loFile)
@@ -67,10 +72,9 @@ def convertMathematica(args):
                                                parseConstantMatrix,
                                                parseMassMatrix,
                                                parseRotationMatrix)
+    
 
-
-    from json import dump
-    dump({"vectorMassesSquared": parseExpressionSystem(getLines(args.vectorMassesSquaredFile)),
+    json.dump({"vectorMassesSquared": parseExpressionSystem(getLines(args.vectorMassesSquaredFile)),
           "vectorShortHands": parseExpressionSystem(getLines(args.vectorShortHandsFile)),
           "scalarPermutationMatrix": parseConstantMatrix(getLines(args.scalarPermutationFile)),
           "scalarMassMatrixUpperLeft": parseMassMatrix(getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
@@ -84,11 +88,10 @@ def convertMathematica(args):
           "softToUltraSoft": parseExpressionSystem(getLines(args.softToUltraSoftFile))},
          open(args.parsedExpressionsFile, "w"),
          indent = 4)
-
 def minimization(args):
-    from json import load
-    parsedExpressions = load(open(args.parsedExpressionsFile, "r"))
-
+    parsedExpressions = json.load(open(args.parsedExpressionsFile, "r"))
+    variableSymbols =  getLines( "Data/Variables/LagranianSymbols.json", mode = "json") 
+    
     from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
                                              MassMatrix,
                                              RotationMatrix)
@@ -100,7 +103,8 @@ def minimization(args):
                                  "relLocalTol" : args.relLocalTolerance,
                                  "varLowerBounds" : args.varLowerBounds,
                                  "varUpperBounds" : args.varUpperBounds})
-    effectivePotential = EffectivePotential(['v1', 'v2', 'v3'],
+    
+    effectivePotential = EffectivePotential(variableSymbols["fieldSymbols"],
                                             args.loopOrder,
                                             args.bNumba,
                                             args.bVerbose,
@@ -125,12 +129,12 @@ def minimization(args):
                 from ijson import items
                 pool.map(doMinimization, ({"benchmark": item,
                                            "effectivePotential": effectivePotential,
-                                           "dimensionalReduction": dimensionalReduction} for item in items(benchmarkFile, "item", use_float = True)))
+                                           "dimensionalReduction": dimensionalReduction } for item in items(benchmarkFile, "item", use_float = True)))
 
         else:
             for parameters in ({"benchmark": item,
                                 "effectivePotential": effectivePotential,
-                                "dimensionalReduction": dimensionalReduction} for item in load(benchmarkFile)):
+                                "dimensionalReduction": dimensionalReduction} for item in json.load(benchmarkFile)):
                 doMinimization(parameters)
 
 from ThreeHiggs.UserInput import UserInput

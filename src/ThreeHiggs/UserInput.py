@@ -171,10 +171,16 @@ class UserInput(argparse.ArgumentParser):
                           metavar='')
 
         self.add_argument('--parsedExpressionsFile', 
-                  action = 'store', 
-                  default = "parsedExpressions.json",
-                  dest = 'parsedExpressionsFile',
-                  metavar='')
+                          action = 'store', 
+                          default = "parsedExpressions.json",
+                          dest = 'parsedExpressionsFile',
+                          metavar='')
+        
+        self.add_argument('--lagranianVariables', 
+                          action = 'store', 
+                          default = "Data/Variables/LagranianSymbols.json",
+                          dest = 'lagranianVariables',
+                          metavar='')
 
     ##Used to check userinputs are valid, mostly done with the choice keyword above now though
     def parse(self):
