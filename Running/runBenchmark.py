@@ -4,6 +4,7 @@ def doMinimization(parameters):
     benchmark = parameters["benchmark"] if "benchmark" in parameters else None
     effectivePotential = parameters["effectivePotential"] if "effectivePotential" in parameters else None
     dimensionalReduction = parameters["dimensionalReduction"] if "dimensionalReduction" in parameters else None
+    pertSymbols = parameters["pertSymbols"] if "pertSymbols" in parameters else None
 
     if args.bVerbose:
         print(f"Starting benchmark: {benchmark['bmNumber']}")
@@ -21,6 +22,7 @@ def doMinimization(parameters):
                                                 args.TRangeStart,
                                                 args.TRangeEnd,
                                                 args.TRangeStepSize,
+                                                pertSymbols,
                                                 bVerbose = args.bVerbose)
   
     filename = f"{args.resultsDirectory}/BM_{benchmark['bmNumber']}"
@@ -49,7 +51,7 @@ def doMinimization(parameters):
                                                                         benchmark["bmInput"]),
                                                          indent = 4))
 
-## This is not ideal but idk what else to do
+## Adding a mode is not ideal but idk what else to do
 def getLines(relativePathToResource, mode = "default"):
     ## fallback to hardcoded package name if the __package__ call fails
     packageName = __package__ or "ThreeHiggs"
@@ -96,7 +98,7 @@ def minimization(args):
                                              MassMatrix,
                                              RotationMatrix)
     from ThreeHiggs.EffectivePotential import EffectivePotential, cNlopt
-    nloptInst = cNlopt(config = {"nbrVars": 3, ##TODO this should be len(fieldNames) 
+    nloptInst = cNlopt(config = {"nbrVars": len(variableSymbols["fieldSymbols"]), 
                                  "absGlobalTol" : args.absGlobalTolerance,
                                  "relGlobalTol" :args.relGlobalTolerance, 
                                  "absLocalTol" : args.absLocalTolerance, 
@@ -132,7 +134,10 @@ def minimization(args):
                                            "dimensionalReduction": dimensionalReduction } for item in items(benchmarkFile, "item", use_float = True)))
 
         else:
-            for parameters in ({"benchmark": item,
+            for parameters in ({"pertSymbols": set(variableSymbols["fourPointSymbols"] + 
+                                                   variableSymbols["yukawaSymbols"] + 
+                                                   variableSymbols["gaugeSymbols"]), 
+                                "benchmark": item,
                                 "effectivePotential": effectivePotential,
                                 "dimensionalReduction": dimensionalReduction} for item in json.load(benchmarkFile)):
                 doMinimization(parameters)
