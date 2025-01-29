@@ -15,15 +15,17 @@ def doMinimization(parameters):
 
         return
 
-    from ThreeHiggs.TransitionFinder import traceFreeEnergyMinimum
-    minimizationResult = traceFreeEnergyMinimum(effectivePotential, 
-                                                dimensionalReduction, 
-                                                benchmark,
-                                                args.TRangeStart,
-                                                args.TRangeEnd,
-                                                args.TRangeStepSize,
-                                                pertSymbols,
-                                                bVerbose = args.bVerbose)
+    from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
+    traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
+                                                "dimensionalReduction": dimensionalReduction, 
+                                                "TRangeStart": args.TRangeStart,
+                                                "TRangeEnd": args.TRangeEnd,
+                                                "TRangeStepSize": args.TRangeStepSize,
+                                                "pertSymbols": pertSymbols,
+                                                "bVerbose": args.bVerbose })
+    
+    
+    minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
   
     filename = f"{args.resultsDirectory}/BM_{benchmark['bmNumber']}"
     
@@ -134,7 +136,7 @@ def minimization(args):
                                            "dimensionalReduction": dimensionalReduction } for item in items(benchmarkFile, "item", use_float = True)))
 
         else:
-            for parameters in ({"pertSymbols": set(variableSymbols["fourPointSymbols"] + 
+            for parameters in ({"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
                                                    variableSymbols["yukawaSymbols"] + 
                                                    variableSymbols["gaugeSymbols"]), 
                                 "benchmark": item,
