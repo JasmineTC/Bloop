@@ -181,7 +181,7 @@ class TransitionFinderUnitTests(TestCase):
         source = {"lam11": 0.7,
                   "lam12": -0.8,
                   "lam12p": 0}
-        symbols = set(["lam11", "lam12", "lam12p"])
+        symbols = {"lam11", "lam12", "lam12p"}
 
         self.assertEqual(reference, bIsPerturbative(source, symbols))
 
@@ -190,7 +190,7 @@ class TransitionFinderUnitTests(TestCase):
         source = {"lam11": -12.57,
                   "lam12": 0,
                   "lam12p": 0}
-        symbols = set(["lam11", "lam12", "lam12p"])
+        symbols = {"lam11", "lam12", "lam12p"}
 
         self.assertEqual(reference, bIsPerturbative(source, symbols) )
 
