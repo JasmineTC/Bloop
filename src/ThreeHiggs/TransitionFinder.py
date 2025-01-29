@@ -43,7 +43,7 @@ class TraceFreeEnergyMinimum:
     TRangeStepSize: float = 0
     
     pertSymbols: frozenset = frozenset([1])
-    
+    ## Hack - idk how to type hint this correctly
     effectivePotential: str = "effectivePotentialInstance"
     dimensionalReduction: str = "dimensionalReductionInstance"
     
