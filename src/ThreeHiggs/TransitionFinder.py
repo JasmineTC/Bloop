@@ -36,6 +36,7 @@ def runCoupling(dictt, keyMapping, muEvaulate: float):
     return runCoupling
 
 from dataclasses import dataclass, InitVar
+from ThreeHiggs.BmGenerator import bIsBounded
 @dataclass(frozen=True)
 class TraceFreeEnergyMinimum:
     TRangeStart: float = 0
@@ -75,6 +76,60 @@ class TraceFreeEnergyMinimum:
         if status == "NaN": 
             return "MinimisationFailed"
         return False
+    
+    def doTLoop(self, T, minimizationResults, BetaSpline4D, keyMapping):
+        if self.bVerbose:
+            print (f'Start of temp = {T} loop')
+        minimizationResults["T"].append(T)
+        
+        TDependentConstsDict =  self.TDependentConsts(T)
+        
+        paramsForMatching = runCoupling(BetaSpline4D, 
+                                        keyMapping, 
+                                        TDependentConstsDict["RGScale"])
+        
+        ##Not ideal but cba fixing in this commit
+        paramsForMatching |= TDependentConstsDict
+        
+        if minimizationResults["bIsPerturbative"]:
+            minimizationResults["bIsPerturbative"] = bIsPerturbative(paramsForMatching, self.pertSymbols)
+        
+        if not bIsBounded(paramsForMatching):
+            minimizationResults["failureReason"] = "Unbounded"
+            return minimizationResults
+        params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
+        
+        initialGuesses = [[0.1,0.1,0.1], ## TODO This should go in a config file or something
+                          [5,5,5],
+                          [-5,5,5], 
+                          [5,5,5],
+                          [-5,5,5], 
+                          [40,40,40],
+                          [-40,40,40], 
+                          [59,59,59], 
+                          [-59,59,59]]
+        minimumLocation, minimumValueReal, minimumValueImag, status = self.effectivePotential.findGlobalMinimum(T, 
+                                                                                                                params3D, 
+                                                                                                                initialGuesses)
+        ##Not ideal name or structure imo
+        isBadState = self.isBad(T, minimumLocation, status)
+        if isBadState:
+            minimizationResults["failureReason"] = isBadState
+            return minimizationResults
+        
+        minimizationResults["valueVeffReal"].append(minimumValueReal)
+        minimizationResults["valueVeffImag"].append(minimumValueImag)
+        minimizationResults["minimumLocation"].append(minimumLocation)
+        
+        if not minimizationResults["complex"]:
+            minimizationResults["complex"] = (status == "complex")
+        
+        if not minimizationResults["UltraSoftTemp"]:
+            if self.effectivePotential.bReachedUltraSoftScale(minimumLocation,
+                                                              T, 
+                                                              params3D): 
+                minimizationResults["UltraSoftTemp"] = T
+        return minimizationResults
             
     def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
         """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale ~7T.
@@ -101,61 +156,14 @@ class TraceFreeEnergyMinimum:
                                "failureReason": None}
 
         counter = 0
-        from ThreeHiggs.BmGenerator import bIsBounded
         for T in TRange:
-            T = float(T) ## To make compatible with JSON
-            if self.bVerbose:
-                print (f'Start of temp = {T} loop')
-            minimizationResults["T"].append(T)
+            ##Not ideal but fixing is for future commit
+            minimizationResults = self.doTLoop(float(T), minimizationResults, BetaSpline4D, keyMapping)
             
-            TDependentConstsDict =  self.TDependentConsts(T)
-            
-            paramsForMatching = runCoupling(BetaSpline4D, 
-                                            keyMapping, 
-                                            TDependentConstsDict["RGScale"])
-            
-            ##Not ideal but cba fixing in this commit
-            paramsForMatching |= TDependentConstsDict
-            
-            if minimizationResults["bIsPerturbative"]:
-                minimizationResults["bIsPerturbative"] = bIsPerturbative(paramsForMatching, self.pertSymbols)
-            
-            if not bIsBounded(paramsForMatching):
-                minimizationResults["failureReason"] = "Unbounded"
+            if minimizationResults["failureReason"]:
                 break
-            params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
-            
-            initialGuesses = [[0.1,0.1,0.1], ## TODO This should go in a config file or something
-                              [5,5,5],
-                              [-5,5,5], 
-                              [5,5,5],
-                              [-5,5,5], 
-                              [40,40,40],
-                              [-40,40,40], 
-                              [59,59,59], 
-                              [-59,59,59]]
-            minimumLocation, minimumValueReal, minimumValueImag, status = self.effectivePotential.findGlobalMinimum(T, 
-                                                                                                                    params3D, 
-                                                                                                                    initialGuesses)
-            ##Not ideal name or structure imo
-            isBadState = self.isBad(T, minimumLocation, status)
-            if isBadState:
-                minimizationResults["failureReason"] = isBadState
-            
-            minimizationResults["valueVeffReal"].append(minimumValueReal)
-            minimizationResults["valueVeffImag"].append(minimumValueImag)
-            minimizationResults["minimumLocation"].append(minimumLocation)
-            
-            if not minimizationResults["complex"]:
-                minimizationResults["complex"] = (status == "complex")
-            
-            if not minimizationResults["UltraSoftTemp"]:
-                if self.effectivePotential.bReachedUltraSoftScale(minimumLocation,
-                                                                  T, 
-                                                                  params3D): 
-                    minimizationResults["UltraSoftTemp"] = T
                 
-            if np.all(minimumLocation < 1e-2):
+            if np.all( minimizationResults["minimumLocation"][-1] < 1e-2):
                 if self.bVerbose:
                     print (f"Symmetric phase found at temp {T}")
                 if counter == 3:
