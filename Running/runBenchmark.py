@@ -10,6 +10,15 @@ def drange(start: float, end: float, jump: str) -> Generator:
         yield float(start)
         start += decimal.Decimal(jump)
 
+import decimal
+from typing import Generator
+def drange(start: float, end: float, jump: str) -> Generator:
+  start =  decimal.Decimal(start)
+  ##Swap to list comp?
+  while start <= end:
+    yield float(start)
+    start += decimal.Decimal(jump)
+
 def doMinimization(parameters):
     benchmark = parameters["benchmark"] if "benchmark" in parameters else None
     effectivePotential = parameters["effectivePotential"] if "effectivePotential" in parameters else None
@@ -25,13 +34,12 @@ def doMinimization(parameters):
 
         return
     
-    import numpy as np
-    TRange = np.arange(args.TRangeStart, args.TRangeEnd, args.TRangeStepSize)
-
     from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
     traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
                                                 "dimensionalReduction": dimensionalReduction, 
-                                                "TRange": TRange,
+                                                "TRange": tuple(drange(args.TRangeStart, 
+                                                                       args.TRangeEnd, 
+                                                                       str(args.TRangeStepSize))),
                                                 "pertSymbols": pertSymbols,
                                                 "bVerbose": args.bVerbose,
                                                 "initialGuesses": args.initialGuesses})
