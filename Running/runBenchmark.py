@@ -25,17 +25,13 @@ def doMinimization(parameters):
 
         return
     
-    # print(tuple(drange(args.TRangeStart, 
-    #                        args.TRangeEnd, 
-    #                        f"{args.TRangeStepSize}")))
-    
     import numpy as np
-    a = np.arange(args.TRangeStart, args.TRangeEnd, args.TRangeStepSize)
-    
+    TRange = np.arange(args.TRangeStart, args.TRangeEnd, args.TRangeStepSize)
+
     from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
     traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
                                                 "dimensionalReduction": dimensionalReduction, 
-                                                "TRange": a ,
+                                                "TRange": TRange,
                                                 "pertSymbols": pertSymbols,
                                                 "bVerbose": args.bVerbose,
                                                 "initialGuesses": args.initialGuesses})
