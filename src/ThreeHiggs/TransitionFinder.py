@@ -148,7 +148,7 @@ class TraceFreeEnergyMinimum:
                     minimizationResults["UltraSoftTemp"] = T
 
                 
-            if np.all( minimizationResults["minimumLocation"][-1] < 1e-2):
+            if np.all( minimizationResults["minimumLocation"][-1] < 0.5):
                 if self.bVerbose:
                     print (f"Symmetric phase found at temp {T}")
                 if counter == 3:
