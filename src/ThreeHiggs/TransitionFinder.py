@@ -8,6 +8,12 @@ def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
             return False
     return True
 
+def runCoupling(betaSpline4D: dict[str, float], keyMapping: list[str], muEvaulate: float):
+    runCoupling = {}
+    for key in keyMapping:
+        runCoupling[key] = betaSpline4D[key](muEvaulate).item()
+    return runCoupling
+
 def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
     
     langrianParams4D = {}
@@ -26,14 +32,6 @@ def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
     langrianParams4D["RGScale"] = inputParams["RGScale"]
 
     return langrianParams4D
-
-def runCoupling(dictt, keyMapping, muEvaulate: float):
-    runCoupling = {}
-    ##Loop over the dict, for each key compute the spline at muEvaulate, ignore the RGScale in the dict
-    for key in keyMapping:
-        ##RHS is an array of a single number, so add item() to extract that single number
-        runCoupling[key] = dictt[key](muEvaulate).item()
-    return runCoupling
 
 from dataclasses import dataclass, InitVar
 from ThreeHiggs.BmGenerator import bIsBounded
@@ -78,11 +76,11 @@ class TraceFreeEnergyMinimum:
             return "MinimisationFailed"
         return False
     
-    def doTLoop(self, T, BetaSpline4D, keyMapping):
+    def doTLoop(self, T, betaSpline4D, keyMapping):
         
         TDependentConstsDict =  self.TDependentConsts(T)
         
-        paramsForMatching = runCoupling(BetaSpline4D, 
+        paramsForMatching = runCoupling(betaSpline4D, 
                                         keyMapping, 
                                         TDependentConstsDict["RGScale"]) | TDependentConstsDict
         
@@ -105,7 +103,7 @@ class TraceFreeEnergyMinimum:
         
         from .BetaFunctions import BetaFunctions4D
         betasFunctions = BetaFunctions4D() 
-        BetaSpline4D, keyMapping = betasFunctions.constructSplineDict(muRange, LagranianParams4D)
+        betaSpline4D, keyMapping = betasFunctions.constructSplineDict(muRange, LagranianParams4D)
         
         minimizationResults = {"T": [],
                                "valueVeffReal": [],
@@ -125,7 +123,7 @@ class TraceFreeEnergyMinimum:
             minimizationResults["T"].append(T)
             
             minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.doTLoop(T, 
-                                                                                                           BetaSpline4D, 
+                                                                                                           betaSpline4D, 
                                                                                                            keyMapping)
             ##Not ideal name or structure imo
             isBadState = self.isBad(T, minimumLocation, status)
