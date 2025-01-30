@@ -39,11 +39,9 @@ from dataclasses import dataclass, InitVar
 from ThreeHiggs.BmGenerator import bIsBounded
 @dataclass(frozen=True)
 class TraceFreeEnergyMinimum:
-    TRangeStart: float = 0
-    TRangeEnd: float = 0
-    TRangeStepSize: float = 0
+    TRange: tuple = (0,)
     
-    pertSymbols: frozenset = frozenset([1])
+    pertSymbols: frozenset = frozenset({1})
     
     initialGuesses: tuple = (0,)
     
@@ -74,7 +72,7 @@ class TraceFreeEnergyMinimum:
                minimumLocation, 
                status):
         ## This is a hack to remove bad benchmark points
-        if T == self.TRangeStart and (minimumLocation[0] > 1 or minimumLocation[1] > 1):
+        if T == self.TRange[0] and (minimumLocation[0] > 1 or minimumLocation[1] > 1):
             return "v3NotGlobalMin"
         if status == "NaN": 
             return "MinimisationFailed"
@@ -129,12 +127,11 @@ class TraceFreeEnergyMinimum:
         """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale ~7T.
         To make this work nicely we integrate the beta functions here up to the largest temp used 
         then interpolate over the beta function."""
-        TRange = np.arange(self.TRangeStart, self.TRangeEnd, self.TRangeStepSize)
         
         LagranianParams4D = get4DLagranianParams(benchmark)
         startScale = LagranianParams4D["RGScale"]
-        endScale = 7.3 * TRange[-1] 
-        muRange = np.linspace(startScale, endScale, TRange.size*10)
+        endScale = 7.3 * self.TRange[-1] 
+        muRange = np.linspace(startScale, endScale, len(self.TRange)*10)
         
         from .BetaFunctions import BetaFunctions4D
         betasFunctions = BetaFunctions4D() 
@@ -150,9 +147,9 @@ class TraceFreeEnergyMinimum:
                                "failureReason": None}
 
         counter = 0
-        for T in TRange:
+        for T in self.TRange:
             ##Not ideal but fixing is for future commit
-            minimizationResults = self.doTLoop(float(T), minimizationResults, BetaSpline4D, keyMapping)
+            minimizationResults = self.doTLoop(T, minimizationResults, BetaSpline4D, keyMapping)
             
             if minimizationResults["failureReason"]:
                 break

@@ -1,4 +1,14 @@
 import json 
+from typing import Generator
+import decimal
+
+## This avoids floating point error in T gotten by np.arange or linspace
+## However one must be careful as 1 = decimal.Decimal(1.000000000000001) 
+def drange(start: float, end: float, jump: str) -> Generator:
+    start =  decimal.Decimal(start) 
+    while start <= end:
+        yield float(start)
+        start += decimal.Decimal(jump)
 
 def doMinimization(parameters):
     benchmark = parameters["benchmark"] if "benchmark" in parameters else None
@@ -14,16 +24,21 @@ def doMinimization(parameters):
             print(f"Benchmark {benchmark['bmNumber']} has been rejected as outside benchmark range.")
 
         return
-
+    
+    # print(tuple(drange(args.TRangeStart, 
+    #                        args.TRangeEnd, 
+    #                        f"{args.TRangeStepSize}")))
+    
+    import numpy as np
+    a = np.arange(args.TRangeStart, args.TRangeEnd, args.TRangeStepSize)
+    
     from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
     traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
                                                 "dimensionalReduction": dimensionalReduction, 
-                                                "TRangeStart": args.TRangeStart,
-                                                "TRangeEnd": args.TRangeEnd,
-                                                "TRangeStepSize": args.TRangeStepSize,
+                                                "TRange": a ,
                                                 "pertSymbols": pertSymbols,
                                                 "bVerbose": args.bVerbose,
-                                                "initialGuesses":args.initialGuesses})
+                                                "initialGuesses": args.initialGuesses})
     
     
     minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
