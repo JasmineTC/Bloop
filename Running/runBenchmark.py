@@ -22,7 +22,8 @@ def doMinimization(parameters):
                                                 "TRangeEnd": args.TRangeEnd,
                                                 "TRangeStepSize": args.TRangeStepSize,
                                                 "pertSymbols": pertSymbols,
-                                                "bVerbose": args.bVerbose })
+                                                "bVerbose": args.bVerbose,
+                                                "initialGuesses":args.initialGuesses})
     
     
     minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
