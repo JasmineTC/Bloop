@@ -78,10 +78,7 @@ class TraceFreeEnergyMinimum:
             return "MinimisationFailed"
         return False
     
-    def doTLoop(self, T, minimizationResults, BetaSpline4D, keyMapping):
-        if self.bVerbose:
-            print (f'Start of temp = {T} loop')
-        minimizationResults["T"].append(T)
+    def doTLoop(self, T, BetaSpline4D, keyMapping):
         
         TDependentConstsDict =  self.TDependentConsts(T)
         
@@ -92,36 +89,12 @@ class TraceFreeEnergyMinimum:
         ##Not ideal but cba fixing in this commit
         paramsForMatching |= TDependentConstsDict
         
-        if minimizationResults["bIsPerturbative"]:
-            minimizationResults["bIsPerturbative"] = bIsPerturbative(paramsForMatching, self.pertSymbols)
-        
-        if not bIsBounded(paramsForMatching):
-            minimizationResults["failureReason"] = "Unbounded"
-            return minimizationResults
         params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
         
-        minimumLocation, minimumValueReal, minimumValueImag, status = self.effectivePotential.findGlobalMinimum(T, 
-                                                                                                                params3D, 
-                                                                                                                self.initialGuesses)
-        ##Not ideal name or structure imo
-        isBadState = self.isBad(T, minimumLocation, status)
-        if isBadState:
-            minimizationResults["failureReason"] = isBadState
-            return minimizationResults
-        
-        minimizationResults["valueVeffReal"].append(minimumValueReal)
-        minimizationResults["valueVeffImag"].append(minimumValueImag)
-        minimizationResults["minimumLocation"].append(minimumLocation)
-        
-        if not minimizationResults["complex"]:
-            minimizationResults["complex"] = (status == "complex")
-        
-        if not minimizationResults["UltraSoftTemp"]:
-            if self.effectivePotential.bReachedUltraSoftScale(minimumLocation,
-                                                              T, 
-                                                              params3D): 
-                minimizationResults["UltraSoftTemp"] = T
-        return minimizationResults
+        return ( *self.effectivePotential.findGlobalMinimum(T, params3D, self.initialGuesses), 
+                bIsPerturbative(paramsForMatching, self.pertSymbols), 
+                bIsBounded(paramsForMatching),
+                params3D)
             
     def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
         """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale ~7T.
@@ -147,12 +120,36 @@ class TraceFreeEnergyMinimum:
                                "failureReason": None}
 
         counter = 0
+        ##Still not happy with this
         for T in self.TRange:
-            ##Not ideal but fixing is for future commit
-            minimizationResults = self.doTLoop(T, minimizationResults, BetaSpline4D, keyMapping)
+            if self.bVerbose:
+                print (f'Start of temp = {T} loop')
+                
+            minimizationResults["T"].append(T)
             
-            if minimizationResults["failureReason"]:
+            minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.doTLoop(T, 
+                                                                                                           BetaSpline4D, 
+                                                                                                           keyMapping)
+            ##Not ideal name or structure imo
+            isBadState = self.isBad(T, minimumLocation, status)
+            if isBadState:
+                minimizationResults["failureReason"] = isBadState
                 break
+            
+            
+            minimizationResults["valueVeffReal"].append(minimumValueReal)
+            minimizationResults["valueVeffImag"].append(minimumValueImag)
+            minimizationResults["minimumLocation"].append(minimumLocation)
+            
+            if not minimizationResults["complex"]:
+                minimizationResults["complex"] = (status == "complex")
+            
+            if not minimizationResults["UltraSoftTemp"]:
+                if self.effectivePotential.bReachedUltraSoftScale(minimumLocation,
+                                                                  T, 
+                                                                  params3D): 
+                    minimizationResults["UltraSoftTemp"] = T
+
                 
             if np.all( minimizationResults["minimumLocation"][-1] < 1e-2):
                 if self.bVerbose:
@@ -163,7 +160,6 @@ class TraceFreeEnergyMinimum:
 
         minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
         return minimizationResults
-
 
 from unittest import TestCase
 class TransitionFinderUnitTests(TestCase):
