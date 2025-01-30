@@ -84,10 +84,7 @@ class TraceFreeEnergyMinimum:
         
         paramsForMatching = runCoupling(BetaSpline4D, 
                                         keyMapping, 
-                                        TDependentConstsDict["RGScale"])
-        
-        ##Not ideal but cba fixing in this commit
-        paramsForMatching |= TDependentConstsDict
+                                        TDependentConstsDict["RGScale"]) | TDependentConstsDict
         
         params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
         
