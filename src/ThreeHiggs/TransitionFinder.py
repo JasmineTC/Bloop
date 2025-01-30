@@ -96,14 +96,14 @@ class TraceFreeEnergyMinimum:
         To make this work nicely we integrate the beta functions here up to the largest temp used 
         then interpolate over the beta function."""
         
-        LagranianParams4D = get4DLagranianParams(benchmark)
-        muRange = np.linspace(LagranianParams4D["RGScale"], 
+        lagranianParams4D = get4DLagranianParams(benchmark)
+        muRange = np.linspace(lagranianParams4D["RGScale"], 
                               7.3 * self.TRange[-1],
                               len(self.TRange)*10)
         
         from .BetaFunctions import BetaFunctions4D
         betasFunctions = BetaFunctions4D() 
-        betaSpline4D, keyMapping = betasFunctions.constructSplineDict(muRange, LagranianParams4D)
+        betaSpline4D, keyMapping = betasFunctions.constructSplineDict(muRange, lagranianParams4D)
         
         minimizationResults = {"T": [],
                                "valueVeffReal": [],
@@ -115,7 +115,6 @@ class TraceFreeEnergyMinimum:
                                "failureReason": None}
 
         counter = 0
-        ##Still not happy with this
         for T in self.TRange:
             if self.bVerbose:
                 print (f'Start of temp = {T} loop')
