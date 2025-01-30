@@ -44,6 +44,9 @@ class TraceFreeEnergyMinimum:
     TRangeStepSize: float = 0
     
     pertSymbols: frozenset = frozenset([1])
+    
+    initialGuesses: tuple = (0,)
+    
     ## Hack - idk how to type hint this correctly
     effectivePotential: str = "effectivePotentialInstance"
     dimensionalReduction: str = "dimensionalReductionInstance"
@@ -99,18 +102,9 @@ class TraceFreeEnergyMinimum:
             return minimizationResults
         params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
         
-        initialGuesses = [[0.1,0.1,0.1], ## TODO This should go in a config file or something
-                          [5,5,5],
-                          [-5,5,5], 
-                          [5,5,5],
-                          [-5,5,5], 
-                          [40,40,40],
-                          [-40,40,40], 
-                          [59,59,59], 
-                          [-59,59,59]]
         minimumLocation, minimumValueReal, minimumValueImag, status = self.effectivePotential.findGlobalMinimum(T, 
                                                                                                                 params3D, 
-                                                                                                                initialGuesses)
+                                                                                                                self.initialGuesses)
         ##Not ideal name or structure imo
         isBadState = self.isBad(T, minimumLocation, status)
         if isBadState:
