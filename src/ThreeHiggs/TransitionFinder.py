@@ -97,9 +97,9 @@ class TraceFreeEnergyMinimum:
         then interpolate over the beta function."""
         
         LagranianParams4D = get4DLagranianParams(benchmark)
-        startScale = LagranianParams4D["RGScale"]
-        endScale = 7.3 * self.TRange[-1] 
-        muRange = np.linspace(startScale, endScale, len(self.TRange)*10)
+        muRange = np.linspace(LagranianParams4D["RGScale"], 
+                              7.3 * self.TRange[-1],
+                              len(self.TRange)*10)
         
         from .BetaFunctions import BetaFunctions4D
         betasFunctions = BetaFunctions4D() 
