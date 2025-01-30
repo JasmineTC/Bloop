@@ -63,7 +63,7 @@ class TraceFreeEnergyMinimum:
     def TDependentConsts(self, T):
         matchingScale = 4.*pi*exp(-np.euler_gamma) * T
         Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
-        return {"RGScale": 4.*pi*exp(-np.euler_gamma) * T,
+        return {"RGScale": matchingScale,
                 "T": T,
                 "Lb": Lb,
                 "Lf": Lb + self.Lfconst}
