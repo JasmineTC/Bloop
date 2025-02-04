@@ -62,6 +62,21 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--varUpperBounds', nargs = "*", action = 'store', default = [60, 60, 60], type = float, dest = 'varUpperBounds',
         metavar='')
         
+        self.add_argument('--initialGuesses', 
+                          nargs = "*", 
+                          action = 'store', 
+                          default = [[0.1,0.1,0.1], 
+                                     [5,5,5],
+                                     [-5,5,5], 
+                                     [5,5,5],
+                                     [-5,5,5], 
+                                     [40,40,40],
+                                     [-40,40,40], 
+                                     [59,59,59], 
+                                     [-59,59,59]], 
+                          type = float, dest = 'initialGuesses',
+        metavar='')
+        
         self.add_argument('--TRangeStart', action = 'store', default = 50, type = float, dest = 'TRangeStart',
         metavar='')
         self.add_argument('--TRangeEnd', action = 'store', default = 200, type = float, dest = 'TRangeEnd',
@@ -73,6 +88,8 @@ class UserInput(argparse.ArgumentParser):
         metavar='')
         self.add_argument('--lastStage', type = Stages.fromString, default = "plot", dest = 'lastStage',
         metavar='')
+        
+        
 
         self.add_argument('--benchmarkFile', 
                   action = 'store', 

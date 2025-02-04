@@ -1,4 +1,14 @@
 import json 
+from typing import Generator
+import decimal
+
+## This avoids floating point error in T gotten by np.arange or linspace
+## However one must be careful as 1 = decimal.Decimal(1.000000000000001) 
+def drange(start: float, end: float, jump: str) -> Generator:
+    start =  decimal.Decimal(start) 
+    while start <= end:
+        yield float(start)
+        start += decimal.Decimal(jump)
 
 def doMinimization(parameters):
     benchmark = parameters["benchmark"] if "benchmark" in parameters else None
@@ -14,16 +24,19 @@ def doMinimization(parameters):
             print(f"Benchmark {benchmark['bmNumber']} has been rejected as outside benchmark range.")
 
         return
-
-    from ThreeHiggs.TransitionFinder import traceFreeEnergyMinimum
-    minimizationResult = traceFreeEnergyMinimum(effectivePotential, 
-                                                dimensionalReduction, 
-                                                benchmark,
-                                                args.TRangeStart,
-                                                args.TRangeEnd,
-                                                args.TRangeStepSize,
-                                                pertSymbols,
-                                                bVerbose = args.bVerbose)
+    
+    from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
+    traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
+                                                "dimensionalReduction": dimensionalReduction, 
+                                                "TRange": tuple(drange(args.TRangeStart, 
+                                                                       args.TRangeEnd, 
+                                                                       str(args.TRangeStepSize))),
+                                                "pertSymbols": pertSymbols,
+                                                "bVerbose": args.bVerbose,
+                                                "initialGuesses": args.initialGuesses})
+    
+    
+    minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
   
     filename = f"{args.resultsDirectory}/BM_{benchmark['bmNumber']}"
     
@@ -134,7 +147,7 @@ def minimization(args):
                                            "dimensionalReduction": dimensionalReduction } for item in items(benchmarkFile, "item", use_float = True)))
 
         else:
-            for parameters in ({"pertSymbols": set(variableSymbols["fourPointSymbols"] + 
+            for parameters in ({"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
                                                    variableSymbols["yukawaSymbols"] + 
                                                    variableSymbols["gaugeSymbols"]), 
                                 "benchmark": item,

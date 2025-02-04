@@ -8,16 +8,18 @@ def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
             return False
     return True
 
-
+def runCoupling(betaSpline4D: dict[str, float], keyMapping: list[str], muEvaulate: float):
+    runCoupling = {}
+    for key in keyMapping:
+        runCoupling[key] = betaSpline4D[key](muEvaulate).item()
+    return runCoupling
 
 def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
-    """Take inputs from the BM file.
-    With tree-level matching the renormalization scale does not directly show up in the expressions, but
-    needs to be specified for later loop calculations."""
+    
     langrianParams4D = {}
     ## --- SM fermions and gauge bosons ---
     v = 246.22  ## "Higgs VEV". Consider using Fermi constant instead
-    langrianParams4D["yt3"] = sqrt(2.) * 172.76 / v  ## 172.76 is the top mass (not squared! would it be better to store y^2?)
+    langrianParams4D["yt3"] = sqrt(2.) * 172.76 / v  ## 172.76 is the top mass
     MW = 80.377 ## W boson mass
     MZ = 91.1876 ## Z boson mass
     
@@ -31,117 +33,126 @@ def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
 
     return langrianParams4D
 
-def runCoupling(dictt, keyMapping, muEvaulate: float):
-    runCoupling = {}
-    ##Loop over the dict, for each key compute the spline at muEvaulate, ignore the RGScale in the dict
-    for key in keyMapping:
-        ##RHS is an array of a single number, so add item() to extract that single number
-        runCoupling[key] = dictt[key](muEvaulate).item()
-    return runCoupling
-
-def traceFreeEnergyMinimum(effectivePotential,
-                           dimensionalReduction,
-                           benchmark,
-                           TRangeStart: float, 
-                           TRangeEnd: float, 
-                           TRangeStepSize: float,
-                           pertSymbols: set,
-                           bVerbose = False) -> dict[str: ]:
-    """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale ~7T.
-    To make this work nicely we integrate the beta functions here up to the largest temp used 
-    then interpolate over the beta function."""
-    TRange = np.arange(TRangeStart, TRangeEnd, TRangeStepSize)
+from dataclasses import dataclass, InitVar
+from ThreeHiggs.BmGenerator import bIsBounded
+@dataclass(frozen=True)
+class TraceFreeEnergyMinimum:
+    TRange: tuple = (0,)
     
-    LagranianParams4D = get4DLagranianParams(benchmark)
-    startScale = LagranianParams4D["RGScale"]
-    endScale = 7.3 * TRange[-1] 
-    muRange = np.linspace(startScale, endScale, TRange.size*10)
+    pertSymbols: frozenset = frozenset({1})
     
-    from .BetaFunctions import BetaFunctions4D
-    betasFunctions = BetaFunctions4D() 
-    BetaSpline4D, keyMapping = betasFunctions.constructSplineDict(muRange, LagranianParams4D)
+    initialGuesses: tuple = (0,)
+    
+    ## Hack - idk how to type hint this correctly
+    effectivePotential: str = "effectivePotentialInstance"
+    dimensionalReduction: str = "dimensionalReductionInstance"
+    
+    bVerbose: bool = False
     
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
     
-    minimizationResults = {"T": [],
-                           "valueVeffReal": [],
-                           "valueVeffImag": [],
-                           "complex": False,
-                           "minimumLocation": [], 
-                           "bIsPerturbative": True, 
-                           "UltraSoftTemp": None, 
-                           "failureReason": None}
-
-    counter = 0
-    from ThreeHiggs.BmGenerator import bIsBounded
-    for T in TRange:
-        T = float(T) ## To make compatible with JSON
-        if bVerbose:
-            print (f'Start of temp = {T} loop')
-        minimizationResults["T"].append(T)
-        
-        goalRGScale =  T ## Final scale in 3D -check if goalRGscale is ever different from just T
-        matchingScale = 4.*pi*exp(-np.euler_gamma) * T ## Scale that minimises T dependent logs
-        paramsForMatching = runCoupling(BetaSpline4D, keyMapping, matchingScale)
-        if not bIsBounded(paramsForMatching):
-            minimizationResults["failureReason"] = "Unbounded"
-            break
-        
-        ## T dependent Variables needed to compute the 2 loop EP but aren't Lagranian params 
-        paramsForMatching["RGScale"] = matchingScale
-        paramsForMatching["T"] = T
-        Lb = 2. * log(matchingScale / T) - EulerGammaPrime
-        paramsForMatching["Lb"] = Lb
-        paramsForMatching["Lf"] = Lb + Lfconst
-
-        ##Take the 4D params (at the matching scale) and match them to the 3D params
-        params3D = dimensionalReduction.getUltraSoftParams(paramsForMatching, goalRGScale)
-        
-        initialGuesses = [[0.1,0.1,0.1], ## TODO This should go in a config file or something
-                          [5,5,5],
-                          [-5,5,5], 
-                          [5,5,5],
-                          [-5,5,5], 
-                          [40,40,40],
-                          [-40,40,40], 
-                          [59,59,59], 
-                          [-59,59,59]]
-        minimumLocation, minimumValueReal, minimumValueImag, status = effectivePotential.findGlobalMinimum(T, params3D, initialGuesses)
-        if T == TRangeStart and (minimumLocation[0] > 1 or minimumLocation[1] > 1): ## This is a hack to remove bad benchmark points
-            minimizationResults["failureReason"] = "v3NotGlobalMin"
-            break
+    config: InitVar[dict] = None
+    
+    def __post_init__(self, config: dict):
+        if config:
+            self.__init__(**config)
             
+    def TDependentConsts(self, T):
+        matchingScale = 4.*pi*exp(-np.euler_gamma) * T
+        Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
+        return {"RGScale": matchingScale,
+                "T": T,
+                "Lb": Lb,
+                "Lf": Lb + self.Lfconst}
+
+    def isBad(self, T, 
+               minimumLocation, 
+               status):
+        ## This is a hack to remove bad benchmark points
+        if T == self.TRange[0] and (minimumLocation[0] > 1 or minimumLocation[1] > 1):
+            return "v3NotGlobalMin"
         if status == "NaN": 
-            minimizationResults["failureReason"] = "MinimisationFailed"
-            break
+            return "MinimisationFailed"
+        return False
+    
+    def executeMinimisation(self, T, betaSpline4D, keyMapping):
         
-        minimizationResults["valueVeffReal"].append(minimumValueReal)
-        minimizationResults["valueVeffImag"].append(minimumValueImag)
-        minimizationResults["minimumLocation"].append(minimumLocation)
-        if not minimizationResults["complex"]:
-            minimizationResults["complex"] = status == "complex"
+        TDependentConstsDict =  self.TDependentConsts(T)
         
-        if not minimizationResults["UltraSoftTemp"]: ## If the ultra soft temp has not yet been set
-            if effectivePotential.bReachedUltraSoftScale(minimumLocation, ## Check if ultra soft scale reached
-                                                         T, 
-                                                         params3D): 
-                minimizationResults["UltraSoftTemp"] = T ## If reached then set that as the ultra soft temp
-                                                         ##- this will stop the first if statement from passing
+        paramsForMatching = runCoupling(betaSpline4D, 
+                                        keyMapping, 
+                                        TDependentConstsDict["RGScale"]) | TDependentConstsDict
         
-        if minimizationResults["bIsPerturbative"]: ##If the potential was perturbative check if it still is
-            minimizationResults["bIsPerturbative"] = bIsPerturbative(paramsForMatching, pertSymbols) ## If non-pert then value set to false and won't be updated
+        params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
+        
+        return ( *self.effectivePotential.findGlobalMinimum(T, params3D, self.initialGuesses), 
+                bIsPerturbative(paramsForMatching, self.pertSymbols), 
+                bIsBounded(paramsForMatching),
+                params3D)
+            
+    def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
+        lagranianParams4D = get4DLagranianParams(benchmark)
+        
+        ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
+        ## usually a T-dependent scale ~7.3T
+        muRange = np.linspace(lagranianParams4D["RGScale"], 
+                              7.3 * self.TRange[-1],
+                              len(self.TRange)*10)
+        
+        from .BetaFunctions import BetaFunctions4D
+        betasFunctions = BetaFunctions4D() 
+        betaSpline4D, keyMapping = betasFunctions.constructSplineDict(muRange, lagranianParams4D)
+        
+        minimizationResults = {"T": [],
+                               "valueVeffReal": [],
+                               "valueVeffImag": [],
+                               "complex": False,
+                               "minimumLocation": [], 
+                               "bIsPerturbative": True, 
+                               "UltraSoftTemp": None, 
+                               "failureReason": None}
 
-        if np.all(minimumLocation < 1e-2):
-            if bVerbose:
-                print (f"Symmetric phase found at temp {T}")
-            if counter == 3:
+        counter = 0
+        for T in self.TRange:
+            if self.bVerbose:
+                print (f'Start of temp = {T} loop')
+                
+            minimizationResults["T"].append(T)
+            
+            minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T, 
+                                                                                                           betaSpline4D, 
+                                                                                                           keyMapping)
+            ##Not ideal name or structure imo
+            isBadState = self.isBad(T, minimumLocation, status)
+            if isBadState:
+                minimizationResults["failureReason"] = isBadState
                 break
-            counter += 1
+            
+            
+            minimizationResults["valueVeffReal"].append(minimumValueReal)
+            minimizationResults["valueVeffImag"].append(minimumValueImag)
+            minimizationResults["minimumLocation"].append(minimumLocation)
+            
+            if not minimizationResults["complex"]:
+                minimizationResults["complex"] = (status == "complex")
+            
+            if not minimizationResults["UltraSoftTemp"]:
+                if self.effectivePotential.bReachedUltraSoftScale(minimumLocation,
+                                                                  T, 
+                                                                  params3D): 
+                    minimizationResults["UltraSoftTemp"] = T
 
-    minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
-    return minimizationResults
+                
+            if np.all( minimizationResults["minimumLocation"][-1] < 0.5):
+                if self.bVerbose:
+                    print (f"Symmetric phase found at temp {T}")
+                if counter == 3:
+                    break
+                counter += 1
 
+        minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
+        return minimizationResults
 
 from unittest import TestCase
 class TransitionFinderUnitTests(TestCase):
@@ -150,7 +161,7 @@ class TransitionFinderUnitTests(TestCase):
         source = {"lam11": 0.7,
                   "lam12": -0.8,
                   "lam12p": 0}
-        symbols = set(["lam11", "lam12", "lam12p"])
+        symbols = {"lam11", "lam12", "lam12p"}
 
         self.assertEqual(reference, bIsPerturbative(source, symbols))
 
@@ -159,7 +170,7 @@ class TransitionFinderUnitTests(TestCase):
         source = {"lam11": -12.57,
                   "lam12": 0,
                   "lam12p": 0}
-        symbols = set(["lam11", "lam12", "lam12p"])
+        symbols = {"lam11", "lam12", "lam12p"}
 
         self.assertEqual(reference, bIsPerturbative(source, symbols) )
 
