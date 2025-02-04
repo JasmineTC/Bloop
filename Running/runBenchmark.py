@@ -10,24 +10,6 @@ def drange(start: float, end: float, jump: str) -> Generator:
         yield float(start)
         start += decimal.Decimal(jump)
 
-import decimal
-from typing import Generator
-def drange(start: float, end: float, jump: str) -> Generator:
-  start =  decimal.Decimal(start)
-  ##Swap to list comp?
-  while start <= end:
-    yield float(start)
-    start += decimal.Decimal(jump)
-
-import decimal
-from typing import Generator
-def drange(start: float, end: float, jump: str) -> Generator:
-  start =  decimal.Decimal(start)
-  ##Swap to list comp?
-  while start <= end:
-    yield float(start)
-    start += decimal.Decimal(jump)
-
 def doMinimization(parameters):
     benchmark = parameters["benchmark"] if "benchmark" in parameters else None
     effectivePotential = parameters["effectivePotential"] if "effectivePotential" in parameters else None
