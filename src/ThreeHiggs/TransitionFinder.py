@@ -1,26 +1,13 @@
 import numpy as np
 from math import sqrt, pi, log, exp
 
-def bIsPerturbative(param : dict[str, float]) -> bool:
+def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
     ## Should actually check vertices but not a feature in DRalgo at time of writting
-    return abs(param["lam11"]) < 4*pi and \
-       abs(param["lam12"]) < 4*pi and \
-       abs(param["lam12p"]) < 4*pi and \
-       abs(param["lam1Im"]) < 4*pi and \
-       abs(param["lam1Re"]) < 4*pi and \
-       abs(param["lam22"]) < 4*pi and \
-       abs(param["lam23"]) < 4*pi and \
-       abs(param["lam23p"]) < 4*pi and \
-       abs(param["lam2Im"]) < 4*pi and \
-       abs(param["lam2Re"]) < 4*pi and \
-       abs(param["lam31"]) < 4*pi and \
-       abs(param["lam31p"]) < 4*pi and \
-       abs(param["lam33"]) < 4*pi and \
-       abs(param["lam3Im"]) < 4*pi and \
-       abs(param["lam3Re"]) < 4*pi and \
-       abs(param["g1"]) < 4*pi and \
-       abs(param["g2"]) < 4*pi and \
-       abs(param["g3"]) < 4*pi
+    for key, value in paramDict4D.items():
+        if key in pertSymbols and abs(value) > 4*pi:
+            return False
+    return True
+
 
 
 def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
@@ -58,6 +45,7 @@ def traceFreeEnergyMinimum(effectivePotential,
                            TRangeStart: float, 
                            TRangeEnd: float, 
                            TRangeStepSize: float,
+                           pertSymbols: set,
                            bVerbose = False) -> dict[str: ]:
     """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale ~7T.
     To make this work nicely we integrate the beta functions here up to the largest temp used 
@@ -142,7 +130,7 @@ def traceFreeEnergyMinimum(effectivePotential,
                                                          ##- this will stop the first if statement from passing
         
         if minimizationResults["bIsPerturbative"]: ##If the potential was perturbative check if it still is
-            minimizationResults["bIsPerturbative"] = bIsPerturbative(paramsForMatching) ## If non-pert then value set to false and won't be updated
+            minimizationResults["bIsPerturbative"] = bIsPerturbative(paramsForMatching, pertSymbols) ## If non-pert then value set to false and won't be updated
 
         if np.all(minimumLocation < 1e-2):
             if bVerbose:
@@ -159,47 +147,19 @@ from unittest import TestCase
 class TransitionFinderUnitTests(TestCase):
     def test_bIsPerturbativeTrue(self):
         reference = True
-        source = {"lam11": 0,
-                  "lam12": 0,
-                  "lam12p": 0,
-                  "lam1Im": 0,
-                  "lam1Re": 0,
-                  "lam22": 0,
-                  "lam23": 0,
-                  "lam23p": 0,
-                  "lam2Im": 0,
-                  "lam2Re": 0,
-                  "lam31": 0,
-                  "lam31p": 0,
-                  "lam33": 0,
-                  "lam3Im": 0,
-                  "lam3Re": 0,
-                  "g1": 0,
-                  "g2": 0,
-                  "g3": 0}
+        source = {"lam11": 0.7,
+                  "lam12": -0.8,
+                  "lam12p": 0}
+        symbols = set(["lam11", "lam12", "lam12p"])
 
-        self.assertEqual(reference, bIsPerturbative(source))
+        self.assertEqual(reference, bIsPerturbative(source, symbols))
 
     def test_bIsPerturbativeFalse(self):
         reference = False
-        source = {"lam11": -999,
+        source = {"lam11": -12.57,
                   "lam12": 0,
-                  "lam12p": 0,
-                  "lam1Im": 0,
-                  "lam1Re": 0,
-                  "lam22": 0,
-                  "lam23": 0,
-                  "lam23p": 0,
-                  "lam2Im": 0,
-                  "lam2Re": 0,
-                  "lam31": 0,
-                  "lam31p": 0,
-                  "lam33": 0,
-                  "lam3Im": 0,
-                  "lam3Re": 0,
-                  "g1": 0,
-                  "g2": 0,
-                  "g3": 0}
+                  "lam12p": 0}
+        symbols = set(["lam11", "lam12", "lam12p"])
 
-        self.assertEqual(reference, bIsPerturbative(source))
+        self.assertEqual(reference, bIsPerturbative(source, symbols) )
 

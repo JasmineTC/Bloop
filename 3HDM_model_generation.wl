@@ -252,17 +252,10 @@ symbolsToStrings[symbols_List] := ToString /@ symbols
 
 (* Apply the function to each element in the list and flatten results *)
 fourPointSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ \[CapitalLambda]4]]
-(** I don't know when this will ever be needed but incase it is ever needed **)
+(** I don't know when this will ever be needed but incase it is ever needed\.12 **)
 threePointSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ \[CapitalLambda]3]] 
 twoPointSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ \[Mu]ij]]
 yukawaSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ Ysff]]
-
-
-ExportUTF8[variables<>"/LagranianSymbols.json", { {"fourPointSymbols"-> symbolsToStrings[fourPointSymbols]},
-												{"threePointSymbols"-> symbolsToStrings[threePointSymbols]},
-												{"twoPointSymbols"-> symbolsToStrings[twoPointSymbols]}, 
-												{"yukawaSymbols"-> symbolsToStrings[yukawaSymbols]}, 
-												{"gaugeSymbols"-> symbolsToStrings[GaugeCouplings]}  } ];
 
 
 couplingsSoft = PrintCouplings[];
@@ -376,6 +369,14 @@ backgroundFieldsFull = {(*\[Phi]1*)0, v1, 0, 0,(*\[Phi]2*)0, v2, 0, 0, (*\[Phi]3
 DefineVEVS[backgroundFieldsFull];
 (* store a list of all nonzero background field symbols *)
 backgroundFields = {v1, v2, v3};
+
+
+ExportUTF8[variables<>"/LagranianSymbols.json", {"fourPointSymbols"-> symbolsToStrings[fourPointSymbols],
+												"threePointSymbols"-> symbolsToStrings[threePointSymbols],
+												"twoPointSymbols"-> symbolsToStrings[twoPointSymbols],
+												"gaugeSymbols"-> symbolsToStrings[GaugeCouplings],
+												"yukawaSymbols" -> symbolsToStrings[yukawaSymbols],
+												"fieldSymbols" -> symbolsToStrings[DeleteDuplicates @ Flatten[splitExpr /@ backgroundFieldsFull]]} ]
 
 
 (* ::Subsection:: *)
@@ -605,7 +606,7 @@ ExportUTF8[effectivePotentialDirectory<>"/vectorMasses.txt", VectorMassExpressio
 ExportUTF8[effectivePotentialDirectory<>"/vectorShorthands.txt", vectorShorthands];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Export Veff derivatives*)
 
 
