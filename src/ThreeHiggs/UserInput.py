@@ -97,6 +97,14 @@ class UserInput(argparse.ArgumentParser):
                   dest = 'benchmarkFile',
                   metavar='')
         
+        
+        self.add_argument("--benchmarkType", action = "store",  dest = "benchmarkType", default = "handPicked",
+                        choices = ["handPicked", "random", "randomSSS"],
+                        help = "Str: Specify the mode to generate bm with.")
+        
+        self.add_argument("--randNum",type = int, action = "store",  dest = "randNum", default = 1_000_000,
+                        help = "Int: Specify how many random bm to generate.")
+        
         self.add_argument('--firstBenchmark', type = int, default = 0, dest = 'firstBenchmark',
         metavar='')
         from sys import maxsize
