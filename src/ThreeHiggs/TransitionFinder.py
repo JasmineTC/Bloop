@@ -76,7 +76,7 @@ class TraceFreeEnergyMinimum:
             return "MinimisationFailed"
         return False
     
-    def doTLoop(self, T, betaSpline4D, keyMapping):
+    def executeMinimisation(self, T, betaSpline4D, keyMapping):
         
         TDependentConstsDict =  self.TDependentConsts(T)
         
@@ -92,11 +92,10 @@ class TraceFreeEnergyMinimum:
                 params3D)
             
     def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
-        """RG running. We want to do 4D -> 3D matching at a scale where logs are small; usually a T-dependent scale ~7T.
-        To make this work nicely we integrate the beta functions here up to the largest temp used 
-        then interpolate over the beta function."""
-        
         lagranianParams4D = get4DLagranianParams(benchmark)
+        
+        ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
+        ## usually a T-dependent scale ~7.3T
         muRange = np.linspace(lagranianParams4D["RGScale"], 
                               7.3 * self.TRange[-1],
                               len(self.TRange)*10)
@@ -121,7 +120,7 @@ class TraceFreeEnergyMinimum:
                 
             minimizationResults["T"].append(T)
             
-            minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.doTLoop(T, 
+            minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T, 
                                                                                                            betaSpline4D, 
                                                                                                            keyMapping)
             ##Not ideal name or structure imo
