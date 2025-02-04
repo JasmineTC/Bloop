@@ -99,10 +99,10 @@ class UserInput(argparse.ArgumentParser):
         
         
         self.add_argument("--benchmarkType", action = "store",  dest = "benchmarkType", default = "handPicked",
-                        choices = ["handPicked", "random", "randomSSS"],
+                        choices = ["load", "handPicked", "random", "randomSSS"],
                         help = "Str: Specify the mode to generate bm with.")
         
-        self.add_argument("--randNum",type = int, action = "store",  dest = "randNum", default = 1_000_000,
+        self.add_argument("--randomNum",type = int, action = "store",  dest = "randomNum", default = 1_000_000,
                         help = "Int: Specify how many random bm to generate.")
         
         self.add_argument('--firstBenchmark', type = int, default = 0, dest = 'firstBenchmark',

@@ -171,25 +171,26 @@ def _strongSubSet():
                     ele["bmNumber"]))
     return bmDict
 
-def generateBenchmarks(args):
+def generateBenchmarks(benchmarkOutput: str, mode: str, randomNum: int):
     from pathlib import Path
-    (output_file := Path(args.benchmarkFile)).parent.mkdir(exist_ok=True, parents=True)   
+    (output_file := Path(benchmarkOutput)).parent.mkdir(exist_ok=True, parents=True)   
     
     from json import dump  
     
-    if args.benchmarkType == "load":
+    if mode == "load":
         return
-    elif args.benchmarkType == "handPicked":
+    elif mode == "handPicked":
         dump(_handPickedBm(), open(output_file, "w"), indent = 4)
         return
-    elif args.mode == "random":
-        dump(_randomBmParam(args.randNum), open(output_file, "w"), indent = 4)
+    elif mode == "random":
+        dump(_randomBmParam(randomNum), open(output_file, "w"), indent = 4)
         return
-    elif args.benchmarkType == "randomSSS":
+    elif mode == "randomSSS":
+        ## THIS NEEDS UPDATING BUT NOT IN THIS COMMIT
         dump(_strongSubSet(), open(output_file, "w"), indent = 4)
         return 
     else:
-        print("Scan method not defined")
+        print("Scan method not defined, exiting")
         exit()
 
 
