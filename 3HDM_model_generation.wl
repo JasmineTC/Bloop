@@ -247,17 +247,22 @@ splitExpr[expr_] := Module[{terms},
     }
   ]
 ];
+symbolsToStrings[symbols_List] := ToString /@ symbols
+
 
 (* Apply the function to each element in the list and flatten results *)
 fourPointSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ \[CapitalLambda]4]]
+(** I don't know when this will ever be needed but incase it is ever needed **)
+threePointSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ \[CapitalLambda]3]] 
 twoPointSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ \[Mu]ij]]
 yukawaSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ Ysff]]
 
 
-ExportUTF8[variables<>"/scalar4PointSymbols.txt", fourPointSymbols];
-ExportUTF8[variables<>"/scalarMassSymbols.txt", twoPointSymbols];
-ExportUTF8[variables<>"/YukawaSymbols.txt", yukawaSymbols];
-ExportUTF8[variables<>"/GaugeSymbols.txt", String[GaugeCouplings]];
+ExportUTF8[variables<>"/LagranianSymbols.json", { {"fourPointSymbols"-> symbolsToStrings[fourPointSymbols]},
+												{"threePointSymbols"-> symbolsToStrings[threePointSymbols]},
+												{"twoPointSymbols"-> symbolsToStrings[twoPointSymbols]}, 
+												{"yukawaSymbols"-> symbolsToStrings[yukawaSymbols]}, 
+												{"gaugeSymbols"-> symbolsToStrings[GaugeCouplings]}  } ];
 
 
 couplingsSoft = PrintCouplings[];
