@@ -76,7 +76,10 @@ class TraceFreeEnergyMinimum:
             return "MinimisationFailed"
         return False
     
-    def executeMinimisation(self, T, betaSpline4D, keyMapping):
+    def executeMinimisation(self, T, 
+                            minimumLocation,
+                            betaSpline4D,
+                            keyMapping):
         
         TDependentConstsDict =  self.TDependentConsts(T)
         
@@ -85,8 +88,8 @@ class TraceFreeEnergyMinimum:
                                         TDependentConstsDict["RGScale"]) | TDependentConstsDict
         
         params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
-        
-        return ( *self.effectivePotential.findGlobalMinimum(T, params3D, self.initialGuesses), 
+        a = self.initialGuesses + (minimumLocation, ) 
+        return ( *self.effectivePotential.findGlobalMinimum(T, params3D, a), 
                 bIsPerturbative(paramsForMatching, self.pertSymbols), 
                 bIsBounded(paramsForMatching),
                 params3D)
@@ -114,13 +117,18 @@ class TraceFreeEnergyMinimum:
                                "failureReason": None}
 
         counter = 0
+        ## Initialise minimumLocation to feed into the minimisation algo so it can
+        ## use the location of the previous minimum as a guess for the next
+        ## Not ideal as the code has to repeat an initial guess on first T
+        minimumLocation = self.initialGuesses[0]
         for T in self.TRange:
             if self.bVerbose:
                 print (f'Start of temp = {T} loop')
                 
             minimizationResults["T"].append(T)
             
-            minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T, 
+            minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T,
+                                                                                                           tuple(minimumLocation),                      
                                                                                                            betaSpline4D, 
                                                                                                            keyMapping)
             ##Not ideal name or structure imo
