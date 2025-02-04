@@ -4,8 +4,8 @@ from enum import IntEnum
 
 class Stages(IntEnum):
     convertMathematica = 0
-    minimization = 1
-    plot = 2
+    generateBenchmark = 1
+    doMinimization = 2
 
     @staticmethod
     def fromString(*args, **kwargs):
@@ -86,7 +86,7 @@ class UserInput(argparse.ArgumentParser):
 
         self.add_argument('--firstStage', type = Stages.fromString, default = "convertMathematica", dest = 'firstStage',
         metavar='')
-        self.add_argument('--lastStage', type = Stages.fromString, default = "plot", dest = 'lastStage',
+        self.add_argument('--lastStage', type = Stages.fromString, default = "doMinimization", dest = 'lastStage',
         metavar='')
         
         
