@@ -173,19 +173,24 @@ def _strongSubSet():
 
 def generateBenchmarks(args):
     from pathlib import Path
-    Path.mkdir(args.benchmarkFile).mkdir(parents = True, exist_ok = True)
-    from json import dump                       
-    if args.benchmarkType == "handPicked":
-        dump(_handPickedBm(), open(args.benchmarkFile, "w"), indent = 4)
+    (output_file := Path(args.benchmarkFile)).parent.mkdir(exist_ok=True, parents=True)   
+    
+    from json import dump  
+    
+    if args.benchmarkType == "load":
+        return
+    elif args.benchmarkType == "handPicked":
+        dump(_handPickedBm(), open(output_file, "w"), indent = 4)
+        return
+    elif args.mode == "random":
+        dump(_randomBmParam(args.randNum), open(output_file, "w"), indent = 4)
+        return
+    elif args.benchmarkType == "randomSSS":
+        dump(_strongSubSet(), open(output_file, "w"), indent = 4)
+        return 
     else:
-        print("Error")
+        print("Scan method not defined")
         exit()
-    # elif args.mode == "random":
-    #     print("no")
-    #     #dump(_randomBmParam(args.randNum), open("Benchmarks/randomScan.json", "w"), indent = 4)
-    # else:
-    #     dump(_strongSubSet(), open("Benchmarks/randomScanSSS.json", "w"), indent = 4)
-
 
 
     
