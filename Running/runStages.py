@@ -1,9 +1,7 @@
 
-from ThreeHiggs.UserInput import UserInput
-userinput = UserInput()
-args = userinput.parse()
+from ThreeHiggs.UserInput import UserInput, Stages
+args = UserInput().parse()
 
-from ThreeHiggs.UserInput import Stages
 if args.firstStage <= Stages.convertMathematica <= args.lastStage:
     from ThreeHiggs.ConvertMathematica import convertMathematica
     convertMathematica(args)
