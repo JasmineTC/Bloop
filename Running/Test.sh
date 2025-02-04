@@ -9,7 +9,7 @@ echo Intergration tests...
 # Super coarse test providing full coverage
 echo Intergration test: Running code at NNLO, complex mass mode on...
 rm -f IntegrationTests/ComplexMass/OutputResult/* 
-python3 runBenchmark.py --loopOrder 2 \
+python3 runStages.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
                         --bSave \
@@ -24,7 +24,7 @@ diff IntegrationTests/ComplexMass/OutputResult/BM_1_interp.json IntegrationTests
 # Super coarse test providing full coverage, complex mass+numba
 echo Intergration test: Running code at NNLO, complex mass mode on with Numba...
 rm -f IntegrationTests/Numba/OutputResult/* 
-python3 runBenchmark.py --loopOrder 2 \
+python3 runStages.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
                         --bSave \
