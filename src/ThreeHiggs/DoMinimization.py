@@ -11,10 +11,11 @@ def drange(start: float, end: float, jump: str) -> Generator:
         start += decimal.Decimal(jump)
 
 def doMinimization(parameters):
-    benchmark = parameters["benchmark"] if "benchmark" in parameters else None
-    effectivePotential = parameters["effectivePotential"] if "effectivePotential" in parameters else None
-    dimensionalReduction = parameters["dimensionalReduction"] if "dimensionalReduction" in parameters else None
-    pertSymbols = parameters["pertSymbols"] if "pertSymbols" in parameters else None
+    ## This should be doable with **unpacking but difficult with pool (starmap?)
+    benchmark = parameters["benchmark"] 
+    effectivePotential = parameters["effectivePotential"] 
+    dimensionalReduction = parameters["dimensionalReduction"] 
+    pertSymbols = parameters["pertSymbols"] 
     args = parameters["args"]
 
     if args.bVerbose:
