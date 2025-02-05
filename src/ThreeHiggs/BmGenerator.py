@@ -177,9 +177,7 @@ def generateBenchmarks(benchmarkOutput: str, mode: str, randomNum: int):
     
     from json import dump  
     
-    if mode == "load":
-        return
-    elif mode == "handPicked":
+    if mode == "handPicked":
         dump(_handPickedBm(), open(output_file, "w"), indent = 4)
         return
     elif mode == "random":
@@ -189,9 +187,7 @@ def generateBenchmarks(benchmarkOutput: str, mode: str, randomNum: int):
         ## THIS NEEDS UPDATING BUT NOT IN THIS COMMIT
         dump(_strongSubSet(), open(output_file, "w"), indent = 4)
         return 
-    else:
-        print("Scan method not defined, exiting")
-        exit()
+    return
 
 
     
