@@ -5,9 +5,27 @@ echo Unit tests...
 python3 ../src/ThreeHiggs/UnitTests.py
 
 echo Intergration tests...
+# Super coarse test providing full coverage
+echo Intergration test: Running code at NLO with pool using 2 cores...
+rm -f IntegrationTests/Pool/OutputResult/* 
+python3 runStages.py --loopOrder 1 \
+                        --firstBenchmark 0 \
+                        --lastBenchmark 3 \
+                        --bSave \
+                        --resultsDirectory IntegrationTests/Pool/OutputResult/  \
+                        --TRangeStart 50 \
+                        --TRangeEnd 200 \
+                        --TRangeStepSize 2 \
+                        --bPool \
+                        --cores 2
+diff IntegrationTests/Pool/OutputResult/BM_0.json IntegrationTests/Pool/ReferenceResult/BM_0.json
+diff IntegrationTests/Pool/OutputResult/BM_1.json IntegrationTests/Pool/ReferenceResult/BM_1.json
+diff IntegrationTests/Pool/OutputResult/BM_2.json IntegrationTests/Pool/ReferenceResult/BM_2.json
+diff IntegrationTests/Pool/OutputResult/BM_3.json IntegrationTests/Pool/ReferenceResult/BM_3.json
+exit
 
 # Super coarse test providing full coverage
-echo Intergration test: Running code at NNLO, complex mass mode on...
+echo Intergration test: Running code at NNLOn...
 rm -f IntegrationTests/ComplexMass/OutputResult/* 
 python3 runStages.py --loopOrder 2 \
                         --firstBenchmark 1 \
@@ -21,8 +39,8 @@ python3 runStages.py --loopOrder 2 \
 diff IntegrationTests/ComplexMass/OutputResult/BM_1.json IntegrationTests/ComplexMass/ReferenceResult/BM_1.json
 diff IntegrationTests/ComplexMass/OutputResult/BM_1_interp.json IntegrationTests/ComplexMass/ReferenceResult/BM_1_interp.json
 
-# Super coarse test providing full coverage, complex mass+numba
-echo Intergration test: Running code at NNLO, complex mass mode on with Numba...
+
+echo Intergration test: Running code at NNLO with Numba...
 rm -f IntegrationTests/Numba/OutputResult/* 
 python3 runStages.py --loopOrder 2 \
                         --firstBenchmark 1 \

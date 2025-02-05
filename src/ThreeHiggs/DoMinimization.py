@@ -4,17 +4,20 @@ import decimal
 
 ## This avoids floating point error in T gotten by np.arange or linspace
 ## However one must be careful as 1 = decimal.Decimal(1.000000000000001) 
-def drange(start: float, end: float, jump: str) -> Generator:
+def _drange(start: float, end: float, jump: str) -> Generator:
     start =  decimal.Decimal(start) 
     while start <= end:
         yield float(start)
         start += decimal.Decimal(jump)
 
-def doMinimization(args, parameters):
-    benchmark = parameters["benchmark"] if "benchmark" in parameters else None
-    effectivePotential = parameters["effectivePotential"] if "effectivePotential" in parameters else None
-    dimensionalReduction = parameters["dimensionalReduction"] if "dimensionalReduction" in parameters else None
-    pertSymbols = parameters["pertSymbols"] if "pertSymbols" in parameters else None
+def _doMinimization(parameters):
+    ## This should be doable with **unpacking but difficult with pool (starmap?)
+    benchmark = parameters["benchmark"] 
+    effectivePotential = parameters["effectivePotential"] 
+    dimensionalReduction = parameters["dimensionalReduction"] 
+    pertSymbols = parameters["pertSymbols"] 
+    args = parameters["args"]
+    print(benchmark)
 
     if args.bVerbose:
         print(f"Starting benchmark: {benchmark['bmNumber']}")
@@ -28,7 +31,7 @@ def doMinimization(args, parameters):
     from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
     traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
                                                 "dimensionalReduction": dimensionalReduction, 
-                                                "TRange": tuple(drange(args.TRangeStart, 
+                                                "TRange": tuple(_drange(args.TRangeStart, 
                                                                        args.TRangeEnd, 
                                                                        str(args.TRangeStepSize))),
                                                 "pertSymbols": pertSymbols,
@@ -98,19 +101,18 @@ def minimization(args):
                                                           "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"])})
     
     with open(args.benchmarkFile) as benchmarkFile:
+        minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
+                                                     variableSymbols["yukawaSymbols"] + 
+                                                     variableSymbols["gaugeSymbols"]), 
+                            "effectivePotential": effectivePotential,
+                            "dimensionalReduction": dimensionalReduction,
+                            "args": args} 
         if args.bPool:
             from pathos.multiprocessing import Pool
             with Pool(args.cores) as pool:
                 from ijson import items
-                pool.map(doMinimization, ({"benchmark": item,
-                                           "effectivePotential": effectivePotential,
-                                           "dimensionalReduction": dimensionalReduction } for item in items(benchmarkFile, "item", use_float = True)))
+                pool.map(_doMinimization, (minimizationDict | {"benchmark": item} for item in items(benchmarkFile, "item", use_float = True)))
 
         else:
-            for parameters in ({"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
-                                                   variableSymbols["yukawaSymbols"] + 
-                                                   variableSymbols["gaugeSymbols"]), 
-                                "benchmark": item,
-                                "effectivePotential": effectivePotential,
-                                "dimensionalReduction": dimensionalReduction} for item in json.load(benchmarkFile)):
-                doMinimization(args, parameters)
+            for parameters in (minimizationDict | {"benchmark": item} for item in json.load(benchmarkFile)):
+                _doMinimization(parameters)
