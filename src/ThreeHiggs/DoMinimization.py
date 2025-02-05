@@ -10,11 +10,12 @@ def drange(start: float, end: float, jump: str) -> Generator:
         yield float(start)
         start += decimal.Decimal(jump)
 
-def doMinimization(args, parameters):
+def doMinimization(parameters):
     benchmark = parameters["benchmark"] if "benchmark" in parameters else None
     effectivePotential = parameters["effectivePotential"] if "effectivePotential" in parameters else None
     dimensionalReduction = parameters["dimensionalReduction"] if "dimensionalReduction" in parameters else None
     pertSymbols = parameters["pertSymbols"] if "pertSymbols" in parameters else None
+    args = parameters["args"]
 
     if args.bVerbose:
         print(f"Starting benchmark: {benchmark['bmNumber']}")
@@ -102,7 +103,8 @@ def minimization(args):
                                                      variableSymbols["yukawaSymbols"] + 
                                                      variableSymbols["gaugeSymbols"]), 
                             "effectivePotential": effectivePotential,
-                            "dimensionalReduction": dimensionalReduction} 
+                            "dimensionalReduction": dimensionalReduction,
+                            "args": args} 
         if args.bPool:
             from pathos.multiprocessing import Pool
             with Pool(args.cores) as pool:
@@ -111,4 +113,4 @@ def minimization(args):
 
         else:
             for parameters in (minimizationDict | {"benchmark": item} for item in json.load(benchmarkFile)):
-                doMinimization(args, parameters)
+                doMinimization(parameters)
