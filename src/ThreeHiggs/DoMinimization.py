@@ -98,19 +98,17 @@ def minimization(args):
                                                           "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"])})
     
     with open(args.benchmarkFile) as benchmarkFile:
+        minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
+                                               variableSymbols["yukawaSymbols"] + 
+                                               variableSymbols["gaugeSymbols"]), 
+                            "effectivePotential": effectivePotential,
+                            "dimensionalReduction": dimensionalReduction} 
         if args.bPool:
             from pathos.multiprocessing import Pool
             with Pool(args.cores) as pool:
                 from ijson import items
-                pool.map(doMinimization, ({"benchmark": item,
-                                           "effectivePotential": effectivePotential,
-                                           "dimensionalReduction": dimensionalReduction } for item in items(benchmarkFile, "item", use_float = True)))
+                pool.map(doMinimization, (minimizationDict | {"benchmark": item} for item in items(benchmarkFile, "item", use_float = True)))
 
         else:
-            for parameters in ({"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
-                                                   variableSymbols["yukawaSymbols"] + 
-                                                   variableSymbols["gaugeSymbols"]), 
-                                "benchmark": item,
-                                "effectivePotential": effectivePotential,
-                                "dimensionalReduction": dimensionalReduction} for item in json.load(benchmarkFile)):
+            for parameters in (minimizationDict | {"benchmark": item} for item in json.load(benchmarkFile)):
                 doMinimization(args, parameters)
