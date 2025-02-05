@@ -99,8 +99,8 @@ def minimization(args):
     
     with open(args.benchmarkFile) as benchmarkFile:
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
-                                               variableSymbols["yukawaSymbols"] + 
-                                               variableSymbols["gaugeSymbols"]), 
+                                                     variableSymbols["yukawaSymbols"] + 
+                                                     variableSymbols["gaugeSymbols"]), 
                             "effectivePotential": effectivePotential,
                             "dimensionalReduction": dimensionalReduction} 
         if args.bPool:
