@@ -1,0 +1,29 @@
+from ThreeHiggs.GetLines import getLines
+from json import dump
+def convertMathematica(args):
+    veffLines = getLines(args.loFile)
+    if (args.loopOrder >= 1):
+        veffLines += getLines(args.nloFile)
+    if (args.loopOrder >= 2):
+        veffLines += getLines(args.nnloFile)
+
+    from ThreeHiggs.MathematicaParsers import (parseExpressionSystem,
+                                               parseConstantMatrix,
+                                               parseMassMatrix,
+                                               parseRotationMatrix)
+    
+
+    dump({"vectorMassesSquared": parseExpressionSystem(getLines(args.vectorMassesSquaredFile)),
+          "vectorShortHands": parseExpressionSystem(getLines(args.vectorShortHandsFile)),
+          "scalarPermutationMatrix": parseConstantMatrix(getLines(args.scalarPermutationFile)),
+          "scalarMassMatrixUpperLeft": parseMassMatrix(getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
+                                                       getLines(args.scalarMassMatrixUpperLeftFile)),
+          "scalarMassMatrixBottomRight": parseMassMatrix(getLines(args.scalarMassMatrixBottomRightDefinitionsFile),
+                                                         getLines(args.scalarMassMatrixBottomRightFile)),
+          "scalarRotationMatrix": parseRotationMatrix(getLines(args.scalarRotationFile)),
+          "veff": parseExpressionSystem(veffLines),
+          "hardToSoft": parseExpressionSystem(getLines(args.hardToSoftFile)),
+          "softScaleRGE": parseExpressionSystem(getLines(args.softScaleRGEFile)),
+          "softToUltraSoft": parseExpressionSystem(getLines(args.softToUltraSoftFile))},
+         open(args.parsedExpressionsFile, "w"),
+         indent = 4)

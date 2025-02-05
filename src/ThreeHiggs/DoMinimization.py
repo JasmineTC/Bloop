@@ -1,4 +1,4 @@
-import json 
+import json
 from typing import Generator
 import decimal
 
@@ -10,7 +10,7 @@ def drange(start: float, end: float, jump: str) -> Generator:
         yield float(start)
         start += decimal.Decimal(jump)
 
-def doMinimization(parameters):
+def doMinimization(args, parameters):
     benchmark = parameters["benchmark"] if "benchmark" in parameters else None
     effectivePotential = parameters["effectivePotential"] if "effectivePotential" in parameters else None
     dimensionalReduction = parameters["dimensionalReduction"] if "dimensionalReduction" in parameters else None
@@ -42,11 +42,10 @@ def doMinimization(parameters):
     
     from pathlib import Path
     Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
-    from json import dumps
     if args.bSave:
         if args.bVerbose:
             print(f"Saving {benchmark['bmNumber']} to {filename}")
-        open(f"{filename}.json", "w").write(dumps(minimizationResult, indent = 4))
+        open(f"{filename}.json", "w").write(json.dumps(minimizationResult, indent = 4))
       
     if args.bPlot:
         if args.bVerbose:
@@ -59,50 +58,11 @@ def doMinimization(parameters):
         if args.bVerbose:
             print(f"Processing {benchmark['bmNumber']} to {filename+'_interp'}")
         from ThreeHiggs.ProcessMinimization import interpretData
-        open(f"{filename}_interp.json", "w").write(dumps(interpretData(minimizationResult,
+        open(f"{filename}_interp.json", "w").write(json.dumps(interpretData(minimizationResult,
                                                                         benchmark["bmNumber"],
                                                                         benchmark["bmInput"]),
                                                          indent = 4))
-
-## Adding a mode is not ideal but idk what else to do
-def getLines(relativePathToResource, mode = "default"):
-    ## fallback to hardcoded package name if the __package__ call fails
-    packageName = __package__ or "ThreeHiggs"
-
-    from importlib.resources import files
-    path = files(packageName) / relativePathToResource
-    
-    if mode == "json":
-        return json.load(open(path, "r"))
-    return open(path, "r" , encoding = "utf-8").readlines()
-
-def convertMathematica(args):
-    veffLines = getLines(args.loFile)
-    if (args.loopOrder >= 1):
-        veffLines += getLines(args.nloFile)
-    if (args.loopOrder >= 2):
-        veffLines += getLines(args.nnloFile)
-
-    from ThreeHiggs.MathematicaParsers import (parseExpressionSystem,
-                                               parseConstantMatrix,
-                                               parseMassMatrix,
-                                               parseRotationMatrix)
-    
-
-    json.dump({"vectorMassesSquared": parseExpressionSystem(getLines(args.vectorMassesSquaredFile)),
-          "vectorShortHands": parseExpressionSystem(getLines(args.vectorShortHandsFile)),
-          "scalarPermutationMatrix": parseConstantMatrix(getLines(args.scalarPermutationFile)),
-          "scalarMassMatrixUpperLeft": parseMassMatrix(getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
-                                                       getLines(args.scalarMassMatrixUpperLeftFile)),
-          "scalarMassMatrixBottomRight": parseMassMatrix(getLines(args.scalarMassMatrixBottomRightDefinitionsFile),
-                                                         getLines(args.scalarMassMatrixBottomRightFile)),
-          "scalarRotationMatrix": parseRotationMatrix(getLines(args.scalarRotationFile)),
-          "veff": parseExpressionSystem(veffLines),
-          "hardToSoft": parseExpressionSystem(getLines(args.hardToSoftFile)),
-          "softScaleRGE": parseExpressionSystem(getLines(args.softScaleRGEFile)),
-          "softToUltraSoft": parseExpressionSystem(getLines(args.softToUltraSoftFile))},
-         open(args.parsedExpressionsFile, "w"),
-         indent = 4)
+from ThreeHiggs.GetLines import getLines        
 def minimization(args):
     parsedExpressions = json.load(open(args.parsedExpressionsFile, "r"))
     variableSymbols =  getLines( "Data/Variables/LagranianSymbols.json", mode = "json") 
@@ -153,15 +113,4 @@ def minimization(args):
                                 "benchmark": item,
                                 "effectivePotential": effectivePotential,
                                 "dimensionalReduction": dimensionalReduction} for item in json.load(benchmarkFile)):
-                doMinimization(parameters)
-
-from ThreeHiggs.UserInput import UserInput
-userinput = UserInput()
-args = userinput.parse()
-
-from ThreeHiggs.UserInput import Stages
-if args.firstStage <= Stages.convertMathematica <= args.lastStage:
-    convertMathematica(args)
-
-if args.firstStage <= Stages.minimization <= args.lastStage:
-   minimization(args)
+                doMinimization(args, parameters)
