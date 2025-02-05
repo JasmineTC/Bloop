@@ -16,6 +16,7 @@ def _doMinimization(parameters):
     effectivePotential = parameters["effectivePotential"] 
     dimensionalReduction = parameters["dimensionalReduction"] 
     pertSymbols = parameters["pertSymbols"] 
+    argumentMap = parameters["argumentMap"]
     args = parameters["args"]
     print(benchmark)
 
@@ -29,14 +30,17 @@ def _doMinimization(parameters):
         return
     
     from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
-    traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
-                                                "dimensionalReduction": dimensionalReduction, 
-                                                "TRange": tuple(_drange(args.TRangeStart, 
-                                                                       args.TRangeEnd, 
-                                                                       str(args.TRangeStepSize))),
-                                                "pertSymbols": pertSymbols,
-                                                "bVerbose": args.bVerbose,
-                                                "initialGuesses": args.initialGuesses})
+    traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {
+        "effectivePotential":effectivePotential, 
+        "dimensionalReduction": dimensionalReduction, 
+        "TRange": tuple(_drange(args.TRangeStart, 
+                                args.TRangeEnd, 
+                                str(args.TRangeStepSize))),
+        "pertSymbols": pertSymbols,
+        "bVerbose": args.bVerbose,
+        "initialGuesses": args.initialGuesses,
+        "argumentMap": argumentMap
+    })
     
     
     minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
@@ -101,11 +105,13 @@ def minimization(args):
                                                           "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"])})
     
     with open(args.benchmarkFile) as benchmarkFile:
+        from ThreeHiggs.makeArgumentMap import makeArgumentMap
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
                                                      variableSymbols["yukawaSymbols"] + 
                                                      variableSymbols["gaugeSymbols"]), 
                             "effectivePotential": effectivePotential,
                             "dimensionalReduction": dimensionalReduction,
+                            "argumentMap": makeArgumentMap(parsedExpressions),
                             "args": args} 
         if args.bPool:
             from pathos.multiprocessing import Pool
