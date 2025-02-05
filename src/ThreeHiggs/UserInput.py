@@ -4,8 +4,8 @@ from enum import IntEnum
 
 class Stages(IntEnum):
     convertMathematica = 0
-    minimization = 1
-    plot = 2
+    generateBenchmark = 1
+    doMinimization = 2
 
     @staticmethod
     def fromString(*args, **kwargs):
@@ -86,7 +86,7 @@ class UserInput(argparse.ArgumentParser):
 
         self.add_argument('--firstStage', type = Stages.fromString, default = "convertMathematica", dest = 'firstStage',
         metavar='')
-        self.add_argument('--lastStage', type = Stages.fromString, default = "plot", dest = 'lastStage',
+        self.add_argument('--lastStage', type = Stages.fromString, default = "doMinimization", dest = 'lastStage',
         metavar='')
         
         
@@ -96,6 +96,14 @@ class UserInput(argparse.ArgumentParser):
                   default = "Benchmarks/handPicked.json",
                   dest = 'benchmarkFile',
                   metavar='')
+        
+        
+        self.add_argument("--benchmarkType", action = "store",  dest = "benchmarkType", default = "handPicked",
+                        choices = ["load", "handPicked", "random", "randomSSS"],
+                        help = "Str: Specify the mode to generate bm with.")
+        
+        self.add_argument("--randomNum",type = int, action = "store",  dest = "randomNum", default = 1_000_000,
+                        help = "Int: Specify how many random bm to generate.")
         
         self.add_argument('--firstBenchmark', type = int, default = 0, dest = 'firstBenchmark',
         metavar='')

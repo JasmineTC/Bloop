@@ -136,7 +136,7 @@ def _randomBmParam(num):
             bmdictList.append(bmDict)
     return bmdictList
 
-def _notRandomBmParam():
+def _handPickedBm():
     bmdictList = []
     bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
                    [67, 4.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
@@ -170,26 +170,24 @@ def _strongSubSet():
                     ele["darkHieracy"],
                     ele["bmNumber"]))
     return bmDict
-if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", action = "store",  dest = "mode", default = "handPicked",
-                    choices = ["handPicked", "random", "randomSSS"],
-                    help = "Str: Specify the mode to generate bm with.")
-    parser.add_argument("--randNum",type = int, action = "store",  dest = "randNum", default = 1_000_000,
-                    help = "Int: Specify how many random bm to generate.")
+
+def generateBenchmarks(benchmarkOutput: str, mode: str, randomNum: int):
+    from pathlib import Path
+    (output_file := Path(benchmarkOutput)).parent.mkdir(exist_ok=True, parents=True)   
     
-
-    args = parser.parse_args()
-    from json import dump                       
-    if args.mode == "handPicked":
-        dump(_notRandomBmParam(), open("Benchmarks/handPicked.json", "w"), indent = 4)
-    elif args.mode == "random":
-        print("no")
-        #dump(_randomBmParam(args.randNum), open("Benchmarks/randomScan.json", "w"), indent = 4)
-    else:
-        dump(_strongSubSet(), open("Benchmarks/randomScanSSS.json", "w"), indent = 4)
-
+    from json import dump  
+    
+    if mode == "handPicked":
+        dump(_handPickedBm(), open(output_file, "w"), indent = 4)
+        return
+    elif mode == "random":
+        dump(_randomBmParam(randomNum), open(output_file, "w"), indent = 4)
+        return
+    elif mode == "randomSSS":
+        ## THIS NEEDS UPDATING BUT NOT IN THIS COMMIT
+        dump(_strongSubSet(), open(output_file, "w"), indent = 4)
+        return 
+    return
 
 
     
