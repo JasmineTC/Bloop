@@ -20,7 +20,7 @@ def makeArgumentMap(parsedExpressions):
     for key, value in parsedExpressions.items():
         symbols |= getSymbols(value)
 
-    return {symbol: index for symbol, index in enumerate(list(symbols))}
+    return {symbol: index for index, symbol in enumerate(symbols)}
 
 if __name__ == "__main__":
     from json import load
