@@ -37,7 +37,8 @@ def _doMinimization(parameters):
         "pertSymbols": pertSymbols,
         "bVerbose": args.bVerbose,
         "initialGuesses": args.initialGuesses,
-        "argumentMap": argumentMap
+        "arg2Index": argumentMap,    
+        "index2Arg": dict((v, k) for k, v in argumentMap.items())
     })
     
     
