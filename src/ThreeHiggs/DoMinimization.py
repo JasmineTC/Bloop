@@ -17,7 +17,6 @@ def _doMinimization(parameters):
     dimensionalReduction = parameters["dimensionalReduction"] 
     pertSymbols = parameters["pertSymbols"] 
     args = parameters["args"]
-    print(benchmark)
 
     if args.bVerbose:
         print(f"Starting benchmark: {benchmark['bmNumber']}")
