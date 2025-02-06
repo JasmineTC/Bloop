@@ -52,7 +52,8 @@ class TraceFreeEnergyMinimum:
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
 
-    argumentMap: dict = field(default_factory=dict)
+    index2Arg: dict = field(default_factory=dict)
+    arg2Index: dict = field(default_factory=dict)
     
     config: InitVar[dict] = None
     
@@ -63,11 +64,11 @@ class TraceFreeEnergyMinimum:
     def TDependentConsts(self, T, arguments):
         matchingScale = 4.*pi*exp(-np.euler_gamma) * T
         Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
-        
-        arguments[self.argumentMap["RGScale"]] = matchingScale
-        arguments[self.argumentMap["T"]] = T
-        arguments[self.argumentMap["Lb"]] = Lb
-        arguments[self.argumentMap["Lf"]] = Lb + self.Lfconst
+
+        arguments[self.arg2Index["RGScale"]] = matchingScale
+        arguments[self.arg2Index["T"]] = T
+        arguments[self.arg2Index["Lb"]] = Lb
+        arguments[self.arg2Index["Lf"]] = Lb + self.Lfconst
 
     def isBad(self, T, 
                minimumLocation, 
@@ -84,15 +85,14 @@ class TraceFreeEnergyMinimum:
                             betaSpline4D,
                             keyMapping):
         
-        arguments = np.zeros(len(self.argumentMap.keys()))
-        self.TDependentConsts(T, self.argumentMap, arguments)
-        print(arguments)
-        exit()
-        TDependentConstsDict = {key: arguments[value] for key, value in self.argumentMap}
+        arguments = np.zeros(len(self.index2Arg.keys()))
+        self.TDependentConsts(T, arguments)
+        TDependentConstsDict = {key: arguments[value] for key, value in self.arg2Index.items()}
         
-        paramsForMatching = runCoupling(betaSpline4D, 
+        ## THIS UNION IS NON COMMUATATIVE!!!! 
+        paramsForMatching = TDependentConstsDict | runCoupling(betaSpline4D, 
                                         keyMapping, 
-                                        TDependentConstsDict["RGScale"]) | TDependentConstsDict
+                                        TDependentConstsDict["RGScale"]) 
         
         params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
         a = self.initialGuesses + (minimumLocation, ) 
@@ -102,8 +102,6 @@ class TraceFreeEnergyMinimum:
                 params3D)
             
     def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
-        print (self.argumentMap)
-        exit()
         lagranianParams4D = get4DLagranianParams(benchmark)
         
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
