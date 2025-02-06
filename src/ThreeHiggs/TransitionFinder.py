@@ -60,14 +60,14 @@ class TraceFreeEnergyMinimum:
         if config:
             self.__init__(**config)
             
-    def TDependentConsts(self, T, argumentMap, arguments):
+    def TDependentConsts(self, T, arguments):
         matchingScale = 4.*pi*exp(-np.euler_gamma) * T
         Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
         
-        arguments[argumentMap["RGScale"]] = matchingScale
-        arguments[argumentMap["T"]] = T
-        arguments[argumentMap["Lb"]] = Lb
-        arguments[argumentMap["Lf"]] = Lb + self.Lfconst
+        arguments[self.argumentMap["RGScale"]] = matchingScale
+        arguments[self.argumentMap["T"]] = T
+        arguments[self.argumentMap["Lb"]] = Lb
+        arguments[self.argumentMap["Lf"]] = Lb + self.Lfconst
 
     def isBad(self, T, 
                minimumLocation, 
@@ -86,6 +86,8 @@ class TraceFreeEnergyMinimum:
         
         arguments = np.zeros(len(self.argumentMap.keys()))
         self.TDependentConsts(T, self.argumentMap, arguments)
+        print(arguments)
+        exit()
         TDependentConstsDict = {key: arguments[value] for key, value in self.argumentMap}
         
         paramsForMatching = runCoupling(betaSpline4D, 
