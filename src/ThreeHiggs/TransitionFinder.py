@@ -33,7 +33,7 @@ def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
 
     return langrianParams4D
 
-from dataclasses import dataclass, InitVar
+from dataclasses import dataclass, InitVar, field
 from ThreeHiggs.BmGenerator import bIsBounded
 @dataclass(frozen=True)
 class TraceFreeEnergyMinimum:
@@ -52,7 +52,7 @@ class TraceFreeEnergyMinimum:
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
 
-    argumentMap: dict = {}
+    argumentMap: dict = field(default_factory=dict)
     
     config: InitVar[dict] = None
     
@@ -67,7 +67,7 @@ class TraceFreeEnergyMinimum:
         arguments[argumentMap["RGScale"]] = matchingScale
         arguments[argumentMap["T"]] = T
         arguments[argumentMap["Lb"]] = Lb
-        arguments[argumentMap["Lf"]] = Lf
+        arguments[argumentMap["Lf"]] = Lb + self.Lfconst
 
     def isBad(self, T, 
                minimumLocation, 
@@ -100,6 +100,8 @@ class TraceFreeEnergyMinimum:
                 params3D)
             
     def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
+        print (self.argumentMap)
+        exit()
         lagranianParams4D = get4DLagranianParams(benchmark)
         
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
