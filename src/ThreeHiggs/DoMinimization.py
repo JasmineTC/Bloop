@@ -18,8 +18,6 @@ def _doMinimization(parameters):
     pertSymbols = parameters["pertSymbols"] 
     argumentMap = parameters["argumentMap"]
     args = parameters["args"]
-    print(benchmark)
-
     if args.bVerbose:
         print(f"Starting benchmark: {benchmark['bmNumber']}")
 
