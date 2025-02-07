@@ -6,7 +6,7 @@ python3 ../src/ThreeHiggs/UnitTests.py
 
 echo Intergration tests...
 # Super coarse test providing full coverage
-echo Intergration test: Running code at NLO with pool using 2 cores...
+echo Running code at NLO with pool using 2 cores...
 rm -f IntegrationTests/Pool/OutputResult/* 
 python3 runStages.py --loopOrder 1 \
                         --firstBenchmark 0 \
@@ -22,10 +22,8 @@ diff IntegrationTests/Pool/OutputResult/BM_0.json IntegrationTests/Pool/Referenc
 diff IntegrationTests/Pool/OutputResult/BM_1.json IntegrationTests/Pool/ReferenceResult/BM_1.json
 diff IntegrationTests/Pool/OutputResult/BM_2.json IntegrationTests/Pool/ReferenceResult/BM_2.json
 diff IntegrationTests/Pool/OutputResult/BM_3.json IntegrationTests/Pool/ReferenceResult/BM_3.json
-exit
 
-# Super coarse test providing full coverage
-echo Intergration test: Running code at NNLOn...
+echo Intergration test: Running code at NNLO...
 rm -f IntegrationTests/ComplexMass/OutputResult/* 
 python3 runStages.py --loopOrder 2 \
                         --firstBenchmark 1 \
