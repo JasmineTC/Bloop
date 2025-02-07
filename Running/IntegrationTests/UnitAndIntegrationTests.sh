@@ -24,7 +24,6 @@ diff IntegrationTests/Pool/OutputResult/BM_0.json IntegrationTests/Pool/Referenc
 diff IntegrationTests/Pool/OutputResult/BM_1.json IntegrationTests/Pool/ReferenceResult/BM_1.json
 diff IntegrationTests/Pool/OutputResult/BM_2.json IntegrationTests/Pool/ReferenceResult/BM_2.json
 diff IntegrationTests/Pool/OutputResult/BM_3.json IntegrationTests/Pool/ReferenceResult/BM_3.json
-exit
 echo Running code at NNLO...
 rm -f IntegrationTests/ComplexMass/OutputResult/* 
 python3 runStages.py --loopOrder 2 \
