@@ -18,10 +18,10 @@ python3 runStages.py --loopOrder 1 \
                         --TRangeStepSize 2 \
                         --bPool \
                         --cores 2
-diff IntegrationTests/Pool/OutputResult/BM_0.json IntegrationTests/Pool/ReferenceResult/BM_0.json
-diff IntegrationTests/Pool/OutputResult/BM_1.json IntegrationTests/Pool/ReferenceResult/BM_1.json
-diff IntegrationTests/Pool/OutputResult/BM_2.json IntegrationTests/Pool/ReferenceResult/BM_2.json
-diff IntegrationTests/Pool/OutputResult/BM_3.json IntegrationTests/Pool/ReferenceResult/BM_3.json
+diff Pool/OutputResult/BM_0.json Pool/ReferenceResult/BM_0.json
+diff Pool/OutputResult/BM_1.json Pool/ReferenceResult/BM_1.json
+diff Pool/OutputResult/BM_2.json Pool/ReferenceResult/BM_2.json
+diff Pool/OutputResult/BM_3.json Pool/ReferenceResult/BM_3.json
 
 echo Intergration test: Running code at NNLO...
 rm -f IntegrationTests/ComplexMass/OutputResult/* 
@@ -34,8 +34,8 @@ python3 runStages.py --loopOrder 2 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
                         --bProcessMin
-diff IntegrationTests/ComplexMass/OutputResult/BM_1.json IntegrationTests/ComplexMass/ReferenceResult/BM_1.json
-diff IntegrationTests/ComplexMass/OutputResult/BM_1_interp.json IntegrationTests/ComplexMass/ReferenceResult/BM_1_interp.json
+diff ComplexMass/OutputResult/BM_1.json ComplexMass/ReferenceResult/BM_1.json
+diff ComplexMass/OutputResult/BM_1_interp.json ComplexMass/ReferenceResult/BM_1_interp.json
 
 
 echo Intergration test: Running code at NNLO with Numba...
@@ -50,6 +50,6 @@ python3 runStages.py --loopOrder 2 \
                         --TRangeStepSize 10 \
                         --bNumba \
                         --bProcessMin
-diff IntegrationTests/Numba/OutputResult/BM_1.json IntegrationTests/Numba/ReferenceResult/BM_1.json
-diff IntegrationTests/Numba/OutputResult/BM_1_interp.json IntegrationTests/Numba/ReferenceResult/BM_1_interp.json
+diff Numba/OutputResult/BM_1.json Numba/ReferenceResult/BM_1.json
+diff Numba/OutputResult/BM_1_interp.json Numba/ReferenceResult/BM_1_interp.json
 
