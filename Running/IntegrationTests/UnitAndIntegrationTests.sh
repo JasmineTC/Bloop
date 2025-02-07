@@ -7,13 +7,13 @@ python3 ../src/ThreeHiggs/UnitTests.py
 echo Intergration tests...
 # Super coarse test providing full coverage
 echo Running code at NLO with pool using 2 cores...
-rm -f IntegrationTests/Pool/OutputResult/* 
+rm -f Pool/OutputResult/* 
 python3 runStages.py --loopOrder 1 \
                         --firstBenchmark 0 \
                         --lastBenchmark 3 \
                         --bSave \
                         --resultsDirectory Pool/OutputResult/  \
-                        --TRangeStart 50 \
+                        --TRangeStart 100 \
                         --TRangeEnd 200 \
                         --TRangeStepSize 2 \
                         --bPool \
@@ -24,7 +24,7 @@ diff Pool/OutputResult/BM_2.json Pool/ReferenceResult/BM_2.json
 diff Pool/OutputResult/BM_3.json Pool/ReferenceResult/BM_3.json
 
 echo Intergration test: Running code at NNLO...
-rm -f IntegrationTests/ComplexMass/OutputResult/* 
+rm -f ComplexMass/OutputResult/* 
 python3 runStages.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
@@ -39,7 +39,7 @@ diff ComplexMass/OutputResult/BM_1_interp.json ComplexMass/ReferenceResult/BM_1_
 
 
 echo Intergration test: Running code at NNLO with Numba...
-rm -f IntegrationTests/Numba/OutputResult/* 
+rm -f Numba/OutputResult/* 
 python3 runStages.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
