@@ -13,7 +13,7 @@ python3 runStages.py --loopOrder 1 \
                         --lastBenchmark 3 \
                         --bSave \
                         --resultsDirectory IntegrationTests/Pool/OutputResult/  \
-                        --TRangeStart 50 \
+                        --TRangeStart 100 \
                         --TRangeEnd 200 \
                         --TRangeStepSize 2 \
                         --bPool \
