@@ -43,14 +43,15 @@ diff IntegrationTests/Pool2/OutputResult/BM_1.json IntegrationTests/Pool2/Refere
 diff IntegrationTests/Pool2/OutputResult/BM_2.json IntegrationTests/Pool2/ReferenceResult/BM_2.json
 diff IntegrationTests/Pool2/OutputResult/BM_3.json IntegrationTests/Pool2/ReferenceResult/BM_3.json
 
-exit
 echo Running code at NNLO...
 rm -f IntegrationTests/ComplexMass/OutputResult/* 
+rm -f IntegrationTests/Benchmarks/*
 python3 runStages.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
                         --bSave \
                         --resultsDirectory IntegrationTests/ComplexMass/OutputResult/  \
+                        --benchmarkFile IntegrationTests/Benchmarks \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
@@ -61,11 +62,13 @@ diff IntegrationTests/ComplexMass/OutputResult/BM_1_interp.json IntegrationTests
 
 echo Running code at NNLO with Numba...
 rm -f IntegrationTests/Numba/OutputResult/* 
+rm -f IntegrationTests/Benchmarks/*
 python3 runStages.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
                         --bSave \
                         --resultsDirectory IntegrationTests/Numba/OutputResult/ \
+                        --benchmarkFile IntegrationTests/Benchmarks \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
