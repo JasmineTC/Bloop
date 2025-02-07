@@ -61,14 +61,6 @@ class TraceFreeEnergyMinimum:
         if config:
             self.__init__(**config)
             
-    def TDependentConsts(self, T):
-        matchingScale = 4.*pi*exp(-np.euler_gamma) * T
-        Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
-        return {"RGScale": matchingScale,
-                "T": T,
-                "Lb": Lb,
-                "Lf": Lb + self.Lfconst}
-
     def isBad(self, T, 
                minimumLocation, 
                status):
@@ -79,16 +71,30 @@ class TraceFreeEnergyMinimum:
             return "MinimisationFailed"
         return False
     
+    
+    def updateTDependentConsts(self, T, inputArray):
+        matchingScale = 4.*pi*exp(-np.euler_gamma) * T
+        Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
+        
+        inputArray[self.arg2Index["RGScale"]] = matchingScale
+        inputArray[self.arg2Index["T"]] = T
+        inputArray[self.arg2Index["Lb"]] = Lb
+        inputArray[self.arg2Index["Lf"]] = Lb + self.Lfconst
+        return inputArray
+    
     def executeMinimisation(self, T, 
                             minimumLocation,
                             betaSpline4D,
                             keyMapping):
         
-        TDependentConstsDict =  self.TDependentConsts(T)
+        paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.arg2Index.keys())))
+        paramValuesDict = {key: paramValuesArray[value] for key, value in self.arg2Index.items()}
         
-        paramsForMatching = runCoupling(betaSpline4D, 
-                                        keyMapping, 
-                                        TDependentConstsDict["RGScale"]) | TDependentConstsDict
+        paramsForMatching = paramValuesDict | runCoupling(betaSpline4D, 
+                                                          keyMapping, 
+                                                          paramValuesDict["RGScale"])
+        
+        
         
         params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
         a = self.initialGuesses + (minimumLocation, ) 
