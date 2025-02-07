@@ -8,11 +8,13 @@ echo Intergration tests...
 # Super coarse test providing full coverage
 echo Running code at NLO with pool using 2 cores...
 rm -f IntegrationTests/Pool/OutputResult/* 
+rm -f IntegrationTests/Benchmarks/*
 python3 runStages.py --loopOrder 1 \
                         --firstBenchmark 0 \
                         --lastBenchmark 3 \
                         --bSave \
                         --resultsDirectory IntegrationTests/Pool/OutputResult/  \
+                        --benchmarkFile IntegrationTests/Benchmarks \
                         --TRangeStart 100 \
                         --TRangeEnd 200 \
                         --TRangeStepSize 2 \
@@ -22,7 +24,7 @@ diff IntegrationTests/Pool/OutputResult/BM_0.json IntegrationTests/Pool/Referenc
 diff IntegrationTests/Pool/OutputResult/BM_1.json IntegrationTests/Pool/ReferenceResult/BM_1.json
 diff IntegrationTests/Pool/OutputResult/BM_2.json IntegrationTests/Pool/ReferenceResult/BM_2.json
 diff IntegrationTests/Pool/OutputResult/BM_3.json IntegrationTests/Pool/ReferenceResult/BM_3.json
-
+exit
 echo Running code at NNLO...
 rm -f IntegrationTests/ComplexMass/OutputResult/* 
 python3 runStages.py --loopOrder 2 \
