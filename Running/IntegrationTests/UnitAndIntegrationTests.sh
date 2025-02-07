@@ -12,7 +12,7 @@ python3 runStages.py --loopOrder 1 \
                         --firstBenchmark 0 \
                         --lastBenchmark 3 \
                         --bSave \
-                        --resultsDirectory IntegrationTests/Pool/OutputResult/  \
+                        --resultsDirectory Pool/OutputResult/  \
                         --TRangeStart 50 \
                         --TRangeEnd 200 \
                         --TRangeStepSize 2 \
@@ -29,7 +29,7 @@ python3 runStages.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
                         --bSave \
-                        --resultsDirectory IntegrationTests/ComplexMass/OutputResult/  \
+                        --resultsDirectory ComplexMass/OutputResult/  \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
@@ -44,12 +44,12 @@ python3 runStages.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
                         --bSave \
-                        --resultsDirectory IntegrationTests/Numba/OutputResult/ \
+                        --resultsDirectory Numba/OutputResult/ \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
                         --bNumba \
-                        --bProcessMin
+                        --bProcessMini
 diff Numba/OutputResult/BM_1.json Numba/ReferenceResult/BM_1.json
 diff Numba/OutputResult/BM_1_interp.json Numba/ReferenceResult/BM_1_interp.json
 
