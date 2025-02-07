@@ -129,7 +129,7 @@ class TraceFreeEnergyMinimum:
         ## Initialise minimumLocation to feed into the minimisation algo so it can
         ## use the location of the previous minimum as a guess for the next
         ## Not ideal as the code has to repeat an initial guess on first T
-        minimumLocation = self.initialGuesses[0]
+        minimumLocation = np.array(self.initialGuesses[0])
         for T in self.TRange:
             if self.bVerbose:
                 print (f'Start of temp = {T} loop')
@@ -137,7 +137,7 @@ class TraceFreeEnergyMinimum:
             minimizationResults["T"].append(T)
             
             minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T,
-                                                                                                           tuple(minimumLocation),                      
+                                                                                                           tuple(minimumLocation.round(5)),                      
                                                                                                            betaSpline4D, 
                                                                                                            keyMapping)
             ##Not ideal name or structure imo
