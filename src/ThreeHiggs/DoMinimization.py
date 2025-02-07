@@ -17,6 +17,8 @@ def _doMinimization(parameters):
     dimensionalReduction = parameters["dimensionalReduction"] 
     pertSymbols = parameters["pertSymbols"] 
     args = parameters["args"]
+    arg2Index = parameters["arg2Index"]
+    index2Arg = parameters["index2Arg"]
 
     if args.bVerbose:
         print(f"Starting benchmark: {benchmark['bmNumber']}")
@@ -35,7 +37,9 @@ def _doMinimization(parameters):
                                                                        str(args.TRangeStepSize))),
                                                 "pertSymbols": pertSymbols,
                                                 "bVerbose": args.bVerbose,
-                                                "initialGuesses": args.initialGuesses})
+                                                "initialGuesses": args.initialGuesses,
+                                                "arg2Index": arg2Index,
+                                                "index2Arg": index2Arg})
     
     
     minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
@@ -100,12 +104,16 @@ def minimization(args):
                                                           "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"])})
     
     with open(args.benchmarkFile) as benchmarkFile:
+        from ThreeHiggs.MakeArgumentMap import makeArgumentMap
+        arg2Index = makeArgumentMap(parsedExpressions)
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
                                                      variableSymbols["yukawaSymbols"] + 
                                                      variableSymbols["gaugeSymbols"]), 
                             "effectivePotential": effectivePotential,
                             "dimensionalReduction": dimensionalReduction,
-                            "args": args} 
+                            "args": args,
+                            "arg2Index": arg2Index,
+                            "index2Arg": {value: key for key, value in arg2Index.items()}} 
         if args.bPool:
             from pathos.multiprocessing import Pool
             with Pool(args.cores) as pool:

@@ -33,7 +33,7 @@ def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
 
     return langrianParams4D
 
-from dataclasses import dataclass, InitVar
+from dataclasses import dataclass, InitVar,field
 from ThreeHiggs.BmGenerator import bIsBounded
 @dataclass(frozen=True)
 class TraceFreeEnergyMinimum:
@@ -51,6 +51,9 @@ class TraceFreeEnergyMinimum:
     
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
+    
+    index2Arg: dict = field(default_factory=dict)
+    arg2Index: dict = field(default_factory=dict)
     
     config: InitVar[dict] = None
     
