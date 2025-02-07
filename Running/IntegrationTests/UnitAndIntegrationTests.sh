@@ -16,6 +16,7 @@ python3 runStages.py --loopOrder 1 \
                         --bSave \
                         --resultsDirectory IntegrationTests/Pool/OutputResult/  \
                         --benchmarkFile IntegrationTests/Benchmarks \
+                        --benchmarkType handPicked \
                         --TRangeStart 100 \
                         --TRangeEnd 200 \
                         --TRangeStepSize 2 \
@@ -32,6 +33,7 @@ python3 runStages.py --loopOrder 1 \
                         --bSave \
                         --resultsDirectory IntegrationTests/Pool/OutputResult/  \
                         --benchmarkFile IntegrationTests/Benchmarks \
+                        --benchmarkType handPicked \
                         --TRangeStart 100 \
                         --TRangeEnd 200 \
                         --TRangeStepSize 2 \
@@ -52,6 +54,7 @@ python3 runStages.py --loopOrder 2 \
                         --bSave \
                         --resultsDirectory IntegrationTests/ComplexMass/OutputResult/  \
                         --benchmarkFile IntegrationTests/Benchmarks \
+                        --benchmarkType handPicked \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
@@ -69,6 +72,7 @@ python3 runStages.py --loopOrder 2 \
                         --bSave \
                         --resultsDirectory IntegrationTests/Numba/OutputResult/ \
                         --benchmarkFile IntegrationTests/Benchmarks \
+                        --benchmarkType handPicked \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
