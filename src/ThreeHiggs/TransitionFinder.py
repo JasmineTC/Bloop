@@ -102,10 +102,37 @@ class TraceFreeEnergyMinimum:
                 bIsPerturbative(paramsForMatching, self.pertSymbols), 
                 bIsBounded(paramsForMatching),
                 params3D)
+    
+    def populateLagranianParams4D(self, inputParams: dict[str, float], argArray: np.array) -> np.array:
+        
+        langrianParams4D = {}
+        ## --- SM fermions and gauge bosons ---
+        v = 246.22  ## "Higgs VEV". Consider using Fermi constant instead
+        langrianParams4D["yt3"] = sqrt(2.) * 172.76 / v  ## 172.76 is the top mass
+        MW = 80.377 ## W boson mass
+        MZ = 91.1876 ## Z boson mass
+        
+        langrianParams4D |= {"g1": 2.*sqrt(MZ**2 - MW**2)/ v,  # U(1)
+                "g2": 2.*MW/ v,                   # SU(2)
+                "g3": sqrt(0.1183 * 4.0 * pi)}    # SU(3)
+        
+        ## --- BSM scalars ---
+        langrianParams4D |= inputParams["couplingValues"] | inputParams["massTerms"]
+        langrianParams4D["RGScale"] = inputParams["RGScale"]
+        
+        for key, value in langrianParams4D.items():
+            argArray[self.arg2Index[key]] = value
+
+        return argArray
             
     def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
-        lagranianParams4D = get4DLagranianParams(benchmark)
+        # lagranianParams4D = get4DLagranianParams(benchmark)
+        lagranianParams4DArray = self.populateLagranianParams4D(benchmark, np.zeros(len(self.arg2Index)))
         
+        print(lagranianParams4D)
+        print()
+        print(lagranianParams4DArray)
+        exit()
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
         ## usually a T-dependent scale ~7.3T
         muRange = np.linspace(lagranianParams4D["RGScale"], 
@@ -170,6 +197,11 @@ class TraceFreeEnergyMinimum:
 
         minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
         return minimizationResults
+
+
+
+
+
 
 from unittest import TestCase
 class TransitionFinderUnitTests(TestCase):
