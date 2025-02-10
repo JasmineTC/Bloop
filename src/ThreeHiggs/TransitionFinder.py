@@ -71,7 +71,7 @@ class TraceFreeEnergyMinimum:
         paramValuesDict = {key: paramValuesArray[value] for key, value in self.arg2Index.items()}
         
         paramsForMatching = paramValuesDict | runCoupling(betaSpline4D, 
-                                                          paramValuesDict["RGScale"])
+                                                          paramValuesArray[self.arg2Index["RGScale"]])
         
         params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
         return ( *self.effectivePotential.findGlobalMinimum(T, params3D, self.initialGuesses + (minimumLocation, ) ), 
