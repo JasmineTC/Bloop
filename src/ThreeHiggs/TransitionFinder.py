@@ -14,25 +14,6 @@ def runCoupling(betaSpline4D: dict, muEvaulate: float):
         runCoupling[key] = float(spline(muEvaulate))
     return runCoupling
 
-def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
-    
-    langrianParams4D = {}
-    ## --- SM fermions and gauge bosons ---
-    v = 246.22  ## "Higgs VEV". Consider using Fermi constant instead
-    langrianParams4D["yt3"] = sqrt(2.) * 172.76 / v  ## 172.76 is the top mass
-    MW = 80.377 ## W boson mass
-    MZ = 91.1876 ## Z boson mass
-    
-    langrianParams4D |= {"g1": 2.*sqrt(MZ**2 - MW**2)/ v,  # U(1)
-            "g2": 2.*MW/ v,                   # SU(2)
-            "g3": sqrt(0.1183 * 4.0 * pi)}    # SU(3)
-    
-    ## --- BSM scalars ---
-    langrianParams4D |= inputParams["couplingValues"] | inputParams["massTerms"]
-    langrianParams4D["RGScale"] = inputParams["RGScale"]
-
-    return langrianParams4D
-
 from dataclasses import dataclass, InitVar,field
 from ThreeHiggs.BmGenerator import bIsBounded
 @dataclass(frozen=True)
@@ -92,10 +73,6 @@ class TraceFreeEnergyMinimum:
         paramsForMatching = paramValuesDict | runCoupling(betaSpline4D, 
                                                           paramValuesDict["RGScale"])
         
-        # print(runCoupling(betaSpline4D, paramValuesDict["RGScale"]))
-        # print(dict(sorted(paramsForMatching.items())))
-        # exit()
-        
         params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
         a = self.initialGuesses + (minimumLocation, ) 
         return ( *self.effectivePotential.findGlobalMinimum(T, params3D, a), 
@@ -126,7 +103,6 @@ class TraceFreeEnergyMinimum:
         return argArray
             
     def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
-        lagranianParams4D = get4DLagranianParams(benchmark)
         lagranianParams4DArray = self.populateLagranianParams4D(benchmark, np.zeros(len(self.arg2Index)))
         
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
@@ -137,18 +113,7 @@ class TraceFreeEnergyMinimum:
         
         from .BetaFunctions import BetaFunctions4D
         betasFunctions = BetaFunctions4D() 
-        betaSpline4D = betasFunctions.constructSplineDict(muRange, lagranianParams4D)
         betaSpline4D = betasFunctions.constructSplineDictArray(muRange, lagranianParams4DArray, self.arg2Index)
-        # list1 = []
-        # list2 = []
-        # for value in betaSpline4D.values():
-        #     list1.append(float((value(100))))
-        # for value in betaSpline4DArray.values():
-        #     list2.append((float(value(100))))
-        # print(sorted(set(list1)))
-        # print()
-        # print(sorted(set(list2)))
-        # exit()
         
         minimizationResults = {"T": [],
                                "valueVeffReal": [],
