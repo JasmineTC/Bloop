@@ -8,12 +8,6 @@ def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
             return False
     return True
 
-def runCoupling(betaSpline4D: dict, muEvaulate: float):
-    runCoupling = {}
-    for key, spline in betaSpline4D.items():
-        runCoupling[key] = float(spline(muEvaulate))
-    return runCoupling
-
 from dataclasses import dataclass, InitVar,field
 from ThreeHiggs.BmGenerator import bIsBounded
 @dataclass(frozen=True)
@@ -63,20 +57,25 @@ class TraceFreeEnergyMinimum:
         inputArray[self.arg2Index["Lf"]] = Lb + self.Lfconst
         return inputArray
     
+    def updateParams4DRan(self, betaSpline4D: dict, array):
+        muEvaulate = array[self.arg2Index["RGScale"]]
+        for key, spline in betaSpline4D.items():
+            array[self.arg2Index[key]] = float(spline(muEvaulate))
+        return array
+    
     def executeMinimisation(self, T, 
                             minimumLocation,
                             betaSpline4D):
         
         paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.arg2Index.keys())))
-        paramValuesDict = {key: paramValuesArray[value] for key, value in self.arg2Index.items()}
         
-        paramsForMatching = paramValuesDict | runCoupling(betaSpline4D, 
-                                                          paramValuesArray[self.arg2Index["RGScale"]])
+        paramsForMatchingArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
+        paramsForMatchingDict = {key: paramsForMatchingArray[value] for key, value in self.arg2Index.items()}
         
-        params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
+        params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatchingDict, T)
         return ( *self.effectivePotential.findGlobalMinimum(T, params3D, self.initialGuesses + (minimumLocation, ) ), 
-                bIsPerturbative(paramsForMatching, self.pertSymbols), 
-                bIsBounded(paramsForMatching),
+                bIsPerturbative(paramsForMatchingDict, self.pertSymbols), 
+                bIsBounded(paramsForMatchingDict),
                 params3D)
     
     def populateLagranianParams4D(self, inputParams: dict[str, float], argArray: np.array) -> np.array:
