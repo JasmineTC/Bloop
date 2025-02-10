@@ -14,7 +14,7 @@ class BetaFunctions4D():
 
         boolArray = np.zeros(len(solution), dtype=bool)
         for idx, row in enumerate(solution):
-             boolArray[idx] = not np.all(row == 0)
+             boolArray[idx] = not np.all(row == row[0])
         
         
         interpDict = {}
@@ -22,8 +22,6 @@ class BetaFunctions4D():
             ## Hack to remove all the extra entries in the array
             if boolArray[value]:
                 interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[value], extrapolate = False)
-        ##Hack -- remove RGscale to match old behaviour
-        interpDict.pop("RGScale")
         return interpDict
         
     def _hardCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float, arg2Index, pi16) -> np.ndarray:
