@@ -8,10 +8,10 @@ def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
             return False
     return True
 
-def runCoupling(betaSpline4D: dict[str, float], keyMapping: list[str], muEvaulate: float):
+def runCoupling(betaSpline4D: dict, muEvaulate: float):
     runCoupling = {}
     for key, spline in betaSpline4D.items():
-        runCoupling[key] = spline(muEvaulate)
+        runCoupling[key] = float(spline(muEvaulate))
     return runCoupling
 
 def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
@@ -84,17 +84,16 @@ class TraceFreeEnergyMinimum:
     
     def executeMinimisation(self, T, 
                             minimumLocation,
-                            betaSpline4D,
-                            keyMapping):
+                            betaSpline4D):
         
         paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.arg2Index.keys())))
         paramValuesDict = {key: paramValuesArray[value] for key, value in self.arg2Index.items()}
         
         paramsForMatching = paramValuesDict | runCoupling(betaSpline4D, 
-                                                          keyMapping, 
                                                           paramValuesDict["RGScale"])
         
-        
+        # print(dict(sorted(paramsForMatching.items())))
+        # exit()
         
         params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
         a = self.initialGuesses + (minimumLocation, ) 
@@ -137,8 +136,8 @@ class TraceFreeEnergyMinimum:
         
         from .BetaFunctions import BetaFunctions4D
         betasFunctions = BetaFunctions4D() 
-        betaSpline4D, keyMapping = betasFunctions.constructSplineDict(muRange, lagranianParams4D)
-        betaSpline4DArray, keyMappingArray = betasFunctions.constructSplineDictArray(muRange, lagranianParams4D, lagranianParams4DArray, self.arg2Index, self.index2Arg)
+        betaSpline4D = betasFunctions.constructSplineDict(muRange, lagranianParams4D)
+        betaSpline4DA = betasFunctions.constructSplineDictArray(muRange, lagranianParams4DArray, self.arg2Index)
         # list1 = []
         # list2 = []
         # for value in betaSpline4D.values():
@@ -172,8 +171,7 @@ class TraceFreeEnergyMinimum:
             
             minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T,
                                                                                                            tuple(minimumLocation.round(5)),                      
-                                                                                                           betaSpline4D, 
-                                                                                                           self.arg2Index)
+                                                                                                           betaSpline4D)
             ##Not ideal name or structure imo
             isBadState = self.isBad(T, minimumLocation, status)
             if isBadState:

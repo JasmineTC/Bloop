@@ -28,10 +28,6 @@ class BetaFunctions4D():
                                                                                              list[str])):
         ## Need to unpack the param dict for odeint
         paramsList, arg2Index, keyMapping = self._unpackParamDict(initialParams)
-        # print(arg2Index)
-        # print()
-        # print(keyMapping)
-        # exit()
         
         solution = np.transpose( scipy.integrate.odeint(self._hardCodeBetaFunction, 
                                         paramsList, 
@@ -41,12 +37,10 @@ class BetaFunctions4D():
         interpDict = {}
         for i, key in enumerate(keyMapping):
             interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[i], extrapolate = False)
-        return interpDict, keyMapping
+        return interpDict
     
-    def constructSplineDictArray(self, muRange, initialParams, array, arg2Index, index2Arg) :
+    def constructSplineDictArray(self, muRange, array, arg2Index) :
         ## Need to unpack the param dict for odeint
-        paramsList, _, keyMapping = self._unpackParamDict(initialParams)
-        
         solution = np.transpose( scipy.integrate.odeint(self._hardCodeBetaFunction, 
                                                         array, 
                                                         muRange,
@@ -57,7 +51,7 @@ class BetaFunctions4D():
             interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[value], extrapolate = False)
         ##Hack -- remove RGscale to match old behaviour
         interpDict.pop("RGScale")
-        return interpDict, keyMapping
+        return interpDict
         
     def _hardCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float, arg2Index, pi16) -> np.ndarray:
 
