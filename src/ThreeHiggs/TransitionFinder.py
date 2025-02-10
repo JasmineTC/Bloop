@@ -74,8 +74,7 @@ class TraceFreeEnergyMinimum:
                                                           paramValuesDict["RGScale"])
         
         params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
-        a = self.initialGuesses + (minimumLocation, ) 
-        return ( *self.effectivePotential.findGlobalMinimum(T, params3D, a), 
+        return ( *self.effectivePotential.findGlobalMinimum(T, params3D, self.initialGuesses + (minimumLocation, ) ), 
                 bIsPerturbative(paramsForMatching, self.pertSymbols), 
                 bIsBounded(paramsForMatching),
                 params3D)
