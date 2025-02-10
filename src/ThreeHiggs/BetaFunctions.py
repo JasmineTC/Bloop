@@ -5,46 +5,6 @@ import scipy
 
 class BetaFunctions4D():
         
-    def _unpackParamDict(self, params: dict[str, float]) -> tuple((np.ndarray,
-                                                                   dict[str, float], 
-                                                                   list[str])):
-        """Puts a 3HDM parameter dict in array format that odeint understands.
-        Also produces a name <-> index mapping for easier access to the params in beta function expressions."""
-        arg2Index = {}
-        keyMapping = []
-        paramsList = []
-        for idx, (key, val) in enumerate(params.items()):
-            ## Do NOT include the RG scale in this
-            if (key == "RGScale"): 
-                continue
-
-            paramsList.append(val)
-            arg2Index[key] = idx
-            keyMapping.append(key)
-
-        return paramsList, arg2Index, keyMapping
-        
-    def constructSplineDict(self, muRange: float, initialParams: dict[str, float]) -> tuple((dict[str, scipy.interpolate.CubicSpline],
-                                                                                             list[str])):
-        ## Need to unpack the param dict for odeint
-        paramsList, arg2Index, keyMapping = self._unpackParamDict(initialParams)
-        
-        solution = np.transpose( scipy.integrate.odeint(self._hardCodeBetaFunction, 
-                                        paramsList, 
-                                        muRange,
-                                        args = ( arg2Index, 16.*Pi**2) ) )
-        
-        
-        boolArray = np.zeros(len(solution), dtype=bool)
-        for idx, row in enumerate(solution):
-             boolArray[idx] = not np.all(row == 0)
-
-        interpDict = {}
-        for i, key in enumerate(keyMapping):
-            if boolArray[i]:
-                interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[i], extrapolate = False)
-        return interpDict
-    
     def constructSplineDictArray(self, muRange, array, arg2Index) :
         ## Need to unpack the param dict for odeint
         solution = np.transpose( scipy.integrate.odeint(self._hardCodeBetaFunction, 
@@ -59,6 +19,7 @@ class BetaFunctions4D():
         
         interpDict = {}
         for key, value in arg2Index.items():
+            ## Hack to remove all the extra entries in the array
             if boolArray[value]:
                 interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[value], extrapolate = False)
         ##Hack -- remove RGscale to match old behaviour
