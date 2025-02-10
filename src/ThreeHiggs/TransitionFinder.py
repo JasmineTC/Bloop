@@ -92,6 +92,7 @@ class TraceFreeEnergyMinimum:
         paramsForMatching = paramValuesDict | runCoupling(betaSpline4D, 
                                                           paramValuesDict["RGScale"])
         
+        # print(runCoupling(betaSpline4D, paramValuesDict["RGScale"]))
         # print(dict(sorted(paramsForMatching.items())))
         # exit()
         
@@ -137,7 +138,7 @@ class TraceFreeEnergyMinimum:
         from .BetaFunctions import BetaFunctions4D
         betasFunctions = BetaFunctions4D() 
         betaSpline4D = betasFunctions.constructSplineDict(muRange, lagranianParams4D)
-        betaSpline4DA = betasFunctions.constructSplineDictArray(muRange, lagranianParams4DArray, self.arg2Index)
+        betaSpline4D = betasFunctions.constructSplineDictArray(muRange, lagranianParams4DArray, self.arg2Index)
         # list1 = []
         # list2 = []
         # for value in betaSpline4D.values():

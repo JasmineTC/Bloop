@@ -33,10 +33,16 @@ class BetaFunctions4D():
                                         paramsList, 
                                         muRange,
                                         args = ( arg2Index, 16.*Pi**2) ) )
+        
+        
+        boolArray = np.zeros(len(solution), dtype=bool)
+        for idx, row in enumerate(solution):
+             boolArray[idx] = not np.all(row == 0)
 
         interpDict = {}
         for i, key in enumerate(keyMapping):
-            interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[i], extrapolate = False)
+            if boolArray[i]:
+                interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[i], extrapolate = False)
         return interpDict
     
     def constructSplineDictArray(self, muRange, array, arg2Index) :
@@ -46,9 +52,15 @@ class BetaFunctions4D():
                                                         muRange,
                                                         args = ( arg2Index, 16.*Pi**2) ) )
 
+        boolArray = np.zeros(len(solution), dtype=bool)
+        for idx, row in enumerate(solution):
+             boolArray[idx] = not np.all(row == 0)
+        
+        
         interpDict = {}
         for key, value in arg2Index.items():
-            interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[value], extrapolate = False)
+            if boolArray[value]:
+                interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[value], extrapolate = False)
         ##Hack -- remove RGscale to match old behaviour
         interpDict.pop("RGScale")
         return interpDict
