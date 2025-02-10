@@ -138,6 +138,17 @@ class TraceFreeEnergyMinimum:
         from .BetaFunctions import BetaFunctions4D
         betasFunctions = BetaFunctions4D() 
         betaSpline4D, keyMapping = betasFunctions.constructSplineDict(muRange, lagranianParams4D)
+        betaSpline4DArray, keyMappingArray = betasFunctions.constructSplineDictArray(muRange, lagranianParams4D, lagranianParams4DArray, self.arg2Index, self.index2Arg)
+        list1 = []
+        list2 = []
+        for value in betaSpline4D.values():
+            list1.append(float((value(100))))
+        for value in betaSpline4DArray.values():
+            list2.append((float(value(100))))
+        print(sorted(set(list1)))
+        print()
+        print(sorted(set(list2)))
+        exit()
         
         minimizationResults = {"T": [],
                                "valueVeffReal": [],
