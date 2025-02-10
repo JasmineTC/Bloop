@@ -10,8 +10,8 @@ def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
 
 def runCoupling(betaSpline4D: dict[str, float], keyMapping: list[str], muEvaulate: float):
     runCoupling = {}
-    for key in keyMapping:
-        runCoupling[key] = betaSpline4D[key](muEvaulate).item()
+    for key, spline in betaSpline4D.items():
+        runCoupling[key] = spline(muEvaulate)
     return runCoupling
 
 def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
@@ -139,16 +139,16 @@ class TraceFreeEnergyMinimum:
         betasFunctions = BetaFunctions4D() 
         betaSpline4D, keyMapping = betasFunctions.constructSplineDict(muRange, lagranianParams4D)
         betaSpline4DArray, keyMappingArray = betasFunctions.constructSplineDictArray(muRange, lagranianParams4D, lagranianParams4DArray, self.arg2Index, self.index2Arg)
-        list1 = []
-        list2 = []
-        for value in betaSpline4D.values():
-            list1.append(float((value(100))))
-        for value in betaSpline4DArray.values():
-            list2.append((float(value(100))))
-        print(sorted(set(list1)))
-        print()
-        print(sorted(set(list2)))
-        exit()
+        # list1 = []
+        # list2 = []
+        # for value in betaSpline4D.values():
+        #     list1.append(float((value(100))))
+        # for value in betaSpline4DArray.values():
+        #     list2.append((float(value(100))))
+        # print(sorted(set(list1)))
+        # print()
+        # print(sorted(set(list2)))
+        # exit()
         
         minimizationResults = {"T": [],
                                "valueVeffReal": [],
@@ -173,7 +173,7 @@ class TraceFreeEnergyMinimum:
             minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T,
                                                                                                            tuple(minimumLocation.round(5)),                      
                                                                                                            betaSpline4D, 
-                                                                                                           keyMapping)
+                                                                                                           self.arg2Index)
             ##Not ideal name or structure imo
             isBadState = self.isBad(T, minimumLocation, status)
             if isBadState:
