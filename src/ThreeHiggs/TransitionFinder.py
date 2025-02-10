@@ -27,7 +27,6 @@ class TraceFreeEnergyMinimum:
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
     
-    index2Arg: dict = field(default_factory=dict)
     arg2Index: dict = field(default_factory=dict)
     
     config: InitVar[dict] = None
