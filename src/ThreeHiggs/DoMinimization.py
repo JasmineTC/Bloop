@@ -18,7 +18,6 @@ def _doMinimization(parameters):
     pertSymbols = parameters["pertSymbols"] 
     args = parameters["args"]
     arg2Index = parameters["arg2Index"]
-    index2Arg = parameters["index2Arg"]
 
     if args.bVerbose:
         print(f"Starting benchmark: {benchmark['bmNumber']}")
@@ -38,8 +37,7 @@ def _doMinimization(parameters):
                                                 "pertSymbols": pertSymbols,
                                                 "bVerbose": args.bVerbose,
                                                 "initialGuesses": args.initialGuesses,
-                                                "arg2Index": arg2Index,
-                                                "index2Arg": index2Arg})
+                                                "arg2Index": arg2Index})
     
     
     minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
@@ -112,8 +110,7 @@ def minimization(args):
                             "effectivePotential": effectivePotential,
                             "dimensionalReduction": dimensionalReduction,
                             "args": args,
-                            "arg2Index": arg2Index,
-                            "index2Arg": {value: key for key, value in arg2Index.items()}} 
+                            "arg2Index": arg2Index} 
         if args.bPool:
             from pathos.multiprocessing import Pool
             with Pool(args.cores) as pool:

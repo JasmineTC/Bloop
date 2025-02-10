@@ -6,7 +6,6 @@ import scipy
 class BetaFunctions4D():
         
     def constructSplineDictArray(self, muRange, array, arg2Index) :
-        ## Need to unpack the param dict for odeint
         solution = np.transpose( scipy.integrate.odeint(self._hardCodeBetaFunction, 
                                                         array, 
                                                         muRange,
@@ -14,16 +13,13 @@ class BetaFunctions4D():
 
         boolArray = np.zeros(len(solution), dtype=bool)
         for idx, row in enumerate(solution):
-             boolArray[idx] = not np.all(row == 0)
-        
+             boolArray[idx] = not np.all(row == row[0])
         
         interpDict = {}
         for key, value in arg2Index.items():
-            ## Hack to remove all the extra entries in the array
+            ## Hack to remove all the const entries in the array
             if boolArray[value]:
                 interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[value], extrapolate = False)
-        ##Hack -- remove RGscale to match old behaviour
-        interpDict.pop("RGScale")
         return interpDict
         
     def _hardCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float, arg2Index, pi16) -> np.ndarray:
