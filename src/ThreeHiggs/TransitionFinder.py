@@ -8,32 +8,7 @@ def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
             return False
     return True
 
-def runCoupling(betaSpline4D: dict[str, float], keyMapping: list[str], muEvaulate: float):
-    runCoupling = {}
-    for key in keyMapping:
-        runCoupling[key] = betaSpline4D[key](muEvaulate).item()
-    return runCoupling
-
-def get4DLagranianParams(inputParams: dict[str, float]) -> dict[str, float]:
-    
-    langrianParams4D = {}
-    ## --- SM fermions and gauge bosons ---
-    v = 246.22  ## "Higgs VEV". Consider using Fermi constant instead
-    langrianParams4D["yt3"] = sqrt(2.) * 172.76 / v  ## 172.76 is the top mass
-    MW = 80.377 ## W boson mass
-    MZ = 91.1876 ## Z boson mass
-    
-    langrianParams4D |= {"g1": 2.*sqrt(MZ**2 - MW**2)/ v,  # U(1)
-            "g2": 2.*MW/ v,                   # SU(2)
-            "g3": sqrt(0.1183 * 4.0 * pi)}    # SU(3)
-    
-    ## --- BSM scalars ---
-    langrianParams4D |= inputParams["couplingValues"] | inputParams["massTerms"]
-    langrianParams4D["RGScale"] = inputParams["RGScale"]
-
-    return langrianParams4D
-
-from dataclasses import dataclass, InitVar
+from dataclasses import dataclass, InitVar,field
 from ThreeHiggs.BmGenerator import bIsBounded
 @dataclass(frozen=True)
 class TraceFreeEnergyMinimum:
@@ -52,20 +27,14 @@ class TraceFreeEnergyMinimum:
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
     
+    arg2Index: dict = field(default_factory=dict)
+    
     config: InitVar[dict] = None
     
     def __post_init__(self, config: dict):
         if config:
             self.__init__(**config)
             
-    def TDependentConsts(self, T):
-        matchingScale = 4.*pi*exp(-np.euler_gamma) * T
-        Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
-        return {"RGScale": matchingScale,
-                "T": T,
-                "Lb": Lb,
-                "Lf": Lb + self.Lfconst}
-
     def isBad(self, T, 
                minimumLocation, 
                status):
@@ -76,36 +45,72 @@ class TraceFreeEnergyMinimum:
             return "MinimisationFailed"
         return False
     
+    
+    def updateTDependentConsts(self, T, inputArray):
+        matchingScale = 4.*pi*exp(-np.euler_gamma) * T
+        Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
+        
+        inputArray[self.arg2Index["RGScale"]] = matchingScale
+        inputArray[self.arg2Index["T"]] = T
+        inputArray[self.arg2Index["Lb"]] = Lb
+        inputArray[self.arg2Index["Lf"]] = Lb + self.Lfconst
+        return inputArray
+    
+    def updateParams4DRan(self, betaSpline4D: dict, array):
+        muEvaulate = array[self.arg2Index["RGScale"]]
+        for key, spline in betaSpline4D.items():
+            array[self.arg2Index[key]] = float(spline(muEvaulate))
+        return array
+    
     def executeMinimisation(self, T, 
                             minimumLocation,
-                            betaSpline4D,
-                            keyMapping):
+                            betaSpline4D):
         
-        TDependentConstsDict =  self.TDependentConsts(T)
+        paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.arg2Index.keys())))
         
-        paramsForMatching = runCoupling(betaSpline4D, 
-                                        keyMapping, 
-                                        TDependentConstsDict["RGScale"]) | TDependentConstsDict
+        paramsForMatchingArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
+        paramsForMatchingDict = {key: paramsForMatchingArray[value] for key, value in self.arg2Index.items()}
         
-        params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatching, T)
-        a = self.initialGuesses + (minimumLocation, ) 
-        return ( *self.effectivePotential.findGlobalMinimum(T, params3D, a), 
-                bIsPerturbative(paramsForMatching, self.pertSymbols), 
-                bIsBounded(paramsForMatching),
+        params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatchingDict, T)
+        return ( *self.effectivePotential.findGlobalMinimum(T, params3D, self.initialGuesses + (minimumLocation, ) ), 
+                bIsPerturbative(paramsForMatchingDict, self.pertSymbols), 
+                bIsBounded(paramsForMatchingDict),
                 params3D)
+    
+    def populateLagranianParams4D(self, inputParams: dict[str, float], argArray: np.array) -> np.array:
+        
+        langrianParams4D = {}
+        ## --- SM fermions and gauge bosons ---
+        v = 246.22  ## "Higgs VEV". Consider using Fermi constant instead
+        langrianParams4D["yt3"] = sqrt(2.) * 172.76 / v  ## 172.76 is the top mass
+        MW = 80.377 ## W boson mass
+        MZ = 91.1876 ## Z boson mass
+        
+        langrianParams4D |= {"g1": 2.*sqrt(MZ**2 - MW**2)/ v,  # U(1)
+                "g2": 2.*MW/ v,                   # SU(2)
+                "g3": sqrt(0.1183 * 4.0 * pi)}    # SU(3)
+        
+        ## --- BSM scalars ---
+        langrianParams4D |= inputParams["couplingValues"] | inputParams["massTerms"]
+        langrianParams4D["RGScale"] = inputParams["RGScale"]
+        
+        for key, value in langrianParams4D.items():
+            argArray[self.arg2Index[key]] = value
+
+        return argArray
             
     def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
-        lagranianParams4D = get4DLagranianParams(benchmark)
+        lagranianParams4DArray = self.populateLagranianParams4D(benchmark, np.zeros(len(self.arg2Index)))
         
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
         ## usually a T-dependent scale ~7.3T
-        muRange = np.linspace(lagranianParams4D["RGScale"], 
+        muRange = np.linspace(lagranianParams4DArray[self.arg2Index["RGScale"]], 
                               7.3 * self.TRange[-1],
                               len(self.TRange)*10)
         
         from .BetaFunctions import BetaFunctions4D
         betasFunctions = BetaFunctions4D() 
-        betaSpline4D, keyMapping = betasFunctions.constructSplineDict(muRange, lagranianParams4D)
+        betaSpline4D = betasFunctions.constructSplineDictArray(muRange, lagranianParams4DArray, self.arg2Index)
         
         minimizationResults = {"T": [],
                                "valueVeffReal": [],
@@ -120,7 +125,7 @@ class TraceFreeEnergyMinimum:
         ## Initialise minimumLocation to feed into the minimisation algo so it can
         ## use the location of the previous minimum as a guess for the next
         ## Not ideal as the code has to repeat an initial guess on first T
-        minimumLocation = self.initialGuesses[0]
+        minimumLocation = np.array(self.initialGuesses[0])
         for T in self.TRange:
             if self.bVerbose:
                 print (f'Start of temp = {T} loop')
@@ -128,9 +133,8 @@ class TraceFreeEnergyMinimum:
             minimizationResults["T"].append(T)
             
             minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T,
-                                                                                                           tuple(minimumLocation),                      
-                                                                                                           betaSpline4D, 
-                                                                                                           keyMapping)
+                                                                                                           tuple(minimumLocation.round(5)),                      
+                                                                                                           betaSpline4D)
             ##Not ideal name or structure imo
             isBadState = self.isBad(T, minimumLocation, status)
             if isBadState:
@@ -161,6 +165,11 @@ class TraceFreeEnergyMinimum:
 
         minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
         return minimizationResults
+
+
+
+
+
 
 from unittest import TestCase
 class TransitionFinderUnitTests(TestCase):
