@@ -29,6 +29,28 @@ def removeSuffices(string):
     
     return string
 
+def replaceSymbolsWithIndices(expression, symbols):
+    for symbol in symbols:
+        print(expression)
+        expression = expression.replace(symbol, f"params[{symbol}Index]")
+
+    return expression
+
+def parseExpressionArray(line, allSymbols, remove3DSuffices = False):
+    identifier = "anonymous"
+
+    if ("->" in line):
+        identifier, line = map(str.strip, line.split("->"))
+
+    from sympy.parsing.mathematica import parse_mathematica
+    identifier = removeSuffices(replaceGreekSymbols(identifier))
+    expression = parse_mathematica(replaceGreekSymbols(line).replace("3d", ""))
+    symbols = [str(symbol) for symbol in expression.free_symbols]
+
+    return {"identifier": identifier, 
+            "expression": replaceSymbolsWithIndices(str(expression), allSymbols), 
+            "symbols": sorted(symbols)}
+
 def parseExpression(line, remove3DSuffices = False):
     identifier = "anonymous"
 
@@ -41,6 +63,9 @@ def parseExpression(line, remove3DSuffices = False):
     symbols = [str(symbol) for symbol in expression.free_symbols]
 
     return {"identifier": identifier, "expression": str(expression), "symbols": sorted(symbols)}
+
+def parseExpressionSystemArray(lines, allSymbols, remove3DSuffices = False):
+    return [parseExpressionArray(line, allSymbols, remove3DSuffices) for line in lines]
 
 def parseExpressionSystem(lines, remove3DSuffices = False):
     return [parseExpression(line, remove3DSuffices) for line in lines]

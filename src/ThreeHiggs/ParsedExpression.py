@@ -41,6 +41,43 @@ class ParsedExpressionSystem:
     def getExpressionNames(self) -> list[str]:
         return [ expr.identifier for expr in self.parsedExpressions ]
 
+class ParsedExpressionArray:
+    def __init__(self, parsedExpression):
+        self.identifier = parsedExpression["identifier"]
+        self.expression = parsedExpression["expression"]
+        self.symbols = parsedExpression["symbols"]
+
+        self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
+
+    def evaluate(self, functionArguments: list[float]) -> float:
+        return eval(self.lambdaExpression, 
+                    functionArguments | {"log": log, 
+                                         "sqrt": sqrt, 
+                                         "pi": pi, 
+                                         "EulerGamma": euler_gamma,
+                                         "Glaisher": Glaisher})
+
+class ParsedExpressionSystemArray:
+    def __init__(self, parsedExpressionSystem):
+        self.parsedExpressions = [ParsedExpression(parsedExpression) 
+                                  for parsedExpression in parsedExpressionSystem]
+
+    def evaluate(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
+        """Optional argument is a hack"""
+        ## Collect inputs from the dict and put them in correct order. I do this by taking the right order from our first expression.
+        ## This is fine since all our expressions use the same input list. 
+        outList = [None] * len(self.parsedExpressions)    
+        for i in range(len(outList)):
+            outList[i] = self.parsedExpressions[i].evaluate(inputDict)
+
+        if not bReturnDict:
+            return outList
+        else:
+            return  { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) } 
+
+    def getExpressionNames(self) -> list[str]:
+        return [ expr.identifier for expr in self.parsedExpressions ]
+
 class MassMatrix:
     def __init__(self, massMatrix):
         self.definitions = ParsedExpressionSystem(massMatrix["definitions"])

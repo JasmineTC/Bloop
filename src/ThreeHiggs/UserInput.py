@@ -110,6 +110,12 @@ class UserInput(argparse.ArgumentParser):
         from sys import maxsize
         self.add_argument('--lastBenchmark', type = int, default = maxsize, dest = 'lastBenchmark',
         metavar='')
+
+        self.add_argument('--allSymbolsFile', 
+                          action = 'store', 
+                          default = "Data/Variables/allSymbols.json",
+                          dest = 'allSymbolsFile',
+                          metavar='')
         
         self.add_argument('--loFile', 
                           action = 'store', 
@@ -127,6 +133,12 @@ class UserInput(argparse.ArgumentParser):
                           action = 'store', 
                           default = "Data/EffectivePotential_threeFields/Veff_NNLO.txt",
                           dest = 'nnloFile',
+                          metavar='')
+
+        self.add_argument('--betaFunctions4DFile', 
+                          action = 'store', 
+                          default = "Data/HardToSoft/BetaFunctions4D.txt",
+                          dest = 'betaFunctions4DFile',
                           metavar='')
 
         self.add_argument('--vectorMassesSquaredFile', 
