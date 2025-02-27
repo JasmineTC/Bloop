@@ -49,31 +49,21 @@ class ParsedExpressionArray:
 
         self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
 
-    def evaluate(self, functionArguments: list[float]) -> float:
-        return eval(self.lambdaExpression, 
-                    functionArguments | {"log": log, 
-                                         "sqrt": sqrt, 
-                                         "pi": pi, 
-                                         "EulerGamma": euler_gamma,
-                                         "Glaisher": Glaisher})
+    def evaluate(self, params):
+        return eval(self.lambdaExpression,  {"log": log, 
+                                             "sqrt": sqrt, 
+                                             "pi": pi, 
+                                             "EulerGamma": euler_gamma,
+                                             "Glaisher": Glaisher,
+                                             "params": params})
 
 class ParsedExpressionSystemArray:
     def __init__(self, parsedExpressionSystem):
-        self.parsedExpressions = [ParsedExpression(parsedExpression) 
+        self.parsedExpressions = [ParsedExpressionArray(parsedExpression) 
                                   for parsedExpression in parsedExpressionSystem]
 
-    def evaluate(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
-        """Optional argument is a hack"""
-        ## Collect inputs from the dict and put them in correct order. I do this by taking the right order from our first expression.
-        ## This is fine since all our expressions use the same input list. 
-        outList = [None] * len(self.parsedExpressions)    
-        for i in range(len(outList)):
-            outList[i] = self.parsedExpressions[i].evaluate(inputDict)
-
-        if not bReturnDict:
-            return outList
-        else:
-            return  { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) } 
+    def evaluate(self, params):
+        return [expression.evaluate(params) for expression in self.parsedExpressions]
 
     def getExpressionNames(self) -> list[str]:
         return [ expr.identifier for expr in self.parsedExpressions ]

@@ -21,7 +21,7 @@ class TraceFreeEnergyMinimum:
     ## Hack - idk how to type hint this correctly
     effectivePotential: str = "effectivePotentialInstance"
     dimensionalReduction: str = "dimensionalReductionInstance"
-    
+    betaFunction4D: str = "betaFunction4DInstance" 
     bVerbose: bool = False
     
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
@@ -101,7 +101,7 @@ class TraceFreeEnergyMinimum:
             
     def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
         lagranianParams4DArray = self.populateLagranianParams4D(benchmark, np.zeros(len(self.arg2Index)))
-        
+               
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
         ## usually a T-dependent scale ~7.3T
         muRange = np.linspace(lagranianParams4DArray[self.arg2Index["RGScale"]], 
@@ -109,7 +109,7 @@ class TraceFreeEnergyMinimum:
                               len(self.TRange)*10)
         
         from .BetaFunctions import BetaFunctions4D
-        betasFunctions = BetaFunctions4D() 
+        betasFunctions = BetaFunctions4D("hello") 
         betaSpline4D = betasFunctions.constructSplineDictArray(muRange, lagranianParams4DArray, self.arg2Index)
         
         minimizationResults = {"T": [],

@@ -4,7 +4,8 @@ from numpy import pi as Pi
 import scipy
 
 class BetaFunctions4D():
-        
+    def __init__(self, expression):
+        self.expression  = expression        
     def constructSplineDictArray(self, muRange, array, arg2Index) :
         solution = np.transpose( scipy.integrate.odeint(self._hardCodeBetaFunction, 
                                                         array, 

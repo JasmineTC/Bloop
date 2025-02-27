@@ -32,9 +32,10 @@ def removeSuffices(string):
 def replaceSymbolsWithIndices(expression, symbols):
     
     expression = replaceGreekSymbols(expression)
-    for symbol in symbols:
+    ## Reverse needed to deal with lam23 and lam23p i.e. substring hits bigger string
+    for idx, symbol in enumerate(sorted(symbols, reverse =True)):
         symbol = replaceGreekSymbols(symbol) 
-        expression = expression.replace(symbol, f"params[{symbol}Index]")
+        expression = expression.replace(symbol, f"params[{idx}]")
     return expression
 
 def parseExpressionArray(line, allSymbols, remove3DSuffices = False):

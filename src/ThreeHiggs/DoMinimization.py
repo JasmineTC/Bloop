@@ -14,10 +14,12 @@ def _doMinimization(parameters):
     ## This should be doable with **unpacking but difficult with pool (starmap?)
     benchmark = parameters["benchmark"] 
     effectivePotential = parameters["effectivePotential"] 
+    betaFunction4D = parameters["betaFunction4D"]
     dimensionalReduction = parameters["dimensionalReduction"] 
     pertSymbols = parameters["pertSymbols"] 
     args = parameters["args"]
     arg2Index = parameters["arg2Index"]
+    
 
     if args.bVerbose:
         print(f"Starting benchmark: {benchmark['bmNumber']}")
@@ -30,14 +32,15 @@ def _doMinimization(parameters):
     
     from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
     traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
-                                                "dimensionalReduction": dimensionalReduction, 
-                                                "TRange": tuple(_drange(args.TRangeStart, 
+                                                                  "dimensionalReduction": dimensionalReduction, 
+                                                                  "betaFunction4D": betaFunction4D,
+                                                                  "TRange": tuple(_drange(args.TRangeStart, 
                                                                        args.TRangeEnd, 
                                                                        str(args.TRangeStepSize))),
-                                                "pertSymbols": pertSymbols,
-                                                "bVerbose": args.bVerbose,
-                                                "initialGuesses": args.initialGuesses,
-                                                "arg2Index": arg2Index})
+                                                                  "pertSymbols": pertSymbols,
+                                                                  "bVerbose": args.bVerbose,
+                                                                  "initialGuesses": args.initialGuesses,
+                                                                  "arg2Index": arg2Index})
     
     
     minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
@@ -82,6 +85,11 @@ def minimization(args):
                                  "relLocalTol" : args.relLocalTolerance,
                                  "varLowerBounds" : args.varLowerBounds,
                                  "varUpperBounds" : args.varUpperBounds})
+    from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
+    #import numpy as np
+    #ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"]).evalulate(np.full(146, 1))
+    from ThreeHiggs.BetaFunctions import BetaFunctions4D
+    betaFunction4D =  BetaFunctions4D(ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"]))
     
     effectivePotential = EffectivePotential(variableSymbols["fieldSymbols"],
                                             args.loopOrder,
@@ -109,6 +117,7 @@ def minimization(args):
                                                      variableSymbols["gaugeSymbols"]), 
                             "effectivePotential": effectivePotential,
                             "dimensionalReduction": dimensionalReduction,
+                            "betaFunction4D": betaFunction4D,
                             "args": args,
                             "arg2Index": arg2Index} 
         if args.bPool:

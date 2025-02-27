@@ -8,7 +8,6 @@ def convertMathematica(args):
         veffLines += getLines(args.nnloFile)
 
     allSymbols = getLines(args.allSymbolsFile, mode = "json")
-
     from ThreeHiggs.MathematicaParsers import (parseExpressionSystem,
                                                parseExpressionSystemArray,
                                                parseConstantMatrix,
