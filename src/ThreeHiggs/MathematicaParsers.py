@@ -30,18 +30,20 @@ def removeSuffices(string):
     return string
 
 def replaceSymbolsWithIndices(expression, symbols):
+    
+    print(expression)
+    expression = replaceGreekSymbols(expression)
     for symbol in symbols:
-        print(expression)
+        symbol = replaceGreekSymbols(symbol) 
         expression = expression.replace(symbol, f"params[{symbol}Index]")
-
+    print(expression)
+    input()
     return expression
 
 def parseExpressionArray(line, allSymbols, remove3DSuffices = False):
     identifier = "anonymous"
-
     if ("->" in line):
         identifier, line = map(str.strip, line.split("->"))
-
     from sympy.parsing.mathematica import parse_mathematica
     identifier = removeSuffices(replaceGreekSymbols(identifier))
     expression = parse_mathematica(replaceGreekSymbols(line).replace("3d", ""))
