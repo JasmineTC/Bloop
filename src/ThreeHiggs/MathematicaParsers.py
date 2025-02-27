@@ -31,13 +31,10 @@ def removeSuffices(string):
 
 def replaceSymbolsWithIndices(expression, symbols):
     
-    print(expression)
     expression = replaceGreekSymbols(expression)
     for symbol in symbols:
         symbol = replaceGreekSymbols(symbol) 
         expression = expression.replace(symbol, f"params[{symbol}Index]")
-    print(expression)
-    input()
     return expression
 
 def parseExpressionArray(line, allSymbols, remove3DSuffices = False):
