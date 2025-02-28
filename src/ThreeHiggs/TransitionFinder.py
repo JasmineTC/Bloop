@@ -22,12 +22,14 @@ class TraceFreeEnergyMinimum:
     effectivePotential: str = "effectivePotentialInstance"
     dimensionalReduction: str = "dimensionalReductionInstance"
     betaFunction4D: str = "betaFunction4DInstance" 
+    
     bVerbose: bool = False
     
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
     
     arg2Index: dict = field(default_factory=dict)
+    allSymbols: list = field(default_factory=list)
     
     config: InitVar[dict] = None
     
@@ -93,7 +95,6 @@ class TraceFreeEnergyMinimum:
         ## --- BSM scalars ---
         langrianParams4D |= inputParams["couplingValues"] | inputParams["massTerms"]
         langrianParams4D["RGScale"] = inputParams["RGScale"]
-        
         for key, value in langrianParams4D.items():
             argArray[self.arg2Index[key]] = value
 
@@ -103,14 +104,12 @@ class TraceFreeEnergyMinimum:
         lagranianParams4DArray = self.populateLagranianParams4D(benchmark, np.zeros(len(self.arg2Index)))
                
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
-        ## usually a T-dependent scale ~7.3T
+        ## usually a T-dependent scale ~7.3Tclean up switch auto complete
         muRange = np.linspace(lagranianParams4DArray[self.arg2Index["RGScale"]], 
                               7.3 * self.TRange[-1],
                               len(self.TRange)*10)
         
-        from .BetaFunctions import BetaFunctions4D
-        betasFunctions = BetaFunctions4D("hello") 
-        betaSpline4D = betasFunctions.constructSplineDictArray(muRange, lagranianParams4DArray, self.arg2Index)
+        betaSpline4D = self.betaFunction4D.constructSplineDictArray(muRange, lagranianParams4DArray, self.arg2Index)
         
         minimizationResults = {"T": [],
                                "valueVeffReal": [],

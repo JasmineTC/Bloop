@@ -19,6 +19,7 @@ def _doMinimization(parameters):
     pertSymbols = parameters["pertSymbols"] 
     args = parameters["args"]
     arg2Index = parameters["arg2Index"]
+    allSymbols = parameters["allSymbols"]
     
 
     if args.bVerbose:
@@ -40,7 +41,8 @@ def _doMinimization(parameters):
                                                                   "pertSymbols": pertSymbols,
                                                                   "bVerbose": args.bVerbose,
                                                                   "initialGuesses": args.initialGuesses,
-                                                                  "arg2Index": arg2Index})
+                                                                  "arg2Index": arg2Index,
+                                                                  "allSymbols": allSymbols})
     
     
     minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
@@ -109,6 +111,12 @@ def minimization(args):
                                                           "softScaleRGE": ParsedExpressionSystem(parsedExpressions["softScaleRGE"]),
                                                           "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"])})
     
+    allSymbols = getLines(args.allSymbolsFile, mode = "json")
+    from ThreeHiggs.MathematicaParsers import replaceGreekSymbols
+    allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
+    ## This is done to be consistent with MathematicaParses
+    allSymbols.sort(reverse=True)
+    
     with open(args.benchmarkFile) as benchmarkFile:
         from ThreeHiggs.MakeArgumentMap import makeArgumentMap
         arg2Index = makeArgumentMap(parsedExpressions)
@@ -119,7 +127,8 @@ def minimization(args):
                             "dimensionalReduction": dimensionalReduction,
                             "betaFunction4D": betaFunction4D,
                             "args": args,
-                            "arg2Index": arg2Index} 
+                            "arg2Index": arg2Index,
+                            "allSymbols": allSymbols} 
         if args.bPool:
             from pathos.multiprocessing import Pool
             with Pool(args.cores) as pool:
