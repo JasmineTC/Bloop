@@ -28,7 +28,6 @@ class TraceFreeEnergyMinimum:
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
     
-    arg2Index: dict = field(default_factory=dict)
     allSymbolsDict: list = field(default_factory=dict)
     
     config: InitVar[dict] = None
@@ -52,26 +51,26 @@ class TraceFreeEnergyMinimum:
         matchingScale = 4.*pi*exp(-np.euler_gamma) * T
         Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
         
-        inputArray[self.arg2Index["RGScale"]] = matchingScale
-        inputArray[self.arg2Index["T"]] = T
-        inputArray[self.arg2Index["Lb"]] = Lb
-        inputArray[self.arg2Index["Lf"]] = Lb + self.Lfconst
+        inputArray[self.allSymbolsDict["RGScale"]] = matchingScale
+        inputArray[self.allSymbolsDict["T"]] = T
+        inputArray[self.allSymbolsDict["Lb"]] = Lb
+        inputArray[self.allSymbolsDict["Lf"]] = Lb + self.Lfconst
         return inputArray
     
     def updateParams4DRan(self, betaSpline4D: dict, array):
-        muEvaulate = array[self.arg2Index["RGScale"]]
+        muEvaulate = array[self.allSymbolsDict["RGScale"]]
         for key, spline in betaSpline4D.items():
-            array[self.arg2Index[key]] = float(spline(muEvaulate))
+            array[self.allSymbolsDict[key]] = float(spline(muEvaulate))
         return array
     
     def executeMinimisation(self, T, 
                             minimumLocation,
                             betaSpline4D):
         
-        paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.arg2Index.keys())))
+        paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.allSymbolsDict.keys())))
         
         paramsForMatchingArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
-        paramsForMatchingDict = {key: paramsForMatchingArray[value] for key, value in self.arg2Index.items()}
+        paramsForMatchingDict = {key: paramsForMatchingArray[value] for key, value in self.allSymbolsDict.items()}
         
         params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatchingDict, T)
         return ( *self.effectivePotential.findGlobalMinimum(T, params3D, self.initialGuesses + (minimumLocation, ) ), 
@@ -96,21 +95,20 @@ class TraceFreeEnergyMinimum:
         langrianParams4D |= inputParams["couplingValues"] | inputParams["massTerms"]
         langrianParams4D["RGScale"] = inputParams["RGScale"]
         for key, value in langrianParams4D.items():
-            argArray[self.arg2Index[key]] = value
+            argArray[self.allSymbolsDict[key]] = value
 
         return argArray
             
     def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
-        print(self.allSymbolsDict)
-        lagranianParams4DArray = self.populateLagranianParams4D(benchmark, np.zeros(len(self.arg2Index)))
+        lagranianParams4DArray = self.populateLagranianParams4D(benchmark, np.zeros(len(self.allSymbolsDict)))
                
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
         ## usually a T-dependent scale ~7.3Tclean up switch auto complete
-        muRange = np.linspace(lagranianParams4DArray[self.arg2Index["RGScale"]], 
+        muRange = np.linspace(lagranianParams4DArray[self.allSymbolsDict["RGScale"]], 
                               7.3 * self.TRange[-1],
                               len(self.TRange)*10)
         
-        betaSpline4D = self.betaFunction4D.constructSplineDictArray(muRange, lagranianParams4DArray, self.arg2Index)
+        betaSpline4D = self.betaFunction4D.constructSplineDictArray(muRange, lagranianParams4DArray, self.allSymbolsDict)
         
         minimizationResults = {"T": [],
                                "valueVeffReal": [],

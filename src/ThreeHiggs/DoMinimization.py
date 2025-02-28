@@ -18,7 +18,6 @@ def _doMinimization(parameters):
     dimensionalReduction = parameters["dimensionalReduction"] 
     pertSymbols = parameters["pertSymbols"] 
     args = parameters["args"]
-    arg2Index = parameters["arg2Index"]
     allSymbols = parameters["allSymbols"]
     
 
@@ -41,7 +40,6 @@ def _doMinimization(parameters):
                                                                   "pertSymbols": pertSymbols,
                                                                   "bVerbose": args.bVerbose,
                                                                   "initialGuesses": args.initialGuesses,
-                                                                  "arg2Index": arg2Index,
                                                                   "allSymbolsDict": {key: value for value, key in enumerate(allSymbols)}})
     
     
@@ -118,8 +116,6 @@ def minimization(args):
     allSymbols.sort(reverse=True)
     
     with open(args.benchmarkFile) as benchmarkFile:
-        from ThreeHiggs.MakeArgumentMap import makeArgumentMap
-        arg2Index = makeArgumentMap(parsedExpressions)
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
                                                      variableSymbols["yukawaSymbols"] + 
                                                      variableSymbols["gaugeSymbols"]), 
@@ -127,7 +123,6 @@ def minimization(args):
                             "dimensionalReduction": dimensionalReduction,
                             "betaFunction4D": betaFunction4D,
                             "args": args,
-                            "arg2Index": arg2Index,
                             "allSymbols": allSymbols} 
         if args.bPool:
             from pathos.multiprocessing import Pool
