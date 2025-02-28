@@ -42,7 +42,7 @@ def _doMinimization(parameters):
                                                                   "bVerbose": args.bVerbose,
                                                                   "initialGuesses": args.initialGuesses,
                                                                   "arg2Index": arg2Index,
-                                                                  "allSymbolsDict": {key, value for enumerate(allSymbols)})
+                                                                  "allSymbolsDict": {key: value for value, key in enumerate(allSymbols)}})
     
     
     minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
