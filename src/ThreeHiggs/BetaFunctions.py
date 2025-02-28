@@ -4,14 +4,18 @@ from numpy import pi as Pi
 import scipy
 
 class BetaFunctions4D():
-    def __init__(self, expression):
-        self.expression  = expression        
+    def __init__(self, betaFunction4DExpression):
+        self.betaFunction4DExpression  = betaFunction4DExpression        
     def constructSplineDictArray(self, muRange, array, arg2Index) :
         solution = np.transpose( scipy.integrate.odeint(self._hardCodeBetaFunction, 
                                                         array, 
                                                         muRange,
                                                         args = ( arg2Index, 16.*Pi**2) ) )
-
+        
+        solutionSoft = np.transpose(scipy.integrate.odeint(self._softCodeBetaFunction, 
+                                                        array, 
+                                                        muRange))
+        print(solution is solutionSoft)
         boolArray = np.zeros(len(solution), dtype=bool)
         for idx, row in enumerate(solution):
              boolArray[idx] = not np.all(row == row[0])
@@ -22,7 +26,12 @@ class BetaFunctions4D():
             if boolArray[value]:
                 interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[value], extrapolate = False)
         return interpDict
-        
+    
+    def _softCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float) -> np.ndarray:
+        ## -----BROKEN------
+        ## len(self.expression) != len(initialConditions) 
+        return np.array(self.betaFunction4DExpression.evaluate(InitialConditions))/mu
+    
     def _hardCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float, arg2Index, pi16) -> np.ndarray:
 
         ## Pick params from the input array since they are appear as hardcoded symbols below
