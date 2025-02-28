@@ -58,12 +58,16 @@ class ParsedExpressionArray:
                                              "params": params})
 
 class ParsedExpressionSystemArray:
-    def __init__(self, parsedExpressionSystem):
+    def __init__(self, parsedExpressionSystem, allSymbols):
         self.parsedExpressions = [ParsedExpressionArray(parsedExpression) 
                                   for parsedExpression in parsedExpressionSystem]
+        self.allSymbols = allSymbols
 
     def evaluate(self, params):
         return [expression.evaluate(params) for expression in self.parsedExpressions]
+    
+    def getParamSubset(self, params):
+        return [params[index] for index, symbol in enumerate(self.allSymbols) if symbol in self.getExpressionNames()]
 
     def getExpressionNames(self) -> list[str]:
         return [ expr.identifier for expr in self.parsedExpressions ]

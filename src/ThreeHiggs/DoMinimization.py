@@ -86,10 +86,15 @@ def minimization(args):
                                  "varLowerBounds" : args.varLowerBounds,
                                  "varUpperBounds" : args.varUpperBounds})
     from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
+    allSymbols = getLines(args.allSymbolsFile, mode = "json")
+    from ThreeHiggs.MathematicaParsers import replaceGreekSymbols
+    allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
+    ## This is done to be consistent with MathematicaParses
+    allSymbols.sort(reverse=True)
     #import numpy as np
     #ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"]).evalulate(np.full(146, 1))
     from ThreeHiggs.BetaFunctions import BetaFunctions4D
-    betaFunction4D =  BetaFunctions4D(ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"]))
+    betaFunction4D =  BetaFunctions4D(ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"], allSymbols))
     
     effectivePotential = EffectivePotential(variableSymbols["fieldSymbols"],
                                             args.loopOrder,
@@ -108,12 +113,7 @@ def minimization(args):
     dimensionalReduction = DimensionalReduction(config = {"hardToSoft": ParsedExpressionSystem(parsedExpressions["hardToSoft"]),
                                                           "softScaleRGE": ParsedExpressionSystem(parsedExpressions["softScaleRGE"]),
                                                           "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"])})
-    
-    allSymbols = getLines(args.allSymbolsFile, mode = "json")
-    from ThreeHiggs.MathematicaParsers import replaceGreekSymbols
-    allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
-    ## This is done to be consistent with MathematicaParses
-    allSymbols.sort(reverse=True)
+
     
     with open(args.benchmarkFile) as benchmarkFile:
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 

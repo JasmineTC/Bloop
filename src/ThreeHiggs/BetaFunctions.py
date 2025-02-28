@@ -11,10 +11,10 @@ class BetaFunctions4D():
                                                         array, 
                                                         muRange,
                                                         args = ( arg2Index, 16.*Pi**2) ) )
-        
+        print(len(array))
         solutionSoft = np.transpose(scipy.integrate.odeint(self._softCodeBetaFunction, 
-                                                        array, 
-                                                        muRange))
+                                                           self.betaFunction4DExpression.getParamSubset(array), 
+                                                           muRange))
         print(solution is solutionSoft)
         boolArray = np.zeros(len(solution), dtype=bool)
         for idx, row in enumerate(solution):
