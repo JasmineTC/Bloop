@@ -29,7 +29,7 @@ class TraceFreeEnergyMinimum:
     Lfconst = 4.*log(2.)
     
     arg2Index: dict = field(default_factory=dict)
-    allSymbols: list = field(default_factory=list)
+    allSymbolsDict: list = field(default_factory=dict)
     
     config: InitVar[dict] = None
     
@@ -101,6 +101,7 @@ class TraceFreeEnergyMinimum:
         return argArray
             
     def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
+        print(self.allSymbolsDict)
         lagranianParams4DArray = self.populateLagranianParams4D(benchmark, np.zeros(len(self.arg2Index)))
                
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
