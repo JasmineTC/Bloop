@@ -5,7 +5,7 @@ def makeFieldDimensionless(temp: list[float], field: list[float]) -> list[float]
     return field/np.sqrt(temp)
 
 def jumpFinder(array: np.ndarray[float])-> np.ndarray[int]:
-    return np.nonzero(np.abs(array) > 0.4)[0]
+    return np.nonzero(np.abs(array) > 0.3)[0]
 
 def interpretData(result: dict, index: int, bmInput: dict[str, float]):
     interpResult = {"failureReason": result["failureReason"],
@@ -47,7 +47,7 @@ def interpretData(result: dict, index: int, bmInput: dict[str, float]):
             interpResult["jumpsv3"].append(( v3DimlessDiff[val], 
                                              result["T"][val] ))
     strength = 0
-    if max(abs(v3DimlessDiff[jumpv3]), default = 0) > 0.6:
+    if max(abs(v3DimlessDiff[jumpv3]), default = 0) > 0.3:
         phaseJumpIdx = jumpv3[ np.argmax( abs( v3DimlessDiff[jumpv3] ) ) ]
         strength = sqrt( v1Dimless[phaseJumpIdx]**2 +\
                                        v2Dimless[phaseJumpIdx]**2 + \
@@ -56,7 +56,7 @@ def interpretData(result: dict, index: int, bmInput: dict[str, float]):
                                        v2Dimless[phaseJumpIdx+1]**2 + \
                                        v3Dimless[phaseJumpIdx+1]**2)
     
-    interpResult["strong"] = strength if strength > 0.6 else False
+    interpResult["strong"] = strength if strength > 0.3 else False
     interpResult["step"] = 2 if (len(jumpv1)+len(jumpv2)) >0  else 1
     return interpResult
     
