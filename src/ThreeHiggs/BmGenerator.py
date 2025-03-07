@@ -81,10 +81,8 @@ def bPhysicalMinimum(params):
         minLocationTemp, minValueTemp = opt.optimize(guess), opt.last_optimum_value()
         if minValueTemp < minValue:
             minLocation, minValue =  minLocationTemp, minValueTemp
-    minLocation =[5,5,251.1]
-    if np.all(np.isclose(minLocation, [0,0, 246], atol=5)):
-        return True
-    return False
+    return np.all(np.isclose(minLocation, [0,0, 246], atol=5))
+
 def _bPositiveMassStates(mu2sq, mu12sq, lam23, lam23p, lambdaMinus, lambdaPlus, vsq) -> bool:
     return -mu2sq - mu12sq + lam23*vsq/2 >0 and \
            -mu2sq + mu12sq + lam23*vsq/2 >0 and \
@@ -174,10 +172,10 @@ def _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHierac
                               "lam31": lam31,
                               "lam31p": lam31p,
                               "lam33": lam33}}
-    if not bIsBounded(paramDict["massTerms"] | paramDict["couplingValues"]):
+    params = paramDict["massTerms"] | paramDict["couplingValues"]
+    if not bIsBounded(params):
         return False
-    print(bPhysicalMinimum( paramDict["massTerms"] | paramDict["couplingValues"]) )
-    exit()
+    print(bPhysicalMinimum(params))
     return paramDict
 
 
