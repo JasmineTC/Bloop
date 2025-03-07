@@ -25,7 +25,64 @@ def bIsBounded(param : dict[str, float]) -> bool:
             param["lam33"]*lamx**2 + param["lam11"]*lamz**2 + param["lam22"]*lamy**2 -param["lam11"]*param["lam22"]*param["lam33"] - 2*lamx*lamy*lamz < 0):
         return False
     return True
-    
+
+
+def potential(params, field):
+    lam11 = params["lam11"]
+    lam22 = params["lam22"]
+    lam33 = params["lam33"]
+    lam12 = params["lam12"]
+    lam12p = params["lam12p"]
+    lam23 = params["lam23"]
+    lam23p = params["lam23p"]
+    lam31 = params["lam31"]
+    lam31p = params["lam31p"]
+    lam1Re = params["lam1Re"]
+    lam2Re = params["lam2Re"]
+    lam3Re = params["lam3Re"]
+    mu1sq = params["mu1sq"]
+    mu12sqRe = params["mu12sqRe"]
+    mu2sq = params["mu2sq"]
+    mu3sq = params["mu3sq"]
+
+    return float((field[0]**4*lam11 + field[1]**4*lam22 + field[2]**4*lam33 - 4*field[0]*field[1]*mu12sqRe + field[0]**2*(field[1]**2*(lam12 + lam12p + 2*lam1Re) + field[2]**2*(lam31 + lam31p + 2*lam3Re) - 2*mu1sq) + field[1]**2*(field[2]**2*(lam23 + lam23p + 2*lam2Re) - 2*mu2sq) - 2*field[2]**2*mu3sq)/4)
+    #return float((field**4*lam11 + field**4*lam22 + field**4*lam33 - 4*field*field*mu12sqRe + field**2*(field**2*(lam12 + lam12p + 2*lam1Re) + field**2*(lam31 + lam31p + 2*lam3Re) - 2*mu1sq) + field**2*(field**2*(lam23 + lam23p + 2*lam2Re) - 2*mu2sq) - 2*field**2*mu3sq)/4)
+
+import nlopt
+from functools import partial
+## TODO import the nlopt stuff from EP and use the eval to compute potential at LO
+## Overkill for threeHiggs since venus calculated the equations for tree level min
+## But this is model indepdent
+def bPhysicalMinimum(params):
+    minimumInitialGuesses = [[0,0,0],
+                             [0,0,246],
+                             [100,100,100],
+                             [-100,100,100],
+                             [50,50,50],
+                             [299,299,299],
+                             [-299,299,299]]
+                             
+    potentialPartial = partial(potential, params)
+    minFunc = lambda x, _: potentialPartial(x)
+    opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, 3)
+    opt.set_min_objective(minFunc)
+    opt.set_lower_bounds([-300,0,0])
+    opt.set_upper_bounds([300,300,300])
+    opt.set_xtol_abs(0.5)
+    opt.set_xtol_rel(0.5)
+    minLocation, minValue = opt.optimize([0,0,0]), opt.last_optimum_value()
+    opt = nlopt.opt(nlopt.LN_BOBYQA, 3)
+    opt.set_min_objective(minFunc)
+    opt.set_lower_bounds([-300,0,0])
+    opt.set_upper_bounds([300,300,300])
+    opt.set_xtol_abs(0.5)
+    opt.set_xtol_rel(0.5)
+    for guess in minimumInitialGuesses:
+        minLocationTemp, minValueTemp = opt.optimize(guess), opt.last_optimum_value()
+        if minValueTemp < minValue:
+            minLocation, minValue =  minLocationTemp, minValueTemp
+    return np.all(np.isclose(minLocation, [0,0, 246], atol=5))
+
 def _bPositiveMassStates(mu2sq, mu12sq, lam23, lam23p, lambdaMinus, lambdaPlus, vsq) -> bool:
     return -mu2sq - mu12sq + lam23*vsq/2 >0 and \
            -mu2sq + mu12sq + lam23*vsq/2 >0 and \
@@ -115,8 +172,10 @@ def _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHierac
                               "lam31": lam31,
                               "lam31p": lam31p,
                               "lam33": lam33}}
-    if not bIsBounded(paramDict["massTerms"] | paramDict["couplingValues"]):
+    params = paramDict["massTerms"] | paramDict["couplingValues"]
+    if not bIsBounded(params):
         return False
+    print(bPhysicalMinimum(params))
     return paramDict
 
 
