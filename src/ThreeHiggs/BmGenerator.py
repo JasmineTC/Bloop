@@ -175,7 +175,6 @@ def _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHierac
     params = paramDict["massTerms"] | paramDict["couplingValues"]
     if not bIsBounded(params):
         return False
-    print(bPhysicalMinimum(params))
     return paramDict
 
 
