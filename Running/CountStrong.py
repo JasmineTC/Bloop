@@ -6,7 +6,7 @@ If the benchmark is strong save the file to a subsetresult dir'''
 from os.path import join
 from glob import glob ## I think glob lets you do the * thingy
 from json import load, dump
-directory = "1Loop/MaximalCPV"
+directory = "1LoopResults/MaximalCPV01"
 totalCount = 0
 strongCount = 0
 mutliV3Jump = 0
@@ -25,7 +25,7 @@ for filePointer in glob(join(directory, '*.json')):
         else:
             if len(resultDic["jumpsv3"])>1:
                 mutliV3Jump += 1
-            if resultDic["strong"]:
+            if resultDic["strong"] >0.6:
                 strongCount += 1
             if resultDic["step"] > 1:
                 multiStepCount += 1
