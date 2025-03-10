@@ -81,7 +81,7 @@ def bPhysicalMinimum(params):
         minLocationTemp, minValueTemp = opt.optimize(guess), opt.last_optimum_value()
         if minValueTemp < minValue:
             minLocation, minValue =  minLocationTemp, minValueTemp
-    return np.all(np.isclose(minLocation, [0,0, 246], atol=5))
+    return np.all(np.isclose(minLocation, [0,0, 246], atol=1))
 
 def _bPositiveMassStates(mu2sq, mu12sq, lam23, lam23p, lambdaMinus, lambdaPlus, vsq) -> bool:
     return -mu2sq - mu12sq + lam23*vsq/2 >0 and \
@@ -214,22 +214,25 @@ def _handPickedBm():
             bmdictList.append(bmDict)
     return bmdictList
 
-def _strongSubSet():
+def _strongSubSet(prevResultDir):
     from json import load
-    dictList = load(open("Benchmarks/StrongBmList.json", "r"))
+    from os.path import join
+    from glob import glob
     bmDict = []
-    for ele in dictList:
-        bmDict.append(_lagranianParamGen(ele["mS1"],
-                    ele["delta12"],
-                    ele["delta1c"], 
-                    ele["deltac"], 
-                    ele["ghDM"], 
-                    ele["thetaCPV"],
-                    ele["darkHieracy"],
-                    ele["bmNumber"]))
+    for fileName in glob(join(prevResultDir, '*.json')):
+        resultDic = load(open(fileName, "r"))
+        if resultDic["strong" ] > 0.6:
+            bmDict.append(_lagranianParamGen(resultDic["bmInput"]["mS1"],
+                                             resultDic["bmInput"]["delta12"],
+                                             resultDic["bmInput"]["delta1c"], 
+                                             resultDic["bmInput"]["deltac"], 
+                                             resultDic["bmInput"]["ghDM"], 
+                                             resultDic["bmInput"]["thetaCPV"],
+                                             resultDic["bmInput"]["darkHieracy"],
+                                             resultDic["bmNumber"]))
     return bmDict
 
-def generateBenchmarks(benchmarkOutput: str, mode: str, randomNum: int):
+def generateBenchmarks(benchmarkOutput: str, mode: str, randomNum: int, prevResultDir: str)-> None:
     from pathlib import Path
     (output_file := Path(benchmarkOutput)).parent.mkdir(exist_ok=True, parents=True)   
     
@@ -243,7 +246,7 @@ def generateBenchmarks(benchmarkOutput: str, mode: str, randomNum: int):
         return
     elif mode == "randomSSS":
         ## THIS NEEDS UPDATING BUT NOT IN THIS COMMIT
-        dump(_strongSubSet(), open(output_file, "w"), indent = 4)
+        dump(_strongSubSet(prevResultDir), open(output_file, "w"), indent = 4)
         return 
     return
 

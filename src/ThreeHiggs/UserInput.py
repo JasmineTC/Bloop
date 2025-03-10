@@ -105,6 +105,11 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument("--randomNum",type = int, action = "store",  dest = "randomNum", default = 1_000_000,
                         help = "Int: Specify how many random bm to generate.")
         
+        self.add_argument("--prevResultDir",type = int, action = "store",  dest = "prevResultDir",
+                        help = "str: Specify the directory you want to make subset of results from.")
+        
+        
+        
         self.add_argument('--firstBenchmark', type = int, default = 0, dest = 'firstBenchmark',
         metavar='')
         from sys import maxsize
