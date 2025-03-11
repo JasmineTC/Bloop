@@ -232,7 +232,7 @@ def _strongSubSet(prevResultDir):
                                              resultDic["bmNumber"]))
     return bmDict
 
-def generateBenchmarks(benchmarkOutput: str, mode: str, randomNum: int, prevResultDir: str)-> None:
+def generateBenchmarks(benchmarkOutput: str, mode: str, randomNum: int = None, prevResultDir: str = None)-> None:
     from pathlib import Path
     (output_file := Path(benchmarkOutput)).parent.mkdir(exist_ok=True, parents=True)   
     
