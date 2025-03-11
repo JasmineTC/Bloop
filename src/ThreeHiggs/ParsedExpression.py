@@ -2,6 +2,8 @@ from cmath import pi, log, sqrt
 from numpy import euler_gamma
 Glaisher = 1.28242712910062
 
+import copy
+
 class ParsedExpression:
     def __init__(self, parsedExpression):
         self.identifier = parsedExpression["identifier"]
@@ -59,18 +61,24 @@ class ParsedExpressionArray:
 
 class ParsedExpressionSystemArray:
     def __init__(self, parsedExpressionSystem, allSymbols):
-        self.parsedExpressions = [ParsedExpressionArray(parsedExpression) 
+        self.parsedExpressions = [(allSymbols.index(parsedExpression["identifier"]), ParsedExpressionArray(parsedExpression))
                                   for parsedExpression in parsedExpressionSystem]
+
         self.allSymbols = allSymbols
 
     def evaluate(self, params):
-        return [expression.evaluate(params) for expression in self.parsedExpressions]
-    
+        newParams = copy.deepcopy(params)
+        
+        for expression in self.parsedExpressions:
+            newParams[expression[0]] = expression[1].evaluate(params)
+
+        return newParams
+
     def getParamSubset(self, params):
         return [params[index] for index, symbol in enumerate(self.allSymbols) if symbol in self.getExpressionNames()]
 
     def getExpressionNames(self) -> list[str]:
-        return [ expr.identifier for expr in self.parsedExpressions ]
+        return [ expr[1].identifier for expr in self.parsedExpressions ]
 
 class MassMatrix:
     def __init__(self, massMatrix):

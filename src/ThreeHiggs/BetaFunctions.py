@@ -13,7 +13,7 @@ class BetaFunctions4D():
                                                         args = ( arg2Index, 16.*Pi**2) ) )
         print(len(array))
         solutionSoft = np.transpose(scipy.integrate.odeint(self._softCodeBetaFunction, 
-                                                           self.betaFunction4DExpression.getParamSubset(array), 
+                                                           array, 
                                                            muRange))
         print(solution is solutionSoft)
         boolArray = np.zeros(len(solution), dtype=bool)
