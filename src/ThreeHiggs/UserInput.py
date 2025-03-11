@@ -1,7 +1,7 @@
 import argparse
 import multiprocessing
 from enum import IntEnum
-
+import json
 class Stages(IntEnum):
     convertMathematica = 0
     generateBenchmark = 1
@@ -18,6 +18,9 @@ class Stages(IntEnum):
 class UserInput(argparse.ArgumentParser):
     def __init__(self):
         super().__init__()
+        self.add_argument('--config', action = 'store', dest = 'config', type = str,
+                          help = "Str: Load cmd line args from json")
+        
         self.add_argument('--loopOrder', action = 'store', default = 2, dest = 'loopOrder', type = int, choices = [1, 2],
                           help = "Int: Specify the order to compute the effective potential to")
         
@@ -30,11 +33,9 @@ class UserInput(argparse.ArgumentParser):
         
         self.add_argument('--bPool', action = 'store_true', default = False, dest = 'bPool', 
                           help = "Bool: Specify if pool should be used to compute benchmarks in parellel")
-        
         self.add_argument('--cores', action = 'store', default = 1, dest = 'cores', type = int, choices = list(range(1, multiprocessing.cpu_count() + 1)),
                           help = "Int: Specify how many cores pool uses to compute benchmarks",
                           metavar='')
-
         self.add_argument('--bSave', action = 'store_true', default=False, dest = 'bSave',  
                           help = "Bool: If activated the results of the minimisation will be saved")
         
@@ -105,16 +106,17 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument("--randomNum",type = int, action = "store",  dest = "randomNum", default = 1_000_000,
                         help = "Int: Specify how many random bm to generate.")
         
-        self.add_argument("--prevResultDir",type = str, action = "store",  dest = "prevResultDir",
-                        help = "str: Specify the directory you want to make subset of results from.")
-        
-        
-        
         self.add_argument('--firstBenchmark', type = int, default = 0, dest = 'firstBenchmark',
         metavar='')
         from sys import maxsize
         self.add_argument('--lastBenchmark', type = int, default = maxsize, dest = 'lastBenchmark',
         metavar='')
+
+        self.add_argument('--allSymbolsFile', 
+                          action = 'store', 
+                          default = "Data/Variables/allSymbols.json",
+                          dest = 'allSymbolsFile',
+                          metavar='')
         
         self.add_argument('--loFile', 
                           action = 'store', 
@@ -132,6 +134,12 @@ class UserInput(argparse.ArgumentParser):
                           action = 'store', 
                           default = "Data/EffectivePotential_threeFields/Veff_NNLO.txt",
                           dest = 'nnloFile',
+                          metavar='')
+
+        self.add_argument('--betaFunctions4DFile', 
+                          action = 'store', 
+                          default = "Data/HardToSoft/BetaFunctions4D.txt",
+                          dest = 'betaFunctions4DFile',
                           metavar='')
 
         self.add_argument('--vectorMassesSquaredFile', 
@@ -212,7 +220,14 @@ class UserInput(argparse.ArgumentParser):
                           dest = 'lagranianVariables',
                           metavar='')
 
-    ##Used to check userinputs are valid, mostly done with the choice keyword above now though
     def parse(self):
+        userArg = super().parse_args()
+        if userArg.config:
+            userConfig = json.load(open(super().parse_args().config, "r"))
+            unexpectedKeys = [userKey for userKey in set(userConfig.keys()) if userKey not in set(vars(userArg).keys())]
+            if len(unexpectedKeys) > 0:
+                print(f"User config file has unexpected key(s): {unexpectedKeys},\nExiting")
+                exit(-1)
+            self.set_defaults(**userConfig)
         return super().parse_args()
 
