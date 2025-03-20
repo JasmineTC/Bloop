@@ -65,8 +65,7 @@ class TraceFreeEnergyMinimum:
     
     def executeMinimisation(self, T, 
                             minimumLocation,
-                            betaSpline4D):
-        
+                            betaSpline4D): 
         paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.allSymbolsDict.keys())))
         
         paramsForMatchingArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
