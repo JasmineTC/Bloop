@@ -16,17 +16,16 @@ class BetaFunctions4D():
         solutionSoft = np.transpose(scipy.integrate.odeint(self._softCodeBetaFunction, 
                                                            array, 
                                                            muRange))
-        print(array, solutionSoft)
-        print(solution == solutionSoft)
-        boolArray = np.zeros(len(solution), dtype=bool)
-        for idx, row in enumerate(solution):
+
+        boolArray = np.zeros(len(solutionSoft), dtype=bool)
+        for idx, row in enumerate(solutionSoft):
              boolArray[idx] = not np.all(row == row[0])
         
         interpDict = {}
         for key, value in arg2Index.items():
             ## Hack to remove all the const entries in the array
             if boolArray[value]:
-                interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[value], extrapolate = False)
+                interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solutionSoft[value], extrapolate = False)
         return interpDict
     
     def _softCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float) -> np.ndarray:
