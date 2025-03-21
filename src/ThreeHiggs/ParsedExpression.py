@@ -29,11 +29,12 @@ class ParsedExpressionSystem:
 
     def evaluate(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
         """Optional argument is a hack"""
+        ## This is fine since all our expressions use the same input list. 
         outList = [expression.evaluate(inputDict) for expression in self.parsedExpressions] 
 
         if bReturnDict:
-            return { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) } 
-        return  { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) } 
+            return { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) }
+        return  outList 
 
     def getExpressionNames(self) -> list[str]:
         return [ expr.identifier for expr in self.parsedExpressions ]
