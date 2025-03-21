@@ -29,16 +29,11 @@ class ParsedExpressionSystem:
 
     def evaluate(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
         """Optional argument is a hack"""
-        ## Collect inputs from the dict and put them in correct order. I do this by taking the right order from our first expression.
-        ## This is fine since all our expressions use the same input list. 
-        outList = [None] * len(self.parsedExpressions)    
-        for i in range(len(outList)):
-            outList[i] = self.parsedExpressions[i].evaluate(inputDict)
+        outList = [expression.evaluate(inputDict) for expression in self.parsedExpressions] 
 
         if not bReturnDict:
             return outList
-        else:
-            return  { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) } 
+        return  { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) } 
 
     def getExpressionNames(self) -> list[str]:
         return [ expr.identifier for expr in self.parsedExpressions ]
