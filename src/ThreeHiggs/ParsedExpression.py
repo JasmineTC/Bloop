@@ -31,8 +31,8 @@ class ParsedExpressionSystem:
         """Optional argument is a hack"""
         outList = [expression.evaluate(inputDict) for expression in self.parsedExpressions] 
 
-        if not bReturnDict:
-            return outList
+        if bReturnDict:
+            return { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) } 
         return  { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) } 
 
     def getExpressionNames(self) -> list[str]:
