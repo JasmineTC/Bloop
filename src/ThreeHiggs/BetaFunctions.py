@@ -6,25 +6,26 @@ import scipy
 class BetaFunctions4D():
     def __init__(self, betaFunction4DExpression):
         self.betaFunction4DExpression  = betaFunction4DExpression        
+
     def constructSplineDictArray(self, muRange, array, arg2Index) :
         solution = np.transpose( scipy.integrate.odeint(self._hardCodeBetaFunction, 
                                                         array, 
                                                         muRange,
                                                         args = ( arg2Index, 16.*Pi**2) ) )
-        print(len(array))
+
         solutionSoft = np.transpose(scipy.integrate.odeint(self._softCodeBetaFunction, 
                                                            array, 
                                                            muRange))
-        print(solution is solutionSoft)
-        boolArray = np.zeros(len(solution), dtype=bool)
-        for idx, row in enumerate(solution):
+
+        boolArray = np.zeros(len(solutionSoft), dtype=bool)
+        for idx, row in enumerate(solutionSoft):
              boolArray[idx] = not np.all(row == row[0])
         
         interpDict = {}
         for key, value in arg2Index.items():
             ## Hack to remove all the const entries in the array
             if boolArray[value]:
-                interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solution[value], extrapolate = False)
+                interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solutionSoft[value], extrapolate = False)
         return interpDict
     
     def _softCodeBetaFunction(self, InitialConditions: np.ndarray, mu: float) -> np.ndarray:

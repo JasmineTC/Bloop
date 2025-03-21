@@ -57,7 +57,11 @@ class ParsedExpressionArray:
 
 class ParsedExpressionSystemArray:
     def __init__(self, parsedExpressionSystem, allSymbols):
-        self.parsedExpressions = [(allSymbols.index(parsedExpression["identifier"]), ParsedExpressionArray(parsedExpression))
+        self.parsedExpressions = [(allSymbols.index(parsedExpression["identifier"]), 
+                                   ParsedExpressionArray(parsedExpression)#, 
+                                   #print(allSymbols.index(parsedExpression["identifier"]),
+                                   #      parsedExpression["identifier"])
+                                   )
                                   for parsedExpression in parsedExpressionSystem]
 
         self.allSymbols = allSymbols
@@ -65,8 +69,15 @@ class ParsedExpressionSystemArray:
     def evaluate(self, params):
         newParams = copy.deepcopy(params)
         
+        #print(newParams)
         for expression in self.parsedExpressions:
+            tmp = newParams[expression[0]] 
             newParams[expression[0]] = expression[1].evaluate(params)
+            #print(tmp, newParams[expression[0]])
+
+        #print(newParams)
+
+        #exit(0)
 
         return newParams
 
