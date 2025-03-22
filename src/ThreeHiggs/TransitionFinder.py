@@ -1,5 +1,6 @@
 import numpy as np
 from math import sqrt, pi, log, exp
+import scipy
 
 def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
     ## Should actually check vertices but not a feature in DRalgo at time of writting
@@ -7,6 +8,26 @@ def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
         if key in pertSymbols and abs(value) > 4*pi:
             return False
     return True
+
+def constructSplineDictArray(betaFunction4DExpression, muRange, initialConditions, allSymbolsDict) :
+    ## -----BUG------
+    ## This updates the RGScale with the value of mu
+    solutionSoft = scipy.integrate.odeint(lambda initialConditions, mu:  np.array(betaFunction4DExpression.evaluate(initialConditions))/mu,
+                                          initialConditions, 
+                                          muRange).transpose()
+
+    interpDict = {}
+    for key, value in allSymbolsDict.items():
+        if key == "RGScale":
+            continue
+        
+        ## Hack to remove all the const entries in the array
+        if np.all(solutionSoft[value] == solutionSoft[value][0]):
+            continue
+        
+        interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solutionSoft[value], extrapolate = False)
+        
+    return interpDict
 
 from dataclasses import dataclass, InitVar,field
 from ThreeHiggs.BmGenerator import bIsBounded
@@ -21,7 +42,7 @@ class TraceFreeEnergyMinimum:
     ## Hack - idk how to type hint this correctly
     effectivePotential: str = "effectivePotentialInstance"
     dimensionalReduction: str = "dimensionalReductionInstance"
-    betaFunction4D: str = "betaFunction4DInstance" 
+    betaFunction4DExpression: str = "betaFunction4DExpression" 
     
     bVerbose: bool = False
     
@@ -107,7 +128,10 @@ class TraceFreeEnergyMinimum:
                               7.3 * self.TRange[-1],
                               len(self.TRange)*10)
         
-        betaSpline4D = self.betaFunction4D.constructSplineDictArray(muRange, lagranianParams4DArray, self.allSymbolsDict)
+        betaSpline4D = constructSplineDictArray(self.betaFunction4DExpression, 
+                                                muRange, 
+                                                lagranianParams4DArray, 
+                                                self.allSymbolsDict)
         
         minimizationResults = {"T": [],
                                "valueVeffReal": [],
