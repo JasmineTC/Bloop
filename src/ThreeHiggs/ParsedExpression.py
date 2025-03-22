@@ -29,16 +29,12 @@ class ParsedExpressionSystem:
 
     def evaluate(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
         """Optional argument is a hack"""
-        ## Collect inputs from the dict and put them in correct order. I do this by taking the right order from our first expression.
-        ## This is fine since all our expressions use the same input list. 
-        outList = [None] * len(self.parsedExpressions)    
-        for i in range(len(outList)):
-            outList[i] = self.parsedExpressions[i].evaluate(inputDict)
+        outList = [expression.evaluate(inputDict) for expression in self.parsedExpressions]  
 
-        if not bReturnDict:
-            return outList
-        else:
-            return  { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) } 
+        if bReturnDict:
+            return { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) } 
+        
+        return outList
 
     def getExpressionNames(self) -> list[str]:
         return [ expr.identifier for expr in self.parsedExpressions ]
@@ -62,10 +58,7 @@ class ParsedExpressionArray:
 class ParsedExpressionSystemArray:
     def __init__(self, parsedExpressionSystem, allSymbols):
         self.parsedExpressions = [(allSymbols.index(parsedExpression["identifier"]), 
-                                   ParsedExpressionArray(parsedExpression)#, 
-                                   #print(allSymbols.index(parsedExpression["identifier"]),
-                                   #      parsedExpression["identifier"])
-                                   )
+                                   ParsedExpressionArray(parsedExpression))
                                   for parsedExpression in parsedExpressionSystem]
 
         self.allSymbols = allSymbols
@@ -73,15 +66,8 @@ class ParsedExpressionSystemArray:
     def evaluate(self, params):
         newParams = copy.deepcopy(params)
         
-        #print(newParams)
         for expression in self.parsedExpressions:
-            tmp = newParams[expression[0]] 
             newParams[expression[0]] = expression[1].evaluate(params)
-            #print(tmp, newParams[expression[0]])
-
-        #print(newParams)
-
-        #exit(0)
 
         return newParams
 
@@ -97,9 +83,6 @@ class MassMatrix:
         self.matrix = compile(massMatrix["matrix"], "<string>", mode = "eval")
 
     def evaluate(self, arguments):
-        """Evaluates the matrix element expressions and puts them in a 2D np.ndarray.
-        The input dict needs to contain keys for all function arguments needed by the expressions. 
-        """
         arguments |= self.definitions.evaluate(arguments, bReturnDict = True)
         return eval(self.matrix, arguments | {"log": log, 
                                               "sqrt": sqrt, 
