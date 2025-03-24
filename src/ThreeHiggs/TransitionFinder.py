@@ -1,5 +1,6 @@
 import numpy as np
 from math import sqrt, pi, log, exp
+import scipy
 
 def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
     ## Should actually check vertices but not a feature in DRalgo at time of writting
@@ -7,6 +8,26 @@ def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
         if key in pertSymbols and abs(value) > 4*pi:
             return False
     return True
+
+def constructSplineDictArray(betaFunction4DExpression, muRange, initialConditions, allSymbolsDict) :
+    ## -----BUG------
+    ## This updates the RGScale with the value of mu
+    solutionSoft = scipy.integrate.odeint(lambda initialConditions, mu:  np.array(betaFunction4DExpression.evaluate(initialConditions))/mu,
+                                          initialConditions, 
+                                          muRange).transpose()
+
+    interpDict = {}
+    for key, value in allSymbolsDict.items():
+        if key == "RGScale":
+            continue
+        
+        ## Hack to remove all the const entries in the array
+        if np.all(solutionSoft[value] == solutionSoft[value][0]):
+            continue
+        
+        interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solutionSoft[value], extrapolate = False)
+        
+    return interpDict
 
 from dataclasses import dataclass, InitVar,field
 from ThreeHiggs.BmGenerator import bIsBounded
@@ -21,13 +42,14 @@ class TraceFreeEnergyMinimum:
     ## Hack - idk how to type hint this correctly
     effectivePotential: str = "effectivePotentialInstance"
     dimensionalReduction: str = "dimensionalReductionInstance"
+    betaFunction4DExpression: str = "betaFunction4DExpression" 
     
     bVerbose: bool = False
     
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
     
-    arg2Index: dict = field(default_factory=dict)
+    allSymbolsDict: list = field(default_factory=dict)
     
     config: InitVar[dict] = None
     
@@ -50,26 +72,25 @@ class TraceFreeEnergyMinimum:
         matchingScale = 4.*pi*exp(-np.euler_gamma) * T
         Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
         
-        inputArray[self.arg2Index["RGScale"]] = matchingScale
-        inputArray[self.arg2Index["T"]] = T
-        inputArray[self.arg2Index["Lb"]] = Lb
-        inputArray[self.arg2Index["Lf"]] = Lb + self.Lfconst
+        inputArray[self.allSymbolsDict["RGScale"]] = matchingScale
+        inputArray[self.allSymbolsDict["T"]] = T
+        inputArray[self.allSymbolsDict["Lb"]] = Lb
+        inputArray[self.allSymbolsDict["Lf"]] = Lb + self.Lfconst
         return inputArray
     
     def updateParams4DRan(self, betaSpline4D: dict, array):
-        muEvaulate = array[self.arg2Index["RGScale"]]
+        muEvaulate = array[self.allSymbolsDict["RGScale"]]
         for key, spline in betaSpline4D.items():
-            array[self.arg2Index[key]] = float(spline(muEvaulate))
+            array[self.allSymbolsDict[key]] = float(spline(muEvaulate))
         return array
     
     def executeMinimisation(self, T, 
                             minimumLocation,
-                            betaSpline4D):
-        
-        paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.arg2Index.keys())))
+                            betaSpline4D): 
+        paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.allSymbolsDict.keys())))
         
         paramsForMatchingArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
-        paramsForMatchingDict = {key: paramsForMatchingArray[value] for key, value in self.arg2Index.items()}
+        paramsForMatchingDict = {key: paramsForMatchingArray[value] for key, value in self.allSymbolsDict.items()}
         
         params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatchingDict, T)
         return ( *self.effectivePotential.findGlobalMinimum(T, params3D, self.initialGuesses + (minimumLocation, ) ), 
@@ -77,31 +98,30 @@ class TraceFreeEnergyMinimum:
                 bIsBounded(paramsForMatchingDict),
                 params3D)
     
-    def populateLagranianParams4D(self, inputParams: dict[str, float], argArray: np.array) -> np.array:
+    def populateLagranianParams4D(self, inputParams: dict[str, float]) -> np.array:
+        higgsVev = 246.22  #Consider using Fermi constant instead
+        ## --- SM fermion and gauge boson masses---
+        MW = 80.377 
+        MZ = 91.1876 
+        MTop = 172.76
+        langrianParams4D = {"yt3": sqrt(2.) * MTop/ higgsVev,
+                            "g1": 2.*sqrt(MZ**2 - MW**2)/ higgsVev, ## U(1)
+                            "g2": 2.*MW/ higgsVev,                  ## SU(2)
+                            "g3": sqrt(0.1183 * 4.0 * pi),          ## SU(3)
+                            ## BSM stuff from benchmark
+                            "RGScale":  inputParams["RGScale"],
+                            **inputParams["massTerms"],
+                            **inputParams["couplingValues"]}
         
-        langrianParams4D = {}
-        ## --- SM fermions and gauge bosons ---
-        v = 246.22  ## "Higgs VEV". Consider using Fermi constant instead
-        langrianParams4D["yt3"] = sqrt(2.) * 172.76 / v  ## 172.76 is the top mass
-        MW = 80.377 ## W boson mass
-        MZ = 91.1876 ## Z boson mass
-        
-        langrianParams4D |= {"g1": 2.*sqrt(MZ**2 - MW**2)/ v,  # U(1)
-                "g2": 2.*MW/ v,                   # SU(2)
-                "g3": sqrt(0.1183 * 4.0 * pi)}    # SU(3)
-        
-        ## --- BSM scalars ---
-        langrianParams4D |= inputParams["couplingValues"] | inputParams["massTerms"]
-        langrianParams4D["RGScale"] = inputParams["RGScale"]
-        
+        params4D = np.zeros(len(self.allSymbolsDict))
         for key, value in langrianParams4D.items():
-            argArray[self.arg2Index[key]] = value
+            params4D[self.allSymbolsDict[key]] = value
 
-        return argArray
+        return params4D
             
     def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
-        lagranianParams4DArray = self.populateLagranianParams4D(benchmark, np.zeros(len(self.arg2Index)))
-        
+        lagranianParams4DArray = self.populateLagranianParams4D(benchmark)
+               
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
         ## usually a T-dependent scale 4.*pi*exp(-np.euler_gamma)*T 
         ## TODO FIX for when user RGscale < 7T!!!
@@ -109,9 +129,10 @@ class TraceFreeEnergyMinimum:
                               7.3 * self.TRange[-1],
                               len(self.TRange)*10)
         
-        from .BetaFunctions import BetaFunctions4D
-        betasFunctions = BetaFunctions4D() 
-        betaSpline4D = betasFunctions.constructSplineDictArray(muRange, lagranianParams4DArray, self.arg2Index)
+        betaSpline4D = constructSplineDictArray(self.betaFunction4DExpression, 
+                                                muRange, 
+                                                lagranianParams4DArray, 
+                                                self.allSymbolsDict)
         
         minimizationResults = {"T": [],
                                "valueVeffReal": [],

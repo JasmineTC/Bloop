@@ -19,6 +19,27 @@ def replaceGreekSymbols(string: str) -> str:
 def removeSuffices(string):
     return string.replace("^2", "sq")
 
+def replaceSymbolsWithIndices(expression, symbols):
+    expression = replaceGreekSymbols(expression)
+    ## Reverse needed to deal with lam23 and lam23p i.e. substring replaces larger full string
+    for idx, symbol in enumerate(sorted(symbols, reverse = True, key = lambda symbol: replaceGreekSymbols(symbol))):
+        expression = expression.replace(replaceGreekSymbols(symbol) , f"params[{idx}]")
+
+    return expression
+
+def parseExpressionArray(line, allSymbols, remove3DSuffices = False):
+    identifier = "anonymous"
+    if ("->" in line):
+        identifier, line = map(str.strip, line.split("->"))
+    from sympy.parsing.mathematica import parse_mathematica
+    identifier = removeSuffices(replaceGreekSymbols(identifier))
+    expression = parse_mathematica(replaceGreekSymbols(line).replace("3d", ""))
+    symbols = [str(symbol) for symbol in expression.free_symbols]
+
+    return {"identifier": identifier, 
+            "expression": replaceSymbolsWithIndices(str(expression), allSymbols), 
+            "symbols": sorted(symbols)}
+
 def parseExpression(line, remove3DSuffices = False):
     identifier = "anonymous"
 
@@ -31,6 +52,9 @@ def parseExpression(line, remove3DSuffices = False):
     symbols = [str(symbol) for symbol in expression.free_symbols]
 
     return {"identifier": identifier, "expression": str(expression), "symbols": sorted(symbols)}
+
+def parseExpressionSystemArray(lines, allSymbols, remove3DSuffices = False):
+    return [parseExpressionArray(line, allSymbols, remove3DSuffices) for line in lines]
 
 def parseExpressionSystem(lines, remove3DSuffices = False):
     return [parseExpression(line, remove3DSuffices) for line in lines]

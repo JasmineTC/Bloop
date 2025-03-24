@@ -14,10 +14,12 @@ def _doMinimization(parameters):
     ## This should be doable with **unpacking but difficult with pool (starmap?)
     benchmark = parameters["benchmark"] 
     effectivePotential = parameters["effectivePotential"] 
+    betaFunction4DExpression = parameters["betaFunction4DExpression"]
     dimensionalReduction = parameters["dimensionalReduction"] 
     pertSymbols = parameters["pertSymbols"] 
     args = parameters["args"]
-    arg2Index = parameters["arg2Index"]
+    allSymbols = parameters["allSymbols"]
+    
 
     if args.bVerbose:
         print(f"Starting benchmark: {benchmark['bmNumber']}")
@@ -30,14 +32,15 @@ def _doMinimization(parameters):
     
     from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
     traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
-                                                "dimensionalReduction": dimensionalReduction, 
-                                                "TRange": tuple(_drange(args.TRangeStart, 
+                                                                  "dimensionalReduction": dimensionalReduction, 
+                                                                  "betaFunction4DExpression": betaFunction4DExpression,
+                                                                  "TRange": tuple(_drange(args.TRangeStart, 
                                                                        args.TRangeEnd, 
                                                                        str(args.TRangeStepSize))),
-                                                "pertSymbols": pertSymbols,
-                                                "bVerbose": args.bVerbose,
-                                                "initialGuesses": args.initialGuesses,
-                                                "arg2Index": arg2Index})
+                                                                  "pertSymbols": pertSymbols,
+                                                                  "bVerbose": args.bVerbose,
+                                                                  "initialGuesses": args.initialGuesses,
+                                                                  "allSymbolsDict": {key: value for value, key in enumerate(allSymbols)}})
     
     
     minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
@@ -100,17 +103,24 @@ def minimization(args):
     dimensionalReduction = DimensionalReduction(config = {"hardToSoft": ParsedExpressionSystem(parsedExpressions["hardToSoft"]),
                                                           "softScaleRGE": ParsedExpressionSystem(parsedExpressions["softScaleRGE"]),
                                                           "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"])})
+
+    
     
     with open(args.benchmarkFile) as benchmarkFile:
-        from ThreeHiggs.MakeArgumentMap import makeArgumentMap
-        arg2Index = makeArgumentMap(parsedExpressions)
+        allSymbols = getLines(args.allSymbolsFile, mode = "json")
+        from ThreeHiggs.MathematicaParsers import replaceGreekSymbols
+        allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
+        ## This is done to be consistent with MathematicaParses
+        allSymbols.sort(reverse=True)
+        from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
                                                      variableSymbols["yukawaSymbols"] + 
                                                      variableSymbols["gaugeSymbols"]), 
                             "effectivePotential": effectivePotential,
                             "dimensionalReduction": dimensionalReduction,
+                            "betaFunction4DExpression": ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"], allSymbols),
                             "args": args,
-                            "arg2Index": arg2Index} 
+                            "allSymbols": allSymbols} 
         if args.bPool:
             from pathos.multiprocessing import Pool
             with Pool(args.cores) as pool:

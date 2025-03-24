@@ -7,7 +7,9 @@ def convertMathematica(args):
     if (args.loopOrder >= 2):
         veffLines += getLines(args.nnloFile)
 
+    allSymbols = getLines(args.allSymbolsFile, mode = "json")
     from ThreeHiggs.MathematicaParsers import (parseExpressionSystem,
+                                               parseExpressionSystemArray,
                                                parseConstantMatrix,
                                                parseMassMatrix,
                                                parseRotationMatrix)
@@ -22,6 +24,7 @@ def convertMathematica(args):
                                                          getLines(args.scalarMassMatrixBottomRightFile)),
           "scalarRotationMatrix": parseRotationMatrix(getLines(args.scalarRotationFile)),
           "veff": parseExpressionSystem(veffLines),
+          "betaFunctions4D": parseExpressionSystemArray(getLines(args.betaFunctions4DFile), allSymbols),
           "hardToSoft": parseExpressionSystem(getLines(args.hardToSoftFile)),
           "softScaleRGE": parseExpressionSystem(getLines(args.softScaleRGEFile)),
           "softToUltraSoft": parseExpressionSystem(getLines(args.softToUltraSoftFile))},
