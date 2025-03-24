@@ -14,7 +14,7 @@ def _doMinimization(parameters):
     ## This should be doable with **unpacking but difficult with pool (starmap?)
     benchmark = parameters["benchmark"] 
     effectivePotential = parameters["effectivePotential"] 
-    betaFunction4D = parameters["betaFunction4D"]
+    betaFunction4DExpression = parameters["betaFunction4DExpression"]
     dimensionalReduction = parameters["dimensionalReduction"] 
     pertSymbols = parameters["pertSymbols"] 
     args = parameters["args"]
@@ -33,7 +33,7 @@ def _doMinimization(parameters):
     from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
     traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
                                                                   "dimensionalReduction": dimensionalReduction, 
-                                                                  "betaFunction4D": betaFunction4D,
+                                                                  "betaFunction4DExpression": betaFunction4DExpression,
                                                                   "TRange": tuple(_drange(args.TRangeStart, 
                                                                        args.TRangeEnd, 
                                                                        str(args.TRangeStepSize))),
@@ -85,16 +85,6 @@ def minimization(args):
                                  "relLocalTol" : args.relLocalTolerance,
                                  "varLowerBounds" : args.varLowerBounds,
                                  "varUpperBounds" : args.varUpperBounds})
-    from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
-    allSymbols = getLines(args.allSymbolsFile, mode = "json")
-    from ThreeHiggs.MathematicaParsers import replaceGreekSymbols
-    allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
-    ## This is done to be consistent with MathematicaParses
-    allSymbols.sort(reverse=True)
-    #import numpy as np
-    #ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"]).evalulate(np.full(146, 1))
-    from ThreeHiggs.BetaFunctions import BetaFunctions4D
-    betaFunction4D =  BetaFunctions4D(ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"], allSymbols))
     
     effectivePotential = EffectivePotential(variableSymbols["fieldSymbols"],
                                             args.loopOrder,
@@ -115,13 +105,20 @@ def minimization(args):
                                                           "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"])})
 
     
+    
     with open(args.benchmarkFile) as benchmarkFile:
+        allSymbols = getLines(args.allSymbolsFile, mode = "json")
+        from ThreeHiggs.MathematicaParsers import replaceGreekSymbols
+        allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
+        ## This is done to be consistent with MathematicaParses
+        allSymbols.sort(reverse=True)
+        from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
                                                      variableSymbols["yukawaSymbols"] + 
                                                      variableSymbols["gaugeSymbols"]), 
                             "effectivePotential": effectivePotential,
                             "dimensionalReduction": dimensionalReduction,
-                            "betaFunction4D": betaFunction4D,
+                            "betaFunction4DExpression": ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"], allSymbols),
                             "args": args,
                             "allSymbols": allSymbols} 
         if args.bPool:
