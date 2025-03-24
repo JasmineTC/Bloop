@@ -123,8 +123,9 @@ class TraceFreeEnergyMinimum:
         lagranianParams4DArray = self.populateLagranianParams4D(benchmark)
                
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
-        ## usually a T-dependent scale ~7.3Tclean up switch auto complete
-        muRange = np.linspace(lagranianParams4DArray[self.allSymbolsDict["RGScale"]], 
+        ## usually a T-dependent scale 4.*pi*exp(-np.euler_gamma)*T 
+        ## TODO FIX for when user RGscale < 7T!!!
+        muRange = np.linspace(lagranianParams4DArray[self.arg2Index["RGScale"]], 
                               7.3 * self.TRange[-1],
                               len(self.TRange)*10)
         

@@ -1,3 +1,4 @@
+from sympy import Matrix
 def replaceGreekSymbols(string: str) -> str:
     #import unicodedata
     ## Unicode magic, this is definitely not ideal
@@ -16,18 +17,7 @@ def replaceGreekSymbols(string: str) -> str:
     return newString
 
 def removeSuffices(string):
-    string = string.replace("^2", "sq")
-
-    #""" For ultrasoft theory DRalgo appends "US" => remove that too. Gauge couplings again need special treatment."""
-    string = string[:-len("US")] if string.endswith("US") else string
-    string = string.replace("USsq", "sq") if string.endswith("USsq") else string
-
-    ## Remove "3d" suffix with even crazier oneliner (suffix meaning that it's removed only from end of the string)
-    string = string[:-len("3d")] if string.endswith("3d") else string
-    ## Gauge couplings are originally of form g3d^2 so account for that too 
-    string = string.replace("3dsq", "sq") if string.endswith("3dsq") else string
-    
-    return string
+    return string.replace("^2", "sq")
 
 def replaceSymbolsWithIndices(expression, symbols):
     expression = replaceGreekSymbols(expression)
@@ -58,7 +48,7 @@ def parseExpression(line, remove3DSuffices = False):
 
     from sympy.parsing.mathematica import parse_mathematica
     identifier = removeSuffices(replaceGreekSymbols(identifier))
-    expression = parse_mathematica(replaceGreekSymbols(line).replace("3d", ""))
+    expression = parse_mathematica(replaceGreekSymbols(line))
     symbols = [str(symbol) for symbol in expression.free_symbols]
 
     return {"identifier": identifier, "expression": str(expression), "symbols": sorted(symbols)}
@@ -76,26 +66,18 @@ def parseMatrix(lines):
                                               .split(',')] for line in lines]
 
 def parseConstantMatrix(lines):
-    matrix = parseMatrix(lines)
-
-    from sympy import Matrix
-    sympyMatrix = Matrix(matrix)
-
-    from numpy import array, float64
-    return {"matrix": array(sympyMatrix.tolist()).astype(float64).tolist()}
+    from numpy import array
+    ## Convert to array to specify type, convert to list to be compatable with json
+    return {"matrix": array(Matrix(parseMatrix(lines)), dtype = int).tolist()}
 
 def parseMassMatrix(definitionsLines, matrixLines):
-    matrix = parseMatrix(matrixLines)
-
-    from sympy import Matrix
-    sympyMatrix = Matrix(matrix)
-
-    from numpy import array, float64
+    from sympy.core.sympify import sympify
+    ##Need sympify that the parsed matrix line is ufuncable
+    ##Need str to make compatable with json 
     return {"definitions": parseExpressionSystem(definitionsLines),
-            "matrix": str(array(sympyMatrix.tolist()).tolist())}
+            "matrix": str(sympify(parseMatrix(matrixLines)))}
 
 def parseRotationMatrix(lines):
-    from sympy import Matrix
     sympyMatrix = Matrix(parseMatrix(lines))
     shape = sympyMatrix.shape
 
@@ -118,13 +100,9 @@ class MathematicaParsersUnitTests(TestCase):
         self.assertEqual(reference, [replaceGreekSymbols(sourceString) for sourceString in source])
 
     def test_removeSuffices(self):
-        reference = ["myVarsq", "sqmyVar",
-                     "myVarsq", "myVar", "3dsqmyVar", "3dmyVar",
-                     "myVarsq", "myVar", "USsqmyVar", "USmyVar"]
+        reference = ["myVarsq", "sqmyVar"]
 
-        source = ["myVar^2", "^2myVar", 
-                  "myVar3dsq", "myVar3d", "3dsqmyVar", "3dmyVar",
-                  "myVarUSsq", "myVarUS", "USsqmyVar", "USmyVar"]
+        source = ["myVar^2", "^2myVar"]
 
         self.assertEqual(reference, [removeSuffices(sourceString) for sourceString in source])
 

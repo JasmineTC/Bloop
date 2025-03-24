@@ -98,7 +98,7 @@ effectivePotentialDirectory = "DRalgoOutput/EffectivePotential";
 variables = "DRalgoOutput/Variables";
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Model*)
 
 
@@ -119,8 +119,6 @@ Rep3={{{1,0},{0},-1/3},"R"};
 Rep4={{{0,0},{1},-1/2},"L"};
 Rep5={{{0,0},{0},-1},"R"};
 RepFermion1Gen={Rep1,Rep2,Rep3,Rep4,Rep5};
-
-
 RepFermion3Gen={RepFermion1Gen,RepFermion1Gen,RepFermion1Gen}//Flatten[#,1]&;
 
 
@@ -197,8 +195,6 @@ QuarticTerm3 = \[Lambda]12p*\[Phi]12*\[Phi]21 + \[Lambda]23p*\[Phi]23*\[Phi]32 +
 QuarticTerm4 = \[Lambda]1*\[Phi]12^2 + \[Lambda]2*\[Phi]23^2 + \[Lambda]3*\[Phi]31^2;
 (* Hermitian conjugate of QuarticTerm4. Just adding it as ConjugateTranspose[...] didn't work, DRalgo just seemed to get stuck. *)
 QuarticTerm5 = \[Lambda]1Conj*\[Phi]21^2 + \[Lambda]2Conj*\[Phi]32^2 + \[Lambda]3Conj*\[Phi]13^2;
-
-
 VQuartic=QuarticTerm1 + QuarticTerm2 + QuarticTerm3 + QuarticTerm4 + QuarticTerm5 // Simplify // Expand; (* simplify to get rid of imag units *)
 \[CapitalLambda]4=GradQuartic[VQuartic];
 
@@ -217,8 +213,6 @@ YukawaDoublet3=CreateInvariantYukawa[Group,RepScalar,RepFermion3Gen,InputInv][[1
 
 (*Ysff=-GradYukawa[yt1*YukawaDoublet1+yt2*YukawaDoublet2+yt3*YukawaDoublet3];*)
 Ysff=-GradYukawa[yt3*YukawaDoublet3];
-
-
 YsffC=SparseArray[Simplify[Conjugate[Ysff]//Normal,Assumptions->{yt3>0}]];
 
 
