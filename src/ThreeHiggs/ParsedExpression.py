@@ -66,6 +66,7 @@ class ParsedExpressionSystemArray:
         
 
     def evaluate(self, params):
+        ## Look into using copy.replace 3.13 feature
         newParams = copy.deepcopy(params)
         
         for expression in self.parsedExpressions:
