@@ -144,7 +144,8 @@ class EffectivePotential:
                  scalarPermutationMatrix,
                  scalarMassMatrices, 
                  scalarRotationMatrix,
-                 veff):
+                 veff,
+                 veffArray):
         
         self.fieldNames = fieldNames
         
@@ -165,21 +166,23 @@ class EffectivePotential:
         self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
         self.scalarRotationMatrix = scalarRotationMatrix
         self.expressions = veff
+        self.expressionsArray = veffArray
 
     def evaluatePotential(self, fields: list[float], T:float, params3D) -> complex:
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
         ## Sum because the result is a list of tree, 1loop etc 
-        return sum(self.expressions.evaluate(compFieldDepParams(fields,
-                                                                T,
-                                                                params3D,
-                                                                self.fieldNames,
-                                                                self.scalarPermutationMatrix, 
-                                                                self.scalarMassMatrices, 
-                                                                self.scalarRotationMatrix,
-                                                                self.vectorShortHands,
-                                                                self.vectorMassesSquared,
-                                                                self.bNumba,
-                                                                self.verbose)))
+        array = self.expressionsArray.getParamsArray(compFieldDepParams(fields,
+                                                         T,
+                                                         params3D,
+                                                         self.fieldNames,
+                                                         self.scalarPermutationMatrix, 
+                                                         self.scalarMassMatrices, 
+                                                         self.scalarRotationMatrix,
+                                                         self.vectorShortHands,
+                                                         self.vectorMassesSquared,
+                                                         self.bNumba,
+                                                         self.bVerbose))
+        return sum(self.expressionsArray.getParamSubset(self.expressionsArray.evaluate(array)))
 
     def findGlobalMinimum(self,T:float, 
                           params3D,

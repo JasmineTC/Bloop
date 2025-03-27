@@ -54,7 +54,6 @@ class ParsedExpressionArray:
                                              "EulerGamma": euler_gamma,
                                              "Glaisher": Glaisher,
                                              "params": params})
-
 class ParsedExpressionSystemArray:
     def __init__(self, parsedExpressionSystem, allSymbols, fileName):
         self.parsedExpressions = [(allSymbols.index(parsedExpression["identifier"]), 
@@ -79,6 +78,9 @@ class ParsedExpressionSystemArray:
 
     def getExpressionNames(self) -> list[str]:
         return [ expr[1].identifier for expr in self.parsedExpressions ]
+    
+    def getParamsArray(self, params):
+        return [params[key] if key in set(params) else 0 for key in self.allSymbols ]
 
 class MassMatrix:
     def __init__(self, massMatrix, fileName):

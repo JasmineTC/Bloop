@@ -73,11 +73,18 @@ def _doMinimization(parameters):
                                                          indent = 4))
 from ThreeHiggs.GetLines import getLines        
 def minimization(args):
+    allSymbols = getLines(args.allSymbolsFile, mode = "json")
+    from ThreeHiggs.MathematicaParsers import replaceGreekSymbols
+    allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
+    ## This is done to be consistent with MathematicaParses
+    allSymbols.sort(reverse=True)
+    
     parsedExpressions = json.load(open(args.parsedExpressionsFile, "r"))
 
     variableSymbols =  getLines( "Data/Variables/LagranianSymbols.json", mode = "json") 
     
     from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
+                                             ParsedExpressionSystemArray,
                                              MassMatrix,
                                              RotationMatrix)
     from ThreeHiggs.EffectivePotential import EffectivePotential, cNlopt
@@ -94,19 +101,14 @@ def minimization(args):
                                             args.bNumba,
                                             args.verbose,
                                             nloptInst,
-                                            ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]["expressions"],
-                                                                   parsedExpressions["vectorMassesSquared"]["fileName"]),
-                                            ParsedExpressionSystem(parsedExpressions["vectorShortHands"]["expressions"],
-                                                                   parsedExpressions["vectorShortHands"]["fileName"]),
-                                            parsedExpressions["scalarPermutationMatrix"],
-                                            (MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]["expressions"], 
-                                                        parsedExpressions["scalarMassMatrixUpperLeft"]["fileName"]), 
-                                             MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"]["expressions"],
-                                                        parsedExpressions["scalarMassMatrixBottomRight"]["fileName"])),
-                                            RotationMatrix(parsedExpressions["scalarRotationMatrix"]["expressions"],
-                                                           parsedExpressions["scalarRotationMatrix"]["fileName"]),
-                                            ParsedExpressionSystem(parsedExpressions["veff"]["expressions"],
-                                                                   parsedExpressions["veff"]["fileName"])) 
+                                            ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
+                                            ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
+                                            parsedExpressions["scalarPermutationMatrix"]["matrix"],
+                                            [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]), 
+                                             MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"])],
+                                            RotationMatrix(parsedExpressions["scalarRotationMatrix"]),
+                                            ParsedExpressionSystem(parsedExpressions["veff"]),
+                                            ParsedExpressionSystemArray(parsedExpressions["veffArray"], allSymbols)) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
     dimensionalReduction = DimensionalReduction(config = {"hardToSoft": ParsedExpressionSystem(parsedExpressions["hardToSoft"]["expressions"], 
@@ -123,6 +125,7 @@ def minimization(args):
         allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")], 
                             reverse = True)
         ## This is done to be consistent with MathematicaParses
+
         from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
                                                      variableSymbols["yukawaSymbols"] + 
