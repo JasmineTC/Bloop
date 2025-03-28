@@ -76,7 +76,7 @@ def minimization(args):
     allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
     ## This is done to be consistent with MathematicaParses
     allSymbols.sort(reverse=True)
-    
+
     parsedExpressions = json.load(open(args.parsedExpressionsFile, "r"))
     # for key,value in parsedExpressions.items():
         # print(key, value)
