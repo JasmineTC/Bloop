@@ -145,7 +145,8 @@ class EffectivePotential:
                  scalarMassMatrices, 
                  scalarRotationMatrix,
                  veff,
-                 veffArray):
+                 veffArray,
+                 allSymbols):
         
         self.fieldNames = fieldNames
         
@@ -167,6 +168,7 @@ class EffectivePotential:
         self.scalarRotationMatrix = scalarRotationMatrix
         self.expressions = veff
         self.expressionsArray = veffArray
+        self.allSymbols = allSymbols
 
     def evaluatePotential(self, fields: list[float], T:float, params3D) -> complex:
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
@@ -182,6 +184,9 @@ class EffectivePotential:
                                                          self.vectorMassesSquared,
                                                          self.bNumba,
                                                          self.bVerbose))
+        # for idx, key in enumerate(self.allSymbols):
+        #     print(key, array[idx])
+        # exit()
         return sum(self.expressionsArray.getParamSubset(self.expressionsArray.evaluate(array)))
 
     def findGlobalMinimum(self,T:float, 

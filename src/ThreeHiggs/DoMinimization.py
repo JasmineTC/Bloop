@@ -108,7 +108,8 @@ def minimization(args):
                                              MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"])],
                                             RotationMatrix(parsedExpressions["scalarRotationMatrix"]),
                                             ParsedExpressionSystem(parsedExpressions["veff"]),
-                                            ParsedExpressionSystemArray(parsedExpressions["veffArray"], allSymbols)) 
+                                            ParsedExpressionSystemArray(parsedExpressions["veffArray"], allSymbols),
+                                            allSymbols) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
     dimensionalReduction = DimensionalReduction(config = {"hardToSoft": ParsedExpressionSystem(parsedExpressions["hardToSoft"]["expressions"], 
