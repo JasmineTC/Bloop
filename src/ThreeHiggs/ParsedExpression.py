@@ -1,6 +1,4 @@
 from cmath import pi, log, sqrt
-from numpy import euler_gamma
-Glaisher = 1.28242712910062
 
 import copy
 
@@ -17,9 +15,7 @@ class ParsedExpression:
         return eval(self.lambdaExpression, 
                     functionArguments | {"log": log, 
                                          "sqrt": sqrt, 
-                                         "pi": pi, 
-                                         "EulerGamma": euler_gamma,
-                                         "Glaisher": Glaisher})
+                                         "pi": pi})
 
 class ParsedExpressionSystem:
     def __init__(self, parsedExpressionSystem, fileName):
@@ -50,9 +46,7 @@ class ParsedExpressionArray:
     def evaluate(self, params):
         return eval(self.lambdaExpression,  {"log": log, 
                                              "sqrt": sqrt, 
-                                             "pi": pi, 
-                                             "EulerGamma": euler_gamma,
-                                             "Glaisher": Glaisher,
+                                             "pi": pi,
                                              "params": params})
 class ParsedExpressionSystemArray:
     def __init__(self, parsedExpressionSystem, allSymbols, fileName):
@@ -92,9 +86,7 @@ class MassMatrix:
         arguments |= self.definitions.evaluate(arguments, bReturnDict = True)
         return eval(self.matrix, arguments | {"log": log, 
                                               "sqrt": sqrt, 
-                                              "pi": pi, 
-                                              "EulerGamma": euler_gamma,
-                                              "Glaisher": Glaisher})
+                                              "pi": pi})
 
 class RotationMatrix:
     def __init__(self, symbolMap, fileName):
