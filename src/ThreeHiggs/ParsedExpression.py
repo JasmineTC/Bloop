@@ -1,4 +1,4 @@
-from cmath import pi, log, sqrt
+from cmath import log, sqrt
 
 import copy
 
@@ -14,8 +14,7 @@ class ParsedExpression:
     def evaluate(self, functionArguments: list[float]) -> float:
         return eval(self.lambdaExpression, 
                     functionArguments | {"log": log, 
-                                         "sqrt": sqrt, 
-                                         "pi": pi})
+                                         "sqrt": sqrt})
 
 class ParsedExpressionSystem:
     def __init__(self, parsedExpressionSystem, fileName):
@@ -45,8 +44,7 @@ class ParsedExpressionArray:
 
     def evaluate(self, params):
         return eval(self.lambdaExpression,  {"log": log, 
-                                             "sqrt": sqrt, 
-                                             "pi": pi,
+                                             "sqrt": sqrt,
                                              "params": params})
 class ParsedExpressionSystemArray:
     def __init__(self, parsedExpressionSystem, allSymbols, fileName):
@@ -85,8 +83,7 @@ class MassMatrix:
     def evaluate(self, arguments):
         arguments |= self.definitions.evaluate(arguments, bReturnDict = True)
         return eval(self.matrix, arguments | {"log": log, 
-                                              "sqrt": sqrt, 
-                                              "pi": pi})
+                                              "sqrt": sqrt})
 
 class RotationMatrix:
     def __init__(self, symbolMap, fileName):

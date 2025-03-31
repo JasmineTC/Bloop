@@ -4,7 +4,8 @@ from numpy import euler_gamma, pi
 Glaisher = "1.28242712910062"
 
 def replaceSymbolsConst(string):
-    return string.replace("pi", str(pi)) \
+    ## Change expressions to use either pi or Pi but not both!!!
+    return string.replace("pi", str(pi)).replace("Pi", str(pi)) \
                  .replace("EulerGamma", str(euler_gamma)) \
                  .replace("Glaisher", Glaisher) 
 
