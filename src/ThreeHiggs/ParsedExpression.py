@@ -109,28 +109,25 @@ class ParsedExpressionUnitTests(TestCase):
         self.assertEqual(reference, ParsedExpression(source, None).evaluate({"lam": 100, "mssq": 100}))
 
     def test_ParsedExpressionComplex(self):
-        source = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+        source = {"expression": "sqrt(lam) + log(mssq)",
                   "identifier": "Identifier",
                   "symbols": ['lam', 'mssq']}
 
-        reference = complex(5.826048814042759, 1.1475471676948477)
+        reference = complex(15.938584910946165+5.336296769019722j)
 
         self.assertEqual(reference, 
                          ParsedExpression(source, None).evaluate({"lam": complex(100, 100), 
                                                             "mssq": complex(100, 100)}))
 
     def test_ParsedExpressionSystem(self):
-        source = [{"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+        source = [{"expression": "sqrt(lam) + log(mssq)",
                    "identifier": "Identifier",
                    "symbols": ['lam', 'mssq']},
-                  {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
-                   "identifier": "Identifier",
-                   "symbols": ['lam', 'mssq']},
-                  {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+                  {"expression": "sqrt(2*lam) + log(mssq)",
                    "identifier": "Identifier",
                    "symbols": ['lam', 'mssq']}]
 
-        reference = [5.400944901447568, 5.400944901447568, 5.400944901447568]
+        reference = [(14.605170185988092+0j), (18.747305809719045+0j)] 
 
         self.assertEqual(reference, 
                          ParsedExpressionSystem(source, None).evaluate({"lam": 100, "mssq": 100}))

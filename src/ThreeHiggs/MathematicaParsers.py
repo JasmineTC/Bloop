@@ -99,28 +99,24 @@ class MathematicaParsersUnitTests(TestCase):
         self.assertEqual(reference, [removeSuffices(sourceString) for sourceString in source])
 
     def test_parseExpression(self):
-        reference = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+        reference = {"expression": "sqrt(lam) + log(mssq)",
                      "identifier": "Identifier",
                      "symbols": ['lam', 'mssq']}
 
-        source = "Identifier -> Sqrt[λ] / (4 * Pi) + Log[mssq]"
+        source = "Identifier -> Sqrt[λ] + Log[mssq]"
 
         self.assertEqual(reference, parseExpression(source))
 
     def test_paseExpressionSystem(self):
-        reference = [{"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+        reference = [{"expression": "sqrt(lam) + log(mssq)",
                       "identifier": "Identifier",
                       "symbols": ['lam', 'mssq']},
-                     {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
-                      "identifier": "Identifier",
-                      "symbols": ['lam', 'mssq']},
-                     {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+                     {"expression": "sqrt(2)*sqrt(lam) + log(mssq)",
                       "identifier": "Identifier",
                       "symbols": ['lam', 'mssq']}]
 
-        source = ["Identifier -> Sqrt[λ] / (4 * Pi) + Log[mssq]",
-                  "Identifier -> Sqrt[λ] / (4 * Pi) + Log[mssq]",
-                  "Identifier -> Sqrt[λ] / (4 * Pi) + Log[mssq]"]
+        source = ["Identifier -> Sqrt[λ] + Log[mssq]",
+                  "Identifier -> Sqrt[2]*Sqrt[λ]+ Log[mssq]"]
 
         self.assertEqual(reference, parseExpressionSystem(source))
 
