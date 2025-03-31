@@ -74,8 +74,8 @@ def _doMinimization(parameters):
 from ThreeHiggs.GetLines import getLines        
 def minimization(args):
     allSymbols = getLines(args.allSymbolsFile, mode = "json")
-    from ThreeHiggs.MathematicaParsers import replaceSymbols
-    allSymbols = [replaceSymbols(symbol) for symbol in allSymbols]
+    from ThreeHiggs.MathematicaParsers import replaceGreekSymbols
+    allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
     ## This is done to be consistent with MathematicaParses
     allSymbols.sort(reverse=True)
 
