@@ -23,7 +23,7 @@ def replaceSymbolsWithIndices(expression, symbols):
 
     return expression
 
-def parseExpressionArray(line, allSymbols):
+def parseExpression(line, allSymbols = None, array = False):
     ## Moving removeSuffices here breaks code (you get params[1]sq)
     line = replaceSymbolsConst(replaceGreekSymbols(line))
     identifier, expression = map(str.strip, line.split("->")) if "->" in line else ("anonymous", line)
@@ -31,25 +31,12 @@ def parseExpressionArray(line, allSymbols):
     expression = parse_mathematica(expression)
 
     return {"identifier": removeSuffices(identifier), 
-            "expression": replaceSymbolsWithIndices(str(expression), allSymbols), 
+            "expression": str(expression) if not array else replaceSymbolsWithIndices(str(expression), allSymbols),
             "symbols": sorted([str(symbol) for symbol in expression.free_symbols])}
 
-def parseExpression(line):
-    ## Moving removeSuffices here breaks code (you get params[1]sq)
-    line = replaceSymbolsConst(replaceGreekSymbols(line))
-    identifier, expression = map(str.strip, line.split("->")) if "->" in line else ("anonymous", line)
-
-    expression = parse_mathematica(expression)
-
-    return {"identifier": removeSuffices(identifier), 
-            "expression": str(expression),
-            "symbols": sorted([str(symbol) for symbol in expression.free_symbols])}
-
-def parseExpressionSystemArray(lines, allSymbols):
-    return [parseExpressionArray(line, allSymbols) for line in lines]
-
-def parseExpressionSystem(lines):
-    return [parseExpression(line) for line in lines]
+def parseExpressionSystem(lines, allSymbols = None, array = False):
+    
+    return [parseExpression(line, allSymbols, array) for line in lines]
 
 def parseMatrix(lines):
     return [[symbol.strip() for symbol in line.strip()
