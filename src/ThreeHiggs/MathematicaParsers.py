@@ -34,7 +34,7 @@ def parseExpressionArray(line, allSymbols):
             "expression": replaceSymbolsWithIndices(str(expression), allSymbols), 
             "symbols": sorted([str(symbol) for symbol in expression.free_symbols])}
 
-def parseExpression(line, remove3DSuffices = False):
+def parseExpression(line):
     ## Moving removeSuffices here breaks code (you get params[1]sq)
     line = replaceSymbolsConst(replaceGreekSymbols(line))
     identifier, expression = map(str.strip, line.split("->")) if "->" in line else ("anonymous", line)
@@ -45,11 +45,11 @@ def parseExpression(line, remove3DSuffices = False):
             "expression": str(expression),
             "symbols": sorted([str(symbol) for symbol in expression.free_symbols])}
 
-def parseExpressionSystemArray(lines, allSymbols, remove3DSuffices = False):
+def parseExpressionSystemArray(lines, allSymbols):
     return [parseExpressionArray(line, allSymbols) for line in lines]
 
-def parseExpressionSystem(lines, remove3DSuffices = False):
-    return [parseExpression(line, remove3DSuffices) for line in lines]
+def parseExpressionSystem(lines):
+    return [parseExpression(line) for line in lines]
 
 def parseMatrix(lines):
     return [[symbol.strip() for symbol in line.strip()
