@@ -148,7 +148,13 @@ class TraceFreeEnergyMinimum:
         ## use the location of the previous minimum as a guess for the next
         ## Not ideal as the code has to repeat an initial guess on first T
         minimumLocation = np.array(self.initialGuesses[0])
-        for T in self.TRange:
+        
+        linestyle = ["-.", "-", "--"]
+        v3Max = 0
+        yMin = 0
+        yMax = 0
+        
+        for idx, T in enumerate(self.TRange):
             if self.bVerbose:
                 print (f'Start of temp = {T} loop')
                 
@@ -177,15 +183,35 @@ class TraceFreeEnergyMinimum:
                                                                   params3D): 
                     minimizationResults["UltraSoftTemp"] = T
 
-                
+            v3Max = minimumLocation[2] if minimumLocation[2] > v3Max else v3Max
+            yMinMax = self.effectivePotential.plotPot(T, params3D, linestyle[idx], minimumLocation[2], minimumValueReal, v3Max)
+            if yMinMax[0]< yMin:
+                yMin = yMinMax[0]
+            if yMinMax[1]> yMax:
+                yMax = yMinMax[1] 
             if np.all( minimizationResults["minimumLocation"][-1] < 0.5):
                 if self.bVerbose:
                     print (f"Symmetric phase found at temp {T}")
                 if counter == 3:
                     break
                 counter += 1
-
+            
         minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
+        
+
+    
+        import matplotlib.pylab as plt
+        plt.legend(loc = 2)
+        plt.rcParams['text.usetex'] = True
+        plt.xlabel(r"$v_3$ ($\text{GeV}^{\: \frac{1}{2}})$")
+        plt.ylabel(r"$\dfrac{\Delta V}{T^3}$", rotation=0, labelpad = 5)
+        plt.hlines(0, 0, v3Max*1.1, colors = 'black')
+        plt.vlines(0, yMin*1.01, yMax*1.01,  colors = 'black')
+        plt.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
+        plt.savefig("Results/StrongPot1Loop.png")
+        plt.show()
+        exit()
+        
         return minimizationResults
 
 
