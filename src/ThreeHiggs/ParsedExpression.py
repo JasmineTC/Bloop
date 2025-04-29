@@ -9,7 +9,7 @@ class ParsedExpression:
         self.symbols = parsedExpression["symbols"]
         self.fileName = fileName
 
-        self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
+        self.lambdaExpression = compile(self.expression, self.identifier, mode = "eval")
 
     def evaluate(self, functionArguments: list[float]) -> float:
         return eval(self.lambdaExpression, 
