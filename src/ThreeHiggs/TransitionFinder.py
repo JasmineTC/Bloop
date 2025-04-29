@@ -186,7 +186,6 @@ class TraceFreeEnergyMinimum:
             
         minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
         
-        
         return minimizationResults
     
     def plotPotential(self, benchmark:  dict[str: float]):
