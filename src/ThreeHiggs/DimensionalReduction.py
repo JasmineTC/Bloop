@@ -20,9 +20,8 @@ class DimensionalReduction():
         outParams |= self.softScaleRGE.evaluate(outParams, bReturnDict = True)
         ## For reasons unknown the RG scale is different for soft and ultra soft physics
         outParams["RGScale"] = goalRGScale
-        
         ## HACK this is the RG scale name in Veff
-        return {"mu3US": goalRGScale} | self.softToUltraSoft.evaluate(outParams, bReturnDict = True)
+        return self.softToUltraSoft.evaluate(outParams, bReturnDict = True)
 
 
 
@@ -43,14 +42,14 @@ class DimensionalReductionUnitTest(TestCase):
     def test_getEFTParams(self):
         from ThreeHiggs.PythoniseMathematica import pythoniseExpressionSystem
         from ThreeHiggs.ParsedExpression import ParsedExpressionSystem
-        dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(pythoniseExpressionSystem(["b -> a"]), None),
-                                                    ParsedExpressionSystem(pythoniseExpressionSystem(["c -> b"]), None), 
-                                                    ParsedExpressionSystem(pythoniseExpressionSystem(["a -> c"]), None))
+        dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(pythoniseExpressionSystem(["b -> a", "T->T"])),
+                                                    ParsedExpressionSystem(pythoniseExpressionSystem(["c -> b"])), 
+                                                    ParsedExpressionSystem(pythoniseExpressionSystem(["a -> c", "mu3US -> T"])))
         reference = {'a': 1, 'mu3US': 0}
 
 
         self.assertEqual(reference,
-                         dimensionalReduction.getUltraSoftParams({"a": 1, "RGScale": -1}, 0))
+                         dimensionalReduction.getUltraSoftParams({"a": 1, "RGScale": -1, "T":0}, 0))
         
     def test_getEFTParamsFull(self):
         from ThreeHiggs.PythoniseMathematica import pythoniseExpressionSystem
@@ -63,3 +62,4 @@ class DimensionalReductionUnitTest(TestCase):
         reference = {'mu3US': 50, 'lam11': (5.523844829176312+0j), 'lam12': (6.621577064652674+0j), 'lam12p': (7.053488262004727+0j), 'lam1Im': 0.0, 'lam1Re': 4.979009923543871, 'lam22': (6.029744638552994+0j), 'lam23': (0.06575174120618288+0j), 'lam23p': (0.011891632008381406+0j), 'lam2Im': 0.0, 'lam2Re': 0.0, 'lam31': (0.06576664548054172+0j), 'lam31p': (0.011898384154257216+0j), 'lam33': (6.281251508922814+0j), 'lam3Im': 0.0, 'lam3Re': 0.0, 'g1': (2.4742142303484282+0j), 'g2': (4.493373011738393+0j), 'g3': (7.560030477241674+0j), 'mu12sqIm': 0.0, 'mu12sqRe': 0.0, 'mu1sq': (-90440.68446664244+0j), 'mu2sq': (-90545.99168869366+0j), 'mu3sq': (6816.682950673874+0j)}
 
         self.assertEqual(reference, dimensionalReduction.getUltraSoftParams(source, 50))
+
