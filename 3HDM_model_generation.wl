@@ -94,7 +94,7 @@ rightSymbols=Union[rightSymbols,getSymbols[rhs]];,{sub,substList}];
 (** All file paths are relative to the working directory (set above). **)
 hardToSoftDirectory = "src/ThreeHiggs/Data/HardToSoft";
 softToUltrasoftDirectory = "src/ThreeHiggs/Data/SoftToUltrasoft";
-effectivePotentialDirectory = "src/ThreeHiggs/Data/EffectivePotential";
+effectivePotentialDirectory = "src/ThreeHiggs/Data/EffectivePotential_threeFields";
 variables = "src/ThreeHiggs/Data/Variables";
 
 
@@ -646,16 +646,6 @@ ExportUTF8[variables<>"/LagranianSymbols.json", {"fourPointSymbols"-> symbolsToS
 												"fieldSymbols" -> symbolsToStrings[DeleteDuplicates @ Flatten[splitExpr /@ backgroundFieldsFull]]				   															   															   															   															   
 												} ]
 												
-
-
-VeffLO
-
-
-symbolsToStrings[GetSubstitutionSymbols[VeffLO]]
-
-
-Part[symbolsToStrings[GetSubstitutionSymbols[VeffNNLO]],1]
-Part[symbolsToStrings[GetSubstitutionSymbols[VeffNNLO]],2]
 
 
 (*The scalar mass matrices are a bit hacky since they don't have a direct out and the block diagonal nature means they shouldn't share the same out*)
