@@ -92,10 +92,10 @@ rightSymbols=Union[rightSymbols,getSymbols[rhs]];,{sub,substList}];
 
 
 (** All file paths are relative to the working directory (set above). **)
-hardToSoftDirectory = "DRalgoOutput/HardToSoft";
-softToUltrasoftDirectory = "DRalgoOutput/SoftToUltrasoft";
-effectivePotentialDirectory = "DRalgoOutput/EffectivePotential";
-variables = "DRalgoOutput/Variables";
+hardToSoftDirectory = "src/ThreeHiggs/Data/HardToSoft";
+softToUltrasoftDirectory = "src/ThreeHiggs/Data/SoftToUltrasoft";
+effectivePotentialDirectory = "src/ThreeHiggs/Data/EffectivePotential";
+variables = "src/ThreeHiggs/Data/Variables";
 
 
 (* ::Section:: *)
@@ -290,6 +290,8 @@ sqrtSubRules[ruleList_]:=Module[{newRules},
 (*We want to do in place updating of parameters in the python code i.e. \[Lambda]14D gets updated to \[Lambda]13D which gets updated to \[Lambda]13DUS,
 it's easier to do this if we remove the suffices so its the same variable name throughout*)
 allSoftScaleParamsSqrtSuffixFree = RemoveSuffixes[sqrtSubRules[allSoftScaleParams], {"3d"}];
+(*Added during the dict to array moving and changing RGScale to T etc*)
+allSoftScaleParamsSqrtSuffixFree = Join[allSoftScaleParamsSqrtSuffixFree, {T->T}];
 ExportUTF8[hardToSoftDirectory<>"/softScaleParams_NLO.txt", allSoftScaleParamsSqrtSuffixFree]
 
 
@@ -301,13 +303,13 @@ SolveRunning3D[betaFunctions_] := Block[{exprList},
 	exprList = {#[[1]], #[[2]]} & /@ betaFunctions;
 
 	(* Make new list with RGE solution on RHS *)
-	newRulesList = (#1 -> #1 + #2*Log[goalScale/startScale]) & @@@ exprList;
+	newRulesList = (#1 -> #1 + #2*Log[T/RGScale]) & @@@ exprList;
 	Return[newRulesList];
 ];
 
-running3D = RemoveSuffixes[SolveRunning3D[BetaFunctions3DS[]],{"3d"}];
-
-ExportUTF8[hardToSoftDirectory<>"/softScaleRGE.txt", running3D]
+running3DSoft = RemoveSuffixes[SolveRunning3D[BetaFunctions3DS[]],{"3d"}];
+running3DSoft= Join[running3DSoft, {RGScale->T}];
+ExportUTF8[hardToSoftDirectory<>"/softScaleRGE.txt", running3DSoft]
 
 
 (* ::Subsection:: *)
@@ -323,13 +325,14 @@ allUltrasoftScaleParams = Join[couplingsUS, scalarMassesUS] /. \[Mu]3->RGScale;
 
 
 allUltrasoftScaleParamsSqrt = RemoveSuffixes[sqrtSubRules[allUltrasoftScaleParams], {"US", "3d"}];(*Some reduant sqrt operations here? e.g. g13dUS*)
+allUltrasoftScaleParamsSqrt= Join[allUltrasoftScaleParamsSqrt, {mu3US -> T}];
 
 
 ExportUTF8[softToUltrasoftDirectory<>"/ultrasoftScaleParams_NLO.txt", allUltrasoftScaleParamsSqrt]
 
 
-runningUS = RemoveSuffixes[SolveRunning3D[BetaFunctions3DUS[]],{"US", "3d"}]
-ExportUTF8[softToUltrasoftDirectory<>"/ultrasoftScaleRGE.txt", runningUS]
+running3DUS = RemoveSuffixes[SolveRunning3D[BetaFunctions3DUS[]],{"US", "3d"}];
+ExportUTF8[softToUltrasoftDirectory<>"/ultrasoftScaleRGE.txt", running3DUS]
 
 
 (* ::Section:: *)
@@ -593,12 +596,6 @@ ExportUTF8[effectivePotentialDirectory<>"/vectorMasses.txt", VectorMassExpressio
 ExportUTF8[effectivePotentialDirectory<>"/vectorShorthands.txt", vectorShorthands];
 
 
-VectorMassDiagSimple
-
-
-VectorMassExpressions
-
-
 (* ::Subsection:: *)
 (*Calculating the effective potential*)
 
@@ -615,7 +612,9 @@ AbsoluteTiming[
 VeffLO = PrintEffectivePotential["LO"]//Simplify; (* Simplify to get rid of possible imaginary units *)
 VeffNLO = PrintEffectivePotential["NLO"]//Simplify; (* Simplify to factor 1/pi division for tiny speed up *)
 VeffNNLO = PrintEffectivePotential["NNLO"]; (* NOT simplified as seems to change numerical result for unknown reasons *)
-
+VeffLO = LO -> VeffLO;
+VeffNLO = NLO -> VeffNLO;
+VeffNNLO = NNLO -> VeffNNLO;
 ExportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", VeffLO];
 ExportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", VeffNLO];
 ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", VeffNNLO];
@@ -629,17 +628,6 @@ extractSymbols[expr_] := Union[Cases[expr, s_Symbol /;
     (* Exclude context-specific symbols *)
     Context[s] =!= "System`", 
     Infinity]]
-
-
-VeffNLO
-
-
-extractSymbols[VeffNNLO]
-
-
-(*$Assumptions = _Symbol \[Element] Reals
-VeffNNLOSIMPREAL = PrintEffectivePotential["NNLO"]//Simplify;
-ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLOSIMPREAL.txt", VeffNNLOSIMPREAL];*)
 
 
 (* Apply the function to each element in the list and flatten results *)
@@ -660,23 +648,23 @@ ExportUTF8[variables<>"/LagranianSymbols.json", {"fourPointSymbols"-> symbolsToS
 												
 
 
-ExportUTF8[variables<>"/test.json", <|
-  "key1" -> "symbolA",
-  "key2" -> <|"nestedKey" -> "symbolB"|>,
-  "key3" -> {"symbolC", "symbolD"}
-|>]
+VeffLO
 
-												
+
+symbolsToStrings[GetSubstitutionSymbols[VeffLO]]
+
+
+Part[symbolsToStrings[GetSubstitutionSymbols[VeffNNLO]],1]
+Part[symbolsToStrings[GetSubstitutionSymbols[VeffNNLO]],2]
 
 
 (*The scalar mass matrices are a bit hacky since they don't have a direct out and the block diagonal nature means they shouldn't share the same out*)
-
 ExportUTF8[variables<>"/EquationSymbols.json", {"hardScaleRGE"->{"Out" -> symbolsToStrings[Part[GetSubstitutionSymbols[BetaFunctions4DUnsquared[]],1]],
 															   "In" -> symbolsToStrings[Part[GetSubstitutionSymbols[BetaFunctions4DUnsquared[]],2]]},
 												"softScaleParams"->{"Out" -> symbolsToStrings[Part[GetSubstitutionSymbols[allSoftScaleParamsSqrtSuffixFree],1]],
 																   "In" -> symbolsToStrings[Part[GetSubstitutionSymbols[allSoftScaleParamsSqrtSuffixFree],2]]},
-												"softScaleRGE"->{"Out" -> symbolsToStrings[Part[GetSubstitutionSymbols[running3D],1]],
-																"In" -> symbolsToStrings[Part[GetSubstitutionSymbols[running3D],2]]},	
+												"softScaleRGE"->{"Out" -> symbolsToStrings[Part[GetSubstitutionSymbols[running3DSoft],1]],
+																"In" -> symbolsToStrings[Part[GetSubstitutionSymbols[running3DSoft],2]]},	
 												"ultraSoftScaleParams"->{"Out" -> symbolsToStrings[Part[GetSubstitutionSymbols[allUltrasoftScaleParamsSqrt],1]],
 																        "In" -> symbolsToStrings[Part[GetSubstitutionSymbols[allUltrasoftScaleParamsSqrt],2]]},
 												"ultraSoftScaleRGE"->{"Out" -> symbolsToStrings[Part[GetSubstitutionSymbols[runningUS],1]],
@@ -688,9 +676,12 @@ ExportUTF8[variables<>"/EquationSymbols.json", {"hardScaleRGE"->{"Out" -> symbol
 												"vectorMasses"->{"Out" -> symbolsToStrings[DeleteDuplicates @ Flatten[splitExpr /@ VectorMassDiagSimple]],
 																"In" -> symbolsToStrings[Part[GetSubstitutionSymbols[VectorMassExpressions],2]]},
 												"rotationSymbols"->symbolsToStrings[DeleteDuplicates @ Flatten[splitExpr /@ DSRot]],
-												"LOPotential"->symbolsToStrings[extractSymbols[VeffLO]],
-												"NLOPotential"->symbolsToStrings[extractSymbols[VeffNLO]],
-												"NNLOPotential"->symbolsToStrings[extractSymbols[VeffNNLO]]				   															   															   															   															   
+												"LO"->{"Out"->symbolsToStrings[Part[GetSubstitutionSymbols[VeffLO],1]],
+													   "In"->symbolsToStrings[Part[GetSubstitutionSymbols[VeffLO],2]]},
+												"NLO"->{"Out"->symbolsToStrings[Part[GetSubstitutionSymbols[VeffNLO],1]],
+													   "In"->symbolsToStrings[Part[GetSubstitutionSymbols[VeffNLO],2]]},
+												"NNLO"->{"Out"->symbolsToStrings[Part[GetSubstitutionSymbols[VeffNNLO],1]],
+													   "In"->symbolsToStrings[Part[GetSubstitutionSymbols[VeffNNLO],2]]}				   															   															   															   															   
 												} ]
 												
 
