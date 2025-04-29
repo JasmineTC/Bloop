@@ -19,6 +19,23 @@ class ParsedExpression:
                                          "pi": pi, 
                                          "EulerGamma": euler_gamma,
                                          "Glaisher": Glaisher})
+    
+class ParsedExpressionNew:
+    def __init__(self, parsedExpression, fileName):
+        self.fileName = fileName
+        self.identifier = parsedExpression["identifier"]
+        self.expression = parsedExpression["expression"]
+        self.symbols = parsedExpression["symbols"]
+
+        self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
+
+    def evaluate(self, functionArguments: list[float]) -> float:
+        return eval(self.lambdaExpression, 
+                    functionArguments | {"log": log, 
+                                         "sqrt": sqrt, 
+                                         "pi": pi, 
+                                         "EulerGamma": euler_gamma,
+                                         "Glaisher": Glaisher})
 
 """ class ParsedExpressionSystem -- Describes a collection of ParsedExpressions that are to be evaluated simultaneously with same input.
 """
@@ -26,6 +43,23 @@ class ParsedExpressionSystem:
     def __init__(self, parsedExpressionSystem):
         self.parsedExpressions = [ParsedExpression(parsedExpression) 
                                   for parsedExpression in parsedExpressionSystem]
+
+    def evaluate(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
+        """Optional argument is a hack"""
+        outList = [expression.evaluate(inputDict) for expression in self.parsedExpressions] 
+
+        if bReturnDict:
+            return { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) }
+        return  outList 
+
+    def getExpressionNames(self) -> list[str]:
+        return [ expr.identifier for expr in self.parsedExpressions ]
+    
+    
+class ParsedExpressionSystemNew:
+    def __init__(self, parsedExpressionSystem):
+        self.parsedExpressions = [ParsedExpressionNew(parsedExpression, parsedExpressionSystem["fileName"]) 
+                                  for parsedExpression in parsedExpressionSystem["Expressions"]]
 
     def evaluate(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
         """Optional argument is a hack"""

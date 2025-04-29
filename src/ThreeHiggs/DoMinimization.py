@@ -75,6 +75,7 @@ def minimization(args):
     variableSymbols =  getLines( "Data/Variables/LagranianSymbols.json", mode = "json") 
     
     from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
+                                             ParsedExpressionSystemNew,
                                              MassMatrix,
                                              RotationMatrix)
     from ThreeHiggs.EffectivePotential import EffectivePotential, cNlopt
@@ -91,7 +92,7 @@ def minimization(args):
                                             args.bNumba,
                                             args.bVerbose,
                                             nloptInst,
-                                            ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
+                                            ParsedExpressionSystemNew(parsedExpressions["vectorMassesSquared"]),
                                             ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
                                             parsedExpressions["scalarPermutationMatrix"]["matrix"],
                                             [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]), 

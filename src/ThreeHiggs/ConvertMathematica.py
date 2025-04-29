@@ -15,7 +15,8 @@ def convertMathematica(args):
                                                parseRotationMatrix)
     
 
-    dump({"vectorMassesSquared": parseExpressionSystem(getLines(args.vectorMassesSquaredFile)),
+    dump({"vectorMassesSquared": {"fileName": args.vectorMassesSquaredFile, 
+                                  "Expressions": parseExpressionSystem(getLines(args.vectorMassesSquaredFile))},
           "vectorShortHands": parseExpressionSystem(getLines(args.vectorShortHandsFile)),
           "scalarPermutationMatrix": parseConstantMatrix(getLines(args.scalarPermutationFile)),
           "scalarMassMatrixUpperLeft": parseMassMatrix(getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
@@ -24,9 +25,11 @@ def convertMathematica(args):
                                                          getLines(args.scalarMassMatrixBottomRightFile)),
           "scalarRotationMatrix": parseRotationMatrix(getLines(args.scalarRotationFile)),
           "veff": parseExpressionSystem(veffLines),
+          "veffArray": parseExpressionSystemArray(veffLines, allSymbols),
           "betaFunctions4D": parseExpressionSystemArray(getLines(args.betaFunctions4DFile), allSymbols),
           "hardToSoft": parseExpressionSystem(getLines(args.hardToSoftFile)),
           "softScaleRGE": parseExpressionSystem(getLines(args.softScaleRGEFile)),
           "softToUltraSoft": parseExpressionSystem(getLines(args.softToUltraSoftFile))},
          open(args.parsedExpressionsFile, "w"),
          indent = 4)
+    print(123)
