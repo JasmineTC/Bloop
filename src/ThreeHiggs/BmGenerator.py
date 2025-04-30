@@ -46,7 +46,6 @@ def potential(params, field):
     mu3sq = params["mu3sq"]
 
     return float((field[0]**4*lam11 + field[1]**4*lam22 + field[2]**4*lam33 - 4*field[0]*field[1]*mu12sqRe + field[0]**2*(field[1]**2*(lam12 + lam12p + 2*lam1Re) + field[2]**2*(lam31 + lam31p + 2*lam3Re) - 2*mu1sq) + field[1]**2*(field[2]**2*(lam23 + lam23p + 2*lam2Re) - 2*mu2sq) - 2*field[2]**2*mu3sq)/4)
-    #return float((field**4*lam11 + field**4*lam22 + field**4*lam33 - 4*field*field*mu12sqRe + field**2*(field**2*(lam12 + lam12p + 2*lam1Re) + field**2*(lam31 + lam31p + 2*lam3Re) - 2*mu1sq) + field**2*(field**2*(lam23 + lam23p + 2*lam2Re) - 2*mu2sq) - 2*field**2*mu3sq)/4)
 
 import nlopt
 from functools import partial
@@ -173,7 +172,7 @@ def _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHierac
                               "lam31p": lam31p,
                               "lam33": lam33}}
     params = paramDict["massTerms"] | paramDict["couplingValues"]
-    if not bIsBounded(params):
+    if not bIsBounded(params) or not bPhysicalMinimum(params):
         return False
     return paramDict
 
