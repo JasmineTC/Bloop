@@ -1,39 +1,27 @@
 from sympy import Matrix
+from sympy.parsing.mathematica import parse_mathematica
 def replaceGreekSymbols(string: str) -> str:
-    #import unicodedata
-    ## Unicode magic, this is definitely not ideal
-    lowerCaseMu = u"\u03BC"
-    lowerCaseLambda = u"\u03BB"
-
-    newString = string 
-
-    newString = newString.replace(lowerCaseLambda, "lam")
-    newString = newString.replace(lowerCaseMu, "mu")
-    
-    """ TODO use unicodedata package here to do magic.
-    """
-    # NOTE: Manual replacements are definitely not a general solution. Consider problematic case: expression that contains both unicode lambda and separate symbol "lam" 
-    # So tbh I'd like to keep the symbols are they are. But parse_mathematica from sympy does not seem to manage greek symbols at all!! 
-    return newString
+    ## TODO use unicodedata package here to do magic. 
+    # Or bully DRalgo people to removing greek symbols
+    return string.replace(u"\u03BB", "lam").replace(u"\u03BC", "mu")
 
 def removeSuffices(string):
     return string.replace("^2", "sq")
 
 def replaceSymbolsWithIndices(expression, symbols):
     expression = replaceGreekSymbols(expression)
+    symbols = [replaceGreekSymbols(symbol) for symbol in symbols]
     ## Reverse needed to deal with lam23 and lam23p i.e. substring replaces larger full string
-    for idx, symbol in enumerate(sorted(symbols, reverse = True, key = lambda symbol: replaceGreekSymbols(symbol))):
-        expression = expression.replace(replaceGreekSymbols(symbol) , f"params[{idx}]")
+    for idx, symbol in enumerate(sorted(symbols, reverse = True)):
+        expression = expression.replace(symbol , f"params[{idx}]")
 
     return expression
 
 def parseExpressionArray(line, allSymbols, remove3DSuffices = False):
-    identifier = "anonymous"
-    if ("->" in line):
-        identifier, line = map(str.strip, line.split("->"))
-    from sympy.parsing.mathematica import parse_mathematica
+    identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
+    
     identifier = removeSuffices(replaceGreekSymbols(identifier))
-    expression = parse_mathematica(replaceGreekSymbols(line).replace("3d", ""))
+    expression = parse_mathematica(replaceGreekSymbols(line))
     symbols = [str(symbol) for symbol in expression.free_symbols]
 
     return {"identifier": identifier, 
@@ -43,7 +31,6 @@ def parseExpressionArray(line, allSymbols, remove3DSuffices = False):
 def parseExpression(line, remove3DSuffices = False):
     identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
 
-    from sympy.parsing.mathematica import parse_mathematica
     identifier = removeSuffices(replaceGreekSymbols(identifier))
     expression = parse_mathematica(replaceGreekSymbols(line))
     symbols = [str(symbol) for symbol in expression.free_symbols]
