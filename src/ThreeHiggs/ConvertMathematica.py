@@ -10,14 +10,13 @@ def convertMathematica(args):
     allSymbols = getLines(args.allSymbolsFile, mode = "json")
     from ThreeHiggs.MathematicaParsers import (parseExpressionSystem,
                                                parseExpressionSystemArray,
-                                               parseConstantMatrix,
                                                parseMassMatrix,
                                                parseRotationMatrix)
     
 
     dump({"vectorMassesSquared": parseExpressionSystem(getLines(args.vectorMassesSquaredFile)),
           "vectorShortHands": parseExpressionSystem(getLines(args.vectorShortHandsFile)),
-          "scalarPermutationMatrix": parseConstantMatrix(getLines(args.scalarPermutationFile)),
+          "scalarPermutationMatrix": getLines(args.scalarPermutationFile, mode="json"),
           "scalarMassMatrixUpperLeft": parseMassMatrix(getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
                                                        getLines(args.scalarMassMatrixUpperLeftFile)),
           "scalarMassMatrixBottomRight": parseMassMatrix(getLines(args.scalarMassMatrixBottomRightDefinitionsFile),

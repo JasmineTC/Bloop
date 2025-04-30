@@ -85,7 +85,6 @@ def minimization(args):
                                  "relLocalTol" : args.relLocalTolerance,
                                  "varLowerBounds" : args.varLowerBounds,
                                  "varUpperBounds" : args.varUpperBounds})
-    
     effectivePotential = EffectivePotential(variableSymbols["fieldSymbols"],
                                             args.loopOrder,
                                             args.bNumba,
@@ -93,7 +92,7 @@ def minimization(args):
                                             nloptInst,
                                             ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
                                             ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
-                                            parsedExpressions["scalarPermutationMatrix"]["matrix"],
+                                            parsedExpressions["scalarPermutationMatrix"],
                                             [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]), 
                                              MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"])],
                                             RotationMatrix(parsedExpressions["scalarRotationMatrix"]),

@@ -65,11 +65,6 @@ def parseMatrix(lines):
                                               .strip('{')
                                               .split(',')] for line in lines]
 
-def parseConstantMatrix(lines):
-    from numpy import array
-    ## Convert to array to specify type, convert to list to be compatable with json
-    return {"matrix": array(Matrix(parseMatrix(lines)), dtype = int).tolist()}
-
 def parseMassMatrix(definitionsLines, matrixLines):
     from sympy.core.sympify import sympify
     ##Need sympify that the parsed matrix line is ufuncable
@@ -137,12 +132,6 @@ class MathematicaParsersUnitTests(TestCase):
         source = ["{1, 0}", "{0, 0}"]
 
         self.assertEqual(reference, parseMatrix(source))
-
-    def test_parseConstantMatrix(self):
-        reference = {"matrix": [[1.0, 0.0], [0.0, 0.0]]}
-        source = ["{1, 0}", "{0, 0}"]
-
-        self.assertEqual(reference, parseConstantMatrix(source))
 
     def test_parseMassMatrix(self):
         reference = {'definitions': [], 'matrix': "[[1, 0], [0, mssq]]"}
