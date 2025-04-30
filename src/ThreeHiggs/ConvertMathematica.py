@@ -2,8 +2,7 @@ from ThreeHiggs.GetLines import getLines
 from json import dump
 def convertMathematica(args):
     veffLines = getLines(args.loFile)
-    if (args.loopOrder >= 1):
-        veffLines += getLines(args.nloFile)
+    veffLines += getLines(args.nloFile)
     if (args.loopOrder >= 2):
         veffLines += getLines(args.nnloFile)
     from ThreeHiggs.MathematicaParsers import (parseExpressionSystem,
