@@ -41,10 +41,7 @@ def parseExpressionArray(line, allSymbols, remove3DSuffices = False):
             "symbols": sorted(symbols)}
 
 def parseExpression(line, remove3DSuffices = False):
-    identifier = "anonymous"
-
-    if ("->" in line):
-        identifier, line = map(str.strip, line.split("->"))
+    identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
 
     from sympy.parsing.mathematica import parse_mathematica
     identifier = removeSuffices(replaceGreekSymbols(identifier))
@@ -68,22 +65,21 @@ def parseMatrix(lines):
 def parseMassMatrix(definitionsLines, matrixLines):
     from sympy.core.sympify import sympify
     ##Need sympify that the parsed matrix line is ufuncable
-    ##Need str to make compatable with json 
+    ##Need str to make compatable with json
     return {"definitions": parseExpressionSystem(definitionsLines),
             "matrix": str(sympify(parseMatrix(matrixLines)))}
 
 def parseRotationMatrix(lines):
     sympyMatrix = Matrix(parseMatrix(lines))
     shape = sympyMatrix.shape
-
+    
     symbolMap = {}
     for i in range(shape[0]):
         for j in range(shape[1]):
             element = sympyMatrix[i, j]
 
             if element.is_symbol:
-                symbolMap[str(sympyMatrix[i, j])] = [i, j]
-
+                symbolMap[str(sympyMatrix[i, j])] = (i, j)
     return {"matrix": symbolMap}
 
 from unittest import TestCase
@@ -140,7 +136,7 @@ class MathematicaParsersUnitTests(TestCase):
         self.assertEqual(reference, parseMassMatrix([], source))
 
     def test_parseRotationMatrix(self):
-        reference = {"matrix": {"mssq00": [0, 0], "mssq11": [1, 1]}}
+        reference = {"matrix": {"mssq00": (0, 0), "mssq11": (1, 1)}}
         source = ["{mssq00, 0}", "{0, mssq11}"]
 
         self.assertEqual(reference, parseRotationMatrix(source))
