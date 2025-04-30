@@ -11,8 +11,8 @@ def convertMathematica(args):
                                                parseMassMatrix,
                                                parseRotationMatrix,
                                                replaceGreekSymbols)
-    allSymbols = [replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")]
     
+    allSymbols = [replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")]
 
     dump({"vectorMassesSquared": parseExpressionSystem(getLines(args.vectorMassesSquaredFile)),
           "vectorShortHands": parseExpressionSystem(getLines(args.vectorShortHandsFile)),
