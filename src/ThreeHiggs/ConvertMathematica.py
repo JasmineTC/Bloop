@@ -6,12 +6,12 @@ def convertMathematica(args):
         veffLines += getLines(args.nloFile)
     if (args.loopOrder >= 2):
         veffLines += getLines(args.nnloFile)
-
-    allSymbols = getLines(args.allSymbolsFile, mode = "json")
     from ThreeHiggs.MathematicaParsers import (parseExpressionSystem,
                                                parseExpressionSystemArray,
                                                parseMassMatrix,
-                                               parseRotationMatrix)
+                                               parseRotationMatrix,
+                                               replaceGreekSymbols)
+    allSymbols = [replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")]
     
 
     dump({"vectorMassesSquared": parseExpressionSystem(getLines(args.vectorMassesSquaredFile)),

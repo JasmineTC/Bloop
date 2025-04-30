@@ -10,7 +10,6 @@ def removeSuffices(string):
 
 def replaceSymbolsWithIndices(expression, symbols):
     expression = replaceGreekSymbols(expression)
-    symbols = [replaceGreekSymbols(symbol) for symbol in symbols]
     ## Reverse needed to deal with lam23 and lam23p i.e. substring replaces larger full string
     for idx, symbol in enumerate(sorted(symbols, reverse = True)):
         expression = expression.replace(symbol , f"params[{idx}]")
