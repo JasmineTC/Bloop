@@ -72,6 +72,10 @@ def _doMinimization(parameters):
 from ThreeHiggs.GetLines import getLines        
 def minimization(args):
     parsedExpressions = json.load(open(args.parsedExpressionsFile, "r"))
+    # for key,value in parsedExpressions.items():
+        # print(key, value)
+        # print()
+    # exit()
     variableSymbols =  getLines( "Data/Variables/LagranianSymbols.json", mode = "json") 
     
     from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
@@ -85,10 +89,7 @@ def minimization(args):
                                  "relLocalTol" : args.relLocalTolerance,
                                  "varLowerBounds" : args.varLowerBounds,
                                  "varUpperBounds" : args.varUpperBounds})
-                                            # [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]["expressions"],
-                                            #             parsedExpressions["scalarMassMatrixUpperLeft"]["fileName"]), 
-                                            #  MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"]["expressions"],
-                                            #             parsedExpressions["scalarMassMatrixBottomRight"]["fileName"])]
+
     effectivePotential = EffectivePotential(variableSymbols["fieldSymbols"],
                                             args.loopOrder,
                                             args.bNumba,
@@ -99,9 +100,12 @@ def minimization(args):
                                             ParsedExpressionSystem(parsedExpressions["vectorShortHands"]["expressions"],
                                                                    parsedExpressions["vectorShortHands"]["fileName"]),
                                             parsedExpressions["scalarPermutationMatrix"],
-                                            [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]), 
-                                             MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"])],
-                                            RotationMatrix(parsedExpressions["scalarRotationMatrix"]),
+                                            (MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]["expressions"], 
+                                                        parsedExpressions["scalarMassMatrixUpperLeft"]["fileName"]), 
+                                             MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"]["expressions"],
+                                                        parsedExpressions["scalarMassMatrixBottomRight"]["fileName"])),
+                                            RotationMatrix(parsedExpressions["scalarRotationMatrix"]["expressions"],
+                                                           parsedExpressions["scalarRotationMatrix"]["fileName"]),
                                             ParsedExpressionSystem(parsedExpressions["veff"]["expressions"],
                                                                    parsedExpressions["veff"]["fileName"])) 
 

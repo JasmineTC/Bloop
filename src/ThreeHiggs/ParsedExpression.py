@@ -5,10 +5,12 @@ Glaisher = 1.28242712910062
 import copy
 
 class ParsedExpression:
-    def __init__(self, parsedExpression):
+    def __init__(self, parsedExpression, fileName):
         self.identifier = parsedExpression["identifier"]
         self.expression = parsedExpression["expression"]
         self.symbols = parsedExpression["symbols"]
+        self.fileName = fileName
+        print(fileName)
 
         self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
 
@@ -20,22 +22,11 @@ class ParsedExpression:
                                          "EulerGamma": euler_gamma,
                                          "Glaisher": Glaisher})
 
-""" class ParsedExpressionSystem -- Describes a collection of ParsedExpressions that are to be evaluated simultaneously with same input.
-"""
-import inspect
-
-
-def get_var_name(var):
-    callers_local_vars = inspect.currentframe().f_back.f_locals.items()
-    return [var_name for var_name, var_val in callers_local_vars if var_val is var]
-
-
 class ParsedExpressionSystem:
-    def __init__(self, parsedExpressionSystem, fileName = None):
-        self.parsedExpressions = [ParsedExpression(parsedExpression) 
+    def __init__(self, parsedExpressionSystem, fileName):
+        self.parsedExpressions = [ParsedExpression(parsedExpression, fileName) 
                                   for parsedExpression in parsedExpressionSystem]
         self.fileName = fileName
-        print(fileName)
         
 
     def evaluate(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
@@ -49,12 +40,11 @@ class ParsedExpressionSystem:
         return [ expr.identifier for expr in self.parsedExpressions ]
 
 class ParsedExpressionArray:
-    def __init__(self, parsedExpression, fileName = None):
+    def __init__(self, parsedExpression, fileName):
         self.identifier = parsedExpression["identifier"]
         self.expression = parsedExpression["expression"]
         self.symbols = parsedExpression["symbols"]
         self.fileName = fileName
-        # print(fileName)
 
         self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
 
@@ -67,9 +57,9 @@ class ParsedExpressionArray:
                                              "params": params})
 
 class ParsedExpressionSystemArray:
-    def __init__(self, parsedExpressionSystem, allSymbols, fileName = None):
+    def __init__(self, parsedExpressionSystem, allSymbols, fileName):
         self.parsedExpressions = [(allSymbols.index(parsedExpression["identifier"]), 
-                                   ParsedExpressionArray(parsedExpression))
+                                   ParsedExpressionArray(parsedExpression, fileName))
                                   for parsedExpression in parsedExpressionSystem]
 
         self.allSymbols = allSymbols
@@ -91,8 +81,8 @@ class ParsedExpressionSystemArray:
         return [ expr[1].identifier for expr in self.parsedExpressions ]
 
 class MassMatrix:
-    def __init__(self, massMatrix, fileName = None):
-        self.definitions = ParsedExpressionSystem(massMatrix["definitions"])
+    def __init__(self, massMatrix, fileName):
+        self.definitions = ParsedExpressionSystem(massMatrix["definitions"], fileName)
         self.matrix = compile(massMatrix["matrix"], "<string>", mode = "eval")
         self.fileName = fileName
 
@@ -105,8 +95,9 @@ class MassMatrix:
                                               "Glaisher": Glaisher})
 
 class RotationMatrix:
-    def __init__(self, symbolMap, fileName = None):
+    def __init__(self, symbolMap, fileName):
         self.symbolMap = symbolMap["matrix"]
+        self.fileName = fileName
 
     def evaluate(self, numericalM):
         """Evaluates our symbols by plugging in numbers from the input numerical matrix.
