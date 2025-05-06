@@ -19,7 +19,7 @@ def replaceSymbolsWithIndices(expression, symbols):
 
     return expression
 
-def pythoniseExpressionArray(line, allSymbols, remove3DSuffices = False):
+def pythoniseExpressionArray(line, allSymbols):
     identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
     
     identifier = removeSuffices(replaceGreekSymbols(identifier))
@@ -30,7 +30,7 @@ def pythoniseExpressionArray(line, allSymbols, remove3DSuffices = False):
             "expression": replaceSymbolsWithIndices(str(expression), allSymbols), 
             "symbols": sorted(symbols)}
 
-def pythoniseExpression(line, remove3DSuffices = False):
+def pythoniseExpression(line):
     identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
 
     identifier = removeSuffices(replaceGreekSymbols(identifier))
@@ -39,11 +39,11 @@ def pythoniseExpression(line, remove3DSuffices = False):
 
     return {"identifier": identifier, "expression": str(expression), "symbols": sorted(symbols)}
 
-def pythoniseExpressionSystemArray(lines, allSymbols, remove3DSuffices = False):
-    return [pythoniseExpressionArray(line, allSymbols, remove3DSuffices) for line in lines]
+def pythoniseExpressionSystemArray(lines, allSymbols):
+    return [pythoniseExpressionArray(line, allSymbols) for line in lines]
 
-def pythoniseExpressionSystem(lines, remove3DSuffices = False):
-    return [pythoniseExpression(line, remove3DSuffices) for line in lines]
+def pythoniseExpressionSystem(lines):
+    return [pythoniseExpression(line) for line in lines]
 
 def pythoniseMatrix(lines):
     return [[symbol.strip() for symbol in line.strip()
@@ -78,7 +78,8 @@ def pythoniseMathematica(args):
         veffLines += getLines(args.nnloFile)
     
     allSymbols = [replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")]
-
+    ## Move get lines to the functions?
+    ## Not ideal to have nested dicts but is future proof for when we move to arrays
     dump({"betaFunctions4D": {"expressions": pythoniseExpressionSystemArray(getLines(args.betaFunctions4DFile), allSymbols),
                               "fileName": args.betaFunctions4DFile},
           "hardToSoft": {"expressions":  pythoniseExpressionSystem(getLines(args.hardToSoftFile)),
