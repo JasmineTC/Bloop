@@ -10,7 +10,6 @@ class ParsedExpression:
         self.expression = parsedExpression["expression"]
         self.symbols = parsedExpression["symbols"]
         self.fileName = fileName
-        print(fileName)
 
         self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
 
@@ -115,7 +114,7 @@ class ParsedExpressionUnitTests(TestCase):
 
         reference = 5.400944901447568
 
-        self.assertEqual(reference, ParsedExpression(source).evaluate({"lam": 100, "mssq": 100}))
+        self.assertEqual(reference, ParsedExpression(source, None).evaluate({"lam": 100, "mssq": 100}))
 
     def test_ParsedExpressionComplex(self):
         source = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
@@ -125,7 +124,7 @@ class ParsedExpressionUnitTests(TestCase):
         reference = complex(5.826048814042759, 1.1475471676948477)
 
         self.assertEqual(reference, 
-                         ParsedExpression(source).evaluate({"lam": complex(100, 100), 
+                         ParsedExpression(source, None).evaluate({"lam": complex(100, 100), 
                                                             "mssq": complex(100, 100)}))
 
     def test_ParsedExpressionSystem(self):
@@ -142,7 +141,7 @@ class ParsedExpressionUnitTests(TestCase):
         reference = [5.400944901447568, 5.400944901447568, 5.400944901447568]
 
         self.assertEqual(reference, 
-                         ParsedExpressionSystem(source).evaluate({"lam": 100, "mssq": 100}))
+                         ParsedExpressionSystem(source, None).evaluate({"lam": 100, "mssq": 100}))
 
     def test_MassMatrix(self):
         source = {"definitions": [{"expression": "1",
@@ -151,11 +150,11 @@ class ParsedExpressionUnitTests(TestCase):
                   "matrix": "[[1, 0], [0, mssq]]"}
 
         reference = [[1, 0], [0, 1]]
-        self.assertEqual(reference, MassMatrix(source).evaluate({}))
+        self.assertEqual(reference, MassMatrix(source, None).evaluate({}))
 
     def test_RotationMatrix(self):
         source = {"matrix": {"mssq00": [0, 0], "mssq11": [1, 1]}}
         reference = {"mssq00": 1, "mssq11": -1}
 
-        self.assertEqual(reference, RotationMatrix(source).evaluate([[1, 0], [0, -1]]))
+        self.assertEqual(reference, RotationMatrix(source, None).evaluate([[1, 0], [0, -1]]))
 

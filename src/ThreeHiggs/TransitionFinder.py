@@ -152,7 +152,7 @@ class TraceFreeEnergyMinimum:
         for T in self.TRange:
             if self.bVerbose:
                 print (f'Start of temp = {T} loop')
-                
+                exit()                
             minimizationResults["T"].append(T)
             
             minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T,

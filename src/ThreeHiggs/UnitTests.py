@@ -1,5 +1,5 @@
 if __name__ == "__main__":
-    from ThreeHiggs.MathematicaParsers import MathematicaParsersUnitTests
+    from ThreeHiggs.ConvertMathematica import ConvertMathematicaUnitTests
     from ThreeHiggs.ParsedExpression import ParsedExpressionUnitTests
     from ThreeHiggs.EffectivePotential import EffectivePotentialUnitTests
     from ThreeHiggs.TransitionFinder import TransitionFinderUnitTests
