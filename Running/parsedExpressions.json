@@ -1,55 +1,2295 @@
 {
-    "vectorMassesSquared": [
-        {
-            "identifier": "mVsq0",
-            "expression": "g2**2*(v1**2 + v2**2 + v3**2)/4",
-            "symbols": [
-                "g2",
-                "v1",
-                "v2",
-                "v3"
-            ]
+    "betaFunctions4D": {
+        "expressions": [
+            {
+                "identifier": "g1",
+                "expression": "43*params[53]**3/(96*pi**2)",
+                "symbols": [
+                    "g1"
+                ]
+            },
+            {
+                "identifier": "g2",
+                "expression": "-17*params[52]**3/(96*pi**2)",
+                "symbols": [
+                    "g2"
+                ]
+            },
+            {
+                "identifier": "g3",
+                "expression": "-7*params[51]**3/(16*pi**2)",
+                "symbols": [
+                    "g3"
+                ]
+            },
+            {
+                "identifier": "lam11",
+                "expression": "(3*params[53]**4 + 6*params[53]**2*(params[52]**2 - 4*params[49]) + 9*params[52]**4 - 72*params[52]**2*params[49] + 192*params[49]**2 + 16*params[48]**2 + 16*params[48]*params[47] + 8*params[47]**2 + 32*params[46]**2 + 32*params[45]**2 + 16*params[39]**2 + 16*params[39]*params[38] + 8*params[38]**2 + 32*params[36]**2 + 32*params[35]**2)/(128*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam31",
+                    "lam31p",
+                    "lam3Im",
+                    "lam3Re"
+                ]
+            },
+            {
+                "identifier": "lam12p",
+                "expression": "(3*params[53]**2*(params[52]**2 - params[47]) - 9*params[52]**2*params[47] + 4*params[47]*(params[49] + 2*params[48] + params[47] + params[44]) + 32*params[46]**2 + 32*params[45]**2 + 2*params[42]*params[38])/(16*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23p",
+                    "lam31p"
+                ]
+            },
+            {
+                "identifier": "lam12",
+                "expression": "(3*params[53]**4 - 6*params[53]**2*(params[52]**2 + 2*params[48]) + 9*params[52]**4 - 36*params[52]**2*params[48] + 48*params[49]*params[48] + 16*params[49]*params[47] + 16*params[48]**2 + 48*params[48]*params[44] + 8*params[47]**2 + 16*params[47]*params[44] + 32*params[46]**2 + 32*params[45]**2 + 16*params[43]*params[39] + 8*params[43]*params[38] + 8*params[42]*params[39])/(64*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam31",
+                    "lam31p"
+                ]
+            },
+            {
+                "identifier": "lam1Im",
+                "expression": "-(3*params[53]**2*params[46] + 9*params[52]**2*params[46] - 4*params[46]*(params[49] + 2*params[48] + 3*params[47] + params[44]) + 4*params[41]*params[35] + 4*params[40]*params[36])/(16*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam22",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam3Im",
+                    "lam3Re"
+                ]
+            },
+            {
+                "identifier": "lam1Re",
+                "expression": "(-3*params[53]**2*params[45] - 9*params[52]**2*params[45] + 4*params[45]*(params[49] + 2*params[48] + 3*params[47] + params[44]) - 4*params[41]*params[36] + 4*params[40]*params[35])/(16*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Re",
+                    "lam22",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam3Im",
+                    "lam3Re"
+                ]
+            },
+            {
+                "identifier": "lam22",
+                "expression": "(3*params[53]**4 + 6*params[53]**2*(params[52]**2 - 4*params[44]) + 9*params[52]**4 - 72*params[52]**2*params[44] + 16*params[48]**2 + 16*params[48]*params[47] + 8*params[47]**2 + 32*params[46]**2 + 32*params[45]**2 + 192*params[44]**2 + 16*params[43]**2 + 16*params[43]*params[42] + 8*params[42]**2 + 32*params[41]**2 + 32*params[40]**2)/(128*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re"
+                ]
+            },
+            {
+                "identifier": "lam23p",
+                "expression": "(3*params[53]**2*(params[52]**2 - params[42]) - 9*params[52]**2*params[42] + 2*params[47]*params[38] + 6*params[42]*params[0]**2 + 4*params[42]*(params[44] + 2*params[43] + params[42] + params[37]) + 32*params[41]**2 + 32*params[40]**2)/(16*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam12p",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31p",
+                    "lam33",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam23",
+                "expression": "(3*params[53]**4 - 6*params[53]**2*(params[52]**2 + 2*params[43]) + 9*params[52]**4 - 36*params[52]**2*params[43] + 16*params[48]*params[39] + 8*params[48]*params[38] + 8*params[47]*params[39] + 48*params[44]*params[43] + 16*params[44]*params[42] + 16*params[43]**2 + 48*params[43]*params[37] + 24*params[43]*params[0]**2 + 8*params[42]**2 + 16*params[42]*params[37] + 32*params[41]**2 + 32*params[40]**2)/(64*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam12",
+                    "lam12p",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam2Im",
+                "expression": "(-4*params[46]*params[35] - 4*params[45]*params[36] + params[41]*(-3*params[53]**2 - 9*params[52]**2 + 4*params[44] + 8*params[43] + 12*params[42] + 4*params[37] + 6*params[0]**2))/(16*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam2Re",
+                "expression": "(-4*params[46]*params[36] + 4*params[45]*params[35] + params[40]*(-3*params[53]**2 - 9*params[52]**2 + 4*params[44] + 8*params[43] + 12*params[42] + 4*params[37] + 6*params[0]**2))/(16*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Re",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam31p",
+                "expression": "(3*params[53]**2*(params[52]**2 - params[38]) + 2*params[47]*params[42] + params[38]*(-9*params[52]**2 + 4*params[49] + 8*params[39] + 4*params[38] + 4*params[37] + 6*params[0]**2) + 32*params[36]**2 + 32*params[35]**2)/(16*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12p",
+                    "lam23p",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam31",
+                "expression": "(3*params[53]**4 - 6*params[53]**2*(params[52]**2 + 2*params[39]) + 9*params[52]**4 - 36*params[52]**2*params[39] + 48*params[49]*params[39] + 16*params[49]*params[38] + 16*params[48]*params[43] + 8*params[48]*params[42] + 8*params[47]*params[43] + 16*params[39]**2 + 48*params[39]*params[37] + 24*params[39]*params[0]**2 + 8*params[38]**2 + 16*params[38]*params[37] + 32*params[36]**2 + 32*params[35]**2)/(64*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam23",
+                    "lam23p",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam33",
+                "expression": "(3*params[53]**4 + 6*params[53]**2*(params[52]**2 - 4*params[37]) + 9*params[52]**4 - 72*params[52]**2*params[37] + 16*params[43]**2 + 16*params[43]*params[42] + 8*params[42]**2 + 32*params[41]**2 + 32*params[40]**2 + 16*params[39]**2 + 16*params[39]*params[38] + 8*params[38]**2 + 96*params[37]*(2*params[37] + params[0]**2) + 32*params[36]**2 + 32*params[35]**2 - 48*params[0]**4)/(128*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam3Im",
+                "expression": "(-4*params[46]*params[40] - 4*params[45]*params[41] + params[36]*(-3*params[53]**2 - 9*params[52]**2 + 4*params[49] + 8*params[39] + 12*params[38] + 4*params[37] + 6*params[0]**2))/(16*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam3Re",
+                "expression": "(-4*params[46]*params[41] + 4*params[45]*params[40] + params[35]*(-3*params[53]**2 - 9*params[52]**2 + 4*params[49] + 8*params[39] + 12*params[38] + 4*params[37] + 6*params[0]**2))/(16*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Re",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "yt3",
+                "expression": "params[0]*(-17*params[53]**2 - 27*params[52]**2 - 96*params[51]**2 + 54*params[0]**2)/(192*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "g3",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "mu12sqIm",
+                "expression": "(-3*params[53]**2*params[14] - 9*params[52]**2*params[14] + 24*params[46]*params[13] + 4*params[14]*(params[48] + 2*params[47] - 6*params[45]))/(32*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "mu12sqIm",
+                    "mu12sqRe"
+                ]
+            },
+            {
+                "identifier": "mu12sqRe",
+                "expression": "(24*params[46]*params[14] + params[13]*(-3*params[53]**2 - 9*params[52]**2 + 4*params[48] + 8*params[47] + 24*params[45]))/(32*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "mu12sqIm",
+                    "mu12sqRe"
+                ]
+            },
+            {
+                "identifier": "mu1sq",
+                "expression": "(8*params[48]*params[11] + 4*params[47]*params[11] - 3*params[12]*(params[53]**2 + 3*params[52]**2 - 8*params[49]) + 4*params[9]*(2*params[39] + params[38]))/(32*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam31",
+                    "lam31p",
+                    "mu1sq",
+                    "mu2sq",
+                    "mu3sq"
+                ]
+            },
+            {
+                "identifier": "mu2sq",
+                "expression": "(8*params[48]*params[12] + 4*params[47]*params[12] - 3*params[11]*(params[53]**2 + 3*params[52]**2 - 8*params[44]) + 4*params[9]*(2*params[43] + params[42]))/(32*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam12",
+                    "lam12p",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "mu1sq",
+                    "mu2sq",
+                    "mu3sq"
+                ]
+            },
+            {
+                "identifier": "mu3sq",
+                "expression": "(8*params[39]*params[12] + 4*params[38]*params[12] + 4*params[11]*(2*params[43] + params[42]) - 3*params[9]*(params[53]**2 + 3*params[52]**2 - 8*params[37] - 4*params[0]**2))/(32*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "lam23",
+                    "lam23p",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "mu1sq",
+                    "mu2sq",
+                    "mu3sq",
+                    "yt3"
+                ]
+            }
+        ],
+        "fileName": "Data/HardToSoft/BetaFunctions4D.txt"
+    },
+    "hardToSoft": {
+        "expressions": [
+            {
+                "identifier": "g1",
+                "expression": "sqrt(-T*g1**4*(3*Lb + 40*Lf)/(96*pi**2) + T*g1**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1"
+                ]
+            },
+            {
+                "identifier": "g2",
+                "expression": "sqrt(T*g2**4*(41*Lb - 24*Lf + 4)/(96*pi**2) + T*g2**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g2"
+                ]
+            },
+            {
+                "identifier": "g3",
+                "expression": "sqrt(T*g3**4*(11*Lb - 4*Lf + 1)/(16*pi**2) + T*g3**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g3"
+                ]
+            },
+            {
+                "identifier": "lam11",
+                "expression": "T*(24*Lb*lam11*(g1**2 + 3*g2**2) - 8*Lb*(24*lam11**2 + 2*lam12**2 + 2*lam12*lam12p + lam12p**2 + 4*lam1Im**2 + 4*lam1Re**2 + 2*lam31**2 + 2*lam31*lam31p + lam31p**2 + 4*lam3Im**2 + 4*lam3Re**2) + 256*pi**2*lam11 + (2 - 3*Lb)*(g1**4 + 2*g1**2*g2**2 + 3*g2**4))/(256*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam31",
+                    "lam31p",
+                    "lam3Im",
+                    "lam3Re"
+                ]
+            },
+            {
+                "identifier": "lam12",
+                "expression": "T*(36*Lb*g2**2*lam12 - 8*Lb*(2*lam11*(3*lam12 + lam12p) + 2*lam12**2 + 6*lam12*lam22 + lam12p**2 + 2*lam12p*lam22 + 4*lam1Im**2 + 4*lam1Re**2 + 2*lam23*lam31 + lam23*lam31p + lam23p*lam31) + g1**4*(2 - 3*Lb) + 2*g1**2*(6*Lb*lam12 + g2**2*(3*Lb - 2)) + g2**4*(6 - 9*Lb) + 128*pi**2*lam12)/(128*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam31",
+                    "lam31p"
+                ]
+            },
+            {
+                "identifier": "lam12p",
+                "expression": "-T*(-9*Lb*g2**2*lam12p + 4*Lb*lam11*lam12p + 8*Lb*lam12*lam12p + 4*Lb*lam12p**2 + 4*Lb*lam12p*lam22 + 32*Lb*lam1Im**2 + 32*Lb*lam1Re**2 + 2*Lb*lam23p*lam31p + g1**2*(-3*Lb*lam12p + g2**2*(3*Lb - 2)) - 32*pi**2*lam12p)/(32*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23p",
+                    "lam31p"
+                ]
+            },
+            {
+                "identifier": "lam1Im",
+                "expression": "T*(3*Lb*g1**2*lam1Im + 9*Lb*g2**2*lam1Im + 4*Lb*(-lam1Im*(lam11 + 2*lam12 + 3*lam12p + lam22) + lam2Im*lam3Re + lam2Re*lam3Im) + 32*pi**2*lam1Im)/(32*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam22",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam3Im",
+                    "lam3Re"
+                ]
+            },
+            {
+                "identifier": "lam1Re",
+                "expression": "T*(3*Lb*g1**2*lam1Re + 9*Lb*g2**2*lam1Re - 4*Lb*(lam1Re*(lam11 + 2*lam12 + 3*lam12p + lam22) - lam2Im*lam3Im + lam2Re*lam3Re) + 32*pi**2*lam1Re)/(32*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Re",
+                    "lam22",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam3Im",
+                    "lam3Re"
+                ]
+            },
+            {
+                "identifier": "lam22",
+                "expression": "T*(24*Lb*lam22*(g1**2 + 3*g2**2) - 8*Lb*(2*lam12**2 + 2*lam12*lam12p + lam12p**2 + 4*lam1Im**2 + 4*lam1Re**2 + 24*lam22**2 + 2*lam23**2 + 2*lam23*lam23p + lam23p**2 + 4*lam2Im**2 + 4*lam2Re**2) + 256*pi**2*lam22 + (2 - 3*Lb)*(g1**4 + 2*g1**2*g2**2 + 3*g2**4))/(256*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re"
+                ]
+            },
+            {
+                "identifier": "lam23",
+                "expression": "-T*(-36*Lb*g2**2*lam23 + 8*Lb*(2*lam12*lam31 + lam12*lam31p + lam12p*lam31 + 6*lam22*lam23 + 2*lam22*lam23p + 2*lam23**2 + 6*lam23*lam33 + lam23p**2 + 2*lam23p*lam33 + 4*lam2Im**2 + 4*lam2Re**2) + 24*Lf*lam23*yt3**2 + g1**4*(3*Lb - 2) - 2*g1**2*(6*Lb*lam23 + g2**2*(3*Lb - 2)) + g2**4*(9*Lb - 6) - 128*pi**2*lam23)/(128*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam12",
+                    "lam12p",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam23p",
+                "expression": "-T*(-9*Lb*g2**2*lam23p + 2*Lb*lam12p*lam31p + 4*Lb*lam22*lam23p + 8*Lb*lam23*lam23p + 4*Lb*lam23p**2 + 4*Lb*lam23p*lam33 + 32*Lb*lam2Im**2 + 32*Lb*lam2Re**2 + 6*Lf*lam23p*yt3**2 + g1**2*(-3*Lb*lam23p + g2**2*(3*Lb - 2)) - 32*pi**2*lam23p)/(32*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam12p",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31p",
+                    "lam33",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam2Im",
+                "expression": "T*(3*Lb*g1**2*lam2Im + 9*Lb*g2**2*lam2Im + 4*Lb*lam1Im*lam3Re + 4*Lb*lam1Re*lam3Im - 4*Lb*lam22*lam2Im - 8*Lb*lam23*lam2Im - 12*Lb*lam23p*lam2Im - 4*Lb*lam2Im*lam33 - 6*Lf*lam2Im*yt3**2 + 32*pi**2*lam2Im)/(32*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam2Re",
+                "expression": "T*(3*Lb*g1**2*lam2Re + 9*Lb*g2**2*lam2Re + 4*Lb*lam1Im*lam3Im - 4*Lb*lam1Re*lam3Re - 4*Lb*lam22*lam2Re - 8*Lb*lam23*lam2Re - 12*Lb*lam23p*lam2Re - 4*Lb*lam2Re*lam33 - 6*Lf*lam2Re*yt3**2 + 32*pi**2*lam2Re)/(32*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Re",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam31",
+                "expression": "-T*(-36*Lb*g2**2*lam31 + 8*Lb*(6*lam11*lam31 + 2*lam11*lam31p + 2*lam12*lam23 + lam12*lam23p + lam12p*lam23 + 2*lam31**2 + 6*lam31*lam33 + lam31p**2 + 2*lam31p*lam33 + 4*lam3Im**2 + 4*lam3Re**2) + 24*Lf*lam31*yt3**2 + g1**4*(3*Lb - 2) - 2*g1**2*(6*Lb*lam31 + g2**2*(3*Lb - 2)) + g2**4*(9*Lb - 6) - 128*pi**2*lam31)/(128*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam23",
+                    "lam23p",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam31p",
+                "expression": "-T*(Lb*(-9*g2**2*lam31p + 2*lam12p*lam23p + 4*lam31p*(lam11 + 2*lam31 + lam31p + lam33) + 32*lam3Im**2 + 32*lam3Re**2) + 6*Lf*lam31p*yt3**2 + g1**2*(-3*Lb*lam31p + g2**2*(3*Lb - 2)) - 32*pi**2*lam31p)/(32*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12p",
+                    "lam23p",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam33",
+                "expression": "-T*(-72*Lb*g2**2*lam33 + 8*Lb*(2*lam23**2 + 2*lam23*lam23p + lam23p**2 + 4*lam2Im**2 + 4*lam2Re**2 + 2*lam31**2 + 2*lam31*lam31p + lam31p**2 + 24*lam33**2 + 4*lam3Im**2 + 4*lam3Re**2) - 48*Lf*(-2*lam33*yt3**2 + yt3**4) + g1**4*(3*Lb - 2) + g1**2*(-24*Lb*lam33 + g2**2*(6*Lb - 4)) + g2**4*(9*Lb - 6) - 256*pi**2*lam33)/(256*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam3Im",
+                "expression": "T*(Lb*lam3Im*(3*g1**2 + 9*g2**2 - 4*lam11 - 8*lam31 - 12*lam31p - 4*lam33) + 4*Lb*(lam1Im*lam2Re + lam1Re*lam2Im) - 6*Lf*lam3Im*yt3**2 + 32*pi**2*lam3Im)/(32*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lam3Re",
+                "expression": "T*(Lb*(4*lam1Im*lam2Im - 4*lam1Re*lam2Re + lam3Re*(3*g1**2 + 9*g2**2 - 4*lam11 - 8*lam31 - 12*lam31p - 4*lam33)) - 6*Lf*lam3Re*yt3**2 + 32*pi**2*lam3Re)/(32*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Re",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lamVLL1",
+                "expression": "-353*T*g1**4/(72*pi**2)",
+                "symbols": [
+                    "T",
+                    "g1"
+                ]
+            },
+            {
+                "identifier": "lamVLL2",
+                "expression": "-T*g1**2*g2**2/(8*pi**2)",
+                "symbols": [
+                    "T",
+                    "g1",
+                    "g2"
+                ]
+            },
+            {
+                "identifier": "lamVLL3",
+                "expression": "7*T*g2**4/(24*pi**2)",
+                "symbols": [
+                    "T",
+                    "g2"
+                ]
+            },
+            {
+                "identifier": "lamVLL4",
+                "expression": "-11*T*g1**2*g3**2/(12*pi**2)",
+                "symbols": [
+                    "T",
+                    "g1",
+                    "g3"
+                ]
+            },
+            {
+                "identifier": "lamVLL5",
+                "expression": "-3*T*g2**2*g3**2/(4*pi**2)",
+                "symbols": [
+                    "T",
+                    "g2",
+                    "g3"
+                ]
+            },
+            {
+                "identifier": "lamVLL6",
+                "expression": "-T*g1*g3**3/(4*pi**2)",
+                "symbols": [
+                    "T",
+                    "g1",
+                    "g3"
+                ]
+            },
+            {
+                "identifier": "lamVLL7",
+                "expression": "T*g3**4/(4*pi**2)",
+                "symbols": [
+                    "T",
+                    "g3"
+                ]
+            },
+            {
+                "identifier": "lamVL1",
+                "expression": "-T*g3**2*yt3**2/(4*pi**2)",
+                "symbols": [
+                    "T",
+                    "g3",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lamVL2",
+                "expression": "-T*g1*g2*(g1**2*(3*Lb + 40*Lf - 40) + g2**2*(-41*Lb + 24*Lf - 8) - 24*lam12p - 48*lam22 - 24*lam23p - 192*pi**2)/(384*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam12p",
+                    "lam22",
+                    "lam23p"
+                ]
+            },
+            {
+                "identifier": "lamVL3",
+                "expression": "-T*g1**2*(g1**2*(3*Lb + 40*Lf - 37) - 9*g2**2 - 24*lam12 - 12*lam12p - 72*lam22 - 24*lam23 - 12*lam23p - 96*pi**2)/(192*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam12",
+                    "lam12p",
+                    "lam22",
+                    "lam23",
+                    "lam23p"
+                ]
+            },
+            {
+                "identifier": "lamVL4",
+                "expression": "T*g2**2*(3*g1**2 + g2**2*(41*Lb - 24*Lf + 71) + 24*lam12 + 12*lam12p + 72*lam22 + 24*lam23 + 12*lam23p + 96*pi**2)/(192*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam12",
+                    "lam12p",
+                    "lam22",
+                    "lam23",
+                    "lam23p"
+                ]
+            },
+            {
+                "identifier": "lamVL5",
+                "expression": "-T*g1*g2*(g1**2*(3*Lb + 40*Lf - 40) + g2**2*(-41*Lb + 24*Lf - 8) - 48*lam11 - 24*lam12p - 24*lam31p - 192*pi**2)/(384*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12p",
+                    "lam31p"
+                ]
+            },
+            {
+                "identifier": "lamVL6",
+                "expression": "-T*g1**2*(g1**2*(3*Lb + 40*Lf - 37) - 9*g2**2 - 72*lam11 - 24*lam12 - 12*lam12p - 24*lam31 - 12*lam31p - 96*pi**2)/(192*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam31",
+                    "lam31p"
+                ]
+            },
+            {
+                "identifier": "lamVL7",
+                "expression": "T*g2**2*(3*g1**2 + g2**2*(41*Lb - 24*Lf + 71) + 72*lam11 + 24*lam12 + 12*lam12p + 24*lam31 + 12*lam31p + 96*pi**2)/(192*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam31",
+                    "lam31p"
+                ]
+            },
+            {
+                "identifier": "lamVL8",
+                "expression": "-T*g1*g2*(g1**2*(3*Lb + 40*Lf - 40) + g2**2*(-41*Lb + 24*Lf - 8) - 24*lam23p - 24*lam31p - 48*lam33 - 24*yt3**2 - 192*pi**2)/(384*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam23p",
+                    "lam31p",
+                    "lam33",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lamVL9",
+                "expression": "-T*g1**2*(g1**2*(3*Lb + 40*Lf - 37) - 9*g2**2 - 24*lam23 - 12*lam23p - 24*lam31 - 12*lam31p - 72*lam33 + 68*yt3**2 - 96*pi**2)/(192*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam23",
+                    "lam23p",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "lamVL10",
+                "expression": "T*g2**2*(3*g1**2 + g2**2*(41*Lb - 24*Lf + 71) + 24*lam23 + 12*lam23p + 24*lam31 + 12*lam31p + 72*lam33 - 36*yt3**2 + 96*pi**2)/(192*pi**2)",
+                "symbols": [
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam23",
+                    "lam23p",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "musqSU2",
+                "expression": "13*T**2*g2**2/6",
+                "symbols": [
+                    "T",
+                    "g2"
+                ]
+            },
+            {
+                "identifier": "musqSU3",
+                "expression": "2*T**2*g3**2",
+                "symbols": [
+                    "T",
+                    "g3"
+                ]
+            },
+            {
+                "identifier": "musqU1",
+                "expression": "13*T**2*g1**2/6",
+                "symbols": [
+                    "T",
+                    "g1"
+                ]
+            },
+            {
+                "identifier": "mu12sqIm",
+                "expression": "Lb*(3*g1**2*mu12sqIm + 9*g2**2*mu12sqIm - 4*lam12*mu12sqIm - 8*lam12p*mu12sqIm - 24*lam1Im*mu12sqRe + 24*lam1Re*mu12sqIm)/(64*pi**2) + mu12sqIm",
+                "symbols": [
+                    "Lb",
+                    "g1",
+                    "g2",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "mu12sqIm",
+                    "mu12sqRe"
+                ]
+            },
+            {
+                "identifier": "mu12sqRe",
+                "expression": "-Lb*(24*lam1Im*mu12sqIm + mu12sqRe*(-3*g1**2 - 9*g2**2 + 4*lam12 + 8*lam12p + 24*lam1Re))/(64*pi**2) + mu12sqRe",
+                "symbols": [
+                    "Lb",
+                    "g1",
+                    "g2",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "mu12sqIm",
+                    "mu12sqRe"
+                ]
+            },
+            {
+                "identifier": "mu1sq",
+                "expression": "-T**2*g1**2/16 - 3*T**2*g2**2/16 - T**2*(6*lam11 + 2*lam12 + lam12p + 2*lam31 + lam31p)/12 + mu1sq + (12*Lb*(T**2*(12*lam11*(2*lam12 + lam12p + 2*lam31 + lam31p) - 4*lam12**2 + 4*lam12*(-lam12p + 6*lam22 + 2*lam23 + lam23p) - 10*lam12p**2 + 12*lam12p*lam22 + 4*lam12p*lam23 + 2*lam12p*lam23p - 72*lam1Im**2 - 72*lam1Re**2 + 8*lam23*lam31 + 4*lam23*lam31p + 4*lam23p*lam31 + 2*lam23p*lam31p - 4*lam31**2 - 4*lam31*lam31p + 24*lam31*lam33 + 18*lam31*yt3**2 - 10*lam31p**2 + 12*lam31p*lam33 + 9*lam31p*yt3**2 - 72*lam3Im**2 - 72*lam3Re**2) - 144*lam11*mu1sq - 48*lam12*mu2sq - 24*lam12p*mu2sq - 48*lam31*mu3sq - 24*lam31p*mu3sq) + T**2*g1**4*(153*Lb - 60*Lf - 1188*log(Glaisher) - 61 + 99*EulerGamma) - 3*T**2*g2**4*(-255*Lb + 36*Lf - 2484*log(Glaisher) + 207*EulerGamma + 211) - 36*T**2*(Lf*yt3**2*(2*lam31 + lam31p) + 96*(6*lam11**2 + lam12**2 + lam12*lam12p + lam12p**2 + 6*lam1Im**2 + 6*lam1Re**2 + lam31**2 + lam31*lam31p + lam31p**2 + 6*lam3Im**2 + 6*lam3Re**2)*log(Glaisher)) + 288*EulerGamma*T**2*(6*lam11**2 + lam12**2 + lam12*lam12p + lam12p**2 + 6*lam1Im**2 + 6*lam1Re**2 + lam31**2 + lam31*lam31p + lam31p**2 + 6*lam3Im**2 + 6*lam3Re**2) + 6*g1**2*(36*Lb*mu1sq + 9*T**2*g2**2*(-4*Lb - 60*log(Glaisher) + 1 + 5*EulerGamma) - 2*T**2*(-3*Lb - 72*log(Glaisher) + 1 + 6*EulerGamma)*(6*lam11 + 2*lam12 + lam12p + 2*lam31 + lam31p)) - 36*g2**2*(-18*Lb*mu1sq + T**2*(-3*Lb - 72*log(Glaisher) + 1 + 6*EulerGamma)*(6*lam11 + 2*lam12 + lam12p + 2*lam31 + lam31p)))/(4608*pi**2)",
+                "symbols": [
+                    "Glaisher",
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "mu1sq",
+                    "mu2sq",
+                    "mu3sq",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "mu2sq",
+                "expression": "-T**2*g1**2/16 - 3*T**2*g2**2/16 - T**2*(2*lam12 + lam12p + 6*lam22 + 2*lam23 + lam23p)/12 + mu2sq + (12*Lb*(T**2*(12*lam11*(2*lam12 + lam12p) - 4*lam12**2 + 4*lam12*(-lam12p + 6*lam22 + 2*lam31 + lam31p) - 10*lam12p**2 + 12*lam12p*lam22 + 4*lam12p*lam31 + 2*lam12p*lam31p - 72*lam1Im**2 - 72*lam1Re**2 + 24*lam22*lam23 + 12*lam22*lam23p - 4*lam23**2 - 4*lam23*lam23p + 8*lam23*lam31 + 4*lam23*lam31p + 24*lam23*lam33 + 18*lam23*yt3**2 - 10*lam23p**2 + 4*lam23p*lam31 + 2*lam23p*lam31p + 12*lam23p*lam33 + 9*lam23p*yt3**2 - 72*lam2Im**2 - 72*lam2Re**2) - 48*lam12*mu1sq - 24*lam12p*mu1sq - 144*lam22*mu2sq - 48*lam23*mu3sq - 24*lam23p*mu3sq) + T**2*g1**4*(153*Lb - 60*Lf - 1188*log(Glaisher) - 61 + 99*EulerGamma) - 3*T**2*g2**4*(-255*Lb + 36*Lf - 2484*log(Glaisher) + 207*EulerGamma + 211) + 36*T**2*(-Lf*yt3**2*(2*lam23 + lam23p) - 96*(lam12**2 + lam12*lam12p + lam12p**2 + 6*lam1Im**2 + 6*lam1Re**2 + 6*lam22**2 + lam23**2 + lam23*lam23p + lam23p**2 + 6*lam2Im**2 + 6*lam2Re**2)*log(Glaisher) + 8*EulerGamma*(lam12**2 + lam12*lam12p + lam12p**2 + 6*lam1Im**2 + 6*lam1Re**2 + 6*lam22**2 + lam23**2 + lam23*lam23p + lam23p**2 + 6*lam2Im**2 + 6*lam2Re**2)) + 6*g1**2*(36*Lb*mu2sq + 9*T**2*g2**2*(-4*Lb - 60*log(Glaisher) + 1 + 5*EulerGamma) - 2*T**2*(-3*Lb - 72*log(Glaisher) + 1 + 6*EulerGamma)*(2*lam12 + lam12p + 6*lam22 + 2*lam23 + lam23p)) - 36*g2**2*(-18*Lb*mu2sq + T**2*(-3*Lb - 72*log(Glaisher) + 1 + 6*EulerGamma)*(2*lam12 + lam12p + 6*lam22 + 2*lam23 + lam23p)))/(4608*pi**2)",
+                "symbols": [
+                    "Glaisher",
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "mu1sq",
+                    "mu2sq",
+                    "mu3sq",
+                    "yt3"
+                ]
+            },
+            {
+                "identifier": "mu3sq",
+                "expression": "-T**2*g1**2/16 - 3*T**2*g2**2/16 - T**2*(2*lam23 + lam23p + 2*lam31 + lam31p + 6*lam33 + 3*yt3**2)/12 + mu3sq + (12*Lb*T**2*(24*lam11*lam31 + 12*lam11*lam31p + 4*lam12*(2*lam23 + lam23p + 2*lam31 + lam31p) + 2*lam12p*(2*lam23 + lam23p + 2*lam31 + lam31p) + 24*lam22*lam23 + 12*lam22*lam23p - 4*lam23**2 - 4*lam23*lam23p + 24*lam23*lam33 - 10*lam23p**2 + 12*lam23p*lam33 - 72*lam2Im**2 - 72*lam2Re**2 - 4*lam31**2 - 4*lam31*lam31p + 24*lam31*lam33 - 10*lam31p**2 + 12*lam31p*lam33 + 54*lam33*yt3**2 - 72*lam3Im**2 - 72*lam3Re**2 - 9*yt3**4) - 288*Lb*(2*lam23*mu2sq + lam23p*mu2sq + 2*lam31*mu1sq + lam31p*mu1sq + 6*lam33*mu3sq) + 72*Lf*yt3**2*(T**2*(2*lam23 + lam23p + 2*lam31 + lam31p + 3*lam33) - 12*mu3sq) + T**2*g1**4*(153*Lb - 60*Lf - 1188*log(Glaisher) - 61 + 99*EulerGamma) - 3*T**2*g2**4*(-255*Lb + 36*Lf - 2484*log(Glaisher) + 207*EulerGamma + 211) + 192*T**2*g3**2*yt3**2*(Lb - 4*Lf + 3) + 288*T**2*(EulerGamma - 12*log(Glaisher))*(lam23**2 + lam23*lam23p + lam23p**2 + 6*lam2Im**2 + 6*lam2Re**2 + lam31**2 + lam31*lam31p + lam31p**2 + 6*lam33**2 + 6*lam3Im**2 + 6*lam3Re**2) + g1**2*(216*Lb*mu3sq + 54*T**2*g2**2*(-4*Lb - 60*log(Glaisher) + 1 + 5*EulerGamma) + T**2*(yt3**2*(-47*Lb - 55*Lf + 66) - 12*(-3*Lb - 72*log(Glaisher) + 1 + 6*EulerGamma)*(2*lam23 + lam23p + 2*lam31 + lam31p + 6*lam33))) - 9*g2**2*(-72*Lb*mu3sq + T**2*(3*yt3**2*(7*Lb - Lf - 2) + 4*(-3*Lb - 72*log(Glaisher) + 1 + 6*EulerGamma)*(2*lam23 + lam23p + 2*lam31 + lam31p + 6*lam33))))/(4608*pi**2)",
+                "symbols": [
+                    "Glaisher",
+                    "Lb",
+                    "Lf",
+                    "T",
+                    "g1",
+                    "g2",
+                    "g3",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "mu1sq",
+                    "mu2sq",
+                    "mu3sq",
+                    "yt3"
+                ]
+            }
+        ],
+        "fileName": "Data/HardToSoft/softScaleParams_NLO.txt"
+    },
+    "softScaleRGE": {
+        "expressions": [
+            {
+                "identifier": "mu12sqIm",
+                "expression": "mu12sqIm",
+                "symbols": [
+                    "mu12sqIm"
+                ]
+            },
+            {
+                "identifier": "mu12sqRe",
+                "expression": "mu12sqRe",
+                "symbols": [
+                    "mu12sqRe"
+                ]
+            },
+            {
+                "identifier": "mu1sq",
+                "expression": "mu1sq - (9*g1**4 + 2*g1**2*(9*g2**2 - 24*lam11 - 8*lam12 - 4*lam12p - 8*lam31 - 4*lam31p) - 27*g2**4 - 24*g2**2*(6*lam11 + 2*lam12 + lam12p + 2*lam31 + lam31p + 4*lamVL7) + 192*lam11**2 + 32*lam12**2 + 32*lam12*lam12p + 32*lam12p**2 + 192*lam1Im**2 + 192*lam1Re**2 + 32*lam31**2 + 32*lam31*lam31p + 32*lam31p**2 + 192*lam3Im**2 + 192*lam3Re**2 + 48*lamVL5**2 + 8*lamVL6**2 + 24*lamVL7**2)*log(goalScale/startScale)/(256*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "goalScale",
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam31",
+                    "lam31p",
+                    "lam3Im",
+                    "lam3Re",
+                    "lamVL5",
+                    "lamVL6",
+                    "lamVL7",
+                    "mu1sq",
+                    "startScale"
+                ]
+            },
+            {
+                "identifier": "mu2sq",
+                "expression": "mu2sq - (9*g1**4 + 2*g1**2*(9*g2**2 - 8*lam12 - 4*lam12p - 24*lam22 - 8*lam23 - 4*lam23p) - 27*g2**4 - 24*g2**2*(2*lam12 + lam12p + 6*lam22 + 2*lam23 + lam23p + 4*lamVL4) + 32*lam12**2 + 32*lam12*lam12p + 32*lam12p**2 + 192*lam1Im**2 + 192*lam1Re**2 + 192*lam22**2 + 32*lam23**2 + 32*lam23*lam23p + 32*lam23p**2 + 192*lam2Im**2 + 192*lam2Re**2 + 48*lamVL2**2 + 8*lamVL3**2 + 24*lamVL4**2)*log(goalScale/startScale)/(256*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "goalScale",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re",
+                    "lamVL2",
+                    "lamVL3",
+                    "lamVL4",
+                    "mu2sq",
+                    "startScale"
+                ]
+            },
+            {
+                "identifier": "mu3sq",
+                "expression": "mu3sq + (-9*g1**4 + 2*g1**2*(-9*g2**2 + 8*lam23 + 4*lam23p + 8*lam31 + 4*lam31p + 24*lam33) + 27*g2**4 + 24*g2**2*(2*lam23 + lam23p + 2*lam31 + lam31p + 6*lam33 + 4*lamVL10) - 32*lam23**2 - 32*lam23*lam23p - 32*lam23p**2 - 192*lam2Im**2 - 192*lam2Re**2 - 32*lam31**2 - 32*lam31*lam31p - 32*lam31p**2 - 192*lam33**2 - 192*lam3Im**2 - 192*lam3Re**2 - 64*lamVL1*(-6*g3**2 + lamVL1) - 24*lamVL10**2 - 48*lamVL8**2 - 8*lamVL9**2)*log(goalScale/startScale)/(256*pi**2)",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "g3",
+                    "goalScale",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re",
+                    "lamVL1",
+                    "lamVL10",
+                    "lamVL8",
+                    "lamVL9",
+                    "mu3sq",
+                    "startScale"
+                ]
+            }
+        ],
+        "fileName": "Data/HardToSoft/softScaleRGE.txt"
+    },
+    "softToUltraSoft": {
+        "expressions": [
+            {
+                "identifier": "lam11",
+                "expression": "lam11 - (4*lamVL5**2/(sqrt(musqSU2) + sqrt(musqU1)) + lamVL6**2/sqrt(musqU1) + 3*lamVL7**2/sqrt(musqSU2))/(32*pi)",
+                "symbols": [
+                    "lam11",
+                    "lamVL5",
+                    "lamVL6",
+                    "lamVL7",
+                    "musqSU2",
+                    "musqU1"
+                ]
+            },
+            {
+                "identifier": "lam12",
+                "expression": "lam12 - (-4*lamVL2*lamVL5/(sqrt(musqSU2) + sqrt(musqU1)) + lamVL3*lamVL6/sqrt(musqU1) + 3*lamVL4*lamVL7/sqrt(musqSU2))/(16*pi)",
+                "symbols": [
+                    "lam12",
+                    "lamVL2",
+                    "lamVL3",
+                    "lamVL4",
+                    "lamVL5",
+                    "lamVL6",
+                    "lamVL7",
+                    "musqSU2",
+                    "musqU1"
+                ]
+            },
+            {
+                "identifier": "lam12p",
+                "expression": "lam12p - lamVL2*lamVL5/(2*pi*(sqrt(musqSU2) + sqrt(musqU1)))",
+                "symbols": [
+                    "lam12p",
+                    "lamVL2",
+                    "lamVL5",
+                    "musqSU2",
+                    "musqU1"
+                ]
+            },
+            {
+                "identifier": "lam1Im",
+                "expression": "lam1Im",
+                "symbols": [
+                    "lam1Im"
+                ]
+            },
+            {
+                "identifier": "lam1Re",
+                "expression": "lam1Re",
+                "symbols": [
+                    "lam1Re"
+                ]
+            },
+            {
+                "identifier": "lam22",
+                "expression": "lam22 - (4*lamVL2**2/(sqrt(musqSU2) + sqrt(musqU1)) + lamVL3**2/sqrt(musqU1) + 3*lamVL4**2/sqrt(musqSU2))/(32*pi)",
+                "symbols": [
+                    "lam22",
+                    "lamVL2",
+                    "lamVL3",
+                    "lamVL4",
+                    "musqSU2",
+                    "musqU1"
+                ]
+            },
+            {
+                "identifier": "lam23",
+                "expression": "lam23 - (3*lamVL10*lamVL4/sqrt(musqSU2) - 4*lamVL2*lamVL8/(sqrt(musqSU2) + sqrt(musqU1)) + lamVL3*lamVL9/sqrt(musqU1))/(16*pi)",
+                "symbols": [
+                    "lam23",
+                    "lamVL10",
+                    "lamVL2",
+                    "lamVL3",
+                    "lamVL4",
+                    "lamVL8",
+                    "lamVL9",
+                    "musqSU2",
+                    "musqU1"
+                ]
+            },
+            {
+                "identifier": "lam23p",
+                "expression": "lam23p - lamVL2*lamVL8/(2*pi*(sqrt(musqSU2) + sqrt(musqU1)))",
+                "symbols": [
+                    "lam23p",
+                    "lamVL2",
+                    "lamVL8",
+                    "musqSU2",
+                    "musqU1"
+                ]
+            },
+            {
+                "identifier": "lam2Im",
+                "expression": "lam2Im",
+                "symbols": [
+                    "lam2Im"
+                ]
+            },
+            {
+                "identifier": "lam2Re",
+                "expression": "lam2Re",
+                "symbols": [
+                    "lam2Re"
+                ]
+            },
+            {
+                "identifier": "lam31",
+                "expression": "lam31 - (3*lamVL10*lamVL7/sqrt(musqSU2) - 4*lamVL5*lamVL8/(sqrt(musqSU2) + sqrt(musqU1)) + lamVL6*lamVL9/sqrt(musqU1))/(16*pi)",
+                "symbols": [
+                    "lam31",
+                    "lamVL10",
+                    "lamVL5",
+                    "lamVL6",
+                    "lamVL7",
+                    "lamVL8",
+                    "lamVL9",
+                    "musqSU2",
+                    "musqU1"
+                ]
+            },
+            {
+                "identifier": "lam31p",
+                "expression": "lam31p - lamVL5*lamVL8/(2*pi*(sqrt(musqSU2) + sqrt(musqU1)))",
+                "symbols": [
+                    "lam31p",
+                    "lamVL5",
+                    "lamVL8",
+                    "musqSU2",
+                    "musqU1"
+                ]
+            },
+            {
+                "identifier": "lam33",
+                "expression": "lam33 - (8*lamVL1**2/sqrt(musqSU3) + 3*lamVL10**2/sqrt(musqSU2) + 4*lamVL8**2/(sqrt(musqSU2) + sqrt(musqU1)) + lamVL9**2/sqrt(musqU1))/(32*pi)",
+                "symbols": [
+                    "lam33",
+                    "lamVL1",
+                    "lamVL10",
+                    "lamVL8",
+                    "lamVL9",
+                    "musqSU2",
+                    "musqSU3",
+                    "musqU1"
+                ]
+            },
+            {
+                "identifier": "lam3Im",
+                "expression": "lam3Im",
+                "symbols": [
+                    "lam3Im"
+                ]
+            },
+            {
+                "identifier": "lam3Re",
+                "expression": "lam3Re",
+                "symbols": [
+                    "lam3Re"
+                ]
+            },
+            {
+                "identifier": "g1",
+                "expression": "sqrt(g1**2)",
+                "symbols": [
+                    "g1"
+                ]
+            },
+            {
+                "identifier": "g2",
+                "expression": "sqrt(-g2**4/(24*pi*sqrt(musqSU2)) + g2**2)",
+                "symbols": [
+                    "g2",
+                    "musqSU2"
+                ]
+            },
+            {
+                "identifier": "g3",
+                "expression": "sqrt(-g3**4/(16*pi*sqrt(musqSU3)) + g3**2)",
+                "symbols": [
+                    "g3",
+                    "musqSU3"
+                ]
+            },
+            {
+                "identifier": "mu12sqIm",
+                "expression": "mu12sqIm",
+                "symbols": [
+                    "mu12sqIm"
+                ]
+            },
+            {
+                "identifier": "mu12sqRe",
+                "expression": "mu12sqRe",
+                "symbols": [
+                    "mu12sqRe"
+                ]
+            },
+            {
+                "identifier": "mu1sq",
+                "expression": "mu1sq + (lamVL6*sqrt(musqU1) + 3*lamVL7*sqrt(musqSU2))/(8*pi) - (12*g2**2*lamVL7 - 24*lamVL5**2*log(RGScale/(sqrt(musqSU2) + sqrt(musqU1))) - 12*lamVL5**2 - 4*lamVL6**2*log(RGScale/(2*sqrt(musqU1))) - 2*lamVL6**2 + lamVL6*lamVLL1 + 3*lamVL6*lamVLL2*sqrt(musqSU2)/sqrt(musqU1) + 8*lamVL6*lamVLL4*sqrt(musqSU3)/sqrt(musqU1) - 6*lamVL7**2 + 3*lamVL7*lamVLL2*sqrt(musqU1)/sqrt(musqSU2) + 15*lamVL7*lamVLL3 + 24*lamVL7*lamVLL5*sqrt(musqSU3)/sqrt(musqSU2) - 6*(g2**4 - 8*g2**2*lamVL7 + 2*lamVL7**2)*log(RGScale/(2*sqrt(musqSU2))))/(128*pi**2)",
+                "symbols": [
+                    "RGScale",
+                    "g2",
+                    "lamVL5",
+                    "lamVL6",
+                    "lamVL7",
+                    "lamVLL1",
+                    "lamVLL2",
+                    "lamVLL3",
+                    "lamVLL4",
+                    "lamVLL5",
+                    "mu1sq",
+                    "musqSU2",
+                    "musqSU3",
+                    "musqU1"
+                ]
+            },
+            {
+                "identifier": "mu2sq",
+                "expression": "mu2sq + (lamVL3*sqrt(musqU1) + 3*lamVL4*sqrt(musqSU2))/(8*pi) - (12*g2**2*lamVL4 - 24*lamVL2**2*log(RGScale/(sqrt(musqSU2) + sqrt(musqU1))) - 12*lamVL2**2 - 4*lamVL3**2*log(RGScale/(2*sqrt(musqU1))) - 2*lamVL3**2 + lamVL3*lamVLL1 + 3*lamVL3*lamVLL2*sqrt(musqSU2)/sqrt(musqU1) + 8*lamVL3*lamVLL4*sqrt(musqSU3)/sqrt(musqU1) - 6*lamVL4**2 + 3*lamVL4*lamVLL2*sqrt(musqU1)/sqrt(musqSU2) + 15*lamVL4*lamVLL3 + 24*lamVL4*lamVLL5*sqrt(musqSU3)/sqrt(musqSU2) - 6*(g2**4 - 8*g2**2*lamVL4 + 2*lamVL4**2)*log(RGScale/(2*sqrt(musqSU2))))/(128*pi**2)",
+                "symbols": [
+                    "RGScale",
+                    "g2",
+                    "lamVL2",
+                    "lamVL3",
+                    "lamVL4",
+                    "lamVLL1",
+                    "lamVLL2",
+                    "lamVLL3",
+                    "lamVLL4",
+                    "lamVLL5",
+                    "mu2sq",
+                    "musqSU2",
+                    "musqSU3",
+                    "musqU1"
+                ]
+            },
+            {
+                "identifier": "mu3sq",
+                "expression": "mu3sq + (8*lamVL1*sqrt(musqSU3) + 3*lamVL10*sqrt(musqSU2) + lamVL9*sqrt(musqU1))/(8*pi) - (-6*g2**4*log(RGScale/(2*sqrt(musqSU2))) + 12*g2**2*lamVL10*(4*log(RGScale/(2*sqrt(musqSU2))) + 1) + 48*g3**2*lamVL1*(4*log(RGScale/(2*sqrt(musqSU3))) + 1) - 16*lamVL1**2*(2*log(RGScale/(2*sqrt(musqSU3))) + 1) + 8*lamVL1*(lamVLL4*sqrt(musqU1) + 3*lamVLL5*sqrt(musqSU2) + 10*lamVLL7*sqrt(musqSU3))/sqrt(musqSU3) - 6*lamVL10**2*(2*log(RGScale/(2*sqrt(musqSU2))) + 1) + 3*lamVL10*(lamVLL2*sqrt(musqU1) + 5*lamVLL3*sqrt(musqSU2) + 8*lamVLL5*sqrt(musqSU3))/sqrt(musqSU2) - 12*lamVL8**2*(2*log(RGScale/(sqrt(musqSU2) + sqrt(musqU1))) + 1) - 2*lamVL9**2*(2*log(RGScale/(2*sqrt(musqU1))) + 1) + lamVL9*(lamVLL1*sqrt(musqU1) + 3*lamVLL2*sqrt(musqSU2) + 8*lamVLL4*sqrt(musqSU3))/sqrt(musqU1))/(128*pi**2)",
+                "symbols": [
+                    "RGScale",
+                    "g2",
+                    "g3",
+                    "lamVL1",
+                    "lamVL10",
+                    "lamVL8",
+                    "lamVL9",
+                    "lamVLL1",
+                    "lamVLL2",
+                    "lamVLL3",
+                    "lamVLL4",
+                    "lamVLL5",
+                    "lamVLL7",
+                    "mu3sq",
+                    "musqSU2",
+                    "musqSU3",
+                    "musqU1"
+                ]
+            }
+        ],
+        "fileName": "Data/SoftToUltrasoft/ultrasoftScaleParams_NLO.txt"
+    },
+    "vectorMassesSquared": {
+        "expressions": [
+            {
+                "identifier": "mVsq0",
+                "expression": "g2**2*(v1**2 + v2**2 + v3**2)/4",
+                "symbols": [
+                    "g2",
+                    "v1",
+                    "v2",
+                    "v3"
+                ]
+            },
+            {
+                "identifier": "mVsq1",
+                "expression": "g2**2*(v1**2 + v2**2 + v3**2)/4",
+                "symbols": [
+                    "g2",
+                    "v1",
+                    "v2",
+                    "v3"
+                ]
+            },
+            {
+                "identifier": "mVsq2",
+                "expression": "(g1**2 + g2**2)*(v1**2 + v2**2 + v3**2)/4",
+                "symbols": [
+                    "g1",
+                    "g2",
+                    "v1",
+                    "v2",
+                    "v3"
+                ]
+            }
+        ],
+        "fileName": "Data/EffectivePotential_threeFields/vectorMasses.txt"
+    },
+    "vectorShortHands": {
+        "expressions": [
+            {
+                "identifier": "stW",
+                "expression": "g1/sqrt(g1**2 + g2**2)",
+                "symbols": [
+                    "g1",
+                    "g2"
+                ]
+            },
+            {
+                "identifier": "ctW",
+                "expression": "g2/sqrt(g1**2 + g2**2)",
+                "symbols": [
+                    "g1",
+                    "g2"
+                ]
+            }
+        ],
+        "fileName": "Data/EffectivePotential_threeFields/vectorShorthands.txt"
+    },
+    "veff": {
+        "expressions": [
+            {
+                "identifier": "anonymous",
+                "expression": "lam11*v1**4/4 + lam22*v2**4/4 + lam33*v3**4/4 - mu12sqRe*v1*v2 - mu3sq*v3**2/2 + v1**2*(-2*mu1sq + v2**2*(lam12 + lam12p + 2*lam1Re) + v3**2*(lam31 + lam31p + 2*lam3Re))/4 + v2**2*(-2*mu2sq + v3**2*(lam23 + lam23p + 2*lam2Re))/4",
+                "symbols": [
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Re",
+                    "mu12sqRe",
+                    "mu1sq",
+                    "mu2sq",
+                    "mu3sq",
+                    "v1",
+                    "v2",
+                    "v3"
+                ]
+            },
+            {
+                "identifier": "anonymous",
+                "expression": "-(MSsq01**(3/2) + MSsq02**(3/2) + MSsq03**(3/2) + MSsq04**(3/2) + MSsq05**(3/2) + MSsq06**(3/2) + MSsq07**(3/2) + MSsq08**(3/2) + MSsq09**(3/2) + MSsq10**(3/2) + MSsq11**(3/2) + MSsq12**(3/2) + 2*mVsq0**(3/2) + 2*mVsq1**(3/2) + 2*mVsq2**(3/2))/(12*pi)",
+                "symbols": [
+                    "MSsq01",
+                    "MSsq02",
+                    "MSsq03",
+                    "MSsq04",
+                    "MSsq05",
+                    "MSsq06",
+                    "MSsq07",
+                    "MSsq08",
+                    "MSsq09",
+                    "MSsq10",
+                    "MSsq11",
+                    "MSsq12",
+                    "mVsq0",
+                    "mVsq1",
+                    "mVsq2"
+                ]
+            }
+        ],
+        "fileName": "Combined Veff files"
+    },
+    "scalarMassMatrixUpperLeft": {
+        "expressions": {
+            "definitions": [
+                {
+                    "identifier": "MMUL0",
+                    "expression": "lam11*v1**2 + lam12*v2**2/2 + lam31*v3**2/2 - mu1sq",
+                    "symbols": [
+                        "lam11",
+                        "lam12",
+                        "lam31",
+                        "mu1sq",
+                        "v1",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL1",
+                    "expression": "lam3Im*v1*v3",
+                    "symbols": [
+                        "lam3Im",
+                        "v1",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL2",
+                    "expression": "lam23*v2**2/2 + lam31*v1**2/2 + lam33*v3**2 - mu3sq",
+                    "symbols": [
+                        "lam23",
+                        "lam31",
+                        "lam33",
+                        "mu3sq",
+                        "v1",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL3",
+                    "expression": "v1*v3*(lam31p/2 + lam3Re)",
+                    "symbols": [
+                        "lam31p",
+                        "lam3Re",
+                        "v1",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL4",
+                    "expression": "lam11*v1**2 + lam12*v2**2/2 + lam31*v3**2/2 - mu1sq",
+                    "symbols": [
+                        "lam11",
+                        "lam12",
+                        "lam31",
+                        "mu1sq",
+                        "v1",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL5",
+                    "expression": "v1*v3*(lam31p/2 + lam3Re)",
+                    "symbols": [
+                        "lam31p",
+                        "lam3Re",
+                        "v1",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL6",
+                    "expression": "-lam3Im*v1*v3",
+                    "symbols": [
+                        "lam3Im",
+                        "v1",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL7",
+                    "expression": "lam23*v2**2/2 + lam31*v1**2/2 + lam33*v3**2 - mu3sq",
+                    "symbols": [
+                        "lam23",
+                        "lam31",
+                        "lam33",
+                        "mu3sq",
+                        "v1",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL8",
+                    "expression": "-mu12sqRe + v1*v2*(lam12p/2 + lam1Re)",
+                    "symbols": [
+                        "lam12p",
+                        "lam1Re",
+                        "mu12sqRe",
+                        "v1",
+                        "v2"
+                    ]
+                },
+                {
+                    "identifier": "MMUL9",
+                    "expression": "-lam2Im*v2*v3",
+                    "symbols": [
+                        "lam2Im",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL10",
+                    "expression": "lam1Im*v1*v2 - mu12sqIm",
+                    "symbols": [
+                        "lam1Im",
+                        "mu12sqIm",
+                        "v1",
+                        "v2"
+                    ]
+                },
+                {
+                    "identifier": "MMUL11",
+                    "expression": "v2*v3*(lam23p/2 + lam2Re)",
+                    "symbols": [
+                        "lam23p",
+                        "lam2Re",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL12",
+                    "expression": "lam12*v1**2/2 + lam22*v2**2 + lam23*v3**2/2 - mu2sq",
+                    "symbols": [
+                        "lam12",
+                        "lam22",
+                        "lam23",
+                        "mu2sq",
+                        "v1",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL13",
+                    "expression": "-lam1Im*v1*v2 + mu12sqIm",
+                    "symbols": [
+                        "lam1Im",
+                        "mu12sqIm",
+                        "v1",
+                        "v2"
+                    ]
+                },
+                {
+                    "identifier": "MMUL14",
+                    "expression": "v2*v3*(lam23p/2 + lam2Re)",
+                    "symbols": [
+                        "lam23p",
+                        "lam2Re",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL15",
+                    "expression": "-mu12sqRe + v1*v2*(lam12p/2 + lam1Re)",
+                    "symbols": [
+                        "lam12p",
+                        "lam1Re",
+                        "mu12sqRe",
+                        "v1",
+                        "v2"
+                    ]
+                },
+                {
+                    "identifier": "MMUL16",
+                    "expression": "lam2Im*v2*v3",
+                    "symbols": [
+                        "lam2Im",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMUL17",
+                    "expression": "lam12*v1**2/2 + lam22*v2**2 + lam23*v3**2/2 - mu2sq",
+                    "symbols": [
+                        "lam12",
+                        "lam22",
+                        "lam23",
+                        "mu2sq",
+                        "v1",
+                        "v2",
+                        "v3"
+                    ]
+                }
+            ],
+            "matrix": "[[MMUL0, MMUL1, 0, MMUL5, MMUL8, MMUL13], [MMUL1, MMUL2, MMUL3, 0, MMUL9, MMUL14], [0, MMUL3, MMUL4, MMUL6, MMUL10, MMUL15], [MMUL5, 0, MMUL6, MMUL7, MMUL11, MMUL16], [MMUL8, MMUL9, MMUL10, MMUL11, MMUL12, 0], [MMUL13, MMUL14, MMUL15, MMUL16, 0, MMUL17]]"
         },
-        {
-            "identifier": "mVsq1",
-            "expression": "g2**2*(v1**2 + v2**2 + v3**2)/4",
-            "symbols": [
-                "g2",
-                "v1",
-                "v2",
-                "v3"
-            ]
+        "fileName": [
+            "Data/EffectivePotential_threeFields/scalarMassMatrix_upperLeft_definitions.txt",
+            "Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight.txt"
+        ]
+    },
+    "scalarMassMatrixBottomRight": {
+        "expressions": {
+            "definitions": [
+                {
+                    "identifier": "MMBR0",
+                    "expression": "3*lam22*v2**2 - mu2sq + v1**2*(lam12 + lam12p + 2*lam1Re)/2 + v3**2*(lam23 + lam23p + 2*lam2Re)/2",
+                    "symbols": [
+                        "lam12",
+                        "lam12p",
+                        "lam1Re",
+                        "lam22",
+                        "lam23",
+                        "lam23p",
+                        "lam2Re",
+                        "mu2sq",
+                        "v1",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR1",
+                    "expression": "-lam1Im*v1**2 + lam2Im*v3**2",
+                    "symbols": [
+                        "lam1Im",
+                        "lam2Im",
+                        "v1",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR2",
+                    "expression": "lam22*v2**2 - mu2sq + v1**2*(lam12 + lam12p - 2*lam1Re)/2 + v3**2*(lam23 + lam23p - 2*lam2Re)/2",
+                    "symbols": [
+                        "lam12",
+                        "lam12p",
+                        "lam1Re",
+                        "lam22",
+                        "lam23",
+                        "lam23p",
+                        "lam2Re",
+                        "mu2sq",
+                        "v1",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR3",
+                    "expression": "2*lam1Im*v1*v2 - mu12sqIm",
+                    "symbols": [
+                        "lam1Im",
+                        "mu12sqIm",
+                        "v1",
+                        "v2"
+                    ]
+                },
+                {
+                    "identifier": "MMBR4",
+                    "expression": "2*lam1Re*v1*v2 - mu12sqRe",
+                    "symbols": [
+                        "lam1Re",
+                        "mu12sqRe",
+                        "v1",
+                        "v2"
+                    ]
+                },
+                {
+                    "identifier": "MMBR5",
+                    "expression": "lam11*v1**2 - mu1sq + v2**2*(lam12 + lam12p - 2*lam1Re)/2 + v3**2*(lam31 + lam31p - 2*lam3Re)/2",
+                    "symbols": [
+                        "lam11",
+                        "lam12",
+                        "lam12p",
+                        "lam1Re",
+                        "lam31",
+                        "lam31p",
+                        "lam3Re",
+                        "mu1sq",
+                        "v1",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR6",
+                    "expression": "v2*v3*(lam23 + lam23p + 2*lam2Re)",
+                    "symbols": [
+                        "lam23",
+                        "lam23p",
+                        "lam2Re",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR7",
+                    "expression": "2*lam2Im*v2*v3",
+                    "symbols": [
+                        "lam2Im",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR8",
+                    "expression": "-2*lam3Im*v1*v3",
+                    "symbols": [
+                        "lam3Im",
+                        "v1",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR9",
+                    "expression": "3*lam33*v3**2 - mu3sq + v1**2*(lam31 + lam31p + 2*lam3Re)/2 + v2**2*(lam23 + lam23p + 2*lam2Re)/2",
+                    "symbols": [
+                        "lam23",
+                        "lam23p",
+                        "lam2Re",
+                        "lam31",
+                        "lam31p",
+                        "lam33",
+                        "lam3Re",
+                        "mu3sq",
+                        "v1",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR10",
+                    "expression": "-mu12sqRe + v1*v2*(lam12 + lam12p + 2*lam1Re)",
+                    "symbols": [
+                        "lam12",
+                        "lam12p",
+                        "lam1Re",
+                        "mu12sqRe",
+                        "v1",
+                        "v2"
+                    ]
+                },
+                {
+                    "identifier": "MMBR11",
+                    "expression": "-2*lam1Im*v1*v2 + mu12sqIm",
+                    "symbols": [
+                        "lam1Im",
+                        "mu12sqIm",
+                        "v1",
+                        "v2"
+                    ]
+                },
+                {
+                    "identifier": "MMBR12",
+                    "expression": "lam1Im*v2**2 - lam3Im*v3**2",
+                    "symbols": [
+                        "lam1Im",
+                        "lam3Im",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR13",
+                    "expression": "v1*v3*(lam31 + lam31p + 2*lam3Re)",
+                    "symbols": [
+                        "lam31",
+                        "lam31p",
+                        "lam3Re",
+                        "v1",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR14",
+                    "expression": "3*lam11*v1**2 - mu1sq + v2**2*(lam12 + lam12p + 2*lam1Re)/2 + v3**2*(lam31 + lam31p + 2*lam3Re)/2",
+                    "symbols": [
+                        "lam11",
+                        "lam12",
+                        "lam12p",
+                        "lam1Re",
+                        "lam31",
+                        "lam31p",
+                        "lam3Re",
+                        "mu1sq",
+                        "v1",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR15",
+                    "expression": "-2*lam2Im*v2*v3",
+                    "symbols": [
+                        "lam2Im",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR16",
+                    "expression": "2*lam2Re*v2*v3",
+                    "symbols": [
+                        "lam2Re",
+                        "v2",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR17",
+                    "expression": "2*lam3Re*v1*v3",
+                    "symbols": [
+                        "lam3Re",
+                        "v1",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR18",
+                    "expression": "-lam2Im*v2**2 + lam3Im*v1**2",
+                    "symbols": [
+                        "lam2Im",
+                        "lam3Im",
+                        "v1",
+                        "v2"
+                    ]
+                },
+                {
+                    "identifier": "MMBR19",
+                    "expression": "2*lam3Im*v1*v3",
+                    "symbols": [
+                        "lam3Im",
+                        "v1",
+                        "v3"
+                    ]
+                },
+                {
+                    "identifier": "MMBR20",
+                    "expression": "lam33*v3**2 - mu3sq + v1**2*(lam31 + lam31p - 2*lam3Re)/2 + v2**2*(lam23 + lam23p - 2*lam2Re)/2",
+                    "symbols": [
+                        "lam23",
+                        "lam23p",
+                        "lam2Re",
+                        "lam31",
+                        "lam31p",
+                        "lam33",
+                        "lam3Re",
+                        "mu3sq",
+                        "v1",
+                        "v2",
+                        "v3"
+                    ]
+                }
+            ],
+            "matrix": "[[MMBR0, MMBR1, MMBR3, MMBR6, MMBR10, MMBR15], [MMBR1, MMBR2, MMBR4, MMBR7, MMBR11, MMBR16], [MMBR3, MMBR4, MMBR5, MMBR8, MMBR12, MMBR17], [MMBR6, MMBR7, MMBR8, MMBR9, MMBR13, MMBR18], [MMBR10, MMBR11, MMBR12, MMBR13, MMBR14, MMBR19], [MMBR15, MMBR16, MMBR17, MMBR18, MMBR19, MMBR20]]"
         },
-        {
-            "identifier": "mVsq2",
-            "expression": "(g1**2 + g2**2)*(v1**2 + v2**2 + v3**2)/4",
-            "symbols": [
-                "g1",
-                "g2",
-                "v1",
-                "v2",
-                "v3"
-            ]
-        }
-    ],
-    "vectorShortHands": [
-        {
-            "identifier": "stW",
-            "expression": "g1/sqrt(g1**2 + g2**2)",
-            "symbols": [
-                "g1",
-                "g2"
-            ]
+        "fileName": [
+            "Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight_definitions.txt",
+            "Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight.txt"
+        ]
+    },
+    "scalarRotationMatrix": {
+        "expressions": {
+            "matrix": {
+                "RUL11": [
+                    0,
+                    0
+                ],
+                "RUL12": [
+                    0,
+                    1
+                ],
+                "RUL13": [
+                    0,
+                    2
+                ],
+                "RUL14": [
+                    0,
+                    3
+                ],
+                "RUL15": [
+                    0,
+                    4
+                ],
+                "RUL16": [
+                    0,
+                    5
+                ],
+                "RBR51": [
+                    1,
+                    6
+                ],
+                "RBR52": [
+                    1,
+                    7
+                ],
+                "RBR53": [
+                    1,
+                    8
+                ],
+                "RBR54": [
+                    1,
+                    9
+                ],
+                "RBR55": [
+                    1,
+                    10
+                ],
+                "RBR56": [
+                    1,
+                    11
+                ],
+                "RUL31": [
+                    2,
+                    0
+                ],
+                "RUL32": [
+                    2,
+                    1
+                ],
+                "RUL33": [
+                    2,
+                    2
+                ],
+                "RUL34": [
+                    2,
+                    3
+                ],
+                "RUL35": [
+                    2,
+                    4
+                ],
+                "RUL36": [
+                    2,
+                    5
+                ],
+                "RBR31": [
+                    3,
+                    6
+                ],
+                "RBR32": [
+                    3,
+                    7
+                ],
+                "RBR33": [
+                    3,
+                    8
+                ],
+                "RBR34": [
+                    3,
+                    9
+                ],
+                "RBR35": [
+                    3,
+                    10
+                ],
+                "RBR36": [
+                    3,
+                    11
+                ],
+                "RUL51": [
+                    4,
+                    0
+                ],
+                "RUL52": [
+                    4,
+                    1
+                ],
+                "RUL53": [
+                    4,
+                    2
+                ],
+                "RUL54": [
+                    4,
+                    3
+                ],
+                "RUL55": [
+                    4,
+                    4
+                ],
+                "RUL56": [
+                    4,
+                    5
+                ],
+                "RBR11": [
+                    5,
+                    6
+                ],
+                "RBR12": [
+                    5,
+                    7
+                ],
+                "RBR13": [
+                    5,
+                    8
+                ],
+                "RBR14": [
+                    5,
+                    9
+                ],
+                "RBR15": [
+                    5,
+                    10
+                ],
+                "RBR16": [
+                    5,
+                    11
+                ],
+                "RUL61": [
+                    6,
+                    0
+                ],
+                "RUL62": [
+                    6,
+                    1
+                ],
+                "RUL63": [
+                    6,
+                    2
+                ],
+                "RUL64": [
+                    6,
+                    3
+                ],
+                "RUL65": [
+                    6,
+                    4
+                ],
+                "RUL66": [
+                    6,
+                    5
+                ],
+                "RBR21": [
+                    7,
+                    6
+                ],
+                "RBR22": [
+                    7,
+                    7
+                ],
+                "RBR23": [
+                    7,
+                    8
+                ],
+                "RBR24": [
+                    7,
+                    9
+                ],
+                "RBR25": [
+                    7,
+                    10
+                ],
+                "RBR26": [
+                    7,
+                    11
+                ],
+                "RUL41": [
+                    8,
+                    0
+                ],
+                "RUL42": [
+                    8,
+                    1
+                ],
+                "RUL43": [
+                    8,
+                    2
+                ],
+                "RUL44": [
+                    8,
+                    3
+                ],
+                "RUL45": [
+                    8,
+                    4
+                ],
+                "RUL46": [
+                    8,
+                    5
+                ],
+                "RBR41": [
+                    9,
+                    6
+                ],
+                "RBR42": [
+                    9,
+                    7
+                ],
+                "RBR43": [
+                    9,
+                    8
+                ],
+                "RBR44": [
+                    9,
+                    9
+                ],
+                "RBR45": [
+                    9,
+                    10
+                ],
+                "RBR46": [
+                    9,
+                    11
+                ],
+                "RUL21": [
+                    10,
+                    0
+                ],
+                "RUL22": [
+                    10,
+                    1
+                ],
+                "RUL23": [
+                    10,
+                    2
+                ],
+                "RUL24": [
+                    10,
+                    3
+                ],
+                "RUL25": [
+                    10,
+                    4
+                ],
+                "RUL26": [
+                    10,
+                    5
+                ],
+                "RBR61": [
+                    11,
+                    6
+                ],
+                "RBR62": [
+                    11,
+                    7
+                ],
+                "RBR63": [
+                    11,
+                    8
+                ],
+                "RBR64": [
+                    11,
+                    9
+                ],
+                "RBR65": [
+                    11,
+                    10
+                ],
+                "RBR66": [
+                    11,
+                    11
+                ]
+            }
         },
-        {
-            "identifier": "ctW",
-            "expression": "g2/sqrt(g1**2 + g2**2)",
-            "symbols": [
-                "g1",
-                "g2"
-            ]
-        }
-    ],
+        "fileName": "Data/EffectivePotential_threeFields/scalarRotationMatrix.txt"
+    },
     "scalarPermutationMatrix": [
         [
             1,
@@ -219,2209 +2459,5 @@
             0,
             1
         ]
-    ],
-    "scalarMassMatrixUpperLeft": {
-        "definitions": [
-            {
-                "identifier": "MMUL0",
-                "expression": "lam11*v1**2 + lam12*v2**2/2 + lam31*v3**2/2 - mu1sq",
-                "symbols": [
-                    "lam11",
-                    "lam12",
-                    "lam31",
-                    "mu1sq",
-                    "v1",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL1",
-                "expression": "lam3Im*v1*v3",
-                "symbols": [
-                    "lam3Im",
-                    "v1",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL2",
-                "expression": "lam23*v2**2/2 + lam31*v1**2/2 + lam33*v3**2 - mu3sq",
-                "symbols": [
-                    "lam23",
-                    "lam31",
-                    "lam33",
-                    "mu3sq",
-                    "v1",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL3",
-                "expression": "v1*v3*(lam31p/2 + lam3Re)",
-                "symbols": [
-                    "lam31p",
-                    "lam3Re",
-                    "v1",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL4",
-                "expression": "lam11*v1**2 + lam12*v2**2/2 + lam31*v3**2/2 - mu1sq",
-                "symbols": [
-                    "lam11",
-                    "lam12",
-                    "lam31",
-                    "mu1sq",
-                    "v1",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL5",
-                "expression": "v1*v3*(lam31p/2 + lam3Re)",
-                "symbols": [
-                    "lam31p",
-                    "lam3Re",
-                    "v1",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL6",
-                "expression": "-lam3Im*v1*v3",
-                "symbols": [
-                    "lam3Im",
-                    "v1",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL7",
-                "expression": "lam23*v2**2/2 + lam31*v1**2/2 + lam33*v3**2 - mu3sq",
-                "symbols": [
-                    "lam23",
-                    "lam31",
-                    "lam33",
-                    "mu3sq",
-                    "v1",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL8",
-                "expression": "-mu12sqRe + v1*v2*(lam12p/2 + lam1Re)",
-                "symbols": [
-                    "lam12p",
-                    "lam1Re",
-                    "mu12sqRe",
-                    "v1",
-                    "v2"
-                ]
-            },
-            {
-                "identifier": "MMUL9",
-                "expression": "-lam2Im*v2*v3",
-                "symbols": [
-                    "lam2Im",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL10",
-                "expression": "lam1Im*v1*v2 - mu12sqIm",
-                "symbols": [
-                    "lam1Im",
-                    "mu12sqIm",
-                    "v1",
-                    "v2"
-                ]
-            },
-            {
-                "identifier": "MMUL11",
-                "expression": "v2*v3*(lam23p/2 + lam2Re)",
-                "symbols": [
-                    "lam23p",
-                    "lam2Re",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL12",
-                "expression": "lam12*v1**2/2 + lam22*v2**2 + lam23*v3**2/2 - mu2sq",
-                "symbols": [
-                    "lam12",
-                    "lam22",
-                    "lam23",
-                    "mu2sq",
-                    "v1",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL13",
-                "expression": "-lam1Im*v1*v2 + mu12sqIm",
-                "symbols": [
-                    "lam1Im",
-                    "mu12sqIm",
-                    "v1",
-                    "v2"
-                ]
-            },
-            {
-                "identifier": "MMUL14",
-                "expression": "v2*v3*(lam23p/2 + lam2Re)",
-                "symbols": [
-                    "lam23p",
-                    "lam2Re",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL15",
-                "expression": "-mu12sqRe + v1*v2*(lam12p/2 + lam1Re)",
-                "symbols": [
-                    "lam12p",
-                    "lam1Re",
-                    "mu12sqRe",
-                    "v1",
-                    "v2"
-                ]
-            },
-            {
-                "identifier": "MMUL16",
-                "expression": "lam2Im*v2*v3",
-                "symbols": [
-                    "lam2Im",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMUL17",
-                "expression": "lam12*v1**2/2 + lam22*v2**2 + lam23*v3**2/2 - mu2sq",
-                "symbols": [
-                    "lam12",
-                    "lam22",
-                    "lam23",
-                    "mu2sq",
-                    "v1",
-                    "v2",
-                    "v3"
-                ]
-            }
-        ],
-        "matrix": "[[MMUL0, MMUL1, 0, MMUL5, MMUL8, MMUL13], [MMUL1, MMUL2, MMUL3, 0, MMUL9, MMUL14], [0, MMUL3, MMUL4, MMUL6, MMUL10, MMUL15], [MMUL5, 0, MMUL6, MMUL7, MMUL11, MMUL16], [MMUL8, MMUL9, MMUL10, MMUL11, MMUL12, 0], [MMUL13, MMUL14, MMUL15, MMUL16, 0, MMUL17]]"
-    },
-    "scalarMassMatrixBottomRight": {
-        "definitions": [
-            {
-                "identifier": "MMBR0",
-                "expression": "3*lam22*v2**2 - mu2sq + v1**2*(lam12 + lam12p + 2*lam1Re)/2 + v3**2*(lam23 + lam23p + 2*lam2Re)/2",
-                "symbols": [
-                    "lam12",
-                    "lam12p",
-                    "lam1Re",
-                    "lam22",
-                    "lam23",
-                    "lam23p",
-                    "lam2Re",
-                    "mu2sq",
-                    "v1",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR1",
-                "expression": "-lam1Im*v1**2 + lam2Im*v3**2",
-                "symbols": [
-                    "lam1Im",
-                    "lam2Im",
-                    "v1",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR2",
-                "expression": "lam22*v2**2 - mu2sq + v1**2*(lam12 + lam12p - 2*lam1Re)/2 + v3**2*(lam23 + lam23p - 2*lam2Re)/2",
-                "symbols": [
-                    "lam12",
-                    "lam12p",
-                    "lam1Re",
-                    "lam22",
-                    "lam23",
-                    "lam23p",
-                    "lam2Re",
-                    "mu2sq",
-                    "v1",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR3",
-                "expression": "2*lam1Im*v1*v2 - mu12sqIm",
-                "symbols": [
-                    "lam1Im",
-                    "mu12sqIm",
-                    "v1",
-                    "v2"
-                ]
-            },
-            {
-                "identifier": "MMBR4",
-                "expression": "2*lam1Re*v1*v2 - mu12sqRe",
-                "symbols": [
-                    "lam1Re",
-                    "mu12sqRe",
-                    "v1",
-                    "v2"
-                ]
-            },
-            {
-                "identifier": "MMBR5",
-                "expression": "lam11*v1**2 - mu1sq + v2**2*(lam12 + lam12p - 2*lam1Re)/2 + v3**2*(lam31 + lam31p - 2*lam3Re)/2",
-                "symbols": [
-                    "lam11",
-                    "lam12",
-                    "lam12p",
-                    "lam1Re",
-                    "lam31",
-                    "lam31p",
-                    "lam3Re",
-                    "mu1sq",
-                    "v1",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR6",
-                "expression": "v2*v3*(lam23 + lam23p + 2*lam2Re)",
-                "symbols": [
-                    "lam23",
-                    "lam23p",
-                    "lam2Re",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR7",
-                "expression": "2*lam2Im*v2*v3",
-                "symbols": [
-                    "lam2Im",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR8",
-                "expression": "-2*lam3Im*v1*v3",
-                "symbols": [
-                    "lam3Im",
-                    "v1",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR9",
-                "expression": "3*lam33*v3**2 - mu3sq + v1**2*(lam31 + lam31p + 2*lam3Re)/2 + v2**2*(lam23 + lam23p + 2*lam2Re)/2",
-                "symbols": [
-                    "lam23",
-                    "lam23p",
-                    "lam2Re",
-                    "lam31",
-                    "lam31p",
-                    "lam33",
-                    "lam3Re",
-                    "mu3sq",
-                    "v1",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR10",
-                "expression": "-mu12sqRe + v1*v2*(lam12 + lam12p + 2*lam1Re)",
-                "symbols": [
-                    "lam12",
-                    "lam12p",
-                    "lam1Re",
-                    "mu12sqRe",
-                    "v1",
-                    "v2"
-                ]
-            },
-            {
-                "identifier": "MMBR11",
-                "expression": "-2*lam1Im*v1*v2 + mu12sqIm",
-                "symbols": [
-                    "lam1Im",
-                    "mu12sqIm",
-                    "v1",
-                    "v2"
-                ]
-            },
-            {
-                "identifier": "MMBR12",
-                "expression": "lam1Im*v2**2 - lam3Im*v3**2",
-                "symbols": [
-                    "lam1Im",
-                    "lam3Im",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR13",
-                "expression": "v1*v3*(lam31 + lam31p + 2*lam3Re)",
-                "symbols": [
-                    "lam31",
-                    "lam31p",
-                    "lam3Re",
-                    "v1",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR14",
-                "expression": "3*lam11*v1**2 - mu1sq + v2**2*(lam12 + lam12p + 2*lam1Re)/2 + v3**2*(lam31 + lam31p + 2*lam3Re)/2",
-                "symbols": [
-                    "lam11",
-                    "lam12",
-                    "lam12p",
-                    "lam1Re",
-                    "lam31",
-                    "lam31p",
-                    "lam3Re",
-                    "mu1sq",
-                    "v1",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR15",
-                "expression": "-2*lam2Im*v2*v3",
-                "symbols": [
-                    "lam2Im",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR16",
-                "expression": "2*lam2Re*v2*v3",
-                "symbols": [
-                    "lam2Re",
-                    "v2",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR17",
-                "expression": "2*lam3Re*v1*v3",
-                "symbols": [
-                    "lam3Re",
-                    "v1",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR18",
-                "expression": "-lam2Im*v2**2 + lam3Im*v1**2",
-                "symbols": [
-                    "lam2Im",
-                    "lam3Im",
-                    "v1",
-                    "v2"
-                ]
-            },
-            {
-                "identifier": "MMBR19",
-                "expression": "2*lam3Im*v1*v3",
-                "symbols": [
-                    "lam3Im",
-                    "v1",
-                    "v3"
-                ]
-            },
-            {
-                "identifier": "MMBR20",
-                "expression": "lam33*v3**2 - mu3sq + v1**2*(lam31 + lam31p - 2*lam3Re)/2 + v2**2*(lam23 + lam23p - 2*lam2Re)/2",
-                "symbols": [
-                    "lam23",
-                    "lam23p",
-                    "lam2Re",
-                    "lam31",
-                    "lam31p",
-                    "lam33",
-                    "lam3Re",
-                    "mu3sq",
-                    "v1",
-                    "v2",
-                    "v3"
-                ]
-            }
-        ],
-        "matrix": "[[MMBR0, MMBR1, MMBR3, MMBR6, MMBR10, MMBR15], [MMBR1, MMBR2, MMBR4, MMBR7, MMBR11, MMBR16], [MMBR3, MMBR4, MMBR5, MMBR8, MMBR12, MMBR17], [MMBR6, MMBR7, MMBR8, MMBR9, MMBR13, MMBR18], [MMBR10, MMBR11, MMBR12, MMBR13, MMBR14, MMBR19], [MMBR15, MMBR16, MMBR17, MMBR18, MMBR19, MMBR20]]"
-    },
-    "scalarRotationMatrix": {
-        "matrix": {
-            "RUL11": [
-                0,
-                0
-            ],
-            "RUL12": [
-                0,
-                1
-            ],
-            "RUL13": [
-                0,
-                2
-            ],
-            "RUL14": [
-                0,
-                3
-            ],
-            "RUL15": [
-                0,
-                4
-            ],
-            "RUL16": [
-                0,
-                5
-            ],
-            "RBR51": [
-                1,
-                6
-            ],
-            "RBR52": [
-                1,
-                7
-            ],
-            "RBR53": [
-                1,
-                8
-            ],
-            "RBR54": [
-                1,
-                9
-            ],
-            "RBR55": [
-                1,
-                10
-            ],
-            "RBR56": [
-                1,
-                11
-            ],
-            "RUL31": [
-                2,
-                0
-            ],
-            "RUL32": [
-                2,
-                1
-            ],
-            "RUL33": [
-                2,
-                2
-            ],
-            "RUL34": [
-                2,
-                3
-            ],
-            "RUL35": [
-                2,
-                4
-            ],
-            "RUL36": [
-                2,
-                5
-            ],
-            "RBR31": [
-                3,
-                6
-            ],
-            "RBR32": [
-                3,
-                7
-            ],
-            "RBR33": [
-                3,
-                8
-            ],
-            "RBR34": [
-                3,
-                9
-            ],
-            "RBR35": [
-                3,
-                10
-            ],
-            "RBR36": [
-                3,
-                11
-            ],
-            "RUL51": [
-                4,
-                0
-            ],
-            "RUL52": [
-                4,
-                1
-            ],
-            "RUL53": [
-                4,
-                2
-            ],
-            "RUL54": [
-                4,
-                3
-            ],
-            "RUL55": [
-                4,
-                4
-            ],
-            "RUL56": [
-                4,
-                5
-            ],
-            "RBR11": [
-                5,
-                6
-            ],
-            "RBR12": [
-                5,
-                7
-            ],
-            "RBR13": [
-                5,
-                8
-            ],
-            "RBR14": [
-                5,
-                9
-            ],
-            "RBR15": [
-                5,
-                10
-            ],
-            "RBR16": [
-                5,
-                11
-            ],
-            "RUL61": [
-                6,
-                0
-            ],
-            "RUL62": [
-                6,
-                1
-            ],
-            "RUL63": [
-                6,
-                2
-            ],
-            "RUL64": [
-                6,
-                3
-            ],
-            "RUL65": [
-                6,
-                4
-            ],
-            "RUL66": [
-                6,
-                5
-            ],
-            "RBR21": [
-                7,
-                6
-            ],
-            "RBR22": [
-                7,
-                7
-            ],
-            "RBR23": [
-                7,
-                8
-            ],
-            "RBR24": [
-                7,
-                9
-            ],
-            "RBR25": [
-                7,
-                10
-            ],
-            "RBR26": [
-                7,
-                11
-            ],
-            "RUL41": [
-                8,
-                0
-            ],
-            "RUL42": [
-                8,
-                1
-            ],
-            "RUL43": [
-                8,
-                2
-            ],
-            "RUL44": [
-                8,
-                3
-            ],
-            "RUL45": [
-                8,
-                4
-            ],
-            "RUL46": [
-                8,
-                5
-            ],
-            "RBR41": [
-                9,
-                6
-            ],
-            "RBR42": [
-                9,
-                7
-            ],
-            "RBR43": [
-                9,
-                8
-            ],
-            "RBR44": [
-                9,
-                9
-            ],
-            "RBR45": [
-                9,
-                10
-            ],
-            "RBR46": [
-                9,
-                11
-            ],
-            "RUL21": [
-                10,
-                0
-            ],
-            "RUL22": [
-                10,
-                1
-            ],
-            "RUL23": [
-                10,
-                2
-            ],
-            "RUL24": [
-                10,
-                3
-            ],
-            "RUL25": [
-                10,
-                4
-            ],
-            "RUL26": [
-                10,
-                5
-            ],
-            "RBR61": [
-                11,
-                6
-            ],
-            "RBR62": [
-                11,
-                7
-            ],
-            "RBR63": [
-                11,
-                8
-            ],
-            "RBR64": [
-                11,
-                9
-            ],
-            "RBR65": [
-                11,
-                10
-            ],
-            "RBR66": [
-                11,
-                11
-            ]
-        }
-    },
-    "veff": [
-        {
-            "identifier": "anonymous",
-            "expression": "lam11*v1**4/4 + lam22*v2**4/4 + lam33*v3**4/4 - mu12sqRe*v1*v2 - mu3sq*v3**2/2 + v1**2*(-2*mu1sq + v2**2*(lam12 + lam12p + 2*lam1Re) + v3**2*(lam31 + lam31p + 2*lam3Re))/4 + v2**2*(-2*mu2sq + v3**2*(lam23 + lam23p + 2*lam2Re))/4",
-            "symbols": [
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Re",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Re",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Re",
-                "mu12sqRe",
-                "mu1sq",
-                "mu2sq",
-                "mu3sq",
-                "v1",
-                "v2",
-                "v3"
-            ]
-        },
-        {
-            "identifier": "anonymous",
-            "expression": "-(MSsq01**(3/2) + MSsq02**(3/2) + MSsq03**(3/2) + MSsq04**(3/2) + MSsq05**(3/2) + MSsq06**(3/2) + MSsq07**(3/2) + MSsq08**(3/2) + MSsq09**(3/2) + MSsq10**(3/2) + MSsq11**(3/2) + MSsq12**(3/2) + 2*mVsq0**(3/2) + 2*mVsq1**(3/2) + 2*mVsq2**(3/2))/(12*pi)",
-            "symbols": [
-                "MSsq01",
-                "MSsq02",
-                "MSsq03",
-                "MSsq04",
-                "MSsq05",
-                "MSsq06",
-                "MSsq07",
-                "MSsq08",
-                "MSsq09",
-                "MSsq10",
-                "MSsq11",
-                "MSsq12",
-                "mVsq0",
-                "mVsq1",
-                "mVsq2"
-            ]
-        }
-    ],
-    "betaFunctions4D": [
-        {
-            "identifier": "g1",
-            "expression": "43*params[53]**3/(96*pi**2)",
-            "symbols": [
-                "g1"
-            ]
-        },
-        {
-            "identifier": "g2",
-            "expression": "-17*params[52]**3/(96*pi**2)",
-            "symbols": [
-                "g2"
-            ]
-        },
-        {
-            "identifier": "g3",
-            "expression": "-7*params[51]**3/(16*pi**2)",
-            "symbols": [
-                "g3"
-            ]
-        },
-        {
-            "identifier": "lam11",
-            "expression": "(3*params[53]**4 + 6*params[53]**2*(params[52]**2 - 4*params[49]) + 9*params[52]**4 - 72*params[52]**2*params[49] + 192*params[49]**2 + 16*params[48]**2 + 16*params[48]*params[47] + 8*params[47]**2 + 32*params[46]**2 + 32*params[45]**2 + 16*params[39]**2 + 16*params[39]*params[38] + 8*params[38]**2 + 32*params[36]**2 + 32*params[35]**2)/(128*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "lam31",
-                "lam31p",
-                "lam3Im",
-                "lam3Re"
-            ]
-        },
-        {
-            "identifier": "lam12p",
-            "expression": "(3*params[53]**2*(params[52]**2 - params[47]) - 9*params[52]**2*params[47] + 4*params[47]*(params[49] + 2*params[48] + params[47] + params[44]) + 32*params[46]**2 + 32*params[45]**2 + 2*params[42]*params[38])/(16*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23p",
-                "lam31p"
-            ]
-        },
-        {
-            "identifier": "lam12",
-            "expression": "(3*params[53]**4 - 6*params[53]**2*(params[52]**2 + 2*params[48]) + 9*params[52]**4 - 36*params[52]**2*params[48] + 48*params[49]*params[48] + 16*params[49]*params[47] + 16*params[48]**2 + 48*params[48]*params[44] + 8*params[47]**2 + 16*params[47]*params[44] + 32*params[46]**2 + 32*params[45]**2 + 16*params[43]*params[39] + 8*params[43]*params[38] + 8*params[42]*params[39])/(64*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam31",
-                "lam31p"
-            ]
-        },
-        {
-            "identifier": "lam1Im",
-            "expression": "-(3*params[53]**2*params[46] + 9*params[52]**2*params[46] - 4*params[46]*(params[49] + 2*params[48] + 3*params[47] + params[44]) + 4*params[41]*params[35] + 4*params[40]*params[36])/(16*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam22",
-                "lam2Im",
-                "lam2Re",
-                "lam3Im",
-                "lam3Re"
-            ]
-        },
-        {
-            "identifier": "lam1Re",
-            "expression": "(-3*params[53]**2*params[45] - 9*params[52]**2*params[45] + 4*params[45]*(params[49] + 2*params[48] + 3*params[47] + params[44]) - 4*params[41]*params[36] + 4*params[40]*params[35])/(16*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Re",
-                "lam22",
-                "lam2Im",
-                "lam2Re",
-                "lam3Im",
-                "lam3Re"
-            ]
-        },
-        {
-            "identifier": "lam22",
-            "expression": "(3*params[53]**4 + 6*params[53]**2*(params[52]**2 - 4*params[44]) + 9*params[52]**4 - 72*params[52]**2*params[44] + 16*params[48]**2 + 16*params[48]*params[47] + 8*params[47]**2 + 32*params[46]**2 + 32*params[45]**2 + 192*params[44]**2 + 16*params[43]**2 + 16*params[43]*params[42] + 8*params[42]**2 + 32*params[41]**2 + 32*params[40]**2)/(128*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam2Re"
-            ]
-        },
-        {
-            "identifier": "lam23p",
-            "expression": "(3*params[53]**2*(params[52]**2 - params[42]) - 9*params[52]**2*params[42] + 2*params[47]*params[38] + 6*params[42]*params[0]**2 + 4*params[42]*(params[44] + 2*params[43] + params[42] + params[37]) + 32*params[41]**2 + 32*params[40]**2)/(16*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam12p",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam2Re",
-                "lam31p",
-                "lam33",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam23",
-            "expression": "(3*params[53]**4 - 6*params[53]**2*(params[52]**2 + 2*params[43]) + 9*params[52]**4 - 36*params[52]**2*params[43] + 16*params[48]*params[39] + 8*params[48]*params[38] + 8*params[47]*params[39] + 48*params[44]*params[43] + 16*params[44]*params[42] + 16*params[43]**2 + 48*params[43]*params[37] + 24*params[43]*params[0]**2 + 8*params[42]**2 + 16*params[42]*params[37] + 32*params[41]**2 + 32*params[40]**2)/(64*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam12",
-                "lam12p",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam2Re",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam2Im",
-            "expression": "(-4*params[46]*params[35] - 4*params[45]*params[36] + params[41]*(-3*params[53]**2 - 9*params[52]**2 + 4*params[44] + 8*params[43] + 12*params[42] + 4*params[37] + 6*params[0]**2))/(16*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam2Re",
-            "expression": "(-4*params[46]*params[36] + 4*params[45]*params[35] + params[40]*(-3*params[53]**2 - 9*params[52]**2 + 4*params[44] + 8*params[43] + 12*params[42] + 4*params[37] + 6*params[0]**2))/(16*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Re",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam31p",
-            "expression": "(3*params[53]**2*(params[52]**2 - params[38]) + 2*params[47]*params[42] + params[38]*(-9*params[52]**2 + 4*params[49] + 8*params[39] + 4*params[38] + 4*params[37] + 6*params[0]**2) + 32*params[36]**2 + 32*params[35]**2)/(16*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam11",
-                "lam12p",
-                "lam23p",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam31",
-            "expression": "(3*params[53]**4 - 6*params[53]**2*(params[52]**2 + 2*params[39]) + 9*params[52]**4 - 36*params[52]**2*params[39] + 48*params[49]*params[39] + 16*params[49]*params[38] + 16*params[48]*params[43] + 8*params[48]*params[42] + 8*params[47]*params[43] + 16*params[39]**2 + 48*params[39]*params[37] + 24*params[39]*params[0]**2 + 8*params[38]**2 + 16*params[38]*params[37] + 32*params[36]**2 + 32*params[35]**2)/(64*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam23",
-                "lam23p",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam33",
-            "expression": "(3*params[53]**4 + 6*params[53]**2*(params[52]**2 - 4*params[37]) + 9*params[52]**4 - 72*params[52]**2*params[37] + 16*params[43]**2 + 16*params[43]*params[42] + 8*params[42]**2 + 32*params[41]**2 + 32*params[40]**2 + 16*params[39]**2 + 16*params[39]*params[38] + 8*params[38]**2 + 96*params[37]*(2*params[37] + params[0]**2) + 32*params[36]**2 + 32*params[35]**2 - 48*params[0]**4)/(128*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam2Re",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam3Im",
-            "expression": "(-4*params[46]*params[40] - 4*params[45]*params[41] + params[36]*(-3*params[53]**2 - 9*params[52]**2 + 4*params[49] + 8*params[39] + 12*params[38] + 4*params[37] + 6*params[0]**2))/(16*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam11",
-                "lam1Im",
-                "lam1Re",
-                "lam2Im",
-                "lam2Re",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Im",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam3Re",
-            "expression": "(-4*params[46]*params[41] + 4*params[45]*params[40] + params[35]*(-3*params[53]**2 - 9*params[52]**2 + 4*params[49] + 8*params[39] + 12*params[38] + 4*params[37] + 6*params[0]**2))/(16*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam11",
-                "lam1Im",
-                "lam1Re",
-                "lam2Im",
-                "lam2Re",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Re",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "yt3",
-            "expression": "params[0]*(-17*params[53]**2 - 27*params[52]**2 - 96*params[51]**2 + 54*params[0]**2)/(192*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "g3",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "mu12sqIm",
-            "expression": "(-3*params[53]**2*params[14] - 9*params[52]**2*params[14] + 24*params[46]*params[13] + 4*params[14]*(params[48] + 2*params[47] - 6*params[45]))/(32*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "mu12sqIm",
-                "mu12sqRe"
-            ]
-        },
-        {
-            "identifier": "mu12sqRe",
-            "expression": "(24*params[46]*params[14] + params[13]*(-3*params[53]**2 - 9*params[52]**2 + 4*params[48] + 8*params[47] + 24*params[45]))/(32*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "mu12sqIm",
-                "mu12sqRe"
-            ]
-        },
-        {
-            "identifier": "mu1sq",
-            "expression": "(8*params[48]*params[11] + 4*params[47]*params[11] - 3*params[12]*(params[53]**2 + 3*params[52]**2 - 8*params[49]) + 4*params[9]*(2*params[39] + params[38]))/(32*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam31",
-                "lam31p",
-                "mu1sq",
-                "mu2sq",
-                "mu3sq"
-            ]
-        },
-        {
-            "identifier": "mu2sq",
-            "expression": "(8*params[48]*params[12] + 4*params[47]*params[12] - 3*params[11]*(params[53]**2 + 3*params[52]**2 - 8*params[44]) + 4*params[9]*(2*params[43] + params[42]))/(32*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam12",
-                "lam12p",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "mu1sq",
-                "mu2sq",
-                "mu3sq"
-            ]
-        },
-        {
-            "identifier": "mu3sq",
-            "expression": "(8*params[39]*params[12] + 4*params[38]*params[12] + 4*params[11]*(2*params[43] + params[42]) - 3*params[9]*(params[53]**2 + 3*params[52]**2 - 8*params[37] - 4*params[0]**2))/(32*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "lam23",
-                "lam23p",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "mu1sq",
-                "mu2sq",
-                "mu3sq",
-                "yt3"
-            ]
-        }
-    ],
-    "hardToSoft": [
-        {
-            "identifier": "g1",
-            "expression": "sqrt(-T*g1**4*(3*Lb + 40*Lf)/(96*pi**2) + T*g1**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1"
-            ]
-        },
-        {
-            "identifier": "g2",
-            "expression": "sqrt(T*g2**4*(41*Lb - 24*Lf + 4)/(96*pi**2) + T*g2**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g2"
-            ]
-        },
-        {
-            "identifier": "g3",
-            "expression": "sqrt(T*g3**4*(11*Lb - 4*Lf + 1)/(16*pi**2) + T*g3**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g3"
-            ]
-        },
-        {
-            "identifier": "lam11",
-            "expression": "T*(24*Lb*lam11*(g1**2 + 3*g2**2) - 8*Lb*(24*lam11**2 + 2*lam12**2 + 2*lam12*lam12p + lam12p**2 + 4*lam1Im**2 + 4*lam1Re**2 + 2*lam31**2 + 2*lam31*lam31p + lam31p**2 + 4*lam3Im**2 + 4*lam3Re**2) + 256*pi**2*lam11 + (2 - 3*Lb)*(g1**4 + 2*g1**2*g2**2 + 3*g2**4))/(256*pi**2)",
-            "symbols": [
-                "Lb",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "lam31",
-                "lam31p",
-                "lam3Im",
-                "lam3Re"
-            ]
-        },
-        {
-            "identifier": "lam12",
-            "expression": "T*(36*Lb*g2**2*lam12 - 8*Lb*(2*lam11*(3*lam12 + lam12p) + 2*lam12**2 + 6*lam12*lam22 + lam12p**2 + 2*lam12p*lam22 + 4*lam1Im**2 + 4*lam1Re**2 + 2*lam23*lam31 + lam23*lam31p + lam23p*lam31) + g1**4*(2 - 3*Lb) + 2*g1**2*(6*Lb*lam12 + g2**2*(3*Lb - 2)) + g2**4*(6 - 9*Lb) + 128*pi**2*lam12)/(128*pi**2)",
-            "symbols": [
-                "Lb",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam31",
-                "lam31p"
-            ]
-        },
-        {
-            "identifier": "lam12p",
-            "expression": "-T*(-9*Lb*g2**2*lam12p + 4*Lb*lam11*lam12p + 8*Lb*lam12*lam12p + 4*Lb*lam12p**2 + 4*Lb*lam12p*lam22 + 32*Lb*lam1Im**2 + 32*Lb*lam1Re**2 + 2*Lb*lam23p*lam31p + g1**2*(-3*Lb*lam12p + g2**2*(3*Lb - 2)) - 32*pi**2*lam12p)/(32*pi**2)",
-            "symbols": [
-                "Lb",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23p",
-                "lam31p"
-            ]
-        },
-        {
-            "identifier": "lam1Im",
-            "expression": "T*(3*Lb*g1**2*lam1Im + 9*Lb*g2**2*lam1Im + 4*Lb*(-lam1Im*(lam11 + 2*lam12 + 3*lam12p + lam22) + lam2Im*lam3Re + lam2Re*lam3Im) + 32*pi**2*lam1Im)/(32*pi**2)",
-            "symbols": [
-                "Lb",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam22",
-                "lam2Im",
-                "lam2Re",
-                "lam3Im",
-                "lam3Re"
-            ]
-        },
-        {
-            "identifier": "lam1Re",
-            "expression": "T*(3*Lb*g1**2*lam1Re + 9*Lb*g2**2*lam1Re - 4*Lb*(lam1Re*(lam11 + 2*lam12 + 3*lam12p + lam22) - lam2Im*lam3Im + lam2Re*lam3Re) + 32*pi**2*lam1Re)/(32*pi**2)",
-            "symbols": [
-                "Lb",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Re",
-                "lam22",
-                "lam2Im",
-                "lam2Re",
-                "lam3Im",
-                "lam3Re"
-            ]
-        },
-        {
-            "identifier": "lam22",
-            "expression": "T*(24*Lb*lam22*(g1**2 + 3*g2**2) - 8*Lb*(2*lam12**2 + 2*lam12*lam12p + lam12p**2 + 4*lam1Im**2 + 4*lam1Re**2 + 24*lam22**2 + 2*lam23**2 + 2*lam23*lam23p + lam23p**2 + 4*lam2Im**2 + 4*lam2Re**2) + 256*pi**2*lam22 + (2 - 3*Lb)*(g1**4 + 2*g1**2*g2**2 + 3*g2**4))/(256*pi**2)",
-            "symbols": [
-                "Lb",
-                "T",
-                "g1",
-                "g2",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam2Re"
-            ]
-        },
-        {
-            "identifier": "lam23",
-            "expression": "-T*(-36*Lb*g2**2*lam23 + 8*Lb*(2*lam12*lam31 + lam12*lam31p + lam12p*lam31 + 6*lam22*lam23 + 2*lam22*lam23p + 2*lam23**2 + 6*lam23*lam33 + lam23p**2 + 2*lam23p*lam33 + 4*lam2Im**2 + 4*lam2Re**2) + 24*Lf*lam23*yt3**2 + g1**4*(3*Lb - 2) - 2*g1**2*(6*Lb*lam23 + g2**2*(3*Lb - 2)) + g2**4*(9*Lb - 6) - 128*pi**2*lam23)/(128*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam12",
-                "lam12p",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam2Re",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam23p",
-            "expression": "-T*(-9*Lb*g2**2*lam23p + 2*Lb*lam12p*lam31p + 4*Lb*lam22*lam23p + 8*Lb*lam23*lam23p + 4*Lb*lam23p**2 + 4*Lb*lam23p*lam33 + 32*Lb*lam2Im**2 + 32*Lb*lam2Re**2 + 6*Lf*lam23p*yt3**2 + g1**2*(-3*Lb*lam23p + g2**2*(3*Lb - 2)) - 32*pi**2*lam23p)/(32*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam12p",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam2Re",
-                "lam31p",
-                "lam33",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam2Im",
-            "expression": "T*(3*Lb*g1**2*lam2Im + 9*Lb*g2**2*lam2Im + 4*Lb*lam1Im*lam3Re + 4*Lb*lam1Re*lam3Im - 4*Lb*lam22*lam2Im - 8*Lb*lam23*lam2Im - 12*Lb*lam23p*lam2Im - 4*Lb*lam2Im*lam33 - 6*Lf*lam2Im*yt3**2 + 32*pi**2*lam2Im)/(32*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam2Re",
-            "expression": "T*(3*Lb*g1**2*lam2Re + 9*Lb*g2**2*lam2Re + 4*Lb*lam1Im*lam3Im - 4*Lb*lam1Re*lam3Re - 4*Lb*lam22*lam2Re - 8*Lb*lam23*lam2Re - 12*Lb*lam23p*lam2Re - 4*Lb*lam2Re*lam33 - 6*Lf*lam2Re*yt3**2 + 32*pi**2*lam2Re)/(32*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Re",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam31",
-            "expression": "-T*(-36*Lb*g2**2*lam31 + 8*Lb*(6*lam11*lam31 + 2*lam11*lam31p + 2*lam12*lam23 + lam12*lam23p + lam12p*lam23 + 2*lam31**2 + 6*lam31*lam33 + lam31p**2 + 2*lam31p*lam33 + 4*lam3Im**2 + 4*lam3Re**2) + 24*Lf*lam31*yt3**2 + g1**4*(3*Lb - 2) - 2*g1**2*(6*Lb*lam31 + g2**2*(3*Lb - 2)) + g2**4*(9*Lb - 6) - 128*pi**2*lam31)/(128*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam23",
-                "lam23p",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam31p",
-            "expression": "-T*(Lb*(-9*g2**2*lam31p + 2*lam12p*lam23p + 4*lam31p*(lam11 + 2*lam31 + lam31p + lam33) + 32*lam3Im**2 + 32*lam3Re**2) + 6*Lf*lam31p*yt3**2 + g1**2*(-3*Lb*lam31p + g2**2*(3*Lb - 2)) - 32*pi**2*lam31p)/(32*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam12p",
-                "lam23p",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam33",
-            "expression": "-T*(-72*Lb*g2**2*lam33 + 8*Lb*(2*lam23**2 + 2*lam23*lam23p + lam23p**2 + 4*lam2Im**2 + 4*lam2Re**2 + 2*lam31**2 + 2*lam31*lam31p + lam31p**2 + 24*lam33**2 + 4*lam3Im**2 + 4*lam3Re**2) - 48*Lf*(-2*lam33*yt3**2 + yt3**4) + g1**4*(3*Lb - 2) + g1**2*(-24*Lb*lam33 + g2**2*(6*Lb - 4)) + g2**4*(9*Lb - 6) - 256*pi**2*lam33)/(256*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam2Re",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam3Im",
-            "expression": "T*(Lb*lam3Im*(3*g1**2 + 9*g2**2 - 4*lam11 - 8*lam31 - 12*lam31p - 4*lam33) + 4*Lb*(lam1Im*lam2Re + lam1Re*lam2Im) - 6*Lf*lam3Im*yt3**2 + 32*pi**2*lam3Im)/(32*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam1Im",
-                "lam1Re",
-                "lam2Im",
-                "lam2Re",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Im",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lam3Re",
-            "expression": "T*(Lb*(4*lam1Im*lam2Im - 4*lam1Re*lam2Re + lam3Re*(3*g1**2 + 9*g2**2 - 4*lam11 - 8*lam31 - 12*lam31p - 4*lam33)) - 6*Lf*lam3Re*yt3**2 + 32*pi**2*lam3Re)/(32*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam1Im",
-                "lam1Re",
-                "lam2Im",
-                "lam2Re",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Re",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lamVLL1",
-            "expression": "-353*T*g1**4/(72*pi**2)",
-            "symbols": [
-                "T",
-                "g1"
-            ]
-        },
-        {
-            "identifier": "lamVLL2",
-            "expression": "-T*g1**2*g2**2/(8*pi**2)",
-            "symbols": [
-                "T",
-                "g1",
-                "g2"
-            ]
-        },
-        {
-            "identifier": "lamVLL3",
-            "expression": "7*T*g2**4/(24*pi**2)",
-            "symbols": [
-                "T",
-                "g2"
-            ]
-        },
-        {
-            "identifier": "lamVLL4",
-            "expression": "-11*T*g1**2*g3**2/(12*pi**2)",
-            "symbols": [
-                "T",
-                "g1",
-                "g3"
-            ]
-        },
-        {
-            "identifier": "lamVLL5",
-            "expression": "-3*T*g2**2*g3**2/(4*pi**2)",
-            "symbols": [
-                "T",
-                "g2",
-                "g3"
-            ]
-        },
-        {
-            "identifier": "lamVLL6",
-            "expression": "-T*g1*g3**3/(4*pi**2)",
-            "symbols": [
-                "T",
-                "g1",
-                "g3"
-            ]
-        },
-        {
-            "identifier": "lamVLL7",
-            "expression": "T*g3**4/(4*pi**2)",
-            "symbols": [
-                "T",
-                "g3"
-            ]
-        },
-        {
-            "identifier": "lamVL1",
-            "expression": "-T*g3**2*yt3**2/(4*pi**2)",
-            "symbols": [
-                "T",
-                "g3",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lamVL2",
-            "expression": "-T*g1*g2*(g1**2*(3*Lb + 40*Lf - 40) + g2**2*(-41*Lb + 24*Lf - 8) - 24*lam12p - 48*lam22 - 24*lam23p - 192*pi**2)/(384*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam12p",
-                "lam22",
-                "lam23p"
-            ]
-        },
-        {
-            "identifier": "lamVL3",
-            "expression": "-T*g1**2*(g1**2*(3*Lb + 40*Lf - 37) - 9*g2**2 - 24*lam12 - 12*lam12p - 72*lam22 - 24*lam23 - 12*lam23p - 96*pi**2)/(192*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam12",
-                "lam12p",
-                "lam22",
-                "lam23",
-                "lam23p"
-            ]
-        },
-        {
-            "identifier": "lamVL4",
-            "expression": "T*g2**2*(3*g1**2 + g2**2*(41*Lb - 24*Lf + 71) + 24*lam12 + 12*lam12p + 72*lam22 + 24*lam23 + 12*lam23p + 96*pi**2)/(192*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam12",
-                "lam12p",
-                "lam22",
-                "lam23",
-                "lam23p"
-            ]
-        },
-        {
-            "identifier": "lamVL5",
-            "expression": "-T*g1*g2*(g1**2*(3*Lb + 40*Lf - 40) + g2**2*(-41*Lb + 24*Lf - 8) - 48*lam11 - 24*lam12p - 24*lam31p - 192*pi**2)/(384*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam12p",
-                "lam31p"
-            ]
-        },
-        {
-            "identifier": "lamVL6",
-            "expression": "-T*g1**2*(g1**2*(3*Lb + 40*Lf - 37) - 9*g2**2 - 72*lam11 - 24*lam12 - 12*lam12p - 24*lam31 - 12*lam31p - 96*pi**2)/(192*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam31",
-                "lam31p"
-            ]
-        },
-        {
-            "identifier": "lamVL7",
-            "expression": "T*g2**2*(3*g1**2 + g2**2*(41*Lb - 24*Lf + 71) + 72*lam11 + 24*lam12 + 12*lam12p + 24*lam31 + 12*lam31p + 96*pi**2)/(192*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam31",
-                "lam31p"
-            ]
-        },
-        {
-            "identifier": "lamVL8",
-            "expression": "-T*g1*g2*(g1**2*(3*Lb + 40*Lf - 40) + g2**2*(-41*Lb + 24*Lf - 8) - 24*lam23p - 24*lam31p - 48*lam33 - 24*yt3**2 - 192*pi**2)/(384*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam23p",
-                "lam31p",
-                "lam33",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lamVL9",
-            "expression": "-T*g1**2*(g1**2*(3*Lb + 40*Lf - 37) - 9*g2**2 - 24*lam23 - 12*lam23p - 24*lam31 - 12*lam31p - 72*lam33 + 68*yt3**2 - 96*pi**2)/(192*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam23",
-                "lam23p",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "lamVL10",
-            "expression": "T*g2**2*(3*g1**2 + g2**2*(41*Lb - 24*Lf + 71) + 24*lam23 + 12*lam23p + 24*lam31 + 12*lam31p + 72*lam33 - 36*yt3**2 + 96*pi**2)/(192*pi**2)",
-            "symbols": [
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam23",
-                "lam23p",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "musqSU2",
-            "expression": "13*T**2*g2**2/6",
-            "symbols": [
-                "T",
-                "g2"
-            ]
-        },
-        {
-            "identifier": "musqSU3",
-            "expression": "2*T**2*g3**2",
-            "symbols": [
-                "T",
-                "g3"
-            ]
-        },
-        {
-            "identifier": "musqU1",
-            "expression": "13*T**2*g1**2/6",
-            "symbols": [
-                "T",
-                "g1"
-            ]
-        },
-        {
-            "identifier": "mu12sqIm",
-            "expression": "Lb*(3*g1**2*mu12sqIm + 9*g2**2*mu12sqIm - 4*lam12*mu12sqIm - 8*lam12p*mu12sqIm - 24*lam1Im*mu12sqRe + 24*lam1Re*mu12sqIm)/(64*pi**2) + mu12sqIm",
-            "symbols": [
-                "Lb",
-                "g1",
-                "g2",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "mu12sqIm",
-                "mu12sqRe"
-            ]
-        },
-        {
-            "identifier": "mu12sqRe",
-            "expression": "-Lb*(24*lam1Im*mu12sqIm + mu12sqRe*(-3*g1**2 - 9*g2**2 + 4*lam12 + 8*lam12p + 24*lam1Re))/(64*pi**2) + mu12sqRe",
-            "symbols": [
-                "Lb",
-                "g1",
-                "g2",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "mu12sqIm",
-                "mu12sqRe"
-            ]
-        },
-        {
-            "identifier": "mu1sq",
-            "expression": "-T**2*g1**2/16 - 3*T**2*g2**2/16 - T**2*(6*lam11 + 2*lam12 + lam12p + 2*lam31 + lam31p)/12 + mu1sq + (12*Lb*(T**2*(12*lam11*(2*lam12 + lam12p + 2*lam31 + lam31p) - 4*lam12**2 + 4*lam12*(-lam12p + 6*lam22 + 2*lam23 + lam23p) - 10*lam12p**2 + 12*lam12p*lam22 + 4*lam12p*lam23 + 2*lam12p*lam23p - 72*lam1Im**2 - 72*lam1Re**2 + 8*lam23*lam31 + 4*lam23*lam31p + 4*lam23p*lam31 + 2*lam23p*lam31p - 4*lam31**2 - 4*lam31*lam31p + 24*lam31*lam33 + 18*lam31*yt3**2 - 10*lam31p**2 + 12*lam31p*lam33 + 9*lam31p*yt3**2 - 72*lam3Im**2 - 72*lam3Re**2) - 144*lam11*mu1sq - 48*lam12*mu2sq - 24*lam12p*mu2sq - 48*lam31*mu3sq - 24*lam31p*mu3sq) + T**2*g1**4*(153*Lb - 60*Lf - 1188*log(Glaisher) - 61 + 99*EulerGamma) - 3*T**2*g2**4*(-255*Lb + 36*Lf - 2484*log(Glaisher) + 207*EulerGamma + 211) - 36*T**2*(Lf*yt3**2*(2*lam31 + lam31p) + 96*(6*lam11**2 + lam12**2 + lam12*lam12p + lam12p**2 + 6*lam1Im**2 + 6*lam1Re**2 + lam31**2 + lam31*lam31p + lam31p**2 + 6*lam3Im**2 + 6*lam3Re**2)*log(Glaisher)) + 288*EulerGamma*T**2*(6*lam11**2 + lam12**2 + lam12*lam12p + lam12p**2 + 6*lam1Im**2 + 6*lam1Re**2 + lam31**2 + lam31*lam31p + lam31p**2 + 6*lam3Im**2 + 6*lam3Re**2) + 6*g1**2*(36*Lb*mu1sq + 9*T**2*g2**2*(-4*Lb - 60*log(Glaisher) + 1 + 5*EulerGamma) - 2*T**2*(-3*Lb - 72*log(Glaisher) + 1 + 6*EulerGamma)*(6*lam11 + 2*lam12 + lam12p + 2*lam31 + lam31p)) - 36*g2**2*(-18*Lb*mu1sq + T**2*(-3*Lb - 72*log(Glaisher) + 1 + 6*EulerGamma)*(6*lam11 + 2*lam12 + lam12p + 2*lam31 + lam31p)))/(4608*pi**2)",
-            "symbols": [
-                "Glaisher",
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "mu1sq",
-                "mu2sq",
-                "mu3sq",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "mu2sq",
-            "expression": "-T**2*g1**2/16 - 3*T**2*g2**2/16 - T**2*(2*lam12 + lam12p + 6*lam22 + 2*lam23 + lam23p)/12 + mu2sq + (12*Lb*(T**2*(12*lam11*(2*lam12 + lam12p) - 4*lam12**2 + 4*lam12*(-lam12p + 6*lam22 + 2*lam31 + lam31p) - 10*lam12p**2 + 12*lam12p*lam22 + 4*lam12p*lam31 + 2*lam12p*lam31p - 72*lam1Im**2 - 72*lam1Re**2 + 24*lam22*lam23 + 12*lam22*lam23p - 4*lam23**2 - 4*lam23*lam23p + 8*lam23*lam31 + 4*lam23*lam31p + 24*lam23*lam33 + 18*lam23*yt3**2 - 10*lam23p**2 + 4*lam23p*lam31 + 2*lam23p*lam31p + 12*lam23p*lam33 + 9*lam23p*yt3**2 - 72*lam2Im**2 - 72*lam2Re**2) - 48*lam12*mu1sq - 24*lam12p*mu1sq - 144*lam22*mu2sq - 48*lam23*mu3sq - 24*lam23p*mu3sq) + T**2*g1**4*(153*Lb - 60*Lf - 1188*log(Glaisher) - 61 + 99*EulerGamma) - 3*T**2*g2**4*(-255*Lb + 36*Lf - 2484*log(Glaisher) + 207*EulerGamma + 211) + 36*T**2*(-Lf*yt3**2*(2*lam23 + lam23p) - 96*(lam12**2 + lam12*lam12p + lam12p**2 + 6*lam1Im**2 + 6*lam1Re**2 + 6*lam22**2 + lam23**2 + lam23*lam23p + lam23p**2 + 6*lam2Im**2 + 6*lam2Re**2)*log(Glaisher) + 8*EulerGamma*(lam12**2 + lam12*lam12p + lam12p**2 + 6*lam1Im**2 + 6*lam1Re**2 + 6*lam22**2 + lam23**2 + lam23*lam23p + lam23p**2 + 6*lam2Im**2 + 6*lam2Re**2)) + 6*g1**2*(36*Lb*mu2sq + 9*T**2*g2**2*(-4*Lb - 60*log(Glaisher) + 1 + 5*EulerGamma) - 2*T**2*(-3*Lb - 72*log(Glaisher) + 1 + 6*EulerGamma)*(2*lam12 + lam12p + 6*lam22 + 2*lam23 + lam23p)) - 36*g2**2*(-18*Lb*mu2sq + T**2*(-3*Lb - 72*log(Glaisher) + 1 + 6*EulerGamma)*(2*lam12 + lam12p + 6*lam22 + 2*lam23 + lam23p)))/(4608*pi**2)",
-            "symbols": [
-                "Glaisher",
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam2Re",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "mu1sq",
-                "mu2sq",
-                "mu3sq",
-                "yt3"
-            ]
-        },
-        {
-            "identifier": "mu3sq",
-            "expression": "-T**2*g1**2/16 - 3*T**2*g2**2/16 - T**2*(2*lam23 + lam23p + 2*lam31 + lam31p + 6*lam33 + 3*yt3**2)/12 + mu3sq + (12*Lb*T**2*(24*lam11*lam31 + 12*lam11*lam31p + 4*lam12*(2*lam23 + lam23p + 2*lam31 + lam31p) + 2*lam12p*(2*lam23 + lam23p + 2*lam31 + lam31p) + 24*lam22*lam23 + 12*lam22*lam23p - 4*lam23**2 - 4*lam23*lam23p + 24*lam23*lam33 - 10*lam23p**2 + 12*lam23p*lam33 - 72*lam2Im**2 - 72*lam2Re**2 - 4*lam31**2 - 4*lam31*lam31p + 24*lam31*lam33 - 10*lam31p**2 + 12*lam31p*lam33 + 54*lam33*yt3**2 - 72*lam3Im**2 - 72*lam3Re**2 - 9*yt3**4) - 288*Lb*(2*lam23*mu2sq + lam23p*mu2sq + 2*lam31*mu1sq + lam31p*mu1sq + 6*lam33*mu3sq) + 72*Lf*yt3**2*(T**2*(2*lam23 + lam23p + 2*lam31 + lam31p + 3*lam33) - 12*mu3sq) + T**2*g1**4*(153*Lb - 60*Lf - 1188*log(Glaisher) - 61 + 99*EulerGamma) - 3*T**2*g2**4*(-255*Lb + 36*Lf - 2484*log(Glaisher) + 207*EulerGamma + 211) + 192*T**2*g3**2*yt3**2*(Lb - 4*Lf + 3) + 288*T**2*(EulerGamma - 12*log(Glaisher))*(lam23**2 + lam23*lam23p + lam23p**2 + 6*lam2Im**2 + 6*lam2Re**2 + lam31**2 + lam31*lam31p + lam31p**2 + 6*lam33**2 + 6*lam3Im**2 + 6*lam3Re**2) + g1**2*(216*Lb*mu3sq + 54*T**2*g2**2*(-4*Lb - 60*log(Glaisher) + 1 + 5*EulerGamma) + T**2*(yt3**2*(-47*Lb - 55*Lf + 66) - 12*(-3*Lb - 72*log(Glaisher) + 1 + 6*EulerGamma)*(2*lam23 + lam23p + 2*lam31 + lam31p + 6*lam33))) - 9*g2**2*(-72*Lb*mu3sq + T**2*(3*yt3**2*(7*Lb - Lf - 2) + 4*(-3*Lb - 72*log(Glaisher) + 1 + 6*EulerGamma)*(2*lam23 + lam23p + 2*lam31 + lam31p + 6*lam33))))/(4608*pi**2)",
-            "symbols": [
-                "Glaisher",
-                "Lb",
-                "Lf",
-                "T",
-                "g1",
-                "g2",
-                "g3",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam2Re",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "mu1sq",
-                "mu2sq",
-                "mu3sq",
-                "yt3"
-            ]
-        }
-    ],
-    "softScaleRGE": [
-        {
-            "identifier": "mu12sqIm",
-            "expression": "mu12sqIm",
-            "symbols": [
-                "mu12sqIm"
-            ]
-        },
-        {
-            "identifier": "mu12sqRe",
-            "expression": "mu12sqRe",
-            "symbols": [
-                "mu12sqRe"
-            ]
-        },
-        {
-            "identifier": "mu1sq",
-            "expression": "mu1sq - (9*g1**4 + 2*g1**2*(9*g2**2 - 24*lam11 - 8*lam12 - 4*lam12p - 8*lam31 - 4*lam31p) - 27*g2**4 - 24*g2**2*(6*lam11 + 2*lam12 + lam12p + 2*lam31 + lam31p + 4*lamVL7) + 192*lam11**2 + 32*lam12**2 + 32*lam12*lam12p + 32*lam12p**2 + 192*lam1Im**2 + 192*lam1Re**2 + 32*lam31**2 + 32*lam31*lam31p + 32*lam31p**2 + 192*lam3Im**2 + 192*lam3Re**2 + 48*lamVL5**2 + 8*lamVL6**2 + 24*lamVL7**2)*log(goalScale/startScale)/(256*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "goalScale",
-                "lam11",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "lam31",
-                "lam31p",
-                "lam3Im",
-                "lam3Re",
-                "lamVL5",
-                "lamVL6",
-                "lamVL7",
-                "mu1sq",
-                "startScale"
-            ]
-        },
-        {
-            "identifier": "mu2sq",
-            "expression": "mu2sq - (9*g1**4 + 2*g1**2*(9*g2**2 - 8*lam12 - 4*lam12p - 24*lam22 - 8*lam23 - 4*lam23p) - 27*g2**4 - 24*g2**2*(2*lam12 + lam12p + 6*lam22 + 2*lam23 + lam23p + 4*lamVL4) + 32*lam12**2 + 32*lam12*lam12p + 32*lam12p**2 + 192*lam1Im**2 + 192*lam1Re**2 + 192*lam22**2 + 32*lam23**2 + 32*lam23*lam23p + 32*lam23p**2 + 192*lam2Im**2 + 192*lam2Re**2 + 48*lamVL2**2 + 8*lamVL3**2 + 24*lamVL4**2)*log(goalScale/startScale)/(256*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "goalScale",
-                "lam12",
-                "lam12p",
-                "lam1Im",
-                "lam1Re",
-                "lam22",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam2Re",
-                "lamVL2",
-                "lamVL3",
-                "lamVL4",
-                "mu2sq",
-                "startScale"
-            ]
-        },
-        {
-            "identifier": "mu3sq",
-            "expression": "mu3sq + (-9*g1**4 + 2*g1**2*(-9*g2**2 + 8*lam23 + 4*lam23p + 8*lam31 + 4*lam31p + 24*lam33) + 27*g2**4 + 24*g2**2*(2*lam23 + lam23p + 2*lam31 + lam31p + 6*lam33 + 4*lamVL10) - 32*lam23**2 - 32*lam23*lam23p - 32*lam23p**2 - 192*lam2Im**2 - 192*lam2Re**2 - 32*lam31**2 - 32*lam31*lam31p - 32*lam31p**2 - 192*lam33**2 - 192*lam3Im**2 - 192*lam3Re**2 - 64*lamVL1*(-6*g3**2 + lamVL1) - 24*lamVL10**2 - 48*lamVL8**2 - 8*lamVL9**2)*log(goalScale/startScale)/(256*pi**2)",
-            "symbols": [
-                "g1",
-                "g2",
-                "g3",
-                "goalScale",
-                "lam23",
-                "lam23p",
-                "lam2Im",
-                "lam2Re",
-                "lam31",
-                "lam31p",
-                "lam33",
-                "lam3Im",
-                "lam3Re",
-                "lamVL1",
-                "lamVL10",
-                "lamVL8",
-                "lamVL9",
-                "mu3sq",
-                "startScale"
-            ]
-        }
-    ],
-    "softToUltraSoft": [
-        {
-            "identifier": "lam11",
-            "expression": "lam11 - (4*lamVL5**2/(sqrt(musqSU2) + sqrt(musqU1)) + lamVL6**2/sqrt(musqU1) + 3*lamVL7**2/sqrt(musqSU2))/(32*pi)",
-            "symbols": [
-                "lam11",
-                "lamVL5",
-                "lamVL6",
-                "lamVL7",
-                "musqSU2",
-                "musqU1"
-            ]
-        },
-        {
-            "identifier": "lam12",
-            "expression": "lam12 - (-4*lamVL2*lamVL5/(sqrt(musqSU2) + sqrt(musqU1)) + lamVL3*lamVL6/sqrt(musqU1) + 3*lamVL4*lamVL7/sqrt(musqSU2))/(16*pi)",
-            "symbols": [
-                "lam12",
-                "lamVL2",
-                "lamVL3",
-                "lamVL4",
-                "lamVL5",
-                "lamVL6",
-                "lamVL7",
-                "musqSU2",
-                "musqU1"
-            ]
-        },
-        {
-            "identifier": "lam12p",
-            "expression": "lam12p - lamVL2*lamVL5/(2*pi*(sqrt(musqSU2) + sqrt(musqU1)))",
-            "symbols": [
-                "lam12p",
-                "lamVL2",
-                "lamVL5",
-                "musqSU2",
-                "musqU1"
-            ]
-        },
-        {
-            "identifier": "lam1Im",
-            "expression": "lam1Im",
-            "symbols": [
-                "lam1Im"
-            ]
-        },
-        {
-            "identifier": "lam1Re",
-            "expression": "lam1Re",
-            "symbols": [
-                "lam1Re"
-            ]
-        },
-        {
-            "identifier": "lam22",
-            "expression": "lam22 - (4*lamVL2**2/(sqrt(musqSU2) + sqrt(musqU1)) + lamVL3**2/sqrt(musqU1) + 3*lamVL4**2/sqrt(musqSU2))/(32*pi)",
-            "symbols": [
-                "lam22",
-                "lamVL2",
-                "lamVL3",
-                "lamVL4",
-                "musqSU2",
-                "musqU1"
-            ]
-        },
-        {
-            "identifier": "lam23",
-            "expression": "lam23 - (3*lamVL10*lamVL4/sqrt(musqSU2) - 4*lamVL2*lamVL8/(sqrt(musqSU2) + sqrt(musqU1)) + lamVL3*lamVL9/sqrt(musqU1))/(16*pi)",
-            "symbols": [
-                "lam23",
-                "lamVL10",
-                "lamVL2",
-                "lamVL3",
-                "lamVL4",
-                "lamVL8",
-                "lamVL9",
-                "musqSU2",
-                "musqU1"
-            ]
-        },
-        {
-            "identifier": "lam23p",
-            "expression": "lam23p - lamVL2*lamVL8/(2*pi*(sqrt(musqSU2) + sqrt(musqU1)))",
-            "symbols": [
-                "lam23p",
-                "lamVL2",
-                "lamVL8",
-                "musqSU2",
-                "musqU1"
-            ]
-        },
-        {
-            "identifier": "lam2Im",
-            "expression": "lam2Im",
-            "symbols": [
-                "lam2Im"
-            ]
-        },
-        {
-            "identifier": "lam2Re",
-            "expression": "lam2Re",
-            "symbols": [
-                "lam2Re"
-            ]
-        },
-        {
-            "identifier": "lam31",
-            "expression": "lam31 - (3*lamVL10*lamVL7/sqrt(musqSU2) - 4*lamVL5*lamVL8/(sqrt(musqSU2) + sqrt(musqU1)) + lamVL6*lamVL9/sqrt(musqU1))/(16*pi)",
-            "symbols": [
-                "lam31",
-                "lamVL10",
-                "lamVL5",
-                "lamVL6",
-                "lamVL7",
-                "lamVL8",
-                "lamVL9",
-                "musqSU2",
-                "musqU1"
-            ]
-        },
-        {
-            "identifier": "lam31p",
-            "expression": "lam31p - lamVL5*lamVL8/(2*pi*(sqrt(musqSU2) + sqrt(musqU1)))",
-            "symbols": [
-                "lam31p",
-                "lamVL5",
-                "lamVL8",
-                "musqSU2",
-                "musqU1"
-            ]
-        },
-        {
-            "identifier": "lam33",
-            "expression": "lam33 - (8*lamVL1**2/sqrt(musqSU3) + 3*lamVL10**2/sqrt(musqSU2) + 4*lamVL8**2/(sqrt(musqSU2) + sqrt(musqU1)) + lamVL9**2/sqrt(musqU1))/(32*pi)",
-            "symbols": [
-                "lam33",
-                "lamVL1",
-                "lamVL10",
-                "lamVL8",
-                "lamVL9",
-                "musqSU2",
-                "musqSU3",
-                "musqU1"
-            ]
-        },
-        {
-            "identifier": "lam3Im",
-            "expression": "lam3Im",
-            "symbols": [
-                "lam3Im"
-            ]
-        },
-        {
-            "identifier": "lam3Re",
-            "expression": "lam3Re",
-            "symbols": [
-                "lam3Re"
-            ]
-        },
-        {
-            "identifier": "g1",
-            "expression": "sqrt(g1**2)",
-            "symbols": [
-                "g1"
-            ]
-        },
-        {
-            "identifier": "g2",
-            "expression": "sqrt(-g2**4/(24*pi*sqrt(musqSU2)) + g2**2)",
-            "symbols": [
-                "g2",
-                "musqSU2"
-            ]
-        },
-        {
-            "identifier": "g3",
-            "expression": "sqrt(-g3**4/(16*pi*sqrt(musqSU3)) + g3**2)",
-            "symbols": [
-                "g3",
-                "musqSU3"
-            ]
-        },
-        {
-            "identifier": "mu12sqIm",
-            "expression": "mu12sqIm",
-            "symbols": [
-                "mu12sqIm"
-            ]
-        },
-        {
-            "identifier": "mu12sqRe",
-            "expression": "mu12sqRe",
-            "symbols": [
-                "mu12sqRe"
-            ]
-        },
-        {
-            "identifier": "mu1sq",
-            "expression": "mu1sq + (lamVL6*sqrt(musqU1) + 3*lamVL7*sqrt(musqSU2))/(8*pi) - (12*g2**2*lamVL7 - 24*lamVL5**2*log(RGScale/(sqrt(musqSU2) + sqrt(musqU1))) - 12*lamVL5**2 - 4*lamVL6**2*log(RGScale/(2*sqrt(musqU1))) - 2*lamVL6**2 + lamVL6*lamVLL1 + 3*lamVL6*lamVLL2*sqrt(musqSU2)/sqrt(musqU1) + 8*lamVL6*lamVLL4*sqrt(musqSU3)/sqrt(musqU1) - 6*lamVL7**2 + 3*lamVL7*lamVLL2*sqrt(musqU1)/sqrt(musqSU2) + 15*lamVL7*lamVLL3 + 24*lamVL7*lamVLL5*sqrt(musqSU3)/sqrt(musqSU2) - 6*(g2**4 - 8*g2**2*lamVL7 + 2*lamVL7**2)*log(RGScale/(2*sqrt(musqSU2))))/(128*pi**2)",
-            "symbols": [
-                "RGScale",
-                "g2",
-                "lamVL5",
-                "lamVL6",
-                "lamVL7",
-                "lamVLL1",
-                "lamVLL2",
-                "lamVLL3",
-                "lamVLL4",
-                "lamVLL5",
-                "mu1sq",
-                "musqSU2",
-                "musqSU3",
-                "musqU1"
-            ]
-        },
-        {
-            "identifier": "mu2sq",
-            "expression": "mu2sq + (lamVL3*sqrt(musqU1) + 3*lamVL4*sqrt(musqSU2))/(8*pi) - (12*g2**2*lamVL4 - 24*lamVL2**2*log(RGScale/(sqrt(musqSU2) + sqrt(musqU1))) - 12*lamVL2**2 - 4*lamVL3**2*log(RGScale/(2*sqrt(musqU1))) - 2*lamVL3**2 + lamVL3*lamVLL1 + 3*lamVL3*lamVLL2*sqrt(musqSU2)/sqrt(musqU1) + 8*lamVL3*lamVLL4*sqrt(musqSU3)/sqrt(musqU1) - 6*lamVL4**2 + 3*lamVL4*lamVLL2*sqrt(musqU1)/sqrt(musqSU2) + 15*lamVL4*lamVLL3 + 24*lamVL4*lamVLL5*sqrt(musqSU3)/sqrt(musqSU2) - 6*(g2**4 - 8*g2**2*lamVL4 + 2*lamVL4**2)*log(RGScale/(2*sqrt(musqSU2))))/(128*pi**2)",
-            "symbols": [
-                "RGScale",
-                "g2",
-                "lamVL2",
-                "lamVL3",
-                "lamVL4",
-                "lamVLL1",
-                "lamVLL2",
-                "lamVLL3",
-                "lamVLL4",
-                "lamVLL5",
-                "mu2sq",
-                "musqSU2",
-                "musqSU3",
-                "musqU1"
-            ]
-        },
-        {
-            "identifier": "mu3sq",
-            "expression": "mu3sq + (8*lamVL1*sqrt(musqSU3) + 3*lamVL10*sqrt(musqSU2) + lamVL9*sqrt(musqU1))/(8*pi) - (-6*g2**4*log(RGScale/(2*sqrt(musqSU2))) + 12*g2**2*lamVL10*(4*log(RGScale/(2*sqrt(musqSU2))) + 1) + 48*g3**2*lamVL1*(4*log(RGScale/(2*sqrt(musqSU3))) + 1) - 16*lamVL1**2*(2*log(RGScale/(2*sqrt(musqSU3))) + 1) + 8*lamVL1*(lamVLL4*sqrt(musqU1) + 3*lamVLL5*sqrt(musqSU2) + 10*lamVLL7*sqrt(musqSU3))/sqrt(musqSU3) - 6*lamVL10**2*(2*log(RGScale/(2*sqrt(musqSU2))) + 1) + 3*lamVL10*(lamVLL2*sqrt(musqU1) + 5*lamVLL3*sqrt(musqSU2) + 8*lamVLL5*sqrt(musqSU3))/sqrt(musqSU2) - 12*lamVL8**2*(2*log(RGScale/(sqrt(musqSU2) + sqrt(musqU1))) + 1) - 2*lamVL9**2*(2*log(RGScale/(2*sqrt(musqU1))) + 1) + lamVL9*(lamVLL1*sqrt(musqU1) + 3*lamVLL2*sqrt(musqSU2) + 8*lamVLL4*sqrt(musqSU3))/sqrt(musqU1))/(128*pi**2)",
-            "symbols": [
-                "RGScale",
-                "g2",
-                "g3",
-                "lamVL1",
-                "lamVL10",
-                "lamVL8",
-                "lamVL9",
-                "lamVLL1",
-                "lamVLL2",
-                "lamVLL3",
-                "lamVLL4",
-                "lamVLL5",
-                "lamVLL7",
-                "mu3sq",
-                "musqSU2",
-                "musqSU3",
-                "musqU1"
-            ]
-        }
     ]
 }
