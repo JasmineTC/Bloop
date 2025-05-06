@@ -98,7 +98,7 @@ def convertMathematica(args):
                                         "fileName": (args.scalarMassMatrixUpperLeftDefinitionsFile,
                                                      args.scalarMassMatrixBottomRightFile)},
           "scalarMassMatrixBottomRight": {"expressions": parseMassMatrix(getLines(args.scalarMassMatrixBottomRightDefinitionsFile),
-                                                                         getLines(args.scalarMassMatrixUpperLeftFile)),
+                                                                         getLines(args.scalarMassMatrixBottomRightFile)),
                                         "fileName": (args.scalarMassMatrixBottomRightDefinitionsFile,
                                                      args.scalarMassMatrixBottomRightFile)},
           "scalarRotationMatrix": {"expressions": parseRotationMatrix(getLines(args.scalarRotationFile)),
