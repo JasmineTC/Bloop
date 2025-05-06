@@ -131,7 +131,7 @@ class EffectivePotential:
                  nloptInst,
                  vectorMassesSquared, 
                  vectorShortHands, 
-                 scalarPermutationMatrix, 
+                 scalarPermutationMatrix,
                  scalarMassMatrices, 
                  scalarRotationMatrix,
                  veff):
@@ -148,7 +148,7 @@ class EffectivePotential:
         self.vectorMassesSquared = vectorMassesSquared
         self.vectorShortHands = vectorShortHands
 
-        self.scalarPermutationMatrix = scalarPermutationMatrix
+        self.scalarPermutationMatrix = np.asarray(scalarPermutationMatrix, dtype = int)
         ## can have many matrices if we've block-diagonalized already
         ## ASSUME: the blocks are given in order: upper left to lower right. 
         ##TODO improve this

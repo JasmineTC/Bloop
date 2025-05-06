@@ -481,7 +481,7 @@ scalarPermutationMatrix = {
 {0,1,0,0,0,0,0,0,0,0,0,0},
 {0,0,0,0,0,0,0,0,0,0,0,1}};
 If[!OrthogonalMatrixQ[scalarPermutationMatrix], Print["Error, permutation matrix is not orthogonal"]];
-ExportUTF8[effectivePotentialDirectory<>"/scalarPermutationMatrix.txt", scalarPermutationMatrix];
+ExportUTF8[effectivePotentialDirectory<>"/scalarPermutationMatrix2.txt", StringReplace[ToString[scalarPermutationMatrix],{"{"->"[","}"->"]"}]];
 
 
 (*Our casescalarPermutationMatrix is symmetric but taking transpose anyway for consistency/future proofing*)

@@ -5,10 +5,11 @@ Glaisher = 1.28242712910062
 import copy
 
 class ParsedExpression:
-    def __init__(self, parsedExpression):
+    def __init__(self, parsedExpression, fileName):
         self.identifier = parsedExpression["identifier"]
         self.expression = parsedExpression["expression"]
         self.symbols = parsedExpression["symbols"]
+        self.fileName = fileName
 
         self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
 
@@ -20,17 +21,16 @@ class ParsedExpression:
                                          "EulerGamma": euler_gamma,
                                          "Glaisher": Glaisher})
 
-""" class ParsedExpressionSystem -- Describes a collection of ParsedExpressions that are to be evaluated simultaneously with same input.
-"""
 class ParsedExpressionSystem:
-    def __init__(self, parsedExpressionSystem):
-        self.parsedExpressions = [ParsedExpression(parsedExpression) 
+    def __init__(self, parsedExpressionSystem, fileName):
+        self.parsedExpressions = [ParsedExpression(parsedExpression, fileName) 
                                   for parsedExpression in parsedExpressionSystem]
+        self.fileName = fileName
+        
 
     def evaluate(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
         """Optional argument is a hack"""
         outList = [expression.evaluate(inputDict) for expression in self.parsedExpressions] 
-
         if bReturnDict:
             return { self.parsedExpressions[i].identifier : outList[i] for i in range(len(outList)) }
         return  outList 
@@ -39,10 +39,11 @@ class ParsedExpressionSystem:
         return [ expr.identifier for expr in self.parsedExpressions ]
 
 class ParsedExpressionArray:
-    def __init__(self, parsedExpression):
+    def __init__(self, parsedExpression, fileName):
         self.identifier = parsedExpression["identifier"]
         self.expression = parsedExpression["expression"]
         self.symbols = parsedExpression["symbols"]
+        self.fileName = fileName
 
         self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
 
@@ -55,12 +56,14 @@ class ParsedExpressionArray:
                                              "params": params})
 
 class ParsedExpressionSystemArray:
-    def __init__(self, parsedExpressionSystem, allSymbols):
+    def __init__(self, parsedExpressionSystem, allSymbols, fileName):
         self.parsedExpressions = [(allSymbols.index(parsedExpression["identifier"]), 
-                                   ParsedExpressionArray(parsedExpression))
+                                   ParsedExpressionArray(parsedExpression, fileName))
                                   for parsedExpression in parsedExpressionSystem]
 
         self.allSymbols = allSymbols
+        self.fileName = fileName
+        
 
     def evaluate(self, params):
         newParams = copy.deepcopy(params)
@@ -77,9 +80,10 @@ class ParsedExpressionSystemArray:
         return [ expr[1].identifier for expr in self.parsedExpressions ]
 
 class MassMatrix:
-    def __init__(self, massMatrix):
-        self.definitions = ParsedExpressionSystem(massMatrix["definitions"])
+    def __init__(self, massMatrix, fileName):
+        self.definitions = ParsedExpressionSystem(massMatrix["definitions"], fileName)
         self.matrix = compile(massMatrix["matrix"], "<string>", mode = "eval")
+        self.fileName = fileName
 
     def evaluate(self, arguments):
         arguments |= self.definitions.evaluate(arguments, bReturnDict = True)
@@ -90,8 +94,9 @@ class MassMatrix:
                                               "Glaisher": Glaisher})
 
 class RotationMatrix:
-    def __init__(self, symbolMap):
+    def __init__(self, symbolMap, fileName):
         self.symbolMap = symbolMap["matrix"]
+        self.fileName = fileName
 
     def evaluate(self, numericalM):
         """Evaluates our symbols by plugging in numbers from the input numerical matrix.
@@ -109,7 +114,7 @@ class ParsedExpressionUnitTests(TestCase):
 
         reference = 5.400944901447568
 
-        self.assertEqual(reference, ParsedExpression(source).evaluate({"lam": 100, "mssq": 100}))
+        self.assertEqual(reference, ParsedExpression(source, None).evaluate({"lam": 100, "mssq": 100}))
 
     def test_ParsedExpressionComplex(self):
         source = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
@@ -119,7 +124,7 @@ class ParsedExpressionUnitTests(TestCase):
         reference = complex(5.826048814042759, 1.1475471676948477)
 
         self.assertEqual(reference, 
-                         ParsedExpression(source).evaluate({"lam": complex(100, 100), 
+                         ParsedExpression(source, None).evaluate({"lam": complex(100, 100), 
                                                             "mssq": complex(100, 100)}))
 
     def test_ParsedExpressionSystem(self):
@@ -136,7 +141,7 @@ class ParsedExpressionUnitTests(TestCase):
         reference = [5.400944901447568, 5.400944901447568, 5.400944901447568]
 
         self.assertEqual(reference, 
-                         ParsedExpressionSystem(source).evaluate({"lam": 100, "mssq": 100}))
+                         ParsedExpressionSystem(source, None).evaluate({"lam": 100, "mssq": 100}))
 
     def test_MassMatrix(self):
         source = {"definitions": [{"expression": "1",
@@ -145,11 +150,11 @@ class ParsedExpressionUnitTests(TestCase):
                   "matrix": "[[1, 0], [0, mssq]]"}
 
         reference = [[1, 0], [0, 1]]
-        self.assertEqual(reference, MassMatrix(source).evaluate({}))
+        self.assertEqual(reference, MassMatrix(source, None).evaluate({}))
 
     def test_RotationMatrix(self):
         source = {"matrix": {"mssq00": [0, 0], "mssq11": [1, 1]}}
         reference = {"mssq00": 1, "mssq11": -1}
 
-        self.assertEqual(reference, RotationMatrix(source).evaluate([[1, 0], [0, -1]]))
+        self.assertEqual(reference, RotationMatrix(source, None).evaluate([[1, 0], [0, -1]]))
 

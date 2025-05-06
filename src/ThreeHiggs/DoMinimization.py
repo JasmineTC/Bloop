@@ -72,6 +72,10 @@ def _doMinimization(parameters):
 from ThreeHiggs.GetLines import getLines        
 def minimization(args):
     parsedExpressions = json.load(open(args.parsedExpressionsFile, "r"))
+    # for key,value in parsedExpressions.items():
+        # print(key, value)
+        # print()
+    # exit()
     variableSymbols =  getLines( "Data/Variables/LagranianSymbols.json", mode = "json") 
     
     from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
@@ -85,40 +89,50 @@ def minimization(args):
                                  "relLocalTol" : args.relLocalTolerance,
                                  "varLowerBounds" : args.varLowerBounds,
                                  "varUpperBounds" : args.varUpperBounds})
-    
+
     effectivePotential = EffectivePotential(variableSymbols["fieldSymbols"],
                                             args.loopOrder,
                                             args.bNumba,
                                             args.bVerbose,
                                             nloptInst,
-                                            ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
-                                            ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
-                                            parsedExpressions["scalarPermutationMatrix"]["matrix"],
-                                            [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]), 
-                                             MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"])],
-                                            RotationMatrix(parsedExpressions["scalarRotationMatrix"]),
-                                            ParsedExpressionSystem(parsedExpressions["veff"])) 
+                                            ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]["expressions"],
+                                                                   parsedExpressions["vectorMassesSquared"]["fileName"]),
+                                            ParsedExpressionSystem(parsedExpressions["vectorShortHands"]["expressions"],
+                                                                   parsedExpressions["vectorShortHands"]["fileName"]),
+                                            parsedExpressions["scalarPermutationMatrix"],
+                                            (MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]["expressions"], 
+                                                        parsedExpressions["scalarMassMatrixUpperLeft"]["fileName"]), 
+                                             MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"]["expressions"],
+                                                        parsedExpressions["scalarMassMatrixBottomRight"]["fileName"])),
+                                            RotationMatrix(parsedExpressions["scalarRotationMatrix"]["expressions"],
+                                                           parsedExpressions["scalarRotationMatrix"]["fileName"]),
+                                            ParsedExpressionSystem(parsedExpressions["veff"]["expressions"],
+                                                                   parsedExpressions["veff"]["fileName"])) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
-    dimensionalReduction = DimensionalReduction(config = {"hardToSoft": ParsedExpressionSystem(parsedExpressions["hardToSoft"]),
-                                                          "softScaleRGE": ParsedExpressionSystem(parsedExpressions["softScaleRGE"]),
-                                                          "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"])})
+    dimensionalReduction = DimensionalReduction(config = {"hardToSoft": ParsedExpressionSystem(parsedExpressions["hardToSoft"]["expressions"], 
+                                                                                               parsedExpressions["hardToSoft"]["fileName"]),
+                                                          "softScaleRGE": ParsedExpressionSystem(parsedExpressions["softScaleRGE"]["expressions"],
+                                                                                                 parsedExpressions["softScaleRGE"]["fileName"]),
+                                                          "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]["expressions"],
+                                                                                                    parsedExpressions["softToUltraSoft"]["fileName"])})
 
     
     
     with open(args.benchmarkFile) as benchmarkFile:
-        allSymbols = getLines(args.allSymbolsFile, mode = "json")
-        from ThreeHiggs.MathematicaParsers import replaceGreekSymbols
-        allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
+        from ThreeHiggs.PythoniseMathematica import replaceGreekSymbols
+        allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")], 
+                            reverse = True)
         ## This is done to be consistent with MathematicaParses
-        allSymbols.sort(reverse=True)
         from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
                                                      variableSymbols["yukawaSymbols"] + 
                                                      variableSymbols["gaugeSymbols"]), 
                             "effectivePotential": effectivePotential,
                             "dimensionalReduction": dimensionalReduction,
-                            "betaFunction4DExpression": ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"], allSymbols),
+                            "betaFunction4DExpression": ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"]["expressions"], 
+                                                                                    allSymbols, 
+                                                                                    parsedExpressions["betaFunctions4D"]["fileName"]),
                             "args": args,
                             "allSymbols": allSymbols} 
         if args.bPool:
