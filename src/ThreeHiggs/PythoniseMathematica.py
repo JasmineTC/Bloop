@@ -77,8 +77,9 @@ def pythoniseMathematica(args):
     if (args.loopOrder >= 2):
         veffLines += getLines(args.nnloFile)
     
-    allSymbols = [replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")]
-    ## Move get lines to the functions?
+    allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")], 
+                        reverse = True)
+    ## Move get lines to the functions? -- Would need to rework veffLines in this case
     ## Not ideal to have nested dicts but is future proof for when we move to arrays
     dump({"betaFunctions4D": {"expressions": pythoniseExpressionSystemArray(getLines(args.betaFunctions4DFile), allSymbols),
                               "fileName": args.betaFunctions4DFile},

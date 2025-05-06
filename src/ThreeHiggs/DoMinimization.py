@@ -120,11 +120,10 @@ def minimization(args):
     
     
     with open(args.benchmarkFile) as benchmarkFile:
-        allSymbols = getLines(args.allSymbolsFile, mode = "json")
         from ThreeHiggs.PythoniseMathematica import replaceGreekSymbols
-        allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
+        allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")], 
+                            reverse = True)
         ## This is done to be consistent with MathematicaParses
-        allSymbols.sort(reverse=True)
         from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
                                                      variableSymbols["yukawaSymbols"] + 
