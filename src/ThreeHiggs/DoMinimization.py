@@ -85,23 +85,33 @@ def minimization(args):
                                  "relLocalTol" : args.relLocalTolerance,
                                  "varLowerBounds" : args.varLowerBounds,
                                  "varUpperBounds" : args.varUpperBounds})
+                                            # [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]["expressions"],
+                                            #             parsedExpressions["scalarMassMatrixUpperLeft"]["fileName"]), 
+                                            #  MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"]["expressions"],
+                                            #             parsedExpressions["scalarMassMatrixBottomRight"]["fileName"])]
     effectivePotential = EffectivePotential(variableSymbols["fieldSymbols"],
                                             args.loopOrder,
                                             args.bNumba,
                                             args.bVerbose,
                                             nloptInst,
-                                            ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
-                                            ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
+                                            ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]["expressions"],
+                                                                   parsedExpressions["vectorMassesSquared"]["fileName"]),
+                                            ParsedExpressionSystem(parsedExpressions["vectorShortHands"]["expressions"],
+                                                                   parsedExpressions["vectorShortHands"]["fileName"]),
                                             parsedExpressions["scalarPermutationMatrix"],
                                             [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]), 
                                              MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"])],
                                             RotationMatrix(parsedExpressions["scalarRotationMatrix"]),
-                                            ParsedExpressionSystem(parsedExpressions["veff"])) 
+                                            ParsedExpressionSystem(parsedExpressions["veff"]["expressions"],
+                                                                   parsedExpressions["veff"]["fileName"])) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
-    dimensionalReduction = DimensionalReduction(config = {"hardToSoft": ParsedExpressionSystem(parsedExpressions["hardToSoft"]),
-                                                          "softScaleRGE": ParsedExpressionSystem(parsedExpressions["softScaleRGE"]),
-                                                          "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"])})
+    dimensionalReduction = DimensionalReduction(config = {"hardToSoft": ParsedExpressionSystem(parsedExpressions["hardToSoft"]["expressions"], 
+                                                                                               parsedExpressions["hardToSoft"]["fileName"]),
+                                                          "softScaleRGE": ParsedExpressionSystem(parsedExpressions["softScaleRGE"]["expressions"],
+                                                                                                 parsedExpressions["softScaleRGE"]["fileName"]),
+                                                          "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]["expressions"],
+                                                                                                    parsedExpressions["softToUltraSoft"]["fileName"])})
 
     
     
@@ -117,7 +127,9 @@ def minimization(args):
                                                      variableSymbols["gaugeSymbols"]), 
                             "effectivePotential": effectivePotential,
                             "dimensionalReduction": dimensionalReduction,
-                            "betaFunction4DExpression": ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"], allSymbols),
+                            "betaFunction4DExpression": ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"]["expressions"], 
+                                                                                    allSymbols, 
+                                                                                    parsedExpressions["betaFunctions4D"]["fileName"]),
                             "args": args,
                             "allSymbols": allSymbols} 
         if args.bPool:
