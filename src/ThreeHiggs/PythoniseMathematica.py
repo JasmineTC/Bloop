@@ -106,7 +106,7 @@ def pythoniseMathematica(args):
           "scalarRotationMatrix": {"expressions": pythoniseRotationMatrix(getLines(args.scalarRotationFile)),
                                    "fileName": args.scalarRotationFile},
           "scalarPermutationMatrix": getLines(args.scalarPermutationFile, mode="json")},
-         open(args.parsedExpressionsFile, "w"),
+         open(args.pythonisedExpressionsFile, "w"),
          indent = 4)
 
 from unittest import TestCase
