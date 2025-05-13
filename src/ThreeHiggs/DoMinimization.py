@@ -74,13 +74,12 @@ def _doMinimization(parameters):
 from ThreeHiggs.GetLines import getLines        
 def minimization(args):
     allSymbols = getLines(args.allSymbolsFile, mode = "json")
-    from ThreeHiggs.MathematicaParsers import replaceGreekSymbols
+    from ThreeHiggs.PythoniseMathematica import replaceGreekSymbols
     allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
     ## This is done to be consistent with MathematicaParses
     allSymbols.sort(reverse=True)
 
-    parsedExpressions = json.load(open(args.parsedExpressionsFile, "r"))
-
+    pythonisedExpressions = json.load(open(args.pythonisedExpressionsFile, "r"))
     variableSymbols =  getLines( "Data/Variables/LagranianSymbols.json", mode = "json") 
     
     from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
@@ -101,23 +100,31 @@ def minimization(args):
                                             args.bNumba,
                                             args.verbose,
                                             nloptInst,
-                                            ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]),
-                                            ParsedExpressionSystem(parsedExpressions["vectorShortHands"]),
-                                            parsedExpressions["scalarPermutationMatrix"]["matrix"],
-                                            [MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]), 
-                                             MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"])],
-                                            RotationMatrix(parsedExpressions["scalarRotationMatrix"]),
-                                            ParsedExpressionSystem(parsedExpressions["veff"]),
-                                            ParsedExpressionSystemArray(parsedExpressions["veffArray"], allSymbols),
+                                            ParsedExpressionSystem(pythonisedExpressions["vectorMassesSquared"]["expressions"],
+                                                                   pythonisedExpressions["vectorMassesSquared"]["fileName"]),
+                                            ParsedExpressionSystem(pythonisedExpressions["vectorShortHands"]["expressions"],
+                                                                   pythonisedExpressions["vectorShortHands"]["fileName"]),
+                                            pythonisedExpressions["scalarPermutationMatrix"],
+                                            (MassMatrix(pythonisedExpressions["scalarMassMatrixUpperLeft"]["expressions"], 
+                                                        pythonisedExpressions["scalarMassMatrixUpperLeft"]["fileName"]), 
+                                             MassMatrix(pythonisedExpressions["scalarMassMatrixBottomRight"]["expressions"],
+                                                        pythonisedExpressions["scalarMassMatrixBottomRight"]["fileName"])),
+                                            RotationMatrix(pythonisedExpressions["scalarRotationMatrix"]["expressions"],
+                                                           pythonisedExpressions["scalarRotationMatrix"]["fileName"]),
+                                            ParsedExpressionSystem(pythonisedExpressions["veff"]["expressions"],
+                                                                   pythonisedExpressions["veff"]["fileName"]),
+                                            ParsedExpressionSystemArray(pythonisedExpressions["veffArray"]["expressions"], 
+                                                                        allSymbols, 
+                                                                        pythonisedExpressions["veffArray"]["fileName"]),
                                             allSymbols) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
-    dimensionalReduction = DimensionalReduction(config = {"hardToSoft": ParsedExpressionSystem(parsedExpressions["hardToSoft"]["expressions"], 
-                                                                                               parsedExpressions["hardToSoft"]["fileName"]),
-                                                          "softScaleRGE": ParsedExpressionSystem(parsedExpressions["softScaleRGE"]["expressions"],
-                                                                                                 parsedExpressions["softScaleRGE"]["fileName"]),
-                                                          "softToUltraSoft": ParsedExpressionSystem(parsedExpressions["softToUltraSoft"]["expressions"],
-                                                                                                    parsedExpressions["softToUltraSoft"]["fileName"])})
+    dimensionalReduction = DimensionalReduction(config = {"hardToSoft": ParsedExpressionSystem(pythonisedExpressions["hardToSoft"]["expressions"], 
+                                                                                               pythonisedExpressions["hardToSoft"]["fileName"]),
+                                                          "softScaleRGE": ParsedExpressionSystem(pythonisedExpressions["softScaleRGE"]["expressions"],
+                                                                                                 pythonisedExpressions["softScaleRGE"]["fileName"]),
+                                                          "softToUltraSoft": ParsedExpressionSystem(pythonisedExpressions["softToUltraSoft"]["expressions"],
+                                                                                                    pythonisedExpressions["softToUltraSoft"]["fileName"])})
 
     
     
@@ -133,9 +140,9 @@ def minimization(args):
                                                      variableSymbols["gaugeSymbols"]), 
                             "effectivePotential": effectivePotential,
                             "dimensionalReduction": dimensionalReduction,
-                            "betaFunction4DExpression": ParsedExpressionSystemArray(parsedExpressions["betaFunctions4D"]["expressions"], 
+                            "betaFunction4DExpression": ParsedExpressionSystemArray(pythonisedExpressions["betaFunctions4D"]["expressions"], 
                                                                                     allSymbols, 
-                                                                                    parsedExpressions["betaFunctions4D"]["fileName"]),
+                                                                                    pythonisedExpressions["betaFunctions4D"]["fileName"]),
                             "args": args,
                             "allSymbols": allSymbols} 
         if args.bPool:

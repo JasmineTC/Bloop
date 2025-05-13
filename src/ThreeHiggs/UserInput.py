@@ -212,10 +212,10 @@ class UserInput(argparse.ArgumentParser):
                           dest = 'scalarMassMatrixBottomRightDefinitionsFile',
                           metavar='')
 
-        self.add_argument('--parsedExpressionsFile', 
+        self.add_argument('--pythonisedExpressionsFile', 
                           action = 'store', 
-                          default = "parsedExpressions.json",
-                          dest = 'parsedExpressionsFile',
+                          default = "pythonisedExpressionsFile.json",
+                          dest = 'pythonisedExpressionsFile',
                           metavar='')
         
         self.add_argument('--lagranianVariables', 
