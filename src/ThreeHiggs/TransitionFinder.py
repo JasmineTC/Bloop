@@ -148,10 +148,10 @@ class TraceFreeEnergyMinimum:
         ## use the location of the previous minimum as a guess for the next
         ## Not ideal as the code has to repeat an initial guess on first T
         minimumLocation = np.array(self.initialGuesses[0])
+        
         for T in self.TRange:
             if self.bVerbose:
                 print (f'Start of temp = {T} loop')
-                
             minimizationResults["T"].append(T)
             
             minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T,
@@ -177,15 +177,16 @@ class TraceFreeEnergyMinimum:
                                                                   params3D): 
                     minimizationResults["UltraSoftTemp"] = T
 
-                
             if np.all( minimizationResults["minimumLocation"][-1] < 0.5):
                 if self.bVerbose:
                     print (f"Symmetric phase found at temp {T}")
                 if counter == 3:
                     break
                 counter += 1
-
+            
         minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
+        
+        
         return minimizationResults
 
 

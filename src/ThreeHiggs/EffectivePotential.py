@@ -131,7 +131,7 @@ class EffectivePotential:
                  nloptInst,
                  vectorMassesSquared, 
                  vectorShortHands, 
-                 scalarPermutationMatrix, 
+                 scalarPermutationMatrix,
                  scalarMassMatrices, 
                  scalarRotationMatrix,
                  veff):
@@ -148,7 +148,7 @@ class EffectivePotential:
         self.vectorMassesSquared = vectorMassesSquared
         self.vectorShortHands = vectorShortHands
 
-        self.scalarPermutationMatrix = scalarPermutationMatrix
+        self.scalarPermutationMatrix = np.asarray(scalarPermutationMatrix, dtype = int)
         ## can have many matrices if we've block-diagonalized already
         ## ASSUME: the blocks are given in order: upper left to lower right. 
         ##TODO improve this
@@ -238,6 +238,20 @@ class EffectivePotential:
                             paramDict["MSsq11"], paramDict["MSsq12"]])
     
         return len([lowMass for lowMass in massList if lowMass < self.getUltraSoftScale(paramDict, T)]) > goldStone
+    
+    def plotPot(self, T, params3D, linestyle, v3Min, potMin, v3Max):
+        VeffWrapper = lambda fields, grad : np.real ( self.evaluatePotential(fields, T, params3D) )
+        
+        v3Range = np.linspace(1e-4, v3Max*1.1, 80)
+        potArray = np.zeros(len(v3Range))
+        for idx, v3 in enumerate(v3Range):
+            potArray[idx] = VeffWrapper([1e-4, 1e-4, v3], 1)
+        potArray = potArray/T**3
+        import matplotlib.pylab as plt
+        plt.plot(v3Range, potArray-potArray[0], label = f"{T=:.1f} GeV", linestyle = linestyle)
+        plt.scatter(v3Min, potMin/T**3 - potArray[0])
+        return min(potArray-potArray[0]), max(potArray-potArray[0])
+    
 
 from unittest import TestCase
 class EffectivePotentialUnitTests(TestCase):
