@@ -26,16 +26,7 @@ class DimensionalReduction():
 
 
 
-## Import this from runBenchmark
-def getLines(relativePathToResource):
-    ## fallback to hardcoded package name if the __package__ call fails
-    packageName = __package__ or "ThreeHiggs"
-
-    from importlib.resources import files
-    path = files(packageName) / relativePathToResource
-
-    with open(path, encoding = "utf-8") as file:
-        return file.readlines()
+from ThreeHiggs.GetLines import getLines
     
 from unittest import TestCase
 class DimensionalReductionUnitTest(TestCase):
