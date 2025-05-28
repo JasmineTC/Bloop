@@ -76,8 +76,8 @@ def pythoniseMathematica(args):
     veffLines += getLines(args.nloFile)
     if (args.loopOrder >= 2):
         veffLines += getLines(args.nnloFile)
-    
-    allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")], 
+    ### HACK SET TO REMOVE DUPLICATES --JASMINE TO ADDRESS IN MATHEMATICA WHEN NOT SICK
+    allSymbols = sorted(list(set([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")])), 
                         reverse = True)
     ## Move get lines to the functions? -- Would need to rework veffLines in this case
     ## Not ideal to have nested dicts but is future proof for when we move to arrays
@@ -105,7 +105,9 @@ def pythoniseMathematica(args):
                                                      args.scalarMassMatrixBottomRightFile)},
           "scalarRotationMatrix": {"expressions": pythoniseRotationMatrix(getLines(args.scalarRotationFile)),
                                    "fileName": args.scalarRotationFile},
-          "scalarPermutationMatrix": getLines(args.scalarPermutationFile, mode="json")},
+          "scalarPermutationMatrix": getLines(args.scalarPermutationFile, mode="json"),
+          "allSymbols": {"allSymbols": allSymbols,
+                         "fileName": args.allSymbolsFile}},
          open(args.pythonisedExpressionsFile, "w"),
          indent = 4)
 
