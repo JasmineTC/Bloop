@@ -29,7 +29,6 @@ def _doMinimization(parameters):
             print(f"Benchmark {benchmark['bmNumber']} has been rejected as outside benchmark range.")
 
         return
-    
     from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
     traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
                                                                   "dimensionalReduction": dimensionalReduction, 
@@ -71,13 +70,8 @@ def _doMinimization(parameters):
                                                          indent = 4))
 from ThreeHiggs.GetLines import getLines        
 def minimization(args):
-    allSymbols = getLines(args.allSymbolsFile, mode = "json")
-    from ThreeHiggs.PythoniseMathematica import replaceGreekSymbols
-    allSymbols = [replaceGreekSymbols(symbol) for symbol in allSymbols]
-    ## This is done to be consistent with MathematicaParses
-    allSymbols.sort(reverse=True)
-
     pythonisedExpressions = json.load(open(args.pythonisedExpressionsFile, "r"))
+    allSymbols = pythonisedExpressions["allSymbols"]["allSymbols"]
     variableSymbols =  getLines( "Data/Variables/LagranianSymbols.json", mode = "json") 
     
     from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
@@ -133,6 +127,7 @@ def minimization(args):
         ## This is done to be consistent with MathematicaParses
 
         from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
+
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
                                                      variableSymbols["yukawaSymbols"] + 
                                                      variableSymbols["gaugeSymbols"]), 
