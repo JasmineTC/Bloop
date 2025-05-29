@@ -100,7 +100,8 @@ class RotationMatrix:
 from unittest import TestCase
 class ParsedExpressionUnitTests(TestCase):
     def test_ParsedExpression(self):
-        source = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+        from numpy import pi
+        source = {"expression": f"sqrt(lam)/(4*{pi}) + log(mssq)",
                   "identifier": "Identifier",
                   "symbols": ['lam', 'mssq']}
 

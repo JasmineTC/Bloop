@@ -33,9 +33,9 @@ class DimensionalReductionUnitTest(TestCase):
     def test_getEFTParams(self):
         from ThreeHiggs.PythoniseMathematica import pythoniseExpressionSystem
         from ThreeHiggs.ParsedExpression import ParsedExpressionSystem
-        dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(pythoniseExpressionSystem(["b -> a", "T->T"])),
-                                                    ParsedExpressionSystem(pythoniseExpressionSystem(["c -> b"])), 
-                                                    ParsedExpressionSystem(pythoniseExpressionSystem(["a -> c", "mu3US -> T"])))
+        dimensionalReduction = DimensionalReduction(ParsedExpressionSystem(pythoniseExpressionSystem(["b -> a", "T->T"]), "<string>"),
+                                                    ParsedExpressionSystem(pythoniseExpressionSystem(["c -> b"]), "<string>"), 
+                                                    ParsedExpressionSystem(pythoniseExpressionSystem(["a -> c", "mu3US -> T"]), "<string>"))
         reference = {'a': 1, 'mu3US': 0}
 
 
