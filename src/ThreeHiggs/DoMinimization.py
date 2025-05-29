@@ -21,11 +21,11 @@ def _doMinimization(parameters):
     allSymbols = parameters["allSymbols"]
     
 
-    if args.bVerbose:
+    if args.verbose:
         print(f"Starting benchmark: {benchmark['bmNumber']}")
 
     if not args.firstBenchmark <= benchmark['bmNumber'] <= args.lastBenchmark:
-        if args.bVerbose:
+        if args.verbose:
             print(f"Benchmark {benchmark['bmNumber']} has been rejected as outside benchmark range.")
 
         return
@@ -38,7 +38,7 @@ def _doMinimization(parameters):
                                                                        args.TRangeEnd, 
                                                                        str(args.TRangeStepSize))),
                                                                   "pertSymbols": pertSymbols,
-                                                                  "bVerbose": args.bVerbose,
+                                                                  "verbose": args.verbose,
                                                                   "initialGuesses": args.initialGuesses,
                                                                   "allSymbolsDict": {key: value for value, key in enumerate(allSymbols)}})
     
@@ -50,19 +50,19 @@ def _doMinimization(parameters):
     from pathlib import Path
     Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
     if args.bSave:
-        if args.bVerbose:
+        if args.verbose:
             print(f"Saving {benchmark['bmNumber']} to {filename}")
         open(f"{filename}.json", "w").write(json.dumps(minimizationResult, indent = 4))
       
     if args.bPlot:
-        if args.bVerbose:
+        if args.verbose:
             print(f"Plotting {benchmark['bmNumber']}")
 
         from ThreeHiggs.PlotResult import plotData
         plotData(minimizationResult, benchmark['bmNumber'], args.loopOrder, filename)
 
     if args.bProcessMin:
-        if args.bVerbose:
+        if args.verbose:
             print(f"Processing {benchmark['bmNumber']} to {filename+'_interp'}")
         from ThreeHiggs.ProcessMinimization import interpretData
         open(f"{filename}_interp.json", "w").write(json.dumps(interpretData(minimizationResult,
@@ -72,10 +72,7 @@ def _doMinimization(parameters):
 from ThreeHiggs.GetLines import getLines        
 def minimization(args):
     parsedExpressions = json.load(open(args.parsedExpressionsFile, "r"))
-    # for key,value in parsedExpressions.items():
-        # print(key, value)
-        # print()
-    # exit()
+
     variableSymbols =  getLines( "Data/Variables/LagranianSymbols.json", mode = "json") 
     
     from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
@@ -93,7 +90,7 @@ def minimization(args):
     effectivePotential = EffectivePotential(variableSymbols["fieldSymbols"],
                                             args.loopOrder,
                                             args.bNumba,
-                                            args.bVerbose,
+                                            args.verbose,
                                             nloptInst,
                                             ParsedExpressionSystem(parsedExpressions["vectorMassesSquared"]["expressions"],
                                                                    parsedExpressions["vectorMassesSquared"]["fileName"]),

@@ -11,7 +11,7 @@ def compFieldDepParams(fields: list[float],
                 vectorShortHands,
                 vectorMassesSquared,
                 bNumba,
-                bVerbose) -> dict[str, float]:
+                verbose) -> dict[str, float]:
     ## Background fields
     for i, value in enumerate(fields):
         params3D[fieldNames[i]] = value
@@ -28,7 +28,7 @@ def compFieldDepParams(fields: list[float],
                                    scalarMassMatrices,
                                    scalarRotationMatrix,
                                    bNumba,
-                                   bVerbose)
+                                   verbose)
 
     return params3D
 
@@ -39,7 +39,7 @@ def diagonalizeScalars(params: dict[str, float],
                        scalarMassMatrices,
                        scalarRotationMatrix,
                        bNumba,
-                       bVerbose) -> dict[str, float]:
+                       verbose) -> dict[str, float]:
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
     subMassMatrix = np.array( [matrix.evaluate(params) for matrix in scalarMassMatrices ]).real / T**2
@@ -58,7 +58,7 @@ def diagonalizeScalars(params: dict[str, float],
             
             ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
             ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
-            if not bVerbose:
+            if not verbose:
                 continue
             
             diagonalBlock = np.transpose(vects) @ matrix @ vects
@@ -127,7 +127,7 @@ class EffectivePotential:
                  fieldNames, 
                  loopOrder,
                  bNumba,
-                 bVerbose,
+                 verbose,
                  nloptInst,
                  vectorMassesSquared, 
                  vectorShortHands, 
@@ -141,7 +141,7 @@ class EffectivePotential:
         self.loopOrder = loopOrder
         
         self.bNumba = bNumba
-        self.bVerbose = bVerbose
+        self.verbose = verbose
         
         self.nloptInst = nloptInst
 
@@ -169,7 +169,7 @@ class EffectivePotential:
                                                          self.vectorShortHands,
                                                          self.vectorMassesSquared,
                                                          self.bNumba,
-                                                         self.bVerbose)))
+                                                         self.verbose)))
 
     def findGlobalMinimum(self,T:float, 
                           params3D,
@@ -227,7 +227,7 @@ class EffectivePotential:
                                 self.vectorShortHands,
                                 self.vectorMassesSquared,
                                 self.bNumba,
-                                self.bVerbose)
+                                self.verbose)
 
         ## Convert mass into real type to do comparisons 
         massList = np.real([paramDict["MSsq01"], paramDict["MSsq02"],

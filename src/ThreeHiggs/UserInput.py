@@ -25,7 +25,7 @@ class UserInput(argparse.ArgumentParser):
                           help = "Int: Specify the order to compute the effective potential to")
         
         ## Should probably be made into a int rather than bool to allow for levels of verbosisty 
-        self.add_argument('--bVerbose', action = 'store_true', default = False, dest = 'bVerbose',
+        self.add_argument('--verbose', action = 'store_true', default = False, dest = 'verbose',
                           help = 'Bool: If activated code will print as it progresses and do consistency checks')
         
         self.add_argument('--bNumba', action = 'store_true', default = False, dest = 'bNumba',
