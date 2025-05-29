@@ -291,7 +291,7 @@ sqrtSubRules[ruleList_]:=Module[{newRules},
 it's easier to do this if we remove the suffices so its the same variable name throughout*)
 allSoftScaleParamsSqrtSuffixFree = RemoveSuffixes[sqrtSubRules[allSoftScaleParams], {"3d"}];
 (*Added during the dict to array moving and changing RGScale to T etc*)
-allSoftScaleParamsSqrtSuffixFree = Join[allSoftScaleParamsSqrtSuffixFree, {T->T}];
+allSoftScaleParamsSqrtSuffixFree = Join[allSoftScaleParamsSqrtSuffixFree, {T->T,RGScale->RGScale}];
 ExportUTF8[hardToSoftDirectory<>"/softScaleParams_NLO.txt", allSoftScaleParamsSqrtSuffixFree]
 
 
