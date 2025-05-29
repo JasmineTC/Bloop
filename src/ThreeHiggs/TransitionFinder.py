@@ -91,12 +91,14 @@ class TraceFreeEnergyMinimum:
         
         paramsForMatchingArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
         paramsForMatchingDict = {key: paramsForMatchingArray[value] for key, value in self.allSymbolsDict.items()}
-        
-        params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatchingDict, T)
-        return ( *self.effectivePotential.findGlobalMinimum(T, params3D, self.initialGuesses + (minimumLocation, ) ), 
+        paramsForMatchingDict = self.dimensionalReduction.hardToSoft.evaluate(paramsForMatchingDict, bReturnDict = True)
+        paramsForMatchingDict |= self.dimensionalReduction.softScaleRGE.evaluate(paramsForMatchingDict, bReturnDict = True)
+        paramsForMatchingDict = self.dimensionalReduction.softToUltraSoft.evaluate(paramsForMatchingDict, bReturnDict = True)
+
+        return ( *self.effectivePotential.findGlobalMinimum(T, paramsForMatchingDict, self.initialGuesses + (minimumLocation, ) ), 
                 bIsPerturbative(paramsForMatchingDict, self.pertSymbols), 
                 bIsBounded(paramsForMatchingDict),
-                params3D)
+                paramsForMatchingDict)
     
     def populateLagranianParams4D(self, inputParams: dict[str, float]) -> np.array:
         higgsVev = 246.22  #Consider using Fermi constant instead
