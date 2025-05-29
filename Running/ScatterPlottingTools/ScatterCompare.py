@@ -21,8 +21,8 @@ def loadData(directoryList):
                 bmNumber.append(resultDic["bmNumber"])
     return strength, bmInput, Tc, bmNumber
 
-strength2Loop, bmInput2Loop, Tc2Loop, bmNumber2Loop = loadData(["2LoopResults/2Loop01GeV","2LoopResults/Filler01"] )
-strength1Loop, bmInput1Loop, Tc1Loop, bmNumber1Loop = loadData(["1LoopResults/Results01GeV","1LoopResults/Filler01"] )
+strength2Loop, bmInput2Loop, Tc2Loop, bmNumber2Loop = loadData(["2LoopResults/Combined01SSS"] )
+strength1Loop, bmInput1Loop, Tc1Loop, bmNumber1Loop = loadData(["1LoopResults/Combined01SSS"] )
 
 #Sort the bmInputs by order of strength, this is so the colour of the scatter plot is set by the strong PT at that point, transpose taken so each row is just on variable type
 strength2Loop, theta2Loop, gHDM12Loop, ms12Loop, delta122Loop, delta1c2Loop, deltac2Loop , _, Tc2Loop, bmNumber2Loop = zip(*sorted(zip(strength2Loop, *transpose(bmInput2Loop), Tc2Loop, bmNumber2Loop)))

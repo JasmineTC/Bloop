@@ -235,8 +235,7 @@ def generateBenchmarks(benchmarkOutput: str, mode: str, randomNum: int = None, p
     from pathlib import Path
     (output_file := Path(benchmarkOutput)).parent.mkdir(exist_ok=True, parents=True)   
     
-    from json import dump  
-    
+    from json import dump
     if mode == "handPicked":
         dump(_handPickedBm(), open(output_file, "w"), indent = 4)
         return
@@ -244,7 +243,6 @@ def generateBenchmarks(benchmarkOutput: str, mode: str, randomNum: int = None, p
         dump(_randomBmParam(randomNum), open(output_file, "w"), indent = 4)
         return
     elif mode == "randomSSS":
-        ## THIS NEEDS UPDATING BUT NOT IN THIS COMMIT
         dump(_strongSubSet(prevResultDir), open(output_file, "w"), indent = 4)
         return 
     return
