@@ -42,7 +42,7 @@ def _doMinimization(parameters):
                                                                   "initialGuesses": args.initialGuesses,
                                                                   "allSymbolsDict": {key: value for value, key in enumerate(allSymbols)}})
     
-    traceFreeEnergyMinimumInst.plotPotential(benchmark)
+    # traceFreeEnergyMinimumInst.plotPotential(benchmark)
     minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
   
     filename = f"{args.resultsDirectory}/BM_{benchmark['bmNumber']}"
