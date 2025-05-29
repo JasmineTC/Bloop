@@ -3,8 +3,8 @@
 ## Container
 ```
 podman build . -t threehiggs 
-podman run -it threehiggs /bin/bash
-cd src
+podman run --mount type=bind,src=$PWD,target=/ThreeHiggs -it threehiggs /bin/bash
+cd /ThreeHiggs/src
 python3 runBenchmark.py
 ```
 
