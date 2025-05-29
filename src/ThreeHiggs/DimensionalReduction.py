@@ -12,18 +12,9 @@ class DimensionalReduction():
 
     def getUltraSoftParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
         outParams = self.hardToSoft.evaluate(paramsForMatching, bReturnDict = True)
-
-        ## TODO Talk to someone about this RGScale stuff!!!!!
-        #outParams |= {
-        #    "RGScale": paramsForMatching["RGScale"],
-        #}
-        
         outParams |= self.softScaleRGE.evaluate(outParams, bReturnDict = True)
 
         return self.softToUltraSoft.evaluate(outParams, bReturnDict = True)
-
-
-
 
 from ThreeHiggs.GetLines import getLines
     
