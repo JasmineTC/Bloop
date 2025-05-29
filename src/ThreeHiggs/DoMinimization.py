@@ -74,6 +74,7 @@ from ThreeHiggs.GetLines import getLines
 def minimization(args):
     pythonisedExpressions = json.load(open(args.pythonisedExpressionsFile, "r"))
     allSymbols = pythonisedExpressions["allSymbols"]["allSymbols"]
+
     variableSymbols =  getLines( "Data/Variables/LagranianSymbols.json", mode = "json") 
     
     from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
@@ -123,11 +124,6 @@ def minimization(args):
     
     
     with open(args.benchmarkFile) as benchmarkFile:
-        from ThreeHiggs.PythoniseMathematica import replaceGreekSymbols
-        allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")], 
-                            reverse = True)
-        ## This is done to be consistent with MathematicaParses
-
         from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
 
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 

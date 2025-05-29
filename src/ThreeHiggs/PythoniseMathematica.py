@@ -8,6 +8,16 @@ def replaceGreekSymbols(string: str) -> str:
     # Or bully DRalgo people to removing greek symbols
     return string.replace(u"\u03BB", "lam").replace(u"\u03BC", "mu")
 
+def replaceSymbolsConst(string):
+    ## Change expressions to use either pi or Pi but not both!!!
+    from numpy import pi
+    from numpy import euler_gamma, pi
+    Glaisher = "1.28242712910062"
+
+    return string.replace("pi", str(pi)).replace("Pi", str(pi)) \
+                 .replace("EulerGamma", str(euler_gamma)) \
+                 .replace("Glaisher", Glaisher) 
+
 def removeSuffices(string):
     return string.replace("^2", "sq")
 
@@ -23,7 +33,7 @@ def pythoniseExpressionArray(line, allSymbols):
     identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
     
     identifier = removeSuffices(replaceGreekSymbols(identifier))
-    expression = parse_mathematica(replaceGreekSymbols(line))
+    expression = parse_mathematica(replaceSymbolsConst(replaceGreekSymbols(line)))
     symbols = [str(symbol) for symbol in expression.free_symbols]
 
     return {"identifier": identifier, 
@@ -34,7 +44,7 @@ def pythoniseExpression(line):
     identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
 
     identifier = removeSuffices(replaceGreekSymbols(identifier))
-    expression = parse_mathematica(replaceGreekSymbols(line))
+    expression = parse_mathematica(replaceSymbolsConst(replaceGreekSymbols(line)))
     symbols = [str(symbol) for symbol in expression.free_symbols]
 
     return {"identifier": identifier, "expression": str(expression), "symbols": sorted(symbols)}
@@ -79,6 +89,7 @@ def pythoniseMathematica(args):
     ### HACK SET TO REMOVE DUPLICATES --JASMINE TO ADDRESS IN MATHEMATICA WHEN NOT SICK
     allSymbols = sorted(list(set([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")])), 
                         reverse = True)
+
     ## Move get lines to the functions? -- Would need to rework veffLines in this case
     ## Not ideal to have nested dicts but is future proof for when we move to arrays
     dump({"betaFunctions4D": {"expressions": pythoniseExpressionSystemArray(getLines(args.betaFunctions4DFile), allSymbols),
@@ -94,7 +105,9 @@ def pythoniseMathematica(args):
           "vectorShortHands": {"expressions": pythoniseExpressionSystem(getLines(args.vectorShortHandsFile)),
                                "fileName": args.vectorShortHandsFile},
           "veff": {"expressions": pythoniseExpressionSystem(veffLines),
-                     "fileName": "Combined Veff files"},
+                        "fileName": "Combined Veff files"},
+          "veffArray": {"expressions": pythoniseExpressionSystemArray(veffLines, allSymbols),
+                        "fileName": "Combined Veff files"},
           "scalarMassMatrixUpperLeft": {"expressions": pythoniseMassMatrix(getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
                                                                        getLines(args.scalarMassMatrixUpperLeftFile)),
                                         "fileName": (args.scalarMassMatrixUpperLeftDefinitionsFile,
@@ -127,7 +140,7 @@ class PythoniseMathematicaUnitTests(TestCase):
         self.assertEqual(reference, [removeSuffices(sourceString) for sourceString in source])
 
     def test_pythoniseExpression(self):
-        reference = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+        reference = {"expression": "0.07957747154594767*sqrt(lam) + log(mssq)",
                      "identifier": "Identifier",
                      "symbols": ['lam', 'mssq']}
 
@@ -136,13 +149,13 @@ class PythoniseMathematicaUnitTests(TestCase):
         self.assertEqual(reference, pythoniseExpression(source))
 
     def test_paseExpressionSystem(self):
-        reference = [{"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+        reference = [{"expression": "0.07957747154594767*sqrt(lam) + log(mssq)",
                       "identifier": "Identifier",
                       "symbols": ['lam', 'mssq']},
-                     {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+                     {"expression": "0.07957747154594767*sqrt(lam) + log(mssq)",
                       "identifier": "Identifier",
                       "symbols": ['lam', 'mssq']},
-                     {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+                     {"expression": "0.07957747154594767*sqrt(lam) + log(mssq)",
                       "identifier": "Identifier",
                       "symbols": ['lam', 'mssq']}]
 
