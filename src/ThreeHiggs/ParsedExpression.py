@@ -1,5 +1,6 @@
 from cmath import log, sqrt
 
+import numpy
 import copy
 
 class ParsedExpression:
@@ -55,13 +56,12 @@ class ParsedExpressionSystemArray:
         self.allSymbols = allSymbols
         self.fileName = fileName
         
-
     def evaluate(self, params):
         ## Look into using copy.replace 3.13 feature
         newParams = copy.deepcopy(params)
         
         for expression in self.parsedExpressions:
-            newParams[expression[0]] = expression[1].evaluate(params)
+            newParams[expression[0]] = numpy.real(expression[1].evaluate(params))
 
         return newParams
 

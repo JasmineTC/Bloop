@@ -84,21 +84,30 @@ class TraceFreeEnergyMinimum:
             array[self.allSymbolsDict[key]] = float(spline(muEvaulate))
         return array
     
-    def executeMinimisation(self, T, 
-                            minimumLocation,
-                            betaSpline4D): 
+    def executeMinimisation(
+        self, 
+        T, 
+        minimumLocation,
+        betaSpline4D
+    ): 
         paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.allSymbolsDict.keys())))
-        
-        paramsForMatchingArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
-        paramsForMatchingDict = {key: paramsForMatchingArray[value] for key, value in self.allSymbolsDict.items()}
-        paramsForMatchingDict = self.dimensionalReduction.hardToSoft.evaluate(paramsForMatchingDict, bReturnDict = True)
-        paramsForMatchingDict |= self.dimensionalReduction.softScaleRGE.evaluate(paramsForMatchingDict, bReturnDict = True)
-        paramsForMatchingDict = self.dimensionalReduction.softToUltraSoft.evaluate(paramsForMatchingDict, bReturnDict = True)
+        paramValuesArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
+        paramValuesArray = self.dimensionalReduction.hardToSoft.evaluate(paramValuesArray)
+        paramValuesArray = self.dimensionalReduction.softScaleRGE.evaluate(paramValuesArray)
+        paramValuesArray = self.dimensionalReduction.softToUltraSoft.evaluate(paramValuesArray)
 
-        return ( *self.effectivePotential.findGlobalMinimum(T, paramsForMatchingDict, self.initialGuesses + (minimumLocation, ) ), 
-                bIsPerturbative(paramsForMatchingDict, self.pertSymbols), 
-                bIsBounded(paramsForMatchingDict),
-                paramsForMatchingDict)
+        return ( 
+            *self.effectivePotential.findGlobalMinimum(
+                T, 
+                paramValuesArray, 
+                self.initialGuesses + (minimumLocation, )
+            ), 
+            True,
+            True,
+            #bIsPerturbative(paramsForMatchingDict, self.pertSymbols), 
+            #bIsBounded(paramsForMatchingDict),
+            list(paramValuesArray),
+        )
     
     def populateLagranianParams4D(self, inputParams: dict[str, float]) -> np.array:
         higgsVev = 246.22  #Consider using Fermi constant instead

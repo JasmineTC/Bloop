@@ -92,37 +92,72 @@ def pythoniseMathematica(args):
 
     ## Move get lines to the functions? -- Would need to rework veffLines in this case
     ## Not ideal to have nested dicts but is future proof for when we move to arrays
-    dump({"betaFunctions4D": {"expressions": pythoniseExpressionSystemArray(getLines(args.betaFunctions4DFile), allSymbols),
-                              "fileName": args.betaFunctions4DFile},
-          "hardToSoft": {"expressions":  pythoniseExpressionSystem(getLines(args.hardToSoftFile)),
-                         "fileName": args.hardToSoftFile},
-          "softScaleRGE": {"expressions": pythoniseExpressionSystem(getLines(args.softScaleRGEFile)),
-                           "fileName": args.softScaleRGEFile},
-          "softToUltraSoft": {"expressions": pythoniseExpressionSystem(getLines(args.softToUltraSoftFile)),
-                              "fileName": args.softToUltraSoftFile},
-          "vectorMassesSquared": {"expressions": pythoniseExpressionSystem(getLines(args.vectorMassesSquaredFile)),
-                                  "fileName": args.vectorMassesSquaredFile},
-          "vectorShortHands": {"expressions": pythoniseExpressionSystem(getLines(args.vectorShortHandsFile)),
-                               "fileName": args.vectorShortHandsFile},
-          "veff": {"expressions": pythoniseExpressionSystem(veffLines),
-                        "fileName": "Combined Veff files"},
-          "veffArray": {"expressions": pythoniseExpressionSystemArray(veffLines, allSymbols),
-                        "fileName": "Combined Veff files"},
-          "scalarMassMatrixUpperLeft": {"expressions": pythoniseMassMatrix(getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
-                                                                       getLines(args.scalarMassMatrixUpperLeftFile)),
-                                        "fileName": (args.scalarMassMatrixUpperLeftDefinitionsFile,
-                                                     args.scalarMassMatrixBottomRightFile)},
-          "scalarMassMatrixBottomRight": {"expressions": pythoniseMassMatrix(getLines(args.scalarMassMatrixBottomRightDefinitionsFile),
-                                                                         getLines(args.scalarMassMatrixBottomRightFile)),
-                                        "fileName": (args.scalarMassMatrixBottomRightDefinitionsFile,
-                                                     args.scalarMassMatrixBottomRightFile)},
-          "scalarRotationMatrix": {"expressions": pythoniseRotationMatrix(getLines(args.scalarRotationFile)),
-                                   "fileName": args.scalarRotationFile},
-          "scalarPermutationMatrix": getLines(args.scalarPermutationFile, mode="json"),
-          "allSymbols": {"allSymbols": allSymbols,
-                         "fileName": args.allSymbolsFile}},
-         open(args.pythonisedExpressionsFile, "w"),
-         indent = 4)
+    dump(
+        {
+            "betaFunctions4D": {
+                "expressions": pythoniseExpressionSystemArray(getLines(args.betaFunctions4DFile), allSymbols),
+                "fileName": args.betaFunctions4DFile,
+            },
+            "hardToSoft": {
+                "expressions":  pythoniseExpressionSystemArray(getLines(args.hardToSoftFile), allSymbols),
+                "fileName": args.hardToSoftFile,
+            },
+            "softScaleRGE": {
+                "expressions": pythoniseExpressionSystemArray(getLines(args.softScaleRGEFile), allSymbols),
+                "fileName": args.softScaleRGEFile,
+            },
+            "softToUltraSoft": {
+                "expressions": pythoniseExpressionSystemArray(getLines(args.softToUltraSoftFile), allSymbols),
+                "fileName": args.softToUltraSoftFile,
+            },
+            "vectorMassesSquared": {
+                "expressions": pythoniseExpressionSystemArray(getLines(args.vectorMassesSquaredFile), allSymbols),
+                "fileName": args.vectorMassesSquaredFile,
+            },
+            "vectorShortHands": {
+                "expressions": pythoniseExpressionSystemArray(getLines(args.vectorShortHandsFile), allSymbols),
+                "fileName": args.vectorShortHandsFile,
+            },
+            "veff": {
+                "expressions": pythoniseExpressionSystem(veffLines),
+                "fileName": "Combined Veff files",
+            },
+            "veffArray": {
+                "expressions": pythoniseExpressionSystemArray(veffLines, allSymbols),
+                "fileName": "Combined Veff files",
+            },
+            "scalarMassMatrixUpperLeft": {
+                "expressions": pythoniseMassMatrix(
+                    getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
+                    getLines(args.scalarMassMatrixUpperLeftFile),
+                ),
+                "fileName": (
+                    args.scalarMassMatrixUpperLeftDefinitionsFile,
+                    args.scalarMassMatrixBottomRightFile),
+            },
+            "scalarMassMatrixBottomRight": {
+                "expressions": pythoniseMassMatrix(
+                    getLines(args.scalarMassMatrixBottomRightDefinitionsFile),
+                    getLines(args.scalarMassMatrixBottomRightFile),
+                ),
+                "fileName": (
+                    args.scalarMassMatrixBottomRightDefinitionsFile,
+                    args.scalarMassMatrixBottomRightFile,
+                ),
+            },
+            "scalarRotationMatrix": {
+                "expressions": pythoniseRotationMatrix(getLines(args.scalarRotationFile)),
+                "fileName": args.scalarRotationFile,
+            },
+            "scalarPermutationMatrix": getLines(args.scalarPermutationFile, mode="json"),
+            "allSymbols": {
+                "allSymbols": allSymbols,
+                "fileName": args.allSymbolsFile,
+            },
+        },
+        open(args.pythonisedExpressionsFile, "w"),
+        indent = 4
+    )
 
 from unittest import TestCase
 class PythoniseMathematicaUnitTests(TestCase):

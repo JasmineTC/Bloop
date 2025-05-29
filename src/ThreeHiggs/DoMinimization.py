@@ -95,10 +95,16 @@ def minimization(args):
                                             args.bNumba,
                                             args.verbose,
                                             nloptInst,
-                                            ParsedExpressionSystem(pythonisedExpressions["vectorMassesSquared"]["expressions"],
-                                                                   pythonisedExpressions["vectorMassesSquared"]["fileName"]),
-                                            ParsedExpressionSystem(pythonisedExpressions["vectorShortHands"]["expressions"],
-                                                                   pythonisedExpressions["vectorShortHands"]["fileName"]),
+                                            ParsedExpressionSystemArray(
+                                                pythonisedExpressions["vectorMassesSquared"]["expressions"],
+                                                allSymbols,
+                                                pythonisedExpressions["vectorMassesSquared"]["fileName"],
+                                            ),
+                                            ParsedExpressionSystemArray(
+                                                pythonisedExpressions["vectorShortHands"]["expressions"],
+                                                allSymbols,
+                                                pythonisedExpressions["vectorShortHands"]["fileName"],
+                                            ),
                                             pythonisedExpressions["scalarPermutationMatrix"],
                                             (MassMatrix(pythonisedExpressions["scalarMassMatrixUpperLeft"]["expressions"], 
                                                         pythonisedExpressions["scalarMassMatrixUpperLeft"]["fileName"]), 
@@ -114,18 +120,26 @@ def minimization(args):
                                             allSymbols) 
 
     from ThreeHiggs.DimensionalReduction import DimensionalReduction
-    dimensionalReduction = DimensionalReduction(config = {"hardToSoft": ParsedExpressionSystem(pythonisedExpressions["hardToSoft"]["expressions"], 
-                                                                                               pythonisedExpressions["hardToSoft"]["fileName"]),
-                                                          "softScaleRGE": ParsedExpressionSystem(pythonisedExpressions["softScaleRGE"]["expressions"],
-                                                                                                 pythonisedExpressions["softScaleRGE"]["fileName"]),
-                                                          "softToUltraSoft": ParsedExpressionSystem(pythonisedExpressions["softToUltraSoft"]["expressions"],
-                                                                                                    pythonisedExpressions["softToUltraSoft"]["fileName"])})
-
-    
+    from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
+    dimensionalReduction = DimensionalReduction(config = {
+        "hardToSoft": ParsedExpressionSystemArray(
+            pythonisedExpressions["hardToSoft"]["expressions"], 
+            allSymbols,
+            pythonisedExpressions["hardToSoft"]["fileName"],
+        ),
+        "softScaleRGE": ParsedExpressionSystemArray(
+            pythonisedExpressions["softScaleRGE"]["expressions"],
+            allSymbols,
+            pythonisedExpressions["softScaleRGE"]["fileName"],
+        ),
+        "softToUltraSoft": ParsedExpressionSystemArray(
+            pythonisedExpressions["softToUltraSoft"]["expressions"],
+            allSymbols,
+            pythonisedExpressions["softToUltraSoft"]["fileName"],
+        )
+    })
     
     with open(args.benchmarkFile) as benchmarkFile:
-        from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
-
         minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
                                                      variableSymbols["yukawaSymbols"] + 
                                                      variableSymbols["gaugeSymbols"]), 

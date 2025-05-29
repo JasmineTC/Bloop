@@ -13,6 +13,7 @@ def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
          subEigenValues[idx], subRotationMatrix[idx] = np.linalg.eigh(matrix)
     return subEigenValues*T**2, subRotationMatrix
 
+<<<<<<< HEAD
 def compFieldDepParams(fields: list[float], 
                        T:float, 
                        params3D, 
@@ -25,9 +26,27 @@ def compFieldDepParams(fields: list[float],
                        bNumba,
                        verbose) -> dict[str, float]:
 
+=======
+def compFieldDepParams(
+    fields: list[float], 
+    T:float, 
+    params3D, 
+    allSymbols,
+    fieldNames, 
+    scalarPermutationMatrix,
+    scalarMassMatrices,
+    scalarRotationMatrix,
+    vectorShortHands,
+    vectorMassesSquared,
+    bNumba,
+    bVerbose
+) -> dict[str, float]:
+    ## Background fields
+>>>>>>> 6f2290d (Move to array.)
     for i, value in enumerate(fields):
-        params3D[fieldNames[i]] = value
+        params3D[allSymbols.index(fieldNames[i])] = value
 
+<<<<<<< HEAD
     return params3D | (vectorShortHands.evaluate(params3D, 
                                                  bReturnDict = True) | 
                        
@@ -41,6 +60,29 @@ def compFieldDepParams(fields: list[float],
                                           scalarRotationMatrix,
                                           bNumba,
                                           verbose))
+=======
+    ## Vectors
+    params3D = vectorShortHands.evaluate(params3D)
+    
+    params3D = vectorMassesSquared.evaluate(params3D)
+
+    params3D = \
+        {symbol: params3D[index] for index, symbol in enumerate(allSymbols)} | \
+        {params3D[allSymbols.index("v1")] : fields[0]} | \
+        {params3D[allSymbols.index("v2")] : fields[1]} | \
+        {params3D[allSymbols.index("v3")] : fields[2]}
+
+    ## Scalars       
+    return diagonalizeScalars(
+        params3D, 
+        T,
+        scalarPermutationMatrix,
+        scalarMassMatrices,
+        scalarRotationMatrix,
+        bNumba,
+        bVerbose
+    )
+>>>>>>> 6f2290d (Move to array.)
 
 from itertools import chain
 def diagonalizeScalars(params: dict[str, float], 
@@ -171,22 +213,21 @@ class EffectivePotential:
         self.allSymbols = allSymbols
 
     def evaluatePotential(self, fields: list[float], T:float, params3D) -> complex:
-        ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
-        ## Sum because the result is a list of tree, 1loop etc 
-        array = self.expressionsArray.getParamsArray(compFieldDepParams(fields,
-                                                         T,
-                                                         params3D,
-                                                         self.fieldNames,
-                                                         self.scalarPermutationMatrix, 
-                                                         self.scalarMassMatrices, 
-                                                         self.scalarRotationMatrix,
-                                                         self.vectorShortHands,
-                                                         self.vectorMassesSquared,
-                                                         self.bNumba,
-                                                         self.bVerbose))
-        # for idx, key in enumerate(self.allSymbols):
-        #     print(key, array[idx])
-        # exit()
+        array = self.expressionsArray.getParamsArray(compFieldDepParams(
+            fields,
+            T,
+            params3D,
+            self.allSymbols,
+            self.fieldNames,
+            self.scalarPermutationMatrix, 
+            self.scalarMassMatrices, 
+            self.scalarRotationMatrix,
+            self.vectorShortHands,
+            self.vectorMassesSquared,
+            self.bNumba,
+            self.bVerbose
+        ))
+
         return sum(self.expressionsArray.getParamSubset(self.expressionsArray.evaluate(array)))
 
     def findGlobalMinimum(self,T:float, 
