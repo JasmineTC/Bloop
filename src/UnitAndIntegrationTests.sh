@@ -2,7 +2,7 @@
 
 # Fine tests providing partial coverage
 echo Unit tests...
-python3 ../src/ThreeHiggs/UnitTests.py
+python3 ThreeHiggs/UnitTests.py
 
 echo Intergration tests...
 # Super coarse test providing full coverage
