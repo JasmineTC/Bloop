@@ -187,13 +187,13 @@ class EffectivePotential:
             result = self.nloptInst.nloptLocal(VeffWrapper, candidate)
             if result[1] < bestResult[1]:
                 bestResult = result
-                    
         potentialAtMin = self.evaluatePotential(bestResult[0], T, params3D) ## Compute the potential at minimum to check if its complex
         if abs(potentialAtMin.imag)/abs(potentialAtMin.real) > 1e-8: 
             return bestResult[0], potentialAtMin.real, potentialAtMin.imag, "complex" ## Flag minimum with imag > tol
+
         return bestResult[0], potentialAtMin.real, None, None
     
-    
+     
     def getUltraSoftScale(self, paramDict, T: float) -> float:
         '''Given a field input and temperature compute the scale of ultra soft physics 
         which is g^2 T/ 16 pi, g is taken to be the largest coupling in the 
@@ -248,9 +248,47 @@ class EffectivePotential:
             potArray[idx] = VeffWrapper([1e-4, 1e-4, v3], 1)
         potArray = potArray/T**3
         import matplotlib.pylab as plt
+        # plt.rcParams.update({'font.size': 12.5})
         plt.plot(v3Range, potArray-potArray[0], label = f"{T=:.1f} GeV", linestyle = linestyle)
         plt.scatter(v3Min, potMin/T**3 - potArray[0])
         return min(potArray-potArray[0]), max(potArray-potArray[0])
+    
+    def plotPot3D(self, T, params3D):
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        from matplotlib import cm
+        from matplotlib.ticker import LinearLocator
+        
+        VeffWrapper = lambda fields, grad : np.real ( self.evaluatePotential(fields, T, params3D) )
+        n = 100
+        v3Range = np.linspace(-1.5, 13, n)
+        v2Range = np.linspace(-1.5, 5, n)
+        v2Mesh, v3Mesh = np.meshgrid(v2Range, v3Range)
+        potList = []
+        for v3 in v3Range:
+            for v2 in v2Range:
+                potList.append(VeffWrapper([v2, v2, v3], None))
+        minPot = min(potList)
+        potArray = np.array(potList).reshape(n, n)
+        potArray = (potArray-minPot)/T**3
+        fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+        zMax = 0.005
+        ax.set_zlim(None, zMax)
+        
+        ax.plot_surface(v2Mesh, v3Mesh, potArray, cmap=cm.coolwarm,
+                               linewidth=0, antialiased=False, vmax = zMax)
+        ax.zaxis.set_major_locator(LinearLocator(10))
+        ax.axes.set_xlabel(r"$v_1$, $v_2$ ($\text{GeV}^{\: \frac{1}{2}})$")
+        ax.axes.set_ylabel(r"$v_3$ ($\text{GeV}^{\: \frac{1}{2}})$")
+        ax.zaxis.set_rotate_label(False)
+        ax.axes.set_zlabel(r"$\dfrac{\Delta V}{T^3}$", labelpad = 10, rotation = 0)
+        # A StrMethodFormatter is used automatically
+        ax.zaxis.set_major_formatter('{x:.03f}')
+
+        plt.show()
+        exit()
+    
     
 
 from unittest import TestCase
