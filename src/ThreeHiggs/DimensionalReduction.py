@@ -12,15 +12,14 @@ class DimensionalReduction():
 
     def getUltraSoftParams(self, paramsForMatching: dict[str, float], goalRGScale: float) -> dict[str, float]:
         outParams = self.hardToSoft.evaluate(paramsForMatching, bReturnDict = True)
+
         ## TODO Talk to someone about this RGScale stuff!!!!!
-        outParams |= {"RGScale": paramsForMatching["RGScale"],
-                      "goalScale": goalRGScale,
-                      "startScale": paramsForMatching["RGScale"]}
+        #outParams |= {
+        #    "RGScale": paramsForMatching["RGScale"],
+        #}
         
         outParams |= self.softScaleRGE.evaluate(outParams, bReturnDict = True)
-        ## For reasons unknown the RG scale is different for soft and ultra soft physics
-        outParams["RGScale"] = goalRGScale
-        ## HACK this is the RG scale name in Veff
+
         return self.softToUltraSoft.evaluate(outParams, bReturnDict = True)
 
 
