@@ -1,17 +1,27 @@
+import nlopt
 import numpy as np
-from scipy import linalg
 
-def compFieldDepParams(fields: list[float], 
-                T:float, 
-                params3D, 
-                fieldNames, 
-                scalarPermutationMatrix,
-                scalarMassMatrices,
-                scalarRotationMatrix,
-                vectorShortHands,
-                vectorMassesSquared,
-                bNumba,
-                bVerbose) -> dict[str, float]:
+from scipy import linalg
+from itertools import chain
+from dataclasses import dataclass, InitVar
+
+from .Veff import Veff
+from .Veff import Veff_params
+
+
+def compFieldDepParams(
+        fields: list[float], 
+        T:float, 
+        params3D, 
+        fieldNames, 
+        scalarPermutationMatrix,
+        scalarMassMatrices,
+        scalarRotationMatrix,
+        vectorShortHands,
+        vectorMassesSquared,
+        bNumba,
+        bVerbose
+    ) -> dict[str, float]:
     ## Background fields
     for i, value in enumerate(fields):
         params3D[fieldNames[i]] = value
@@ -22,24 +32,27 @@ def compFieldDepParams(fields: list[float],
     params3D |= vectorMassesSquared.evaluate(params3D, bReturnDict=True)
 
     ## Scalars       
-    params3D |= diagonalizeScalars(params3D, 
-                                   T,
-                                   scalarPermutationMatrix,
-                                   scalarMassMatrices,
-                                   scalarRotationMatrix,
-                                   bNumba,
-                                   bVerbose)
-
+    params3D |= diagonalizeScalars(
+        params3D, 
+        T,
+        scalarPermutationMatrix,
+        scalarMassMatrices,
+        scalarRotationMatrix,
+        bNumba,
+        bVerbose
+    )
     return params3D
 
-from itertools import chain
-def diagonalizeScalars(params: dict[str, float], 
-                       T: float,  
-                       scalarPermutationMatrix,
-                       scalarMassMatrices,
-                       scalarRotationMatrix,
-                       bNumba,
-                       bVerbose) -> dict[str, float]:
+
+def diagonalizeScalars(
+        params: dict[str, float], 
+        T: float,  
+        scalarPermutationMatrix,
+        scalarMassMatrices,
+        scalarRotationMatrix,
+        bNumba,
+        bVerbose
+    ) -> dict[str, float]:
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
     subMassMatrix = np.array( [matrix.evaluate(params) for matrix in scalarMassMatrices ]).real / T**2
@@ -78,8 +91,7 @@ def diagonalizeScalars(params: dict[str, float],
 
     return outDict | {name: float(msq) for name, msq in zip(massNames, chain(*subEigenValues))}
 
-import nlopt
-from dataclasses import dataclass, InitVar
+
 @dataclass(frozen=True)
 class cNlopt:
     nbrVars: int = 0
@@ -117,34 +129,33 @@ class cNlopt:
        	opt.set_xtol_rel(self.relLocalTol)
        	return opt.optimize(initialGuess),  opt.last_optimum_value()
 
+
 """ Evaluating the potential: 
 1. Call setModelParameters() with a dict that sets all parameters in the action. 
 This is assumed to be using 3D EFT, so the params are temperature dependent.
 2. Call evaluate() with a list that specifies values of background fields. Fields are in 3D units, ie. have dimension GeV^(1/2)
 """
 class EffectivePotential:
-    def __init__(self,
-                 fieldNames, 
-                 loopOrder,
-                 bNumba,
-                 bVerbose,
-                 nloptInst,
-                 vectorMassesSquared, 
-                 vectorShortHands, 
-                 scalarPermutationMatrix, 
-                 scalarMassMatrices, 
-                 scalarRotationMatrix,
-                 veff):
-        
+    def __init__(
+            self,
+            fieldNames, 
+            loopOrder,
+            bNumba,
+            bVerbose,
+            nloptInst,
+            vectorMassesSquared, 
+            vectorShortHands, 
+            scalarPermutationMatrix, 
+            scalarMassMatrices, 
+            scalarRotationMatrix,
+            veff
+        ):
         self.fieldNames = fieldNames
+        self.loopOrder  = loopOrder
+        self.bNumba     = bNumba
+        self.bVerbose   = bVerbose
+        self.nloptInst  = nloptInst
         
-        self.loopOrder = loopOrder
-        
-        self.bNumba = bNumba
-        self.bVerbose = bVerbose
-        
-        self.nloptInst = nloptInst
-
         self.vectorMassesSquared = vectorMassesSquared
         self.vectorShortHands = vectorShortHands
 
@@ -157,19 +168,28 @@ class EffectivePotential:
         self.expressions = veff
 
     def evaluatePotential(self, fields: list[float], T:float, params3D) -> complex:
-        ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
-        ## Sum because the result is a list of tree, 1loop etc 
-        return sum(self.expressions.evaluate(compFieldDepParams(fields,
-                                                         T,
-                                                         params3D,
-                                                         self.fieldNames,
-                                                         self.scalarPermutationMatrix, 
-                                                         self.scalarMassMatrices, 
-                                                         self.scalarRotationMatrix,
-                                                         self.vectorShortHands,
-                                                         self.vectorMassesSquared,
-                                                         self.bNumba,
-                                                         self.bVerbose)))
+        # This has masses, angles, all shorthand symbols etc. Everything we 
+        # need to evaluate loop corrections Sum because the result is a list of 
+        # tree, 1loop etc
+        params = compFieldDepParams(
+            fields,
+            T,
+            params3D,
+            self.fieldNames,
+            self.scalarPermutationMatrix, 
+            self.scalarMassMatrices, 
+            self.scalarRotationMatrix,
+            self.vectorShortHands,
+            self.vectorMassesSquared,
+            self.bNumba,
+            self.bVerbose
+        )
+        
+        ps = Veff_params(params)
+        return sum(Veff(*ps))
+        
+        # return sum(self.expressions.evaluate(params))
+
 
     def findGlobalMinimum(self,T:float, 
                           params3D,
