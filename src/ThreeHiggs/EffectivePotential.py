@@ -1,38 +1,47 @@
 import numpy as np
 from scipy import linalg
+from numba import njit
+from itertools import chain
+import nlopt
+from dataclasses import dataclass, InitVar
+
+@njit
+def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
+    subEigenValues = np.empty( (matrixNumber, matrixSize) ) 
+    subRotationMatrix = np.empty( (matrixNumber, matrixSize, matrixSize) )
+    for idx, matrix in enumerate(matrices):
+         subEigenValues[idx], subRotationMatrix[idx] = np.linalg.eigh(matrix)
+    return subEigenValues*T**2, subRotationMatrix
 
 def compFieldDepParams(fields: list[float], 
-                T:float, 
-                params3D, 
-                fieldNames, 
-                scalarPermutationMatrix,
-                scalarMassMatrices,
-                scalarRotationMatrix,
-                vectorShortHands,
-                vectorMassesSquared,
-                bNumba,
-                bVerbose) -> dict[str, float]:
-    ## Background fields
+                       T:float, 
+                       params3D, 
+                       fieldNames, 
+                       scalarPermutationMatrix,
+                       scalarMassMatrices,
+                       scalarRotationMatrix,
+                       vectorShortHands,
+                       vectorMassesSquared,
+                       bNumba,
+                       bVerbose) -> dict[str, float]:
+
     for i, value in enumerate(fields):
         params3D[fieldNames[i]] = value
 
-    ## Vectors
-    params3D |= vectorShortHands.evaluate(params3D, bReturnDict=True)
-    
-    params3D |= vectorMassesSquared.evaluate(params3D, bReturnDict=True)
+    return params3D | (vectorShortHands.evaluate(params3D, 
+                                                 bReturnDict = True) | 
+                       
+                       vectorMassesSquared.evaluate(params3D, 
+                                                    bReturnDict = True) | 
+                       
+                       diagonalizeScalars(params3D, 
+                                          T,
+                                          scalarPermutationMatrix,
+                                          scalarMassMatrices,
+                                          scalarRotationMatrix,
+                                          bNumba,
+                                          bVerbose))
 
-    ## Scalars       
-    params3D |= diagonalizeScalars(params3D, 
-                                   T,
-                                   scalarPermutationMatrix,
-                                   scalarMassMatrices,
-                                   scalarRotationMatrix,
-                                   bNumba,
-                                   bVerbose)
-
-    return params3D
-
-from itertools import chain
 def diagonalizeScalars(params: dict[str, float], 
                        T: float,  
                        scalarPermutationMatrix,
@@ -40,12 +49,15 @@ def diagonalizeScalars(params: dict[str, float],
                        scalarRotationMatrix,
                        bNumba,
                        bVerbose) -> dict[str, float]:
+    
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
+    
     subMassMatrix = np.array( [matrix.evaluate(params) for matrix in scalarMassMatrices ]).real / T**2
+
     if bNumba:
-        from ThreeHiggs.diagonalizeNumba import diagonalizeNumba
-        subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, len(subMassMatrix), len(subMassMatrix[0][0]), T)
+        subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, subMassMatrix.shape[0], subMassMatrix.shape[1], T)
+
     else:
         subRotationMatrix = []
         subEigenValues = []
@@ -78,8 +90,6 @@ def diagonalizeScalars(params: dict[str, float],
 
     return outDict | {name: float(msq) for name, msq in zip(massNames, chain(*subEigenValues))}
 
-import nlopt
-from dataclasses import dataclass, InitVar
 @dataclass(frozen=True)
 class cNlopt:
     nbrVars: int = 0
@@ -160,34 +170,40 @@ class EffectivePotential:
         ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
         ## Sum because the result is a list of tree, 1loop etc 
         return sum(self.expressions.evaluate(compFieldDepParams(fields,
-                                                         T,
-                                                         params3D,
-                                                         self.fieldNames,
-                                                         self.scalarPermutationMatrix, 
-                                                         self.scalarMassMatrices, 
-                                                         self.scalarRotationMatrix,
-                                                         self.vectorShortHands,
-                                                         self.vectorMassesSquared,
-                                                         self.bNumba,
-                                                         self.bVerbose)))
+                                                                T,
+                                                                params3D,
+                                                                self.fieldNames,
+                                                                self.scalarPermutationMatrix, 
+                                                                self.scalarMassMatrices, 
+                                                                self.scalarRotationMatrix,
+                                                                self.vectorShortHands,
+                                                                self.vectorMassesSquared,
+                                                                self.bNumba,
+                                                                self.bVerbose)))
 
     def findGlobalMinimum(self,T:float, 
                           params3D,
-                          minimumCandidates: list[list[float]] = None) -> tuple[list[float], float, float, str]:
+                          minimumCandidates: list = None) -> tuple:
         
         """For physics reasons we only minimise the real part,
         for nlopt reasons we need to give a redunant grad arg"""
         VeffWrapper = lambda fields, grad : np.real ( self.evaluatePotential(fields,
-                                                                      T,
-                                                                      params3D) )
+                                                                             T,
+                                                                             params3D) )
         
-        bestResult = self.nloptInst.nloptGlobal(VeffWrapper, minimumCandidates[0])
+        bestResult = self.nloptInst.nloptGlobal(VeffWrapper, 
+                                                minimumCandidates[0])
 
         for candidate in minimumCandidates:
-            result = self.nloptInst.nloptLocal(VeffWrapper, candidate)
+            result = self.nloptInst.nloptLocal(VeffWrapper,
+                                               candidate)
             if result[1] < bestResult[1]:
                 bestResult = result
-        potentialAtMin = self.evaluatePotential(bestResult[0], T, params3D) ## Compute the potential at minimum to check if its complex
+                
+        ## Compute the potential at minimum to check if its complex
+        potentialAtMin = self.evaluatePotential(bestResult[0],
+                                                T, 
+                                                params3D) 
         if abs(potentialAtMin.imag)/abs(potentialAtMin.real) > 1e-8: 
             return bestResult[0], potentialAtMin.real, potentialAtMin.imag, "complex" ## Flag minimum with imag > tol
 
@@ -218,16 +234,16 @@ class EffectivePotential:
         2) Return true if # of light modes is less than the # of goldstone modes'''
         goldStone = 0 if np.all(np.abs(fields) < 0.1) else 3
         paramDict = compFieldDepParams(fields,
-                                T,
-                                params3D,
-                                self.fieldNames,
-                                self.scalarPermutationMatrix, 
-                                self.scalarMassMatrices, 
-                                self.scalarRotationMatrix,
-                                self.vectorShortHands,
-                                self.vectorMassesSquared,
-                                self.bNumba,
-                                self.bVerbose)
+                                       T,
+                                       params3D,
+                                       self.fieldNames,
+                                       self.scalarPermutationMatrix, 
+                                       self.scalarMassMatrices, 
+                                       self.scalarRotationMatrix,
+                                       self.vectorShortHands,
+                                       self.vectorMassesSquared,
+                                       self.bNumba,
+                                       self.bVerbose)
 
         ## Convert mass into real type to do comparisons 
         massList = np.real([paramDict["MSsq01"], paramDict["MSsq02"],
@@ -239,6 +255,7 @@ class EffectivePotential:
     
         return len([lowMass for lowMass in massList if lowMass < self.getUltraSoftScale(paramDict, T)]) > goldStone
     
+    ##Jasmine plotting tools
     def plotPot(self, T, params3D, linestyle, v3Min, potMin, v3Max):
         VeffWrapper = lambda fields, grad : np.real ( self.evaluatePotential(fields, T, params3D) )
         
