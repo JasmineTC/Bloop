@@ -41,8 +41,10 @@ def _doMinimization(parameters):
                                                                   "bVerbose": args.bVerbose,
                                                                   "initialGuesses": args.initialGuesses,
                                                                   "allSymbolsDict": {key: value for value, key in enumerate(allSymbols)}})
-    
-    # traceFreeEnergyMinimumInst.plotPotential(benchmark)
+    if False:
+        ##THIS IS FOR JASMINE TO MAKE PLOTS - IGNORE
+        traceFreeEnergyMinimumInst.plotPotential(benchmark)
+        exit()
     minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
   
     filename = f"{args.resultsDirectory}/BM_{benchmark['bmNumber']}"

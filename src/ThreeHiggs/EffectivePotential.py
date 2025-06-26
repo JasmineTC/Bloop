@@ -182,7 +182,7 @@ class EffectivePotential:
                                                                       params3D) )
         
         bestResult = self.nloptInst.nloptGlobal(VeffWrapper, minimumCandidates[0])
-        
+
         for candidate in minimumCandidates:
             result = self.nloptInst.nloptLocal(VeffWrapper, candidate)
             if result[1] < bestResult[1]:
@@ -287,7 +287,7 @@ class EffectivePotential:
         ax.zaxis.set_major_formatter('{x:.03f}')
 
         plt.show()
-        exit()
+        return None
     
     
 
