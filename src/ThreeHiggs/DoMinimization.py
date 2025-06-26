@@ -2,7 +2,7 @@ import json
 from typing import Generator
 import decimal
 
-## This avoids floating point error in T gotten by np.arange or linspace
+## This (sometimes) avoids floating point error in T gotten by np.arange or linspace
 ## However one must be careful as 1 = decimal.Decimal(1.000000000000001) 
 def _drange(start: float, end: float, jump: str) -> Generator:
     start =  decimal.Decimal(start) 
@@ -41,8 +41,10 @@ def _doMinimization(parameters):
                                                                   "bVerbose": args.bVerbose,
                                                                   "initialGuesses": args.initialGuesses,
                                                                   "allSymbolsDict": {key: value for value, key in enumerate(allSymbols)}})
-    
-    
+    if False:
+        ##THIS IS FOR JASMINE TO MAKE PLOTS - IGNORE
+        traceFreeEnergyMinimumInst.plotPotential(benchmark)
+        exit()
     minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
   
     filename = f"{args.resultsDirectory}/BM_{benchmark['bmNumber']}"
