@@ -3,6 +3,16 @@ If the functions return True then the benchmark point is allowed by those constr
 Variables that are bools are denoted with a b prefix'''
 
 import math as m
+from json import load, dump
+from ThreeHiggs.ParsedExpression import ParsedExpression
+from ThreeHiggs.EffectivePotential import cNlopt
+from pathlib import Path
+import nlopt
+import numpy as np
+from functools import partial
+from os.path import join
+from glob import glob
+
 def bIsBounded(param : dict[str, float]) -> bool:
     ## Taking equations 26-31 from the draft that ensure the potential is bounded from below.
     if not param["lam11"] > 0:
@@ -26,8 +36,16 @@ def bIsBounded(param : dict[str, float]) -> bool:
         return False
     return True
 
+parsedExpressions = load(open("../parsedExpressions.json", "r"))
+
+
+veffTree = ParsedExpression(parsedExpressions["veff"]["expressions"][0], None)
+params = {'v1': 1, 'v2':2, 'v3':3, 'mu12sqRe': 117.5, 'mu12sqIm': 0, 'mu2sq': -4710.528856347395, 'mu3sq': 7812.5, 'mu1sq': -4710.528856347395, 'lam1Re': 0.1, 'lam1Im': 0.0, 'lam2Re': -0.0005734361980235576, 'lam2Im': 0.00099322062987593, 'lam11': 0.11, 'lam22': 0.12, 'lam12': 0.13, 'lam12p': 0.14, 'lam23': 0.30007679706315876, 'lam23p': -0.29827978978801506, 'lam3Re': -0.0005734361980235576, 'lam3Im': 0.00099322062987593, 'lam31': 0.30007679706315876, 'lam31p': -0.29827978978801506, 'lam33': 0.12886749199352251}
+print(veffTree.evaluate(params))
+exit()
 
 def potential(params, field):
+    print(params)
     lam11 = params["lam11"]
     lam22 = params["lam22"]
     lam33 = params["lam33"]
@@ -47,12 +65,12 @@ def potential(params, field):
 
     return float((field[0]**4*lam11 + field[1]**4*lam22 + field[2]**4*lam33 - 4*field[0]*field[1]*mu12sqRe + field[0]**2*(field[1]**2*(lam12 + lam12p + 2*lam1Re) + field[2]**2*(lam31 + lam31p + 2*lam3Re) - 2*mu1sq) + field[1]**2*(field[2]**2*(lam23 + lam23p + 2*lam2Re) - 2*mu2sq) - 2*field[2]**2*mu3sq)/4)
 
-import nlopt
-from functools import partial
 ## TODO import the nlopt stuff from EP and use the eval to compute potential at LO
 ## Overkill for threeHiggs since venus calculated the equations for tree level min
 ## But this is model indepdent
-def bPhysicalMinimum(params):
+def bPhysicalMinimum(potential, 
+                     params):
+    
     minimumInitialGuesses = [[0,0,0],
                              [0,0,246],
                              [100,100,100],
@@ -94,7 +112,6 @@ def _bNoLightCharged(mSpm1, mSpm2) -> bool:
     return mSpm1 >= 90 and \
            mSpm2 >= 90
            
-from math import sin, cos
 def _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, bmNumber):
     vsq = 246.22**2
     ## Some 'dark' sector params we keep fixed to keep the scan managable
@@ -113,7 +130,7 @@ def _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHierac
     mSpm2 = deltac + mSpm1
     mu12sq = (mSpm2**2 - mSpm1**2)/2
     
-    sinTheta, cosTheta = sin(thetaCPV), cos(thetaCPV)
+    sinTheta, cosTheta = m.sin(thetaCPV), m.cos(thetaCPV)
     lam2absInsideSqR = (2.*mu12sq*cosTheta)**2 + (mS2**2 - mS1**2)**2 - (mSpm2**2 - mSpm1**2)**2
     if lam2absInsideSqR < 0:
         return False
@@ -176,11 +193,10 @@ def _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHierac
         return False
     return paramDict
 
-
-import numpy as np
-def _randomBmParam(num):
+def _randomBmParam(randomNum, nloptInst):
     bmdictList = []
-    while len(bmdictList) < num:
+    ## TODO put in some upper limit for this while loop
+    while len(bmdictList) < randomNum:
         mS1 = np.random.uniform(63, 100)
         delta12 = np.random.uniform(5, 100)
         delta1c = np.random.uniform(5, 100)
@@ -193,7 +209,7 @@ def _randomBmParam(num):
             bmdictList.append(bmDict)
     return bmdictList
 
-def _handPickedBm():
+def _handPickedBm(nloptInst):
     bmdictList = []
     bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
                    [67, 4.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
@@ -214,9 +230,6 @@ def _handPickedBm():
     return bmdictList
 
 def _strongSubSet(prevResultDir):
-    from json import load
-    from os.path import join
-    from glob import glob
     bmDict = []
     for fileName in glob(join(prevResultDir, '*.json')):
         resultDic = load(open(fileName, "r"))
@@ -231,20 +244,32 @@ def _strongSubSet(prevResultDir):
                                              resultDic["bmNumber"]))
     return bmDict
 
-def generateBenchmarks(benchmarkOutput: str, mode: str, randomNum: int = None, prevResultDir: str = None)-> None:
-    from pathlib import Path
-    (output_file := Path(benchmarkOutput)).parent.mkdir(exist_ok=True, parents=True)   
+def generateBenchmarks(args)-> None:
     
-    from json import dump
-    if mode == "handPicked":
-        dump(_handPickedBm(), open(output_file, "w"), indent = 4)
+    (output_file := Path(args.benchmarkOutput)).parent.mkdir(exist_ok=True, 
+                                                        parents=True)   
+    
+    ## Need to take these from args
+    nloptInst = cNlopt(config = {"nbrVars": 3, 
+                                 "absGlobalTol" : 0.5,
+                                 "relGlobalTol" :0.5, 
+                                 "absLocalTol" : 0.5, 
+                                 "relLocalTol" : 0.5,
+                                 "varLowerBounds" : [-300, 0, 0],
+                                 "varUpperBounds" : [300, 300, 300]})
+
+    if args.benchmarkType == "randomSSS":
+        dump(_strongSubSet(args.prevResultDir), open(output_file, "w"), indent = 4)
         return
-    elif mode == "random":
-        dump(_randomBmParam(randomNum), open(output_file, "w"), indent = 4)
+
+    elif args.benchmarkType == "handPicked":
+        dump(_handPickedBm(nloptInst), open(output_file, "w"), indent = 4)
         return
-    elif mode == "randomSSS":
-        dump(_strongSubSet(prevResultDir), open(output_file, "w"), indent = 4)
-        return 
+    
+    elif args.benchmarkType == "random":
+        dump(_randomBmParam(args.randomNum, nloptInst), open(output_file, "w"), indent = 4)
+        return
+
     return
 
 
