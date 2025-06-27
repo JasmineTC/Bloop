@@ -7,7 +7,7 @@ if args.firstStage <= Stages.convertMathematica <= args.lastStage:
 
 if args.firstStage <= Stages.generateBenchmark <= args.lastStage:
     from ThreeHiggs.BmGenerator import generateBenchmarks
-    generateBenchmarks(args.benchmarkFile, args.benchmarkType, args.randomNum, args.prevResultDir)
+    generateBenchmarks(args)
 
 if args.firstStage <= Stages.doMinimization <= args.lastStage:
     from ThreeHiggs.DoMinimization import minimization
