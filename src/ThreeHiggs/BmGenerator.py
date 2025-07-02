@@ -7,9 +7,7 @@ from json import load, dump
 from ThreeHiggs.ParsedExpression import ParsedExpression
 from ThreeHiggs.EffectivePotential import cNlopt
 from pathlib import Path
-import nlopt
 import numpy as np
-from functools import partial
 from os.path import join
 from glob import glob
 
@@ -36,41 +34,10 @@ def bIsBounded(param : dict[str, float]) -> bool:
         return False
     return True
 
-parsedExpressions = load(open("../parsedExpressions.json", "r"))
-
-
-veffTree = ParsedExpression(parsedExpressions["veff"]["expressions"][0], None)
-params = {'v1': 1, 'v2':2, 'v3':3, 'mu12sqRe': 117.5, 'mu12sqIm': 0, 'mu2sq': -4710.528856347395, 'mu3sq': 7812.5, 'mu1sq': -4710.528856347395, 'lam1Re': 0.1, 'lam1Im': 0.0, 'lam2Re': -0.0005734361980235576, 'lam2Im': 0.00099322062987593, 'lam11': 0.11, 'lam22': 0.12, 'lam12': 0.13, 'lam12p': 0.14, 'lam23': 0.30007679706315876, 'lam23p': -0.29827978978801506, 'lam3Re': -0.0005734361980235576, 'lam3Im': 0.00099322062987593, 'lam31': 0.30007679706315876, 'lam31p': -0.29827978978801506, 'lam33': 0.12886749199352251}
-print(veffTree.evaluate(params))
-exit()
-
-def potential(params, field):
-    print(params)
-    lam11 = params["lam11"]
-    lam22 = params["lam22"]
-    lam33 = params["lam33"]
-    lam12 = params["lam12"]
-    lam12p = params["lam12p"]
-    lam23 = params["lam23"]
-    lam23p = params["lam23p"]
-    lam31 = params["lam31"]
-    lam31p = params["lam31p"]
-    lam1Re = params["lam1Re"]
-    lam2Re = params["lam2Re"]
-    lam3Re = params["lam3Re"]
-    mu1sq = params["mu1sq"]
-    mu12sqRe = params["mu12sqRe"]
-    mu2sq = params["mu2sq"]
-    mu3sq = params["mu3sq"]
-
-    return float((field[0]**4*lam11 + field[1]**4*lam22 + field[2]**4*lam33 - 4*field[0]*field[1]*mu12sqRe + field[0]**2*(field[1]**2*(lam12 + lam12p + 2*lam1Re) + field[2]**2*(lam31 + lam31p + 2*lam3Re) - 2*mu1sq) + field[1]**2*(field[2]**2*(lam23 + lam23p + 2*lam2Re) - 2*mu2sq) - 2*field[2]**2*mu3sq)/4)
-
-## TODO import the nlopt stuff from EP and use the eval to compute potential at LO
-## Overkill for threeHiggs since venus calculated the equations for tree level min
-## But this is model indepdent
-def bPhysicalMinimum(potential, 
+def bPhysicalMinimum(nloptInst,
+                     potentialFunc,
                      params):
-    
+    ## Move these to user args or somewhere out of the way
     minimumInitialGuesses = [[0,0,0],
                              [0,0,246],
                              [100,100,100],
@@ -78,26 +45,20 @@ def bPhysicalMinimum(potential,
                              [50,50,50],
                              [299,299,299],
                              [-299,299,299]]
-                             
-    potentialPartial = partial(potential, params)
-    minFunc = lambda x, _: potentialPartial(x)
-    opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, 3)
-    opt.set_min_objective(minFunc)
-    opt.set_lower_bounds([-300,0,0])
-    opt.set_upper_bounds([300,300,300])
-    opt.set_xtol_abs(0.5)
-    opt.set_xtol_rel(0.5)
-    minLocation, minValue = opt.optimize([0,0,0]), opt.last_optimum_value()
-    opt = nlopt.opt(nlopt.LN_BOBYQA, 3)
-    opt.set_min_objective(minFunc)
-    opt.set_lower_bounds([-300,0,0])
-    opt.set_upper_bounds([300,300,300])
-    opt.set_xtol_abs(0.5)
-    opt.set_xtol_rel(0.5)
+    
+    ## I don't like having the function wrapped here, 
+    ## should be defined once at a higher level, not every func call but params
+    ## makes that non-trivial 
+    potentialFuncWrapped = lambda fields, _: potentialFunc(fields, params)
+    
+    minValue = nloptInst.nloptGlobal(potentialFuncWrapped, minimumInitialGuesses[0])[1]
+    
     for guess in minimumInitialGuesses:
-        minLocationTemp, minValueTemp = opt.optimize(guess), opt.last_optimum_value()
+        minLocationTemp, minValueTemp = nloptInst.nloptLocal(potentialFuncWrapped, guess)
+        
         if minValueTemp < minValue:
             minLocation, minValue =  minLocationTemp, minValueTemp
+            
     return np.all(np.isclose(minLocation, [0,0, 246], atol=1))
 
 def _bPositiveMassStates(mu2sq, mu12sq, lam23, lam23p, lambdaMinus, lambdaPlus, vsq) -> bool:
@@ -112,7 +73,16 @@ def _bNoLightCharged(mSpm1, mSpm2) -> bool:
     return mSpm1 >= 90 and \
            mSpm2 >= 90
            
-def _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, bmNumber):
+def _lagranianParamGen(mS1,
+                       delta12, 
+                       delta1c, 
+                       deltac, 
+                       ghDM, 
+                       thetaCPV, 
+                       darkHieracy, 
+                       bmNumber, 
+                       nloptInst, 
+                       potentialFunc):
     vsq = 246.22**2
     ## Some 'dark' sector params we keep fixed to keep the scan managable
     lam1Re = 0.1
@@ -189,13 +159,14 @@ def _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHierac
                               "lam31p": lam31p,
                               "lam33": lam33}}
     params = paramDict["massTerms"] | paramDict["couplingValues"]
-    if not bIsBounded(params) or not bPhysicalMinimum(params):
+    if not bIsBounded(params) or not bPhysicalMinimum(nloptInst, potentialFunc, params):
         return False
     return paramDict
 
-def _randomBmParam(randomNum, nloptInst):
+def _randomBmParam(randomNum, nloptInst, potentialFunc):
     bmdictList = []
     ## TODO put in some upper limit for this while loop
+    darkHieracy = 1
     while len(bmdictList) < randomNum:
         mS1 = np.random.uniform(63, 100)
         delta12 = np.random.uniform(5, 100)
@@ -203,13 +174,14 @@ def _randomBmParam(randomNum, nloptInst):
         deltac = np.random.uniform(5, 100)
         ghDM = np.random.uniform(0, 1)
         thetaCPV = np.random.uniform(np.pi/2, 3*np.pi/2)
-        darkHieracy = 1
-        bmDict = _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, len(bmdictList))
+        bmDict = _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, len(bmdictList), nloptInst, potentialFunc)
+        
         if bmDict:
             bmdictList.append(bmDict)
+            
     return bmdictList
 
-def _handPickedBm(nloptInst):
+def _handPickedBm(nloptInst, potentialFunc):
     bmdictList = []
     bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
                    [67, 4.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
@@ -223,31 +195,33 @@ def _handPickedBm(nloptInst):
                    [90, 55.0, 1.0, 22.0, 0.0, 2.*np.pi/3, 1],
                    [50, 55, 70, 25, 3/9, np.pi/2., 1]]
     for bmInput in bmInputList:
-        mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy = bmInput
-        bmDict = _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, len(bmdictList))
+        bmDict = _lagranianParamGen(*bmInput, len(bmdictList), nloptInst, potentialFunc)
         if bmDict:
             bmdictList.append(bmDict)
     return bmdictList
 
-def _strongSubSet(prevResultDir):
-    bmDict = []
+def _strongSubSet(prevResultDir, nloptInst, potentialFunc):
+    bmdictList = []
+    
     for fileName in glob(join(prevResultDir, '*.json')):
         resultDic = load(open(fileName, "r"))
         if resultDic["strong" ] > 0.6:
-            bmDict.append(_lagranianParamGen(resultDic["bmInput"]["mS1"],
+            bmdictList.append(_lagranianParamGen(resultDic["bmInput"]["mS1"],
                                              resultDic["bmInput"]["delta12"],
                                              resultDic["bmInput"]["delta1c"], 
                                              resultDic["bmInput"]["deltac"], 
                                              resultDic["bmInput"]["ghDM"], 
                                              resultDic["bmInput"]["thetaCPV"],
                                              resultDic["bmInput"]["darkHieracy"],
-                                             resultDic["bmNumber"]))
-    return bmDict
+                                             resultDic["bmNumber"],
+                                             nloptInst,
+                                             potentialFunc))
+    return bmdictList
 
 def generateBenchmarks(args)-> None:
     
-    (output_file := Path(args.benchmarkOutput)).parent.mkdir(exist_ok=True, 
-                                                        parents=True)   
+    (output_file := Path(args.benchmarkFile)).parent.mkdir(exist_ok=True, 
+                                                             parents=True)   
     
     ## Need to take these from args
     nloptInst = cNlopt(config = {"nbrVars": 3, 
@@ -257,17 +231,32 @@ def generateBenchmarks(args)-> None:
                                  "relLocalTol" : 0.5,
                                  "varLowerBounds" : [-300, 0, 0],
                                  "varUpperBounds" : [300, 300, 300]})
-
+    
+    parsedExpressions = load(open("../parsedExpressions.json", "r"))
+    ## Take the pythonised tree level potential we've generated 
+    potential = ParsedExpression(parsedExpressions["veff"]["expressions"][0], None)
+    
+    ## Feels weird to have nested function but not sure how else to go until can
+    ## use arrays with nlopt
+    def potentialFunc(fields, params):
+        params["v1"] = fields[0]
+        params["v2"] = fields[1]
+        params["v3"] = fields[2]
+        return potential.evaluate(params)
+    
+    
+    ## subset has already been checked to be physical so
+    ## shouldn't need nloptInst and potential
     if args.benchmarkType == "randomSSS":
-        dump(_strongSubSet(args.prevResultDir), open(output_file, "w"), indent = 4)
+        dump(_strongSubSet(args.prevResultDir, nloptInst, potentialFunc), open(output_file, "w"), indent = 4)
         return
 
     elif args.benchmarkType == "handPicked":
-        dump(_handPickedBm(nloptInst), open(output_file, "w"), indent = 4)
+        dump(_handPickedBm(nloptInst, potentialFunc), open(output_file, "w"), indent = 4)
         return
     
     elif args.benchmarkType == "random":
-        dump(_randomBmParam(args.randomNum, nloptInst), open(output_file, "w"), indent = 4)
+        dump(_randomBmParam(args.randomNum, nloptInst, potentialFunc), open(output_file, "w"), indent = 4)
         return
 
     return
@@ -295,4 +284,25 @@ class BmGeneratorUnitTests(TestCase):
     def test_lagranianParamGen(self):
         reference = {'bmNumber': 0, 'RGScale': 91.1876, 'bmInput': {'thetaCPV': 3.11308902835221, 'ghDM': 0.15520161865427817, 'mS1': 89.15641588128479, 'delta12': 87.17952518246265, 'delta1c': 14.020273320699415, 'deltac': 5.129099092707543, 'darkHieracy': 1}, 'massTerms': {'mu12sqRe': 542.3572917258725, 'mu12sqIm': 0, 'mu2sq': -9572.907910345595, 'mu3sq': 7812.5, 'mu1sq': -9572.907910345595}, 'couplingValues': {'lam1Re': 0.1, 'lam1Im': 0.0, 'lam2Re': -0.08646867756101999, 'lam2Im': 0.0024653384763691356, 'lam11': 0.11, 'lam22': 0.12, 'lam12': 0.13, 'lam12p': 0.14, 'lam23': 0.05327497010465927, 'lam23p': 0.274933662245124, 'lam3Re': -0.08646867756101999, 'lam3Im': 0.0024653384763691356, 'lam31': 0.05327497010465927, 'lam31p': 0.274933662245124, 'lam33': 0.12886749199352251}}
         source = (89.15641588128479, 87.17952518246265, 14.020273320699415, 5.129099092707543, 0.15520161865427817, 3.11308902835221, 1, 0)
-        self.assertEqual( reference, _lagranianParamGen(*source) )
+        
+        nloptInst = cNlopt(config = {"nbrVars": 3, 
+                                     "absGlobalTol" : 0.5,
+                                     "relGlobalTol" :0.5, 
+                                     "absLocalTol" : 0.5, 
+                                     "relLocalTol" : 0.5,
+                                     "varLowerBounds" : [-300, 0, 0],
+                                     "varUpperBounds" : [300, 300, 300]})
+        ## Gives resource warning for unknown reason
+        parsedExpressions = load(open("parsedExpressions.json", "r"))
+        
+        potential = ParsedExpression(parsedExpressions["veff"]["expressions"][0], None)
+        
+        ## Feels weird to have nested function but not sure how else to go until can
+        ## use arrays with nlopt
+        def potentialFunc(fields, params):
+            params["v1"] = fields[0]
+            params["v2"] = fields[1]
+            params["v3"] = fields[2]
+            return potential.evaluate(params)
+        
+        self.assertEqual( reference, _lagranianParamGen(*source, nloptInst, potentialFunc, ) )
