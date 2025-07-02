@@ -4,7 +4,7 @@ Variables that are bools are denoted with a b prefix'''
 
 import math as m
 from json import load, dump
-from ThreeHiggs.ParsedExpression import ParsedExpression
+from ThreeHiggs.ParsedExpression import ParsedExpression, MassMatrix
 from ThreeHiggs.EffectivePotential import cNlopt
 from pathlib import Path
 import numpy as np
@@ -64,28 +64,7 @@ def bPhysicalMinimum(nloptInst,
             minLocation, minValue =  minLocationTemp, minValueTemp
             
     return np.all(np.isclose(minLocation, [0,0, 246], atol=1))
-
-def _bPositiveMassStates(mu2sq, 
-                         mu12sq, 
-                         lam23, 
-                         lam23p, 
-                         lambdaMinus, 
-                         lambdaPlus, 
-                         vsq):
-    
-    return -mu2sq - mu12sq + lam23*vsq/2 >0 and \
-           -mu2sq + mu12sq + lam23*vsq/2 >0 and \
-           -mu2sq + (lam23 + lam23p)*vsq/2 - lambdaMinus >0 and \
-           -mu2sq + (lam23 + lam23p)*vsq/2 + lambdaMinus >0 and \
-           -mu2sq + (lam23 + lam23p)*vsq/2 - lambdaPlus >0 and \
-           -mu2sq + (lam23 + lam23p)*vsq/2 + lambdaPlus>0
-
-def _bNoLightCharged(mSpm1, 
-                     mSpm2):
-    
-    return mSpm1 >= 90 and \
-           mSpm2 >= 90
-           
+      
 def _lagranianParamGen(mS1,
                        delta12, 
                        delta1c, 
@@ -93,21 +72,13 @@ def _lagranianParamGen(mS1,
                        ghDM, 
                        thetaCPV, 
                        darkHieracy, 
-                       bmNumber, 
-                       nloptInst, 
-                       potential):
-    vsq = 246.22**2
-    ## Some 'dark' sector params we keep fixed to keep the scan managable
-    lam1Re = 0.1
-    lam1Im = 0.0
-    lam11 = 0.11
-    lam22 = 0.12
-    lam12 = 0.13
-    lam12p = 0.14
+                       bmNumber):
     ## SM params
+    vsq = 246.22**2
     mu3sq = 125**2/2 ## Higgs mass*2/2
     lam33 = ((125.00)**2 / (2.*vsq)) ## Higgs mass^2 / 2*vev**2
-
+    
+    ## ~~~ USER BSM PHYSICS ~~~
     mS2 = delta12 + mS1
     mSpm1 = delta1c + mS1
     mSpm2 = deltac + mSpm1
@@ -122,31 +93,12 @@ def _lagranianParamGen(mS1,
     lam2Re = lam2Abs*cosTheta
     lam2Im = lam2Abs*sinTheta
     
-    lambdaMinus = m.sqrt( mu12sq**2 + vsq**2*lam2Abs**2 - 2.*vsq*mu12sq*lam2Abs*cosTheta)
-    lambdaPlus = m.sqrt( mu12sq**2 + vsq**2*lam2Abs**2 + 2.*vsq*mu12sq*lam2Abs*cosTheta)
-    alpha = (-mu12sq + vsq*lam2Abs*cosTheta - lambdaMinus) / ( (vsq*lam2Abs*sinTheta) +1e-100 )
+    alpha = (-mu12sq + vsq*lam2Abs*cosTheta - m.sqrt( mu12sq**2 + vsq**2*lam2Abs**2 - 2.*vsq*mu12sq*lam2Abs*cosTheta)) / ( (vsq*lam2Abs*sinTheta) +1e-100 )
     mu2sq = vsq/2. * ghDM - vsq / (alpha**2 + 1.) * (2.*alpha* sinTheta + (alpha**2 - 1.)*cosTheta) * lam2Abs - (mS2**2 + mS1**2)/2
     lam23 = (2.*mu2sq + mSpm2**2 + mSpm1**2)/vsq
     lam23p = (mS2**2 + mS1**2 - mSpm2**2 - mSpm1**2)/vsq
     
-    mu1sq = darkHieracy*mu2sq
-    lam3Re = darkHieracy*lam2Re
-    lam3Im = darkHieracy*lam2Im
-    lam31 = darkHieracy*lam23
-    lam31p = darkHieracy*lam23p
-    
-    if not _bNoLightCharged(mSpm1, 
-                            mSpm2):
-        return False
-    if not _bPositiveMassStates(mu2sq, 
-                                mu12sq, 
-                                lam23, 
-                                lam23p, 
-                                lambdaMinus, 
-                                lambdaPlus, 
-                                vsq):
-        return False
-    paramDict = {"bmNumber": bmNumber,
+    paramsDict = {"bmNumber": bmNumber,
             "RGScale": 91.1876,
             
             "bmInput": {"thetaCPV" : thetaCPV,
@@ -161,31 +113,58 @@ def _lagranianParamGen(mS1,
                           "mu12sqIm" : 0, 
                           "mu2sq": mu2sq, 
                           "mu3sq":mu3sq,
-                          "mu1sq": mu1sq,},
+                          "mu1sq": darkHieracy*mu2sq,},
                                 
-            "couplingValues":{"lam1Re" : lam1Re, 
-                              "lam1Im" : lam1Im, 
+            "couplingValues":{"lam1Re" : 0.1, 
+                              "lam1Im" : 0, 
                               "lam2Re" : lam2Abs*cosTheta, 
                               "lam2Im" : lam2Abs*sinTheta, 
-                              "lam11" : lam11, 
-                              "lam22" : lam22, 
-                              "lam12" : lam12, 
-                              "lam12p" : lam12p, 
+                              "lam11" : 0.11, 
+                              "lam22" : 0.12, 
+                              "lam12" : 0.13, 
+                              "lam12p" : 0.14, 
                               "lam23": lam23,
                               "lam23p": lam23p,
-                              "lam3Re": lam3Re,
-                              "lam3Im": lam3Im,
-                              "lam31": lam31,
-                              "lam31p": lam31p,
+                              "lam3Re": darkHieracy*lam2Re,
+                              "lam3Im": darkHieracy*lam2Im,
+                              "lam31": darkHieracy*lam23,
+                              "lam31p": darkHieracy*lam23p,
                               "lam33": lam33}}
-    params = paramDict["massTerms"] | paramDict["couplingValues"]
-    if not bIsBounded(params) or not bPhysicalMinimum(nloptInst, 
-                                                      potential, 
-                                                      params):
-        return False
-    return paramDict
+    return paramsDict
 
-def _randomBmParam(randomNum, nloptInst, potential):
+def checkPhysical(params, nloptInst, potential, chargedMassMatrix, neutralMassMatrix):
+    params["v1"] = 0
+    params["v2"] = 0
+    params["v3"] = 246.22
+    if not bIsBounded(params):
+        return False
+    
+    chargedEigenValues = np.linalg.eigvalsh(chargedMassMatrix.evaluate(params))
+    ## Enforces positive charged masses (tolerance to handle goldstone bosons)
+    if not np.all(chargedEigenValues >=-1e-20):
+        return False
+    ## ASSUMING ONLY TWO GOLDSTONES check if masses are heavy enough to avoid dection
+    ## (above 90GeV (8100 = 90**2 - avoids sqrt))
+    if not np.all(chargedEigenValues[2:] >= 8100):
+        return False
+    
+    neutralEigenValues = np.linalg.eigvalsh(neutralMassMatrix.evaluate(params))
+    ## Enforces positive neutral masses (tolerance to handle goldstone bosons)
+    if not np.all(neutralEigenValues >=-1e-20):
+        return False
+    ## ASSUMING ONLY ONE GOLDSTONE check if masses are heavy enough to avoid 
+    ## Higgs decaying to light particle
+    ## (above 63GeV (3969 = 63**2 - avoids sqrt))
+    if not np.all(neutralEigenValues[1:] >= 3969):
+        return False
+    
+    if not bPhysicalMinimum(nloptInst, potential, params):
+        return False
+    
+    return True
+    
+
+def _randomBmParam(randomNum, potential, chargedMassMatrix, neutralMassMatrix):
     bmdictList = []
     ## TODO put in some upper limit for this while loop
     darkHieracy = 1
@@ -214,8 +193,10 @@ def _randomBmParam(randomNum, nloptInst, potential):
             
     return bmdictList
 
-def _handPickedBm(nloptInst, potential):
+def _handPickedBm(nloptInst, potential, chargedMassMatrix, neutralMassMatrix):
+    
     bmdictList = []
+    ## Move this to userArg or something
     bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
                    [67, 4.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
                    [57, 8.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
@@ -229,13 +210,11 @@ def _handPickedBm(nloptInst, potential):
                    [50, 55, 70, 25, 3/9, np.pi/2., 1]]
     
     for bmInput in bmInputList:
-        bmDict = _lagranianParamGen(*bmInput, 
-                                    len(bmdictList), 
-                                    nloptInst, 
-                                    potential)
-        
-        if bmDict:
-            bmdictList.append(bmDict)
+        bmParams = _lagranianParamGen(*bmInput, 
+                                      len(bmdictList))
+        if bmParams:
+            if checkPhysical(bmParams["massTerms"] | bmParams["couplingValues"], nloptInst, potential, chargedMassMatrix, neutralMassMatrix):
+                bmdictList.append(bmParams)
     return bmdictList
 
 def _strongSubSet(prevResultDir, nloptInst, potential):
@@ -275,6 +254,8 @@ def generateBenchmarks(args)-> None:
     parsedExpressions = load(open("../parsedExpressions.json", "r"))
     ## Take the pythonised tree level potential we've generated 
     treeLevel = ParsedExpression(parsedExpressions["veff"]["expressions"][0], None)
+    chargedMassMatrix = MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]["expressions"], None)
+    neutralMassMatrix = MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"]["expressions"], None)
     
     ## Feels weird to have nested function but not sure how else to go until can
     ## use arrays with nlopt
@@ -285,20 +266,16 @@ def generateBenchmarks(args)-> None:
         params["v3"] = fields[2]
         return treeLevel.evaluate(params)
     
-    ## subset has already been checked to be physical so
-    ## shouldn't need nloptInst and potential
     if args.benchmarkType == "randomSSS":
-        dump(_strongSubSet(args.prevResultDir, nloptInst, potential), open(output_file, "w"), indent = 4)
+        dump(_strongSubSet(args.prevResultDir), open(output_file, "w"), indent = 4)
         return
 
     elif args.benchmarkType == "handPicked":
-        dump(_handPickedBm(nloptInst, potential), open(output_file, "w"), indent = 4)
-        return
+        dump(_handPickedBm(nloptInst, potential, chargedMassMatrix, neutralMassMatrix), open(output_file, "w"), indent = 4)
     
     elif args.benchmarkType == "random":
-        dump(_randomBmParam(args.randomNum, nloptInst, potential), open(output_file, "w"), indent = 4)
-        return
-
+        dump(_randomBmParam(args.randomNum, nloptInst, potential, chargedMassMatrix, neutralMassMatrix), open(output_file, "w"), indent = 4)
+    
     return
 
 
