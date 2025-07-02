@@ -11,32 +11,33 @@ import numpy as np
 from os.path import join
 from glob import glob
 
-def bIsBounded(param : dict[str, float]) -> bool:
+def bIsBounded(params):
     ## Taking equations 26-31 from the draft that ensure the potential is bounded from below.
-    if not param["lam11"] > 0:
+    if not params["lam11"] > 0:
         return False
-    if not param["lam22"] > 0:
+    if not params["lam22"] > 0:
         return False
-    if not param["lam33"] > 0:
+    if not params["lam33"] > 0:
         return False
     
-    lamx = param["lam12"] + min(0, param["lam12p"] - 2*m.sqrt(param["lam1Re"]**2 + param["lam1Im"]**2) )
-    lamy = param["lam31"] + min(0, param["lam31p"] - 2*m.sqrt(param["lam3Re"]**2 + param["lam3Im"]**2) )
-    lamz = param["lam23"] + min(0, param["lam23p"] - 2*m.sqrt(param["lam2Re"]**2 + param["lam2Im"]**2) )
-    if not lamx > -2*m.sqrt(param["lam11"]*param["lam22"]):
+    lamx = params["lam12"] + min(0, params["lam12p"] - 2*m.sqrt(params["lam1Re"]**2 + params["lam1Im"]**2) )
+    lamy = params["lam31"] + min(0, params["lam31p"] - 2*m.sqrt(params["lam3Re"]**2 + params["lam3Im"]**2) )
+    lamz = params["lam23"] + min(0, params["lam23p"] - 2*m.sqrt(params["lam2Re"]**2 + params["lam2Im"]**2) )
+    if not lamx > -2*m.sqrt(params["lam11"]*params["lam22"]):
         return False
-    if not lamy > -2*m.sqrt(param["lam11"]*param["lam33"]):
+    if not lamy > -2*m.sqrt(params["lam11"]*params["lam33"]):
         return False
-    if not lamz > -2*m.sqrt(param["lam22"]*param["lam33"]):
+    if not lamz > -2*m.sqrt(params["lam22"]*params["lam33"]):
         return False
-    if not (m.sqrt(param["lam33"])*lamx + m.sqrt(param["lam11"])*lamz + m.sqrt(param["lam22"])*lamy >= 0 or \
-            param["lam33"]*lamx**2 + param["lam11"]*lamz**2 + param["lam22"]*lamy**2 -param["lam11"]*param["lam22"]*param["lam33"] - 2*lamx*lamy*lamz < 0):
+    if not (m.sqrt(params["lam33"])*lamx + m.sqrt(params["lam11"])*lamz + m.sqrt(params["lam22"])*lamy >= 0 or \
+            params["lam33"]*lamx**2 + params["lam11"]*lamz**2 + params["lam22"]*lamy**2 -params["lam11"]*params["lam22"]*params["lam33"] - 2*lamx*lamy*lamz < 0):
         return False
     return True
 
 def bPhysicalMinimum(nloptInst,
-                     potentialFunc,
+                     potential,
                      params):
+    
     ## Move these to user args or somewhere out of the way
     minimumInitialGuesses = [[0,0,0],
                              [0,0,246],
@@ -49,19 +50,29 @@ def bPhysicalMinimum(nloptInst,
     ## I don't like having the function wrapped here, 
     ## should be defined once at a higher level, not every func call but params
     ## makes that non-trivial 
-    potentialFuncWrapped = lambda fields, _: potentialFunc(fields, params)
+    potentialWrapped = lambda fields, _: potential(fields, 
+                                                           params)
     
-    minValue = nloptInst.nloptGlobal(potentialFuncWrapped, minimumInitialGuesses[0])[1]
+    minValue = nloptInst.nloptGlobal(potentialWrapped, 
+                                     minimumInitialGuesses[0])[1]
     
     for guess in minimumInitialGuesses:
-        minLocationTemp, minValueTemp = nloptInst.nloptLocal(potentialFuncWrapped, guess)
+        minLocationTemp, minValueTemp = nloptInst.nloptLocal(potentialWrapped, 
+                                                             guess)
         
         if minValueTemp < minValue:
             minLocation, minValue =  minLocationTemp, minValueTemp
             
     return np.all(np.isclose(minLocation, [0,0, 246], atol=1))
 
-def _bPositiveMassStates(mu2sq, mu12sq, lam23, lam23p, lambdaMinus, lambdaPlus, vsq) -> bool:
+def _bPositiveMassStates(mu2sq, 
+                         mu12sq, 
+                         lam23, 
+                         lam23p, 
+                         lambdaMinus, 
+                         lambdaPlus, 
+                         vsq):
+    
     return -mu2sq - mu12sq + lam23*vsq/2 >0 and \
            -mu2sq + mu12sq + lam23*vsq/2 >0 and \
            -mu2sq + (lam23 + lam23p)*vsq/2 - lambdaMinus >0 and \
@@ -69,7 +80,9 @@ def _bPositiveMassStates(mu2sq, mu12sq, lam23, lam23p, lambdaMinus, lambdaPlus, 
            -mu2sq + (lam23 + lam23p)*vsq/2 - lambdaPlus >0 and \
            -mu2sq + (lam23 + lam23p)*vsq/2 + lambdaPlus>0
 
-def _bNoLightCharged(mSpm1, mSpm2) -> bool:
+def _bNoLightCharged(mSpm1, 
+                     mSpm2):
+    
     return mSpm1 >= 90 and \
            mSpm2 >= 90
            
@@ -82,7 +95,7 @@ def _lagranianParamGen(mS1,
                        darkHieracy, 
                        bmNumber, 
                        nloptInst, 
-                       potentialFunc):
+                       potential):
     vsq = 246.22**2
     ## Some 'dark' sector params we keep fixed to keep the scan managable
     lam1Re = 0.1
@@ -122,9 +135,16 @@ def _lagranianParamGen(mS1,
     lam31 = darkHieracy*lam23
     lam31p = darkHieracy*lam23p
     
-    if not _bNoLightCharged(mSpm1, mSpm2):
+    if not _bNoLightCharged(mSpm1, 
+                            mSpm2):
         return False
-    if not _bPositiveMassStates(mu2sq, mu12sq, lam23, lam23p, lambdaMinus, lambdaPlus, vsq):
+    if not _bPositiveMassStates(mu2sq, 
+                                mu12sq, 
+                                lam23, 
+                                lam23p, 
+                                lambdaMinus, 
+                                lambdaPlus, 
+                                vsq):
         return False
     paramDict = {"bmNumber": bmNumber,
             "RGScale": 91.1876,
@@ -159,14 +179,17 @@ def _lagranianParamGen(mS1,
                               "lam31p": lam31p,
                               "lam33": lam33}}
     params = paramDict["massTerms"] | paramDict["couplingValues"]
-    if not bIsBounded(params) or not bPhysicalMinimum(nloptInst, potentialFunc, params):
+    if not bIsBounded(params) or not bPhysicalMinimum(nloptInst, 
+                                                      potential, 
+                                                      params):
         return False
     return paramDict
 
-def _randomBmParam(randomNum, nloptInst, potentialFunc):
+def _randomBmParam(randomNum, nloptInst, potential):
     bmdictList = []
     ## TODO put in some upper limit for this while loop
     darkHieracy = 1
+    ## Run in parallel?
     while len(bmdictList) < randomNum:
         mS1 = np.random.uniform(63, 100)
         delta12 = np.random.uniform(5, 100)
@@ -174,14 +197,24 @@ def _randomBmParam(randomNum, nloptInst, potentialFunc):
         deltac = np.random.uniform(5, 100)
         ghDM = np.random.uniform(0, 1)
         thetaCPV = np.random.uniform(np.pi/2, 3*np.pi/2)
-        bmDict = _lagranianParamGen(mS1, delta12, delta1c, deltac, ghDM, thetaCPV, darkHieracy, len(bmdictList), nloptInst, potentialFunc)
+        
+        bmDict = _lagranianParamGen(mS1, 
+                                    delta12, 
+                                    delta1c, 
+                                    deltac, 
+                                    ghDM, 
+                                    thetaCPV, 
+                                    darkHieracy, 
+                                    len(bmdictList), 
+                                    nloptInst, 
+                                    potential)
         
         if bmDict:
             bmdictList.append(bmDict)
             
     return bmdictList
 
-def _handPickedBm(nloptInst, potentialFunc):
+def _handPickedBm(nloptInst, potential):
     bmdictList = []
     bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
                    [67, 4.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
@@ -194,28 +227,35 @@ def _handPickedBm(nloptInst, potentialFunc):
                    [90, 55.0, 1.0, 1.0, 0.0, 2.*np.pi/3, 1],
                    [90, 55.0, 1.0, 22.0, 0.0, 2.*np.pi/3, 1],
                    [50, 55, 70, 25, 3/9, np.pi/2., 1]]
+    
     for bmInput in bmInputList:
-        bmDict = _lagranianParamGen(*bmInput, len(bmdictList), nloptInst, potentialFunc)
+        bmDict = _lagranianParamGen(*bmInput, 
+                                    len(bmdictList), 
+                                    nloptInst, 
+                                    potential)
+        
         if bmDict:
             bmdictList.append(bmDict)
     return bmdictList
 
-def _strongSubSet(prevResultDir, nloptInst, potentialFunc):
+def _strongSubSet(prevResultDir, nloptInst, potential):
     bmdictList = []
     
     for fileName in glob(join(prevResultDir, '*.json')):
         resultDic = load(open(fileName, "r"))
+        
         if resultDic["strong" ] > 0.6:
             bmdictList.append(_lagranianParamGen(resultDic["bmInput"]["mS1"],
-                                             resultDic["bmInput"]["delta12"],
-                                             resultDic["bmInput"]["delta1c"], 
-                                             resultDic["bmInput"]["deltac"], 
-                                             resultDic["bmInput"]["ghDM"], 
-                                             resultDic["bmInput"]["thetaCPV"],
-                                             resultDic["bmInput"]["darkHieracy"],
-                                             resultDic["bmNumber"],
-                                             nloptInst,
-                                             potentialFunc))
+                                                 resultDic["bmInput"]["delta12"],
+                                                 resultDic["bmInput"]["delta1c"], 
+                                                 resultDic["bmInput"]["deltac"], 
+                                                 resultDic["bmInput"]["ghDM"], 
+                                                 resultDic["bmInput"]["thetaCPV"],
+                                                 resultDic["bmInput"]["darkHieracy"],
+                                                 resultDic["bmNumber"],
+                                                 nloptInst,
+                                                 potential))
+            
     return bmdictList
 
 def generateBenchmarks(args)-> None:
@@ -234,29 +274,29 @@ def generateBenchmarks(args)-> None:
     
     parsedExpressions = load(open("../parsedExpressions.json", "r"))
     ## Take the pythonised tree level potential we've generated 
-    potential = ParsedExpression(parsedExpressions["veff"]["expressions"][0], None)
+    treeLevel = ParsedExpression(parsedExpressions["veff"]["expressions"][0], None)
     
     ## Feels weird to have nested function but not sure how else to go until can
     ## use arrays with nlopt
-    def potentialFunc(fields, params):
+    def potential(fields, 
+                  params):
         params["v1"] = fields[0]
         params["v2"] = fields[1]
         params["v3"] = fields[2]
-        return potential.evaluate(params)
-    
+        return treeLevel.evaluate(params)
     
     ## subset has already been checked to be physical so
     ## shouldn't need nloptInst and potential
     if args.benchmarkType == "randomSSS":
-        dump(_strongSubSet(args.prevResultDir, nloptInst, potentialFunc), open(output_file, "w"), indent = 4)
+        dump(_strongSubSet(args.prevResultDir, nloptInst, potential), open(output_file, "w"), indent = 4)
         return
 
     elif args.benchmarkType == "handPicked":
-        dump(_handPickedBm(nloptInst, potentialFunc), open(output_file, "w"), indent = 4)
+        dump(_handPickedBm(nloptInst, potential), open(output_file, "w"), indent = 4)
         return
     
     elif args.benchmarkType == "random":
-        dump(_randomBmParam(args.randomNum, nloptInst, potentialFunc), open(output_file, "w"), indent = 4)
+        dump(_randomBmParam(args.randomNum, nloptInst, potential), open(output_file, "w"), indent = 4)
         return
 
     return
@@ -299,10 +339,10 @@ class BmGeneratorUnitTests(TestCase):
         
         ## Feels weird to have nested function but not sure how else to go until can
         ## use arrays with nlopt
-        def potentialFunc(fields, params):
+        def potential(fields, params):
             params["v1"] = fields[0]
             params["v2"] = fields[1]
             params["v3"] = fields[2]
             return potential.evaluate(params)
         
-        self.assertEqual( reference, _lagranianParamGen(*source, nloptInst, potentialFunc, ) )
+        self.assertEqual( reference, _lagranianParamGen(*source, nloptInst, potential, ) )
