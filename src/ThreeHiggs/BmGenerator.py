@@ -164,7 +164,12 @@ def checkPhysical(params, nloptInst, potential, chargedMassMatrix, neutralMassMa
     return True
     
 
-def _randomBmParam(randomNum, potential, chargedMassMatrix, neutralMassMatrix):
+def _randomBmParam(randomNum, 
+                   nloptInst, 
+                   potential, 
+                   chargedMassMatrix, 
+                   neutralMassMatrix):
+    
     bmdictList = []
     ## TODO put in some upper limit for this while loop
     darkHieracy = 1
@@ -177,23 +182,30 @@ def _randomBmParam(randomNum, potential, chargedMassMatrix, neutralMassMatrix):
         ghDM = np.random.uniform(0, 1)
         thetaCPV = np.random.uniform(np.pi/2, 3*np.pi/2)
         
-        bmDict = _lagranianParamGen(mS1, 
-                                    delta12, 
-                                    delta1c, 
-                                    deltac, 
-                                    ghDM, 
-                                    thetaCPV, 
-                                    darkHieracy, 
-                                    len(bmdictList), 
-                                    nloptInst, 
-                                    potential)
+        bmParams = _lagranianParamGen(mS1, 
+                                      delta12, 
+                                      delta1c, 
+                                      deltac, 
+                                      ghDM, 
+                                      thetaCPV, 
+                                      darkHieracy, 
+                                      len(bmdictList))
         
-        if bmDict:
-            bmdictList.append(bmDict)
+        if bmParams:
+            if checkPhysical(bmParams["massTerms"] | bmParams["couplingValues"], 
+                             nloptInst, 
+                             potential, 
+                             chargedMassMatrix, 
+                             neutralMassMatrix):
+                
+                bmdictList.append(bmParams)
             
     return bmdictList
 
-def _handPickedBm(nloptInst, potential, chargedMassMatrix, neutralMassMatrix):
+def _handPickedBm(nloptInst, 
+                  potential, 
+                  chargedMassMatrix, 
+                  neutralMassMatrix):
     
     bmdictList = []
     ## Move this to userArg or something
@@ -217,7 +229,7 @@ def _handPickedBm(nloptInst, potential, chargedMassMatrix, neutralMassMatrix):
                 bmdictList.append(bmParams)
     return bmdictList
 
-def _strongSubSet(prevResultDir, nloptInst, potential):
+def _strongSubSet(prevResultDir):
     bmdictList = []
     
     for fileName in glob(join(prevResultDir, '*.json')):
@@ -231,9 +243,7 @@ def _strongSubSet(prevResultDir, nloptInst, potential):
                                                  resultDic["bmInput"]["ghDM"], 
                                                  resultDic["bmInput"]["thetaCPV"],
                                                  resultDic["bmInput"]["darkHieracy"],
-                                                 resultDic["bmNumber"],
-                                                 nloptInst,
-                                                 potential))
+                                                 resultDic["bmNumber"]))
             
     return bmdictList
 
@@ -253,9 +263,12 @@ def generateBenchmarks(args)-> None:
     
     parsedExpressions = load(open("../parsedExpressions.json", "r"))
     ## Take the pythonised tree level potential we've generated 
-    treeLevel = ParsedExpression(parsedExpressions["veff"]["expressions"][0], None)
-    chargedMassMatrix = MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]["expressions"], None)
-    neutralMassMatrix = MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"]["expressions"], None)
+    treeLevel = ParsedExpression(parsedExpressions["veff"]["expressions"][0], 
+                                 None)
+    chargedMassMatrix = MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]["expressions"], 
+                                   None)
+    neutralMassMatrix = MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"]["expressions"], 
+                                   None)
     
     ## Feels weird to have nested function but not sure how else to go until can
     ## use arrays with nlopt
@@ -267,14 +280,20 @@ def generateBenchmarks(args)-> None:
         return treeLevel.evaluate(params)
     
     if args.benchmarkType == "randomSSS":
-        dump(_strongSubSet(args.prevResultDir), open(output_file, "w"), indent = 4)
+        dump(_strongSubSet(args.prevResultDir), 
+             open(output_file, "w"), 
+             indent = 4)
         return
 
     elif args.benchmarkType == "handPicked":
-        dump(_handPickedBm(nloptInst, potential, chargedMassMatrix, neutralMassMatrix), open(output_file, "w"), indent = 4)
+        dump(_handPickedBm(nloptInst, potential, chargedMassMatrix, neutralMassMatrix), 
+             open(output_file, "w"), 
+             indent = 4)
     
     elif args.benchmarkType == "random":
-        dump(_randomBmParam(args.randomNum, nloptInst, potential, chargedMassMatrix, neutralMassMatrix), open(output_file, "w"), indent = 4)
+        dump(_randomBmParam(args.randomNum, nloptInst, potential, chargedMassMatrix, neutralMassMatrix), 
+             open(output_file, "w"), 
+             indent = 4)
     
     return
 
