@@ -301,6 +301,7 @@ def generateBenchmarks(args)-> None:
     
 from unittest import TestCase
 class BmGeneratorUnitTests(TestCase):
+        
     def test_bIsBoundedFalse(self):
         source = {'mu12sqRe': 12724.595168103033, 'mu12sqIm': 0, 'mu2sq': -20604.175986862854, 'mu3sq': 7812.5, 'mu1sq': -20604.175986862854, 'lam1Re': 0.1, 'lam1Im': 0.0, 'lam2Re': 0.08368703688875163, 'lam2Im': 0.05054893896685599, 'lam11': 0.11, 'lam22': 0.12, 'lam12': 0.13, 'lam12p': 0.14, 'lam23': 0.13184965469208287, 'lam23p': -0.10179114069822925, 'lam3Re': 0.08368703688875163, 'lam3Im': 0.05054893896685599, 'lam31': 0.13184965469208287, 'lam31p': -0.10179114069822925, 'lam33': 0.12886749199352251}
         self.assertEqual(False, bIsBounded(source))
@@ -308,37 +309,9 @@ class BmGeneratorUnitTests(TestCase):
     def test_bIsBoundedTrue(self):
         source = {'mu12sqRe': 4799.941333804141, 'mu12sqIm': 0, 'mu2sq': -11505.594825493996, 'mu3sq': 7812.5, 'mu1sq': -11505.594825493996, 'lam1Re': 0.1, 'lam1Im': 0.0, 'lam2Re': 0.010823997158779158, 'lam2Im': 0.017584425457946057, 'lam11': 0.11, 'lam22': 0.12, 'lam12': 0.13, 'lam12p': 0.14, 'lam23': 0.33218995023667736, 'lam23p': -0.29472720912675215, 'lam3Re': 0.010823997158779158, 'lam3Im': 0.017584425457946057, 'lam31': 0.33218995023667736, 'lam31p': -0.29472720912675215, 'lam33': 0.12886749199352251}
         self.assertEqual(True, bIsBounded(source))
-    
-    def test___bPositiveMassStatesFalse(self):
-        source = (-7446.958243389069, 14066.835009399923, 1.0335363761664145, -0.8185339583108823, 6510.844284793283, 23075.04842411651, 60624.2884)
-        self.assertEqual(False, _bPositiveMassStates(*source))
-        
-    def test___bPositiveMassStatesTrue(self):
-        source = (5142.163347176796, 2301.350882335473, 0.6120747865923423, -0.12441080416604636, 2931.315410805045, 2448.0647739410247, 60624.2884)
-        self.assertEqual(True, _bPositiveMassStates(*source))
         
     def test_lagranianParamGen(self):
         reference = {'bmNumber': 0, 'RGScale': 91.1876, 'bmInput': {'thetaCPV': 3.11308902835221, 'ghDM': 0.15520161865427817, 'mS1': 89.15641588128479, 'delta12': 87.17952518246265, 'delta1c': 14.020273320699415, 'deltac': 5.129099092707543, 'darkHieracy': 1}, 'massTerms': {'mu12sqRe': 542.3572917258725, 'mu12sqIm': 0, 'mu2sq': -9572.907910345595, 'mu3sq': 7812.5, 'mu1sq': -9572.907910345595}, 'couplingValues': {'lam1Re': 0.1, 'lam1Im': 0.0, 'lam2Re': -0.08646867756101999, 'lam2Im': 0.0024653384763691356, 'lam11': 0.11, 'lam22': 0.12, 'lam12': 0.13, 'lam12p': 0.14, 'lam23': 0.05327497010465927, 'lam23p': 0.274933662245124, 'lam3Re': -0.08646867756101999, 'lam3Im': 0.0024653384763691356, 'lam31': 0.05327497010465927, 'lam31p': 0.274933662245124, 'lam33': 0.12886749199352251}}
         source = (89.15641588128479, 87.17952518246265, 14.020273320699415, 5.129099092707543, 0.15520161865427817, 3.11308902835221, 1, 0)
         
-        nloptInst = cNlopt(config = {"nbrVars": 3, 
-                                     "absGlobalTol" : 0.5,
-                                     "relGlobalTol" :0.5, 
-                                     "absLocalTol" : 0.5, 
-                                     "relLocalTol" : 0.5,
-                                     "varLowerBounds" : [-300, 0, 0],
-                                     "varUpperBounds" : [300, 300, 300]})
-        ## Gives resource warning for unknown reason
-        parsedExpressions = load(open("parsedExpressions.json", "r"))
-        
-        potential = ParsedExpression(parsedExpressions["veff"]["expressions"][0], None)
-        
-        ## Feels weird to have nested function but not sure how else to go until can
-        ## use arrays with nlopt
-        def potential(fields, params):
-            params["v1"] = fields[0]
-            params["v2"] = fields[1]
-            params["v3"] = fields[2]
-            return potential.evaluate(params)
-        
-        self.assertEqual( reference, _lagranianParamGen(*source, nloptInst, potential, ) )
+        self.assertEqual( reference, _lagranianParamGen(*source ) )
