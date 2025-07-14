@@ -44,7 +44,7 @@ class TraceFreeEnergyMinimum:
     dimensionalReduction: str = "dimensionalReductionInstance"
     betaFunction4DExpression: str = "betaFunction4DExpression" 
     
-    bVerbose: bool = False
+    verbose: bool = False
     
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
@@ -150,7 +150,7 @@ class TraceFreeEnergyMinimum:
         minimumLocation = np.array(self.initialGuesses[0])
         
         for T in self.TRange:
-            if self.bVerbose:
+            if self.verbose:
                 print (f'Start of temp = {T} loop')
             minimizationResults["T"].append(T)
             
@@ -178,7 +178,7 @@ class TraceFreeEnergyMinimum:
                     minimizationResults["UltraSoftTemp"] = T
 
             if np.all( minimizationResults["minimumLocation"][-1] < 0.5):
-                if self.bVerbose:
+                if self.verbose:
                     print (f"Symmetric phase found at temp {T}")
                 if counter == 3:
                     break
