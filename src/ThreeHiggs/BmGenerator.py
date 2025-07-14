@@ -37,7 +37,6 @@ def bIsBounded(params):
 def bPhysicalMinimum(nloptInst,
                      potential,
                      params):
-    
     ## Move these to user args or somewhere out of the way
     minimumInitialGuesses = [[0,0,0],
                              [0,0,246],
