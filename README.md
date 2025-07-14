@@ -1,19 +1,17 @@
 # ThreeHiggs
 
-## Installation
-Install in developer mode with pip:
-```
-pip install -e .
-```
-
 ## Container
-A container file is also provided but it is WIP.
-
+These commands are to be run inside the ThreeHiggs directory
 ```
 podman build . -t threehiggs 
-podman run -it threehiggs /bin/bash
-mv Running/runBenchmark.py src
-cd Running
+podman run --mount type=bind,src=$PWD,target=/ThreeHiggs -it threehiggs /bin/bash -c "cd /ThreeHiggs/src && exec /bin/bash"
 python3 runBenchmark.py
+```
+
+## Installation
+Install in developer mode with pip:
+Depreciated(?) in favour of container
+```
+pip install -e .
 ```
 

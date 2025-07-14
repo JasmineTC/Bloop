@@ -1,6 +1,7 @@
-
 from ThreeHiggs.UserInput import UserInput, Stages
+
 args = UserInput().parse()
+
 if args.firstStage <= Stages.convertMathematica <= args.lastStage:
     if args.bVerbose:
         print("Convert Mathematica stage started")
@@ -13,7 +14,7 @@ if args.firstStage <= Stages.generateBenchmark <= args.lastStage:
         print("Benchmark generation stage started")
         
     from ThreeHiggs.BmGenerator import generateBenchmarks
-    generateBenchmarks(args.benchmarkFile, args.benchmarkType, args.randomNum, args.prevResultDir)
+    generateBenchmarks(args)
 
 if args.firstStage <= Stages.doMinimization <= args.lastStage:
     if args.bVerbose:

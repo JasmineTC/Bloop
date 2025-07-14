@@ -229,7 +229,7 @@ class TraceFreeEnergyMinimum:
         # plt.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
         # plt.savefig("Results/StrongPot.png")
         # plt.show()
-        exit()
+        return None
         
 
         
