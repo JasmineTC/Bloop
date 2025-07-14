@@ -37,7 +37,6 @@ def bIsBounded(params):
 def bPhysicalMinimum(nloptInst,
                      potential,
                      params):
-    
     ## Move these to user args or somewhere out of the way
     minimumInitialGuesses = [[0,0,0],
                              [0,0,246],
@@ -211,22 +210,24 @@ def _handPickedBm(nloptInst,
     ## Move this to userArg or something
     bmInputList = [[300, 0, 0, 0, 0.0, 0.0, 1],
                    [67, 4.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
-                   [57, 8.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
                    [70, 12.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
-                   [48, 20.0, 50.0, 1.0, 0.0, 5.*np.pi/6., 1],
                    [75, 55.0, 50.0, 1.0, 0.0, 2.*np.pi/3, 1],
                    [74, 55.0, 50.0, 15.0, 0.0, 2.*np.pi/3, 1],
                    [90, 5.0, 1.0, 1.0, 0.0, 2.*np.pi/3, 1],
                    [90, 55.0, 1.0, 1.0, 0.0, 2.*np.pi/3, 1],
-                   [90, 55.0, 1.0, 22.0, 0.0, 2.*np.pi/3, 1],
-                   [50, 55, 70, 25, 3/9, np.pi/2., 1]]
+                   [90, 55.0, 1.0, 22.0, 0.0, 2.*np.pi/3, 1]]
     
     for bmInput in bmInputList:
         bmParams = _lagranianParamGen(*bmInput, 
                                       len(bmdictList))
         if bmParams:
-            if checkPhysical(bmParams["massTerms"] | bmParams["couplingValues"], nloptInst, potential, chargedMassMatrix, neutralMassMatrix):
+            if checkPhysical(bmParams["massTerms"] | bmParams["couplingValues"], 
+                             nloptInst, 
+                             potential, 
+                             chargedMassMatrix, 
+                             neutralMassMatrix):
                 bmdictList.append(bmParams)
+
     return bmdictList
 
 def _strongSubSet(prevResultDir):
