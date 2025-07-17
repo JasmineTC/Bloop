@@ -139,10 +139,13 @@ def minimization(args):
         )
     })
     
+    from ThreeHiggs.PythoniseMathematica import replaceGreekSymbols
+    fourPointSymbols = [replaceGreekSymbols(item) for item in variableSymbols["fourPointSymbols"]]
+    yukawaSymbols = [replaceGreekSymbols(item) for item in variableSymbols["yukawaSymbols"]]
+    gaugeSymbols = [replaceGreekSymbols(item) for item in variableSymbols["gaugeSymbols"]]
+    
     with open(args.benchmarkFile) as benchmarkFile:
-        minimizationDict = {"pertSymbols": frozenset(variableSymbols["fourPointSymbols"] + 
-                                                     variableSymbols["yukawaSymbols"] + 
-                                                     variableSymbols["gaugeSymbols"]), 
+        minimizationDict = {"pertSymbols": frozenset(fourPointSymbols + yukawaSymbols + gaugeSymbols), 
                             "effectivePotential": effectivePotential,
                             "dimensionalReduction": dimensionalReduction,
                             "betaFunction4DExpression": ParsedExpressionSystemArray(pythonisedExpressions["betaFunctions4D"]["expressions"], 

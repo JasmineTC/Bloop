@@ -2,11 +2,12 @@ import numpy as np
 from math import sqrt, pi, log, exp
 import scipy
 
-def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
+def bIsPerturbative(paramValuesArray : list[float], pertSymbols : set, allSymbolsDict : dict) -> bool:
     ## Should actually check vertices but not a feature in DRalgo at time of writting
-    for key, value in paramDict4D.items():
-        if key in pertSymbols and abs(value) > 4*pi:
+    for pertSymbol in pertSymbols:
+        if abs(paramValuesArray[allSymbolsDict[pertSymbol]]) > 4*pi:
             return False
+
     return True
 
 def constructSplineDictArray(betaFunction4DExpression, muRange, initialConditions, allSymbolsDict) :
@@ -102,9 +103,8 @@ class TraceFreeEnergyMinimum:
                 paramValuesArray, 
                 self.initialGuesses + (minimumLocation, )
             ), 
+            bIsPerturbative(paramValuesArray, self.pertSymbols, self.allSymbolsDict), 
             True,
-            True,
-            #bIsPerturbative(paramsForMatchingDict, self.pertSymbols), 
             #bIsBounded(paramsForMatchingDict),
             list(paramValuesArray),
         )
@@ -251,19 +251,17 @@ from unittest import TestCase
 class TransitionFinderUnitTests(TestCase):
     def test_bIsPerturbativeTrue(self):
         reference = True
-        source = {"lam11": 0.7,
-                  "lam12": -0.8,
-                  "lam12p": 0}
-        symbols = {"lam11", "lam12", "lam12p"}
+        source = [0.7, -0.8, 0]
+        pertSymbols = {"lam11", "lam12", "lam12p"}
+        allSymbolsDict = {"lam11": 0, "lam12": 1, "lam12p": 2}
 
-        self.assertEqual(reference, bIsPerturbative(source, symbols))
+        self.assertEqual(reference, bIsPerturbative(source, pertSymbols, allSymbolsDict) )
 
     def test_bIsPerturbativeFalse(self):
         reference = False
-        source = {"lam11": -12.57,
-                  "lam12": 0,
-                  "lam12p": 0}
-        symbols = {"lam11", "lam12", "lam12p"}
+        source = [-12.57, 0, 0]
+        pertSymbols = {"lam11", "lam12", "lam12p"}
+        allSymbolsDict = {"lam11": 0, "lam12": 1, "lam12p": 2}
 
-        self.assertEqual(reference, bIsPerturbative(source, symbols) )
+        self.assertEqual(reference, bIsPerturbative(source, pertSymbols, allSymbolsDict) )
 
