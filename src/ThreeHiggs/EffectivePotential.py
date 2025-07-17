@@ -124,13 +124,13 @@ def diagonalizeScalars(params: dict[str, float],
 
     """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
     so we need to undo the permutatation"""
-    outDict = scalarRotationMatrix.evaluate(scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix))
+    params |= scalarRotationMatrix.evaluate(scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix))
 
     ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
     ##But should probably be handled by a file given from mathematica (such a list is already made in mathematica)
     massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
 
-    return outDict | {name: float(msq) for name, msq in zip(massNames, chain(*subEigenValues))}
+    return params | {name: float(msq) for name, msq in zip(massNames, chain(*subEigenValues))}
 
 @dataclass(frozen=True)
 class cNlopt:
@@ -283,16 +283,17 @@ class EffectivePotential:
         2) Return true if # of light modes is less than the # of goldstone modes'''
         goldStone = 0 if np.all(np.abs(fields) < 0.1) else 3
         paramDict = compFieldDepParams(fields,
-                                       T,
-                                       params3D,
-                                       self.fieldNames,
-                                       self.scalarPermutationMatrix, 
-                                       self.scalarMassMatrices, 
-                                       self.scalarRotationMatrix,
-                                       self.vectorShortHands,
-                                       self.vectorMassesSquared,
-                                       self.bNumba,
-                                       self.verbose)
+                                T,
+                                params3D,
+                                self.allSymbols,
+                                self.fieldNames,
+                                self.scalarPermutationMatrix, 
+                                self.scalarMassMatrices, 
+                                self.scalarRotationMatrix,
+                                self.vectorShortHands,
+                                self.vectorMassesSquared,
+                                self.bNumba,
+                                self.bVerbose)
 
         ## Convert mass into real type to do comparisons 
         massList = np.real([paramDict["MSsq01"], paramDict["MSsq02"],
