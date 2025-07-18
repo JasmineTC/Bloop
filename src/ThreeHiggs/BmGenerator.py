@@ -11,6 +11,11 @@ import numpy as np
 from os.path import join
 from glob import glob
 
+Tprefactor = (0.6528876614409878/(8*np.pi*80.377))**2
+MWsq = 80.377**2
+MZsq = 91.1876**2
+MHsq = 125**2
+
 def bIsBounded(params):
     ## Taking equations 26-31 from the draft that ensure the potential is bounded from below.
     if not params["lam11"] > 0:
@@ -50,7 +55,7 @@ def bPhysicalMinimum(nloptInst,
     ## should be defined once at a higher level, not every func call but params
     ## makes that non-trivial 
     potentialWrapped = lambda fields, _: potential(fields, 
-                                                           params)
+                                                   params)
     
     minValue = nloptInst.nloptGlobal(potentialWrapped, 
                                      minimumInitialGuesses[0])[1]
@@ -131,6 +136,41 @@ def _lagranianParamGen(mS1,
                                     "lam33": lam33}}
     return paramsDict
 
+
+def F(x, y):
+    ## abs(x) used to remove GoldStone bosons ()
+    if x == y or abs(x) < 1e-6 or abs(y) < 1e-6:
+        return 0
+    return (x+y)/2 - np.log(x/y)*(x*y)/(x-y)
+
+def computeT(chargedEigenValues, 
+          chargedEigenVectors, 
+          neutralEigenValues, 
+          neutralEigenVectors):
+    
+    chargedEigenVectorsInv = np.transpose(chargedEigenVectors)
+    neutralEigenVectorsInv = np.transpose(neutralEigenVectors)
+    chargedNeutralInvProduct = chargedEigenVectorsInv @ neutralEigenVectors
+    neutralNeutralInvProduct = neutralEigenVectorsInv @ neutralEigenVectors
+    chargedChargedInvProduct = chargedEigenVectorsInv @ chargedEigenVectors
+    
+    T = 0
+    for chargedIdx, chargedEigenvalue in enumerate(chargedEigenValues):
+        for neutralIdx, neutralEigenvalue in enumerate(neutralEigenValues):
+            T += (chargedNeutralInvProduct[chargedIdx][neutralIdx])**2*F(chargedEigenvalue, neutralEigenvalue)
+    ## List slice (list[idx:]) done to match sum_i sum_j j>i 
+    for neutralIdx, neutralEigenvalue in enumerate(neutralEigenValues):
+        for neutralIdx2, neutralEigenvalue2 in enumerate(neutralEigenValues[neutralIdx:]):
+            T -= (neutralNeutralInvProduct[neutralIdx][neutralIdx2])**2*F(neutralEigenvalue, neutralEigenvalue2)
+            
+    for chargedIdx, chargedEigenValue in enumerate(chargedEigenValues):
+        for chargedIdx2, chargedEigenValue2 in enumerate(chargedEigenValues[chargedIdx:]):
+            T -= 2*(chargedChargedInvProduct[chargedIdx][chargedIdx2])**2*F(chargedEigenValue, chargedEigenValue2)
+    for neutralIdx, neutralEigenvalue in enumerate(neutralEigenValues):
+        T += 3*(neutralNeutralInvProduct[0][neutralIdx])**2*(F(MZsq, neutralEigenvalue) - F(MWsq, neutralEigenvalue))
+
+    return (T- 3*(F(MZsq, MHsq) - F(MWsq, MHsq)))* Tprefactor
+
 def checkPhysical(params, nloptInst, potential, chargedMassMatrix, neutralMassMatrix):
     params["v1"] = 0
     params["v2"] = 0
@@ -138,7 +178,7 @@ def checkPhysical(params, nloptInst, potential, chargedMassMatrix, neutralMassMa
     if not bIsBounded(params):
         return False
     
-    chargedEigenValues = np.linalg.eigvalsh(chargedMassMatrix.evaluate(params))
+    chargedEigenValues, chargedEigenVectors = np.linalg.eigh(chargedMassMatrix.evaluate(params))
     ## Enforces positive charged masses (tolerance to handle goldstone bosons)
     if not np.all(chargedEigenValues >=-1e-20):
         return False
@@ -147,7 +187,7 @@ def checkPhysical(params, nloptInst, potential, chargedMassMatrix, neutralMassMa
     if not np.all(chargedEigenValues[2:] >= 8100):
         return False
     
-    neutralEigenValues = np.linalg.eigvalsh(neutralMassMatrix.evaluate(params))
+    neutralEigenValues, neutralEigenVectors = np.linalg.eigh(neutralMassMatrix.evaluate(params))
     ## Enforces positive neutral masses (tolerance to handle goldstone bosons)
     if not np.all(neutralEigenValues >=-1e-20):
         return False
@@ -159,6 +199,10 @@ def checkPhysical(params, nloptInst, potential, chargedMassMatrix, neutralMassMa
     
     if not bPhysicalMinimum(nloptInst, potential, params):
         return False
+    
+    ##Check if T is within 2 sigma of measured value
+    if not -0.17 <= computeT(chargedEigenValues, chargedEigenVectors, neutralEigenValues, neutralEigenVectors) <= 0.35:
+        return False 
     
     return True
     
@@ -226,6 +270,7 @@ def _handPickedBm(nloptInst,
                              potential, 
                              chargedMassMatrix, 
                              neutralMassMatrix):
+                
                 bmdictList.append(bmParams)
 
     return bmdictList

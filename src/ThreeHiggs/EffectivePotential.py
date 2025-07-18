@@ -42,7 +42,6 @@ def compFieldDepParams(fields: list[float],
                                           bNumba,
                                           verbose))
 
-from itertools import chain
 def diagonalizeScalars(params: dict[str, float], 
                        T: float,  
                        scalarPermutationMatrix,

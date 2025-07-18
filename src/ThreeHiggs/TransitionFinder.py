@@ -112,7 +112,7 @@ class TraceFreeEnergyMinimum:
                             "RGScale":  inputParams["RGScale"],
                             **inputParams["massTerms"],
                             **inputParams["couplingValues"]}
-        
+
         params4D = np.zeros(len(self.allSymbolsDict))
         for key, value in langrianParams4D.items():
             params4D[self.allSymbolsDict[key]] = value
