@@ -603,22 +603,22 @@ VectorMassExpressions
 (*Calculating the effective potential*)
 
 
-(** NB! RotateTensorsCustomMass[] is very very slow, this can run for hours!
+(*(** NB! RotateTensorsCustomMass[] is very very slow, this can run for hours!
 It's because our scalar rotation matrix is so large. **)
 AbsoluteTiming[
 	(** Tell DRalgo to rotate the fields to mass diagonal basis **)
 	RotateTensorsCustomMass[DSRot,DVRot,ScalarMassDiag,VectorMassDiagSimple];
 	CalculatePotentialUS[]
-]
+]*)
 
 
-VeffLO = PrintEffectivePotential["LO"]//Simplify; (* Simplify to get rid of possible imaginary units *)
+(*VeffLO = PrintEffectivePotential["LO"]//Simplify; (* Simplify to get rid of possible imaginary units *)
 VeffNLO = PrintEffectivePotential["NLO"]//Simplify; (* Simplify to factor 1/pi division for tiny speed up *)
 VeffNNLO = PrintEffectivePotential["NNLO"]; (* NOT simplified as seems to change numerical result for unknown reasons *)
 
 ExportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", VeffLO];
 ExportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", VeffNLO];
-ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", VeffNNLO];
+ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", VeffNNLO];*)
 
 
 extractSymbols[expr_] := Union[Cases[expr, s_Symbol /; 
@@ -631,47 +631,19 @@ extractSymbols[expr_] := Union[Cases[expr, s_Symbol /;
     Infinity]]
 
 
-VeffNLO
-
-
-extractSymbols[VeffNNLO]
-
-
-(*$Assumptions = _Symbol \[Element] Reals
-VeffNNLOSIMPREAL = PrintEffectivePotential["NNLO"]//Simplify;
-ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLOSIMPREAL.txt", VeffNNLOSIMPREAL];*)
-
-
-(* Apply the function to each element in the list and flatten results *)
-fourPointSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ \[CapitalLambda]4]];
-(** I don't know when this will ever be needed but incase it is ever needed\.12 **)
-threePointSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ \[CapitalLambda]3]] ;
-twoPointSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ \[Mu]ij]];
-yukawaSymbols = DeleteDuplicates @ Flatten[splitExpr /@ DeleteDuplicates @ Flatten[splitExpr /@ Ysff]];
-
-
-ExportUTF8[variables<>"/LagranianSymbols.json", {"fourPointSymbols"-> symbolsToStrings[fourPointSymbols],
-												"threePointSymbols"-> symbolsToStrings[threePointSymbols],
-												"twoPointSymbols"-> symbolsToStrings[twoPointSymbols],
+ExportUTF8[variables<>"/LagranianSymbols.json", {"fourPointSymbols"-> symbolsToStrings[Variables[\[CapitalLambda]4["NonzeroValues"]]],
+												"threePointSymbols"-> symbolsToStrings[Variables[\[CapitalLambda]3["NonzeroValues"]]],
+												"twoPointSymbols"-> symbolsToStrings[Variables[\[Mu]ij["NonzeroValues"]]],
 												"gaugeSymbols"-> symbolsToStrings[GaugeCouplings],
-												"yukawaSymbols" -> symbolsToStrings[yukawaSymbols],
-												"fieldSymbols" -> symbolsToStrings[DeleteDuplicates @ Flatten[splitExpr /@ backgroundFieldsFull]]				   															   															   															   															   
+												"yukawaSymbols" -> symbolsToStrings[Variables[Ysff["NonzeroValues"]]],
+												"fieldSymbols" -> symbolsToStrings[Variables[backgroundFieldsFull["NonzeroValues"]]]				   															   															   															   															   
 												} ]
-												
-
-
-ExportUTF8[variables<>"/test.json", <|
-  "key1" -> "symbolA",
-  "key2" -> <|"nestedKey" -> "symbolB"|>,
-  "key3" -> {"symbolC", "symbolD"}
-|>]
-
 												
 
 
 (*The scalar mass matrices are a bit hacky since they don't have a direct out and the block diagonal nature means they shouldn't share the same out*)
 
-ExportUTF8[variables<>"/EquationSymbols.json", {"hardScaleRGE"->{"Out" -> symbolsToStrings[Part[GetSubstitutionSymbols[BetaFunctions4DUnsquared[]],1]],
+(*ExportUTF8[variables<>"/EquationSymbols.json", {"hardScaleRGE"->{"Out" -> symbolsToStrings[Part[GetSubstitutionSymbols[BetaFunctions4DUnsquared[]],1]],
 															   "In" -> symbolsToStrings[Part[GetSubstitutionSymbols[BetaFunctions4DUnsquared[]],2]]},
 												"softScaleParams"->{"Out" -> symbolsToStrings[Part[GetSubstitutionSymbols[allSoftScaleParamsSqrtSuffixFree],1]],
 																   "In" -> symbolsToStrings[Part[GetSubstitutionSymbols[allSoftScaleParamsSqrtSuffixFree],2]]},
@@ -692,13 +664,13 @@ ExportUTF8[variables<>"/EquationSymbols.json", {"hardScaleRGE"->{"Out" -> symbol
 												"NLOPotential"->symbolsToStrings[extractSymbols[VeffNLO]],
 												"NNLOPotential"->symbolsToStrings[extractSymbols[VeffNNLO]]				   															   															   															   															   
 												} ]
-												
+												*)
 
 
-(*Claude 3.5 again*)
+(*(*Claude 3.5 again*)
 (*Loading in the json again to extract all symbols from as less effort than doing again in mathematica or down the line in python*)
 ExtractSymbols[data_]:=Module[{results={}},Which[(*If it's a string,try to convert to symbol*)StringQ[data],AppendTo[results,Symbol[data]],(*If it's a list,process each element*)ListQ[data],results=Flatten[Map[ExtractSymbols,data]],(*If it's an association,process only values*)AssociationQ[data],results=Flatten[Map[ExtractSymbols,Values[data]]],(*Handle Rule objects*)MatchQ[data,_Rule],results=ExtractSymbols[data[[2]]],(*Only process the right-hand side*)(*Handle lists of rules*)MatchQ[data,{___Rule}],results=Flatten[Map[ExtractSymbols[#[[2]]]&,data]],(*Process right-hand sides*)True,Print["Unhandled type: ",Head[data]]];
-DeleteDuplicates[results]]
+DeleteDuplicates[results]]*)
 
 
-ExportUTF8[variables<>"/allSymbols.json",symbolsToStrings[ExtractSymbols[Import[variables<>"/EquationSymbols.json"]]]]
+(*ExportUTF8[variables<>"/allSymbols.json",symbolsToStrings[ExtractSymbols[Import[variables<>"/EquationSymbols.json"]]]]*)
