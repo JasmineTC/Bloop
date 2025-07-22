@@ -60,34 +60,43 @@ toSymbolicMatrix[matrix_, elementSymbol_, bIsSymmetric_: False] := Block[
 ];
 
 
-(* Written by Claude v4*)
-extractSymbolsDetailed3[expr_, includeProtected_: False, asStrings_: True] := Module[{symbols, lhsSymbols, rhsSymbols, filterProtected, stringConverter},
-  
-  (* Helper function to filter protected symbols *)
-  filterProtected = If[includeProtected, Identity, Select[#, !MemberQ[Attributes[#], Protected] &] &];
-  
-  (* Helper function to convert to strings if requested *)
-  stringConverter = If[asStrings, 
-    Select[#, Head[#] === Symbol &] /. s_Symbol :> SymbolName[s] &, 
-    Identity
-  ];
-  
+(* Written by Claude v4, bug fixed by ChatGPT o4-mini-high*)
+extractSymbols[expr_, includeProtected_: False, asStrings_: True] :=
+ Module[{syms, lhs, rhs, keepQ, toStr},
+
+  (* keep or drop protected symbols *)
+  keepQ = If[includeProtected, True &, ! MemberQ[Attributes[#], Protected] &];
+
+  (* convert ONLY non-System symbols to strings *)
+  toStr[s_] := If[asStrings, SymbolName[s], s];
+
+  (* core extractor *)
+  symsFrom[e_] :=
+    DeleteDuplicates @ Select[Cases[e, _Symbol, Infinity], keepQ];
+
   Which[
-    (* Handle list of substitution rules *)
-    ListQ[expr] && AllTrue[expr, MatchQ[#, _Rule | _RuleDelayed] &],
-    lhsSymbols = stringConverter@DeleteDuplicates@filterProtected@Cases[expr[[All, 1]], _Symbol, Infinity];
-    rhsSymbols = stringConverter@DeleteDuplicates@filterProtected@Cases[expr[[All, 2]], _Symbol, Infinity];
-    <|"LHS" -> lhsSymbols, "RHS" -> rhsSymbols|>,
-    
-    (* Handle SparseArray *)
-    Head[expr] === SparseArray,
-    stringConverter@DeleteDuplicates@filterProtected@Cases[expr["NonzeroValues"], _Symbol, Infinity],
-    
-    (* Handle regular expressions *)
-    True,
-    stringConverter@DeleteDuplicates@filterProtected@Cases[expr, _Symbol, Infinity]
+   (* list of rules *)
+   ListQ[expr] && AllTrue[expr, MatchQ[#, _Rule | _RuleDelayed] &],
+   lhs = toStr /@ symsFrom[expr[[All, 1]]];
+   rhs = toStr /@ symsFrom[expr[[All, 2]]];
+   <|"LHS" -> lhs, "RHS" -> rhs|>,
+
+   (* SparseArray *)
+   Head[expr] === SparseArray,
+   toStr /@ symsFrom[expr["NonzeroValues"]],
+
+   True,
+   toStr /@ symsFrom[expr]
   ]
 ]
+
+
+symbolsFromDict[rules_List] :=
+  DeleteDuplicates @ Flatten @ Cases[
+    rules,
+    r : (_Rule | _RuleDelayed) /; FreeQ[r[[2]], _Rule | _RuleDelayed] :> r[[2]],
+    {0, \[Infinity]}
+  ]
 
 
 (*Claude 3.5*)
@@ -126,6 +135,13 @@ CombineSubstRules[list1_, list2_] := Block[{combinedList,groupedRules},
 	(* Sum up the right-hand sides for each group *)
 	resultList = Rule @@@ KeyValueMap[{#1, Total[#2[[All, 2]]]} &, groupedRules];
 	Return[resultList];
+];
+
+
+(*Gauge couplings given as g_i^2 even though g_i is what is needed, so take sqrt. Fine to do so long as g_i >0*)
+sqrtSubRules[ruleList_]:=Module[{newRules},
+  newRules = ruleList /. (lhs_ -> expr_) /; MatchQ[lhs, _^2] :> (PowerExpand[Sqrt[lhs]] -> Sqrt[expr]);
+  Return[newRules];
 ];
 
 
