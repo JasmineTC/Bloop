@@ -13,11 +13,11 @@ pathToDRalgo = "/home/jasmine/.Mathematica/Applications/DRalgo/DRalgo.m"
 Get[pathToDRalgo]
 
 
-(* ::Subsection::Closed:: *)
-(*Import helper functions (WIP!!)*)
+(* ::Subsection:: *)
+(*Import helper functions *)
 
 
-Get["/home/jasmine/Documents/repos/ThreeHiggs/Testing/MathematicaToPythonHelper.m"]
+Get["MathematicaToPythonHelper.m"]
 
 
 (* ::Subsection::Closed:: *)
