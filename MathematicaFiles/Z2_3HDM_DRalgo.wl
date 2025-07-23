@@ -17,7 +17,7 @@ Get[pathToDRalgo]
 (*Import helper functions*)
 
 
-Get[StringJoin[NotebookDirectory[], "MathematicaToPythonHelper.m"]]
+Get["MathematicaToPythonHelper.m"]
 
 
 (* ::Subsection::Closed:: *)
@@ -31,7 +31,7 @@ effectivePotentialDirectory = "DRalgoOutput/Data/EffectivePotential";
 variables = "DRalgoOutput/Variables";
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Model*)
 
 
@@ -140,7 +140,7 @@ Ysff=-GradYukawa[yt3*YukawaDoublet3];
 YsffC=SparseArray[Simplify[Conjugate[Ysff]//Normal,Assumptions->{yt3>0}]];
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Dimensional Reduction*)
 
 
@@ -226,7 +226,7 @@ runningUS = RemoveSuffixes[SolveRunning3D[BetaFunctions3DUS[]],{"US", "3d"}];
 exportUTF8[softToUltrasoftDirectory<>"/ultrasoftScaleRGE.txt", runningUS];
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Effective potential*)
 
 
