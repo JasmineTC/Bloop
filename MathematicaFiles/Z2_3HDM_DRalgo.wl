@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Import DRalgo and Group Math*)
 
 
@@ -13,21 +13,21 @@ pathToDRalgo = "/home/jasmine/.Mathematica/Applications/DRalgo/DRalgo.m"
 Get[pathToDRalgo]
 
 
-(* ::Subsection:: *)
-(*Import helper functions (WIP!!)*)
+(* ::Subsection::Closed:: *)
+(*Import helper functions*)
 
 
-Get["/home/jasmine/Documents/repos/ThreeHiggs/Testing/MathematicaToPythonHelper.m"]
+Get[StringJoin[NotebookDirectory[], "MathematicaToPythonHelper.m"]]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Specify file paths for exporting*)
 
 
 (** All file paths are relative to the working directory (set above). **)
-hardToSoftDirectory = "DRalgoOutput/HardToSoft";
-softToUltrasoftDirectory = "DRalgoOutput/SoftToUltrasoft";
-effectivePotentialDirectory = "DRalgoOutput/EffectivePotential";
+hardToSoftDirectory = "DRalgoOutput/Data/HardToSoft";
+softToUltrasoftDirectory = "DRalgoOutput/Data/SoftToUltrasoft";
+effectivePotentialDirectory = "DRalgoOutput/Data/EffectivePotential";
 variables = "DRalgoOutput/Variables";
 
 
