@@ -13,21 +13,21 @@ pathToDRalgo = "/home/jasmine/.Mathematica/Applications/DRalgo/DRalgo.m"
 Get[pathToDRalgo]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Import helper functions (WIP!!)*)
 
 
 Get["/home/jasmine/Documents/repos/ThreeHiggs/Testing/MathematicaToPythonHelper.m"]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Specify file paths for exporting*)
 
 
 (** All file paths are relative to the working directory (set above). **)
-hardToSoftDirectory = "DRalgoOutput/HardToSoft";
-softToUltrasoftDirectory = "DRalgoOutput/SoftToUltrasoft";
-effectivePotentialDirectory = "DRalgoOutput/EffectivePotential";
+hardToSoftDirectory = "DRalgoOutput/Data/HardToSoft";
+softToUltrasoftDirectory = "DRalgoOutput/Data/SoftToUltrasoft";
+effectivePotentialDirectory = "DRalgoOutput/Data/EffectivePotential";
 variables = "DRalgoOutput/Variables";
 
 
