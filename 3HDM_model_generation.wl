@@ -1,9 +1,10 @@
 (* ::Package:: *)
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Import DRalgo and Group Math*)
 
 
+ClearAll[]
 SetDirectory[NotebookDirectory[]];
 $LoadGroupMath=True;
 (* This is pointing to my DRalgo repo for easier updating *)
@@ -12,14 +13,14 @@ pathToDRalgo = "/home/jasmine/.Mathematica/Applications/DRalgo/DRalgo.m"
 Get[pathToDRalgo]
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Import helper functions (WIP!!)*)
 
 
 Get["/home/jasmine/Documents/repos/ThreeHiggs/Testing/MathematicaToPythonHelper.m"]
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Specify file paths for exporting*)
 
 
@@ -30,7 +31,7 @@ effectivePotentialDirectory = "DRalgoOutput/EffectivePotential";
 variables = "DRalgoOutput/Variables";
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Model*)
 
 
@@ -139,7 +140,7 @@ Ysff=-GradYukawa[yt3*YukawaDoublet3];
 YsffC=SparseArray[Simplify[Conjugate[Ysff]//Normal,Assumptions->{yt3>0}]];
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Dimensional Reduction*)
 
 
@@ -152,7 +153,7 @@ YsffC=SparseArray[Simplify[Conjugate[Ysff]//Normal,Assumptions->{yt3>0}]];
 (*However Mode->0 does not really work ATM,  it doesn't give couplings etc...*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*NLO matching, by which I mean Mode -> 2*)
 
 
@@ -165,7 +166,7 @@ PerformDRhard[];
 
 
 betaFunctions4DUnsquared = BetaFunctions4D[] /. {(x_^2 -> y_) :> (x -> y/(2*x))};
-ExportUTF8[hardToSoftDirectory<>"/BetaFunctions4D.txt", betaFunctions4DUnsquared];
+exportUTF8[hardToSoftDirectory<>"/BetaFunctions4D.txt", betaFunctions4DUnsquared];
 
 
 couplingsSoft = PrintCouplings[];
@@ -183,7 +184,7 @@ allSoftScaleParams = Join[couplingsSoft, temporalScalarCouplings, debyeMasses, s
 (*We want to do in place updating of parameters in the python code i.e. \[Lambda]14D gets updated to \[Lambda]13D which gets updated to \[Lambda]13DUS,
 it's easier to do this if we remove the suffices so its the same variable name throughout*)
 allSoftScaleParamsSqrtSuffixFree = RemoveSuffixes[sqrtSubRules[allSoftScaleParams], {"3d"}];
-ExportUTF8[hardToSoftDirectory<>"/softScaleParams_NLO.txt", allSoftScaleParamsSqrtSuffixFree];
+exportUTF8[hardToSoftDirectory<>"/softScaleParams_NLO.txt", allSoftScaleParamsSqrtSuffixFree];
 
 
 (* 3D RG equations can be solved exactly, so do that here. We will export subst rules analogous to the matching relations:
@@ -200,10 +201,10 @@ SolveRunning3D[betaFunctions_] := Block[{exprList},
 
 running3D = RemoveSuffixes[SolveRunning3D[BetaFunctions3DS[]],{"3d"}];
 
-ExportUTF8[hardToSoftDirectory<>"/softScaleRGE.txt", running3D];
+exportUTF8[hardToSoftDirectory<>"/softScaleRGE.txt", running3D];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Soft -> Ultrasoft matching*)
 
 
@@ -218,14 +219,14 @@ allUltrasoftScaleParams = Join[couplingsUS, scalarMassesUS] /. \[Mu]3->RGScale;
 allUltrasoftScaleParamsSqrt = RemoveSuffixes[sqrtSubRules[allUltrasoftScaleParams], {"US", "3d"}];(*Some reduant sqrt operations here? e.g. g13dUS*)
 
 
-ExportUTF8[softToUltrasoftDirectory<>"/ultrasoftScaleParams_NLO.txt", allUltrasoftScaleParamsSqrt];
+exportUTF8[softToUltrasoftDirectory<>"/ultrasoftScaleParams_NLO.txt", allUltrasoftScaleParamsSqrt];
 
 
 runningUS = RemoveSuffixes[SolveRunning3D[BetaFunctions3DUS[]],{"US", "3d"}];
-ExportUTF8[softToUltrasoftDirectory<>"/ultrasoftScaleRGE.txt", runningUS];
+exportUTF8[softToUltrasoftDirectory<>"/ultrasoftScaleRGE.txt", runningUS];
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Effective potential*)
 
 
@@ -245,7 +246,7 @@ ExportUTF8[softToUltrasoftDirectory<>"/ultrasoftScaleRGE.txt", runningUS];
 (*In principle there could be additional shorthands computed between steps 2 and 3 if the diagonalization conditions themselves depend on some shorthand symbols, but we're not including this currently.*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Specify background fields and init DRalgo stuff*)
 
 
@@ -260,7 +261,7 @@ backgroundFieldsFull = {(*\[Phi]1*)0, v1, 0, 0,(*\[Phi]2*)0, v2, 0, 0, (*\[Phi]3
 DefineVEVS[backgroundFieldsFull];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Diagonalizing scalar mass matrix*)
 
 
@@ -275,7 +276,7 @@ DefineVEVS[backgroundFieldsFull];
 scalarMM = PrintTensorsVEV[1]//Normal//Simplify; (* Scalar mass matrix, simplify to get rid of possible imaginary units *)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Permute scalars to make mass matrix block-diagonal *)
 
 
@@ -313,7 +314,7 @@ bottomRightMM = Take[blockDiagonalMM,{7,12},{7,12}];
 If[!SymmetricMatrixQ[upperLeftMM] || !SymmetricMatrixQ[bottomRightMM], Print["Error, block not symmetric!"]];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Export scalar mass matrix*)
 
 
@@ -322,15 +323,15 @@ If[!SymmetricMatrixQ[upperLeftMM] || !SymmetricMatrixQ[bottomRightMM], Print["Er
 {bottomRightMMSymbolic, bottomRightMMDefinitions} = toSymbolicMatrix[bottomRightMM, "MMBR", True]//Simplify;
 
 (* Export expressions separately because we have the code to parse that *)
-ExportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_upperLeft.txt", upperLeftMMSymbolic];
-ExportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_upperLeft_definitions.txt", upperLeftMMDefinitions];
+exportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_upperLeft.txt", upperLeftMMSymbolic];
+exportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_upperLeft_definitions.txt", upperLeftMMDefinitions];
 
 
-ExportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_bottomRight.txt", bottomRightMMSymbolic];
-ExportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_bottomRight_definitions.txt", bottomRightMMDefinitions];
+exportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_bottomRight.txt", bottomRightMMSymbolic];
+exportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_bottomRight_definitions.txt", bottomRightMMDefinitions];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Construct scalar rotation matrix *)
 
 
@@ -361,13 +362,13 @@ DSRot = scalarPermutationMatrix . DSRotBlock;
 Print["Scalar diagonalizing rotation:"];
 DSRot//MatrixForm;
 
-ExportUTF8[effectivePotentialDirectory<>"/scalarRotationMatrix.txt", DSRot];
+exportUTF8[effectivePotentialDirectory<>"/scalarRotationMatrix.txt", DSRot];
 
 (** Diagonal mass matrix, unknown symbols **)
 ScalarMassDiag = DiagonalMatrix[ Table[toIndexedSymbol["MSsq", i, Total[DigitCount[12]]], {i, 1, 12}] ];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Gauge field diagonalization*)
 
 
@@ -406,11 +407,11 @@ vectorShorthands = {stW-> g1/Sqrt[g1^2+g2^2], ctW-> g2/Sqrt[g1^2+g2^2]};
 (** Vector masses mVsq[i]. **)
 {VectorMassDiagSimple, VectorMassExpressions} = toSymbolicMatrix[VectorMassDiag, mVsq];
 
-ExportUTF8[effectivePotentialDirectory<>"/vectorMasses.txt", VectorMassExpressions];
-ExportUTF8[effectivePotentialDirectory<>"/vectorShorthands.txt", vectorShorthands];
+exportUTF8[effectivePotentialDirectory<>"/vectorMasses.txt", VectorMassExpressions];
+exportUTF8[effectivePotentialDirectory<>"/vectorShorthands.txt", vectorShorthands];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Calculating the effective potential*)
 
 
@@ -423,49 +424,56 @@ AbsoluteTiming[
 ]
 
 
-VeffLO = PrintEffectivePotential["LO"]//Simplify; (* Simplify to get rid of possible imaginaryDetailed units *)
-VeffNLO = PrintEffectivePotential["NLO"]//Simplify; (* Simplify to factor 1/pi division for tiny speed up *)
-VeffNNLO = PrintEffectivePotential["NNLO"]; (* NOT simplified as seems to change numerical result for unknown reasons *)
+veffLO = PrintEffectivePotential["LO"]//Simplify; (* Simplify to get rid of possible imaginaryDetailed units *)
+veffNLO = PrintEffectivePotential["NLO"]//Simplify; (* Simplify to factor 1/pi division for tiny speed up *)
+veffNNLO = PrintEffectivePotential["NNLO"]; (* NOT simplified as seems to change numerical result for unknown reasons *)
 
-ExportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", VeffLO];
-ExportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", VeffNLO];
-ExportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", VeffNNLO];
+exportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", veffLO];
+exportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", veffNLO];
+exportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", veffNNLO];
 
 
-ExportUTF8[variables<>"/LagranianSymbols.json", {"fourPointSymbols"-> extractSymbols[\[CapitalLambda]4],
-												"threePointSymbols"-> extractSymbols[\[CapitalLambda]3],
-												"twoPointSymbols"-> extractSymbols[\[Mu]ij],
-												"gaugeSymbols"-> extractSymbols[GaugeCouplings],
-												"yukawaSymbols" -> extractSymbols[Ysff],
-												"fieldSymbols" -> extractSymbols[backgroundFieldsFull]				   															   															   															   															   
-												} ];
+exportUTF8[
+	variables<>"/LagranianSymbols.json", 
+	{"fourPointSymbols"-> extractSymbols[\[CapitalLambda]4],
+	"threePointSymbols"-> extractSymbols[\[CapitalLambda]3],
+	"twoPointSymbols"-> extractSymbols[\[Mu]ij],
+	"gaugeSymbols"-> extractSymbols[GaugeCouplings],
+	"yukawaSymbols" -> extractSymbols[Ysff],
+	"fieldSymbols" -> extractSymbols[backgroundFieldsFull]}];
 
 
 (*The scalar mass matrices are a bit hacky since they don't have a direct out and the block diagonal nature means they shouldn't share the same out*)
-equationSymbols={"hardScaleRGE"->{"Out" -> extractSymbols[betaFunctions4DUnsquared]["LHS"],
-								"In" -> extractSymbols[betaFunctions4DUnsquared]["RHS"]},
-				"softScaleParams"->{"Out" -> extractSymbols[allSoftScaleParamsSqrtSuffixFree]["LHS"],
-								   "In" -> extractSymbols[allSoftScaleParamsSqrtSuffixFree]["RHS"]},
-				"softScaleRGE"->{"Out" -> extractSymbols[running3D]["LHS"],
-								"In" -> extractSymbols[running3D]["RHS"]},	
-				"ultraSoftScaleParams"->{"Out" -> extractSymbols[allUltrasoftScaleParamsSqrt]["LHS"],
-										"In" -> extractSymbols[allUltrasoftScaleParamsSqrt]["RHS"]},
-				"ultraSoftScaleRGE"->{"Out" -> extractSymbols[runningUS]["LHS"],
-									 "In" -> extractSymbols[runningUS]["RHS"]},	
-				"upperLeftMMDefinitions"->{"Out" -> extractSymbols[ScalarMassDiag],
-										  "In" -> extractSymbols[upperLeftMMDefinitions]["RHS"]},
-				"bottomRightMMDefinitions"->{"Out" -> extractSymbols[ScalarMassDiag],
-											"In" -> extractSymbols[bottomRightMMDefinitions]["RHS"]},
-				"vectorMasses"->{"Out" -> extractSymbols[VectorMassDiagSimple],
-								"In" -> extractSymbols[VectorMassExpressions]["RHS"]},
-				"rotationSymbols"->extractSymbols[DSRot],
-				"LOPotential"->extractSymbols[VeffLO],
-				"NLOPotential"->extractSymbols[VeffNLO],
-				"NNLOPotential"->extractSymbols[VeffNNLO]};
+equationSymbols={
+	"hardScaleRGE"->{
+		"Out" -> extractSymbols[betaFunctions4DUnsquared]["LHS"],
+		"In" -> extractSymbols[betaFunctions4DUnsquared]["RHS"]},
+	"softScaleParams"->{
+		"Out" -> extractSymbols[allSoftScaleParamsSqrtSuffixFree]["LHS"],
+		"In" -> extractSymbols[allSoftScaleParamsSqrtSuffixFree]["RHS"]},
+	"softScaleRGE"->{
+		"Out" -> extractSymbols[running3D]["LHS"],
+		"In" -> extractSymbols[running3D]["RHS"]},	
+	"ultraSoftScaleParams"->{
+		"Out" -> extractSymbols[allUltrasoftScaleParamsSqrt]["LHS"],
+		"In" -> extractSymbols[allUltrasoftScaleParamsSqrt]["RHS"]},
+	"ultraSoftScaleRGE"->{
+		"Out" -> extractSymbols[runningUS]["LHS"],
+		"In" -> extractSymbols[runningUS]["RHS"]},	
+	"upperLeftMMDefinitions"->{
+		"Out" -> extractSymbols[ScalarMassDiag],
+		"In" -> extractSymbols[upperLeftMMDefinitions]["RHS"]},
+	"bottomRightMMDefinitions"->{
+		"Out" -> extractSymbols[ScalarMassDiag],
+		"In" -> extractSymbols[bottomRightMMDefinitions]["RHS"]},
+	"vectorMasses"->{
+		"Out" -> extractSymbols[VectorMassDiagSimple],
+		"In" -> extractSymbols[VectorMassExpressions]["RHS"]},
+	"rotationSymbols"->extractSymbols[DSRot],
+	"LOPotential"->extractSymbols[veffLO],
+	"NLOPotential"->extractSymbols[veffNLO],
+	"NNLOPotential"->extractSymbols[veffNNLO]};
 
 
-ExportUTF8[variables<>"/EquationSymbols.json", equationSymbols];
-ExportUTF8[variables<>"/allSymbols.json",symbolsFromDict[equationSymbols]];
-
-
-ExportUTF8[variables<>"/allSymbols.json",symbolsFromDict[equationSymbols]];
+exportUTF8[variables<>"/EquationSymbols.json", equationSymbols];
+exportUTF8[variables<>"/allSymbols.json",symbolsFromDict[equationSymbols]]
