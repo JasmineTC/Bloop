@@ -25,21 +25,15 @@ def compFieldDepParams(
     vectorShortHands,
     vectorMassesSquared,
     bNumba,
-    bVerbose
+    verbose
 ) -> dict[str, float]:
-    ## Background fields
-    ## Vectors
     params3D = vectorShortHands.evaluate(params3D)
-    
     params3D = vectorMassesSquared.evaluate(params3D)
-
     params3D = \
         {symbol: params3D[index] for index, symbol in enumerate(allSymbols)} | \
         {params3D[allSymbols.index("v1")] : fields[0]} | \
         {params3D[allSymbols.index("v2")] : fields[1]} | \
         {params3D[allSymbols.index("v3")] : fields[2]}
-
-    ## Scalars       
     return diagonalizeScalars(
         params3D, 
         T,
@@ -47,10 +41,9 @@ def compFieldDepParams(
         scalarMassMatrices,
         scalarRotationMatrix,
         bNumba,
-        bVerbose
+        verbose
     )
 
-from itertools import chain
 def diagonalizeScalars(params: dict[str, float], 
                        T: float,  
                        scalarPermutationMatrix,
@@ -60,7 +53,6 @@ def diagonalizeScalars(params: dict[str, float],
                        verbose) -> dict[str, float]:
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
-    
     subMassMatrix = np.array( [matrix.evaluate(params) for matrix in scalarMassMatrices ]).real / T**2
 
     if bNumba:
@@ -91,11 +83,9 @@ def diagonalizeScalars(params: dict[str, float],
     """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
     so we need to undo the permutatation"""
     params |= scalarRotationMatrix.evaluate(scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix))
-
     ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
     ##But should probably be handled by a file given from mathematica (such a list is already made in mathematica)
     massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
-
     return params | {name: float(msq) for name, msq in zip(massNames, chain(*subEigenValues))}
 
 @dataclass(frozen=True)
@@ -191,7 +181,7 @@ class EffectivePotential:
             self.vectorShortHands,
             self.vectorMassesSquared,
             self.bNumba,
-            self.bVerbose
+            self.verbose
         ))
 
         return sum(self.expressionsArray.getParamSubset(self.expressionsArray.evaluate(array)))
@@ -259,7 +249,7 @@ class EffectivePotential:
                                 self.vectorShortHands,
                                 self.vectorMassesSquared,
                                 self.bNumba,
-                                self.bVerbose)
+                                self.verbose)
 
         ## Convert mass into real type to do comparisons 
         massList = np.real([paramDict["MSsq01"], paramDict["MSsq02"],
