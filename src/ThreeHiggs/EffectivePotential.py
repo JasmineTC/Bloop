@@ -42,25 +42,6 @@ def compFieldDepParams(
     bVerbose
 ) -> dict[str, float]:
     ## Background fields
->>>>>>> 6f2290d (Move to array.)
-    for i, value in enumerate(fields):
-        params3D[allSymbols.index(fieldNames[i])] = value
-
-<<<<<<< HEAD
-    return params3D | (vectorShortHands.evaluate(params3D, 
-                                                 bReturnDict = True) | 
-                       
-                       vectorMassesSquared.evaluate(params3D, 
-                                                    bReturnDict = True) | 
-                       
-                       diagonalizeScalars(params3D, 
-                                          T,
-                                          scalarPermutationMatrix,
-                                          scalarMassMatrices,
-                                          scalarRotationMatrix,
-                                          bNumba,
-                                          verbose))
-=======
     ## Vectors
     params3D = vectorShortHands.evaluate(params3D)
     
