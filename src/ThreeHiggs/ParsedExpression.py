@@ -47,6 +47,7 @@ class ParsedExpressionArray:
         return eval(self.lambdaExpression,  {"log": log, 
                                              "sqrt": sqrt,
                                              "params": params})
+import numpy as np
 class ParsedExpressionSystemArray:
     def __init__(self, parsedExpressionSystem, allSymbols, fileName):
         self.parsedExpressions = [(allSymbols.index(parsedExpression["identifier"]), 
@@ -58,7 +59,12 @@ class ParsedExpressionSystemArray:
         
     def evaluate(self, params):
         ## Look into using copy.replace 3.13 feature
-        newParams = copy.deepcopy(params)
+        ## Hack because deepcopy on numpy array can cause issues when using exit()
+        ## Too lazy to find the proper way of getting the array type
+        if type(params) == type(np.empty([1])):
+            newParams = np.ndarray.copy(params)
+        else:
+            newParams = copy.deepcopy(params)
         
         for expression in self.parsedExpressions:
             newParams[expression[0]] = numpy.real(expression[1].evaluate(params))
