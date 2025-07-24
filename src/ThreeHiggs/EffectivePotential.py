@@ -13,20 +13,6 @@ def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
          subEigenValues[idx], subRotationMatrix[idx] = np.linalg.eigh(matrix)
     return subEigenValues*T**2, subRotationMatrix
 
-<<<<<<< HEAD
-def compFieldDepParams(fields: list[float], 
-                       T:float, 
-                       params3D, 
-                       fieldNames, 
-                       scalarPermutationMatrix,
-                       scalarMassMatrices,
-                       scalarRotationMatrix,
-                       vectorShortHands,
-                       vectorMassesSquared,
-                       bNumba,
-                       verbose) -> dict[str, float]:
-
-=======
 def compFieldDepParams(
     fields: list[float], 
     T:float, 
@@ -63,7 +49,6 @@ def compFieldDepParams(
         bNumba,
         bVerbose
     )
->>>>>>> 6f2290d (Move to array.)
 
 from itertools import chain
 def diagonalizeScalars(params: dict[str, float], 
