@@ -1,6 +1,6 @@
 from cmath import log, sqrt
 
-import numpy
+import numpy as np
 import copy
 
 class ParsedExpression:
@@ -47,7 +47,7 @@ class ParsedExpressionArray:
         return eval(self.lambdaExpression,  {"log": log, 
                                              "sqrt": sqrt,
                                              "params": params})
-import numpy as np
+
 class ParsedExpressionSystemArray:
     def __init__(self, parsedExpressionSystem, allSymbols, fileName):
         self.parsedExpressions = [(allSymbols.index(parsedExpression["identifier"]), 
@@ -67,7 +67,7 @@ class ParsedExpressionSystemArray:
             newParams = copy.deepcopy(params)
         
         for expression in self.parsedExpressions:
-            newParams[expression[0]] = numpy.real(expression[1].evaluate(params))
+            newParams[expression[0]] = np.real(expression[1].evaluate(params))
 
         return newParams
 
