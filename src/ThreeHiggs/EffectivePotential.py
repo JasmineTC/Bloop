@@ -27,6 +27,9 @@ def compFieldDepParams(
     bNumba,
     verbose
 ) -> dict[str, float]:
+    for i, value in enumerate(fields):
+        params3D[allSymbols.index(fieldNames[i])] = value
+
     params3D = vectorShortHands.evaluate(params3D)
     params3D = vectorMassesSquared.evaluate(params3D)
     params3D = \
