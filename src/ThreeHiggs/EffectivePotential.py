@@ -31,11 +31,8 @@ def compFieldDepParams(
 
     params3D = vectorShortHands.evaluate(params3D)
     params3D = vectorMassesSquared.evaluate(params3D)
-    params3D = \
-        {symbol: params3D[index] for index, symbol in enumerate(allSymbols)} | \
-        {params3D[allSymbols.index("v1")] : fields[0]} | \
-        {params3D[allSymbols.index("v2")] : fields[1]} | \
-        {params3D[allSymbols.index("v3")] : fields[2]}
+    params3D = {key: value for (key, value) in zip(allSymbols, params3D) }
+
     return diagonalizeScalars(
         params3D, 
         T,
