@@ -1,6 +1,6 @@
 from cmath import log, sqrt
 
-import numpy
+import numpy as np
 import copy
 
 class ParsedExpression:
@@ -47,6 +47,7 @@ class ParsedExpressionArray:
         return eval(self.lambdaExpression,  {"log": log, 
                                              "sqrt": sqrt,
                                              "params": params})
+
 class ParsedExpressionSystemArray:
     def __init__(self, parsedExpressionSystem, allSymbols, fileName):
         self.parsedExpressions = [(allSymbols.index(parsedExpression["identifier"]), 
@@ -58,10 +59,14 @@ class ParsedExpressionSystemArray:
         
     def evaluate(self, params):
         ## Look into using copy.replace 3.13 feature
-        newParams = copy.deepcopy(params)
-        
+        ## Hack because deepcopy on numpy array can cause issues when using exit()
+        ## Too lazy to find the proper way of getting the array type
+        if type(params) == type(np.empty([1])):
+            newParams = np.array(params)
+        else:
+            newParams = params
         for expression in self.parsedExpressions:
-            newParams[expression[0]] = numpy.real(expression[1].evaluate(params))
+            newParams[expression[0]] = np.real(expression[1].evaluate(params))
 
         return newParams
 

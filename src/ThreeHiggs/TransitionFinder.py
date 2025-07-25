@@ -96,16 +96,14 @@ class TraceFreeEnergyMinimum:
         paramValuesArray = self.dimensionalReduction.hardToSoft.evaluate(paramValuesArray)
         paramValuesArray = self.dimensionalReduction.softScaleRGE.evaluate(paramValuesArray)
         paramValuesArray = self.dimensionalReduction.softToUltraSoft.evaluate(paramValuesArray)
-
         return ( 
-            *self.effectivePotential.findGlobalMinimum(
+                *self.effectivePotential.findGlobalMinimum(
                 T, 
                 paramValuesArray, 
                 self.initialGuesses + (minimumLocation, )
             ), 
             bIsPerturbative(paramValuesArray, self.pertSymbols, self.allSymbolsDict), 
-            True,
-            #bIsBounded(paramsForMatchingDict),
+            True, #bIsBounded(paramsForMatchingDict)
             list(paramValuesArray),
         )
     
@@ -173,8 +171,6 @@ class TraceFreeEnergyMinimum:
             if isBadState:
                 minimizationResults["failureReason"] = isBadState
                 break
-            
-            
             minimizationResults["valueVeffReal"].append(minimumValueReal)
             minimizationResults["valueVeffImag"].append(minimumValueImag)
             minimizationResults["minimumLocation"].append(minimumLocation)
@@ -188,7 +184,7 @@ class TraceFreeEnergyMinimum:
                                                                   params3D): 
                     minimizationResults["UltraSoftTemp"] = T
 
-            if np.all( minimizationResults["minimumLocation"][-1] < 0.5):
+            if np.all( minimumLocation < 0.5):
                 if self.verbose:
                     print (f"Symmetric phase found at temp {T}")
                 if counter == 3:
