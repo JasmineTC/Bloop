@@ -24,9 +24,8 @@ def compFieldDepParams(
     scalarRotationMatrix,
     vectorShortHands,
     vectorMassesSquared,
-    bNumba,
     verbose
-) -> dict[str, float]:
+) :
     for i, value in enumerate(fields):
         params3D[allSymbols.index(fieldNames[i])] = value
 
@@ -43,45 +42,22 @@ def compFieldDepParams(
         scalarPermutationMatrix,
         scalarMassMatrices,
         scalarRotationMatrix,
-        bNumba,
         verbose
     )
 
-def diagonalizeScalars(params: dict[str, float], 
-                       T: float,  
-                       scalarPermutationMatrix,
-                       scalarMassMatrices,
-                       scalarRotationMatrix,
-                       bNumba,
-                       verbose) -> dict[str, float]:
+def diagonalizeScalars(
+    params, 
+    T,  
+    scalarPermutationMatrix,
+    scalarMassMatrices,
+    scalarRotationMatrix,
+    verbose
+):
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
     subMassMatrix = np.array( [matrix.evaluate(params) for matrix in scalarMassMatrices ]).real / T**2
 
-    if bNumba:
-        subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, subMassMatrix.shape[0], subMassMatrix.shape[1], T)
-
-    else:
-        subRotationMatrix = []
-        subEigenValues = []
-        for matrix in subMassMatrix:
-            eigenValue, vects = np.linalg.eigh(matrix)
-            eigenValue *=T**2
-            
-            subEigenValues.append(eigenValue)                    
-            subRotationMatrix.append(vects)
-            
-            ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
-            ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
-            if not verbose:
-                continue
-            
-            diagonalBlock = np.transpose(vects) @ matrix @ vects
-            offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
-            
-            if not np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
-                continue
-            print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
+    subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, subMassMatrix.shape[0], subMassMatrix.shape[1], T)
 
     """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
     so we need to undo the permutatation"""
@@ -137,7 +113,6 @@ class EffectivePotential:
     def __init__(self,
                  fieldNames, 
                  loopOrder,
-                 bNumba,
                  verbose,
                  nloptInst,
                  vectorMassesSquared, 
@@ -153,7 +128,6 @@ class EffectivePotential:
         
         self.loopOrder = loopOrder
         
-        self.bNumba = bNumba
         self.verbose = verbose
         
         self.nloptInst = nloptInst
@@ -183,7 +157,6 @@ class EffectivePotential:
             self.scalarRotationMatrix,
             self.vectorShortHands,
             self.vectorMassesSquared,
-            self.bNumba,
             self.verbose
         ))
 
@@ -251,7 +224,6 @@ class EffectivePotential:
                                 self.scalarRotationMatrix,
                                 self.vectorShortHands,
                                 self.vectorMassesSquared,
-                                self.bNumba,
                                 self.verbose)
 
         ## Convert mass into real type to do comparisons 

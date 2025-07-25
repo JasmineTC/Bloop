@@ -92,7 +92,6 @@ def minimization(args):
 
     effectivePotential = EffectivePotential(variableSymbols["fieldSymbols"],
                                             args.loopOrder,
-                                            args.bNumba,
                                             args.verbose,
                                             nloptInst,
                                             ParsedExpressionSystemArray(

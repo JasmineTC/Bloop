@@ -77,7 +77,7 @@ class ParsedExpressionSystemArray:
         return [ expr[1].identifier for expr in self.parsedExpressions ]
     
     def getParamsArray(self, params):
-        return [params[key] if key in set(params) else 0 for key in self.allSymbols ]
+        return [params[key] if key in params else 0 for key in self.allSymbols ]
 
 class MassMatrix:
     def __init__(self, massMatrix, fileName):

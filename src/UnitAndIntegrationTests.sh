@@ -45,38 +45,19 @@ diff IntegrationTests/Pool2/OutputResult/BM_2.json IntegrationTests/Pool2/Refere
 diff IntegrationTests/Pool2/OutputResult/BM_3.json IntegrationTests/Pool2/ReferenceResult/BM_3.json
 
 echo Running code at NNLO...
-rm -f IntegrationTests/ComplexMass/OutputResult/* 
+rm -f IntegrationTests/NNLO/OutputResult/* 
 rm -f IntegrationTests/Benchmarks/*
 python3 runStages.py --loopOrder 2 \
                         --firstBenchmark 1 \
                         --lastBenchmark 1 \
                         --bSave \
-                        --resultsDirectory IntegrationTests/ComplexMass/OutputResult/  \
+                        --resultsDirectory IntegrationTests/NNLO/OutputResult/ \
                         --benchmarkFile IntegrationTests/Benchmarks \
                         --benchmarkType handPicked \
                         --TRangeStart 50 \
                         --TRangeEnd 100 \
                         --TRangeStepSize 10 \
                         --bProcessMin
-diff IntegrationTests/ComplexMass/OutputResult/BM_1.json IntegrationTests/ComplexMass/ReferenceResult/BM_1.json
-diff IntegrationTests/ComplexMass/OutputResult/BM_1_interp.json IntegrationTests/ComplexMass/ReferenceResult/BM_1_interp.json
-
-
-echo Running code at NNLO with Numba...
-rm -f IntegrationTests/Numba/OutputResult/* 
-rm -f IntegrationTests/Benchmarks/*
-python3 runStages.py --loopOrder 2 \
-                        --firstBenchmark 1 \
-                        --lastBenchmark 1 \
-                        --bSave \
-                        --resultsDirectory IntegrationTests/Numba/OutputResult/ \
-                        --benchmarkFile IntegrationTests/Benchmarks \
-                        --benchmarkType handPicked \
-                        --TRangeStart 50 \
-                        --TRangeEnd 100 \
-                        --TRangeStepSize 10 \
-                        --bNumba \
-                        --bProcessMin
-diff IntegrationTests/Numba/OutputResult/BM_1.json IntegrationTests/Numba/ReferenceResult/BM_1.json
-diff IntegrationTests/Numba/OutputResult/BM_1_interp.json IntegrationTests/Numba/ReferenceResult/BM_1_interp.json
+diff IntegrationTests/NNLO/OutputResult/BM_1.json IntegrationTests/NNLO/ReferenceResult/BM_1.json
+diff IntegrationTests/NNLO/OutputResult/BM_1_interp.json IntegrationTests/NNLO/ReferenceResult/BM_1_interp.json
 
