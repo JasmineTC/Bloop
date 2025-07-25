@@ -13,9 +13,9 @@ def bIsPerturbative(paramValuesArray : list[float], pertSymbols : set, allSymbol
 def constructSplineDictArray(betaFunction4DExpression, muRange, initialConditions, allSymbolsDict) :
     ## -----BUG------
     ## This updates the RGScale with the value of mu
-    solutionSoft = scipy.integrate.odeint(lambda initialConditions, mu:  np.array(betaFunction4DExpression.evaluate(initialConditions))/mu,
-                                          initialConditions, 
-                                          muRange).transpose()
+    solutionSoft = scipy.integrate.solve_ivp(lambda initialConditions, mu:  np.array(betaFunction4DExpression.evaluate(initialConditions))/mu,
+                                          (muRange[0], muRange[-1]),
+                                             initialConditions).transpose()
 
     interpDict = {}
     for key, value in allSymbolsDict.items():

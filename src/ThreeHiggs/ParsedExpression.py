@@ -59,11 +59,11 @@ class ParsedExpressionSystemArray:
         
     def evaluate(self, params):
         ## Look into using copy.replace 3.13 feature
-        newParams = copy.copy(params)
+        newParams = np.array(params, dtype="complex")
         
         for expression in self.parsedExpressions:
-            newParams[expression[0]] = np.real(expression[1].evaluate(params))
-        
+            newParams[expression[0]] = expression[1].evaluate(params)
+            
         return newParams
 
     def getParamSubset(self, params):
