@@ -62,10 +62,9 @@ class ParsedExpressionSystemArray:
         ## Hack because deepcopy on numpy array can cause issues when using exit()
         ## Too lazy to find the proper way of getting the array type
         if type(params) == type(np.empty([1])):
-            newParams = np.ndarray.copy(params)
+            newParams = np.array(params)
         else:
-            newParams = copy.deepcopy(params)
-        
+            newParams = params
         for expression in self.parsedExpressions:
             newParams[expression[0]] = np.real(expression[1].evaluate(params))
 
