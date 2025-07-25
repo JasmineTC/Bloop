@@ -59,11 +59,7 @@ class ParsedExpressionSystemArray:
         
     def evaluate(self, params):
         ## Look into using copy.replace 3.13 feature
-        ## Hack because deepcopy on numpy array can cause issues when using exit()
-        if type(params) == list:
-            newParams = params
-        else:
-            newParams = np.array(params)
+        newParams = copy.copy(params)
         
         for expression in self.parsedExpressions:
             newParams[expression[0]] = np.real(expression[1].evaluate(params))
@@ -71,7 +67,7 @@ class ParsedExpressionSystemArray:
         return newParams
 
     def getParamSubset(self, params):
-        return [params[index] for index, symbol in enumerate(self.allSymbols) if symbol in self.getExpressionNames()]
+        return [params[self.allSymbols.index(key)] for key in self.getExpressionNames() ]
 
     def getExpressionNames(self) -> list[str]:
         return [ expr[1].identifier for expr in self.parsedExpressions ]
