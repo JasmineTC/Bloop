@@ -20,7 +20,7 @@ Get[pathToDRalgo]
 Get["MathematicaToPythonHelper.m"]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Specify file paths for exporting*)
 
 
@@ -30,7 +30,7 @@ effectivePotentialDirectory = "DRalgoOutput/Data/EffectivePotential";
 variables = "DRalgoOutput/Data/Variables";
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Model*)
 
 
@@ -183,7 +183,8 @@ allSoftScaleParams = Join[couplingsSoft, temporalScalarCouplings, debyeMasses, s
 (*We want to do in place updating of parameters in the python code i.e. \[Lambda]14D gets updated to \[Lambda]13D which gets updated to \[Lambda]13DUS,
 it's easier to do this if we remove the suffices so its the same variable name throughout*)
 allSoftScaleParamsSqrtSuffixFree = RemoveSuffixes[sqrtSubRules[allSoftScaleParams], {"3d"}];
-(*Added during the dict to array moving and changing RGScale to T etc*)
+(*Sometimes compute these equations and put the results into a np.zeros,
+without T->T etc we would lose what T is *)
 allSoftScaleParamsSqrtSuffixFree = Join[allSoftScaleParamsSqrtSuffixFree, {T->T,RGScale->RGScale}];
 exportUTF8[hardToSoftDirectory<>"/softScaleParams_NLO.txt", allSoftScaleParamsSqrtSuffixFree]
 
@@ -431,14 +432,14 @@ veffLO = PrintEffectivePotential["LO"]//Simplify; (* Simplify to get rid of poss
 veffNLO = PrintEffectivePotential["NLO"]//Simplify; (* Simplify to factor 1/pi division for tiny speed up *)
 veffNNLO = PrintEffectivePotential["NNLO"]; (* NOT simplified as seems to change numerical result for unknown reasons *)
 
-(*Done for consistent in out structure for python*)
-VeffLO = LO -> VeffLO;
-VeffNLO = NLO -> VeffNLO;
-VeffNNLO = NNLO -> VeffNNLO;
 
-exportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", veffLO];
-exportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", veffNLO];
-exportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", veffNNLO];
+(*Done for consistent in out structure for python*)
+veffLOR = LO -> veffLO;
+veffNLOR = NLO -> veffNLO;
+veffNNLOR = NNLO -> veffNNLO;
+exportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", veffLOR];
+exportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", veffNLOR];
+exportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", veffNNLOR];
 
 
 exportUTF8[
@@ -469,15 +470,16 @@ equationSymbols={
 		"Out" -> extractSymbols[runningUS]["LHS"],
 		"In" -> extractSymbols[runningUS]["RHS"]},	
 	"upperLeftMMDefinitions"->{
-		"Out" -> extractSymbols[ScalarMassDiag],
+		"Out" -> extractSymbols[upperLeftMMDefinitions]["LHS"],
 		"In" -> extractSymbols[upperLeftMMDefinitions]["RHS"]},
 	"bottomRightMMDefinitions"->{
-		"Out" -> extractSymbols[ScalarMassDiag],
+		"Out" -> extractSymbols[bottomRightMMDefinitions]["LHS"],
 		"In" -> extractSymbols[bottomRightMMDefinitions]["RHS"]},
 	"vectorMasses"->{
 		"Out" -> extractSymbols[VectorMassDiagSimple],
 		"In" -> extractSymbols[VectorMassExpressions]["RHS"]},
 	"rotationSymbols"->extractSymbols[DSRot],
+	"scalarMassNames"->extractSymbols[ScalarMassDiag],
 	"LO"->{
 		"Out" -> extractSymbols[VeffLO]["LHS"],
 		"In" -> extractSymbols[VeffLO]["RHS"]},
@@ -490,4 +492,4 @@ equationSymbols={
 
 
 exportUTF8[variables<>"/EquationSymbols.json", equationSymbols];
-exportUTF8[variables<>"/allSymbols.json",symbolsFromDict[equationSymbols]]
+exportUTF8[variables<>"/allSymbols.json",symbolsFromDict[equationSymbols]];
