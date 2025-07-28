@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Import DRalgo and Group Math*)
 
 
@@ -13,29 +13,21 @@ pathToDRalgo = "/home/jasmine/.Mathematica/Applications/DRalgo/DRalgo.m"
 Get[pathToDRalgo]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Import helper functions *)
 
 
 Get["MathematicaToPythonHelper.m"]
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Specify file paths for exporting*)
 
 
-(** All file paths are relative to the working directory (set above). **)
-<<<<<<< HEAD:Mathematica/Z2_3HDM_DRalgo . wl
 hardToSoftDirectory = "DRalgoOutput/Data/HardToSoft";
 softToUltrasoftDirectory = "DRalgoOutput/Data/SoftToUltrasoft";
 effectivePotentialDirectory = "DRalgoOutput/Data/EffectivePotential";
-variables = "DRalgoOutput/Variables";
-=======
-hardToSoftDirectory = "src/ThreeHiggs/Data/HardToSoft";
-softToUltrasoftDirectory = "src/ThreeHiggs/Data/SoftToUltrasoft";
-effectivePotentialDirectory = "src/ThreeHiggs/Data/EffectivePotential_threeFields";
-variables = "src/ThreeHiggs/Data/Variables";
->>>>>>> f55c261 (Changes to make it easier to do the hard to soft to ultra soft matching):3HDM_model _generation . wl
+variables = "DRalgoOutput/Data/Variables";
 
 
 (* ::Section:: *)
