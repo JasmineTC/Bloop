@@ -1,6 +1,8 @@
 import numpy as np
-from math import sqrt, pi, log, exp
 import scipy
+from math import sqrt, pi, log, exp
+from dataclasses import dataclass, InitVar,field
+from ThreeHiggs.BmGenerator import bIsBounded
 
 def bIsPerturbative(paramValuesArray : list[float], pertSymbols : set, allSymbolsDict : dict) -> bool:
     ## Should actually check vertices but not a feature in DRalgo at time of writting
@@ -13,10 +15,11 @@ def bIsPerturbative(paramValuesArray : list[float], pertSymbols : set, allSymbol
 def constructSplineDictArray(betaFunction4DExpression, muRange, initialConditions, allSymbolsDict) :
     ## -----BUG------
     ## This updates the RGScale with the value of mu
-    solutionSoft = scipy.integrate.solve_ivp(lambda initialConditions, mu:  np.array(betaFunction4DExpression.evaluate(initialConditions))/mu,
-                                          (muRange[0], muRange[-1]),
-                                             initialConditions).transpose()
-
+    initialConditions = np.array(initialConditions, dtype="complex")
+    solutionSoft = scipy.integrate.solve_ivp(lambda mu, initialConditions:  np.array(betaFunction4DExpression.evaluate(initialConditions))/mu,
+                                             (muRange[0], muRange[-1]), 
+                                             initialConditions, 
+                                             t_eval=muRange).y
     interpDict = {}
     for key, value in allSymbolsDict.items():
         if key == "RGScale":
@@ -25,13 +28,10 @@ def constructSplineDictArray(betaFunction4DExpression, muRange, initialCondition
         ## Hack to remove all the const entries in the array
         if np.all(solutionSoft[value] == solutionSoft[value][0]):
             continue
-        
-        interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solutionSoft[value], extrapolate = False)
-        
+        ## Can we find an interpolation method that works with complex muRange??
+        interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solutionSoft[value])
     return interpDict
 
-from dataclasses import dataclass, InitVar,field
-from ThreeHiggs.BmGenerator import bIsBounded
 @dataclass(frozen=True)
 class TraceFreeEnergyMinimum:
     TRange: tuple = (0,)
@@ -79,10 +79,15 @@ class TraceFreeEnergyMinimum:
         inputArray[self.allSymbolsDict["Lf"]] = Lb + self.Lfconst
         return inputArray
     
-    def updateParams4DRan(self, betaSpline4D: dict, array):
+    def updateParams4DRan(
+            self, 
+            betaSpline4D, 
+            array
+    ):
         muEvaulate = array[self.allSymbolsDict["RGScale"]]
         for key, spline in betaSpline4D.items():
-            array[self.allSymbolsDict[key]] = float(spline(muEvaulate))
+            # Taking real part to avoid complex to real cast warning
+            array[self.allSymbolsDict[key]] = spline(np.real(muEvaulate))
         return array
     
     def executeMinimisation(
@@ -91,7 +96,8 @@ class TraceFreeEnergyMinimum:
         minimumLocation,
         betaSpline4D
     ): 
-        paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.allSymbolsDict.keys())))
+        
+        paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.allSymbolsDict.keys()), dtype="complex"))
         paramValuesArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
         paramValuesArray = self.dimensionalReduction.hardToSoft.evaluate(paramValuesArray)
         paramValuesArray = self.dimensionalReduction.softScaleRGE.evaluate(paramValuesArray)
