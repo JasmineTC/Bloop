@@ -39,7 +39,7 @@ def _doMinimization(parameters):
                                                                   "pertSymbols": pertSymbols,
                                                                   "verbose": args.verbose,
                                                                   "initialGuesses": args.initialGuesses,
-                                                                  "allSymbolsDict": {key: value for value, key in enumerate(allSymbols)}})
+                                                                  "allSymbols": allSymbols})
     if False:
         ##THIS IS FOR JASMINE TO MAKE PLOTS - IGNORE
         traceFreeEnergyMinimumInst.plotPotential(benchmark)
