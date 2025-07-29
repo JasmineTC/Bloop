@@ -29,11 +29,11 @@ def constructSplineDictArray(
                                              (muRange[0], muRange[-1]), 
                                              initialConditions, 
                                              t_eval=muRange).y
+    ## Hack to undo buggy behaviour
+    solutionSoft[allSymbols.index("RGScale")].fill(muRange[0])
 
     interpDict = {}
     for idx, ele in enumerate(allSymbols):
-        if ele == "RGScale":
-            continue
         
         ## Hack to remove all the const entries in the array
         if np.all(solutionSoft[idx] == solutionSoft[idx][0]):
@@ -41,6 +41,8 @@ def constructSplineDictArray(
         ## Can we find an interpolation method that works with complex muRange??
         interpDict[ele] =  scipy.interpolate.CubicSpline(muRange, solutionSoft[idx])
     return interpDict
+
+    # return [scipy.interpolate.CubicSpline(muRange, solutionSoft) for solutionSoft in  solutionSoftArray]
 
 @dataclass(frozen=True)
 class TraceFreeEnergyMinimum:
@@ -106,7 +108,7 @@ class TraceFreeEnergyMinimum:
         minimumLocation,
         betaSpline4D
     ): 
-        
+        # paramValuesArray = self.updateParams4DRan(betaSpline4D)
         paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.allSymbols), dtype="complex"))
         paramValuesArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
         paramValuesArray = self.dimensionalReduction.hardToSoft.evaluate(paramValuesArray)
