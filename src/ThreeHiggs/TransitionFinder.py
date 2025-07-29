@@ -50,7 +50,7 @@ class TraceFreeEnergyMinimum:
     
     initialGuesses: tuple = (0,)
     
-    ## Hack - idk how to type hint this correctly
+    ## idk how to type hint this correctly
     effectivePotential: str = "effectivePotentialInstance"
     dimensionalReduction: str = "dimensionalReductionInstance"
     betaFunction4DExpression: str = "betaFunction4DExpression" 
@@ -123,7 +123,9 @@ class TraceFreeEnergyMinimum:
             list(paramValuesArray),
         )
     
-    def populateLagranianParams4D(self, inputParams: dict[str, float]) -> np.array:
+    def populateLagranianParams4D(self, 
+        inputParams
+        ):
         higgsVev = 246.22  #Consider using Fermi constant instead
         ## --- SM fermion and gauge boson masses---
         MW = 80.377 
@@ -144,7 +146,9 @@ class TraceFreeEnergyMinimum:
 
         return params4D
             
-    def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
+    def traceFreeEnergyMinimum(self, 
+        benchmark
+        ):
         lagranianParams4DArray = self.populateLagranianParams4D(benchmark)
                
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
