@@ -117,7 +117,6 @@ class EffectivePotential:
                  scalarPermutationMatrix,
                  scalarMassMatrices, 
                  scalarRotationMatrix,
-                 veff,
                  veffArray,
                  allSymbols):
         
@@ -138,7 +137,6 @@ class EffectivePotential:
         ##TODO improve this
         self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
         self.scalarRotationMatrix = scalarRotationMatrix
-        self.expressions = veff
         self.expressionsArray = veffArray
         self.allSymbols = allSymbols
 

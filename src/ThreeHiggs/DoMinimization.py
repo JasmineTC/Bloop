@@ -111,8 +111,6 @@ def minimization(args):
                                                         pythonisedExpressions["scalarMassMatrixBottomRight"]["fileName"])),
                                             RotationMatrix(pythonisedExpressions["scalarRotationMatrix"]["expressions"],
                                                            pythonisedExpressions["scalarRotationMatrix"]["fileName"]),
-                                            ParsedExpressionSystem(pythonisedExpressions["veff"]["expressions"],
-                                                                   pythonisedExpressions["veff"]["fileName"]),
                                             ParsedExpressionSystemArray(pythonisedExpressions["veffArray"]["expressions"], 
                                                                         allSymbols, 
                                                                         pythonisedExpressions["veffArray"]["fileName"]),
