@@ -1,7 +1,5 @@
 from cmath import log, sqrt
-
 import numpy as np
-import copy
 
 class ParsedExpression:
     def __init__(self, parsedExpression, fileName):
