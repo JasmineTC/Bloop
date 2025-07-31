@@ -82,8 +82,8 @@ def pythoniseMathematica(args):
     veffLines += getLines(args.nloFile)
     if (args.loopOrder >= 2):
         veffLines += getLines(args.nnloFile)
-    ### HACK SET TO REMOVE DUPLICATES --JASMINE TO ADDRESS IN MATHEMATICA WHEN NOT SICK
-    allSymbols = sorted(list(set([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")])), 
+        
+    allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")], 
                         reverse = True)
 
     ## Move get lines to the functions? -- Would need to rework veffLines in this case
