@@ -10,7 +10,6 @@ def replaceGreekSymbols(string: str) -> str:
     return string.replace(u"\u03BB", "lam").replace(u"\u03BC", "mu")
 
 def replaceSymbolsConst(string):
-    ## Change expressions to use either pi or Pi but not both!!!
     return string.replace("Pi", str(pi)) \
                  .replace("EulerGamma", str(euler_gamma)) \
                  .replace("Glaisher", "1.28242712910062") 
