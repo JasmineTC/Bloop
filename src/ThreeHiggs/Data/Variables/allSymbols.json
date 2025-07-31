@@ -47,7 +47,7 @@
 	"RGScale",
 	"Lb",
 	"Lf",
-	"mu3US",
+	"μ3US",
 	"MSsq01",
 	"MSsq02",
 	"MSsq03",
@@ -142,6 +142,5 @@
 	"RUL56",
 	"RUL66",
 	"stW",
-	"ctW",
-	"μ3US"
+	"ctW"
 ]

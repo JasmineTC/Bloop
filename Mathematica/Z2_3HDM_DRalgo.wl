@@ -220,7 +220,7 @@ allUltrasoftScaleParams = Join[couplingsUS, scalarMassesUS] /. \[Mu]3->RGScale;
 
 
 allUltrasoftScaleParamsSqrt = RemoveSuffixes[sqrtSubRules[allUltrasoftScaleParams], {"US", "3d"}];(*Some reduant sqrt operations here? e.g. g13dUS*)
-allUltrasoftScaleParamsSqrt= Join[allUltrasoftScaleParamsSqrt, {mu3US -> T}];
+allUltrasoftScaleParamsSqrt= Join[allUltrasoftScaleParamsSqrt, {\[Mu]3US -> T}];
 
 
 exportUTF8[softToUltrasoftDirectory<>"/ultrasoftScaleParams_NLO.txt", allUltrasoftScaleParamsSqrt];
@@ -497,4 +497,4 @@ exportUTF8[variables<>"/EquationSymbols.json", equationSymbols];
 exportUTF8[variables<>"/allSymbols.json",symbolsFromDict[equationSymbols]];
 
 
-extractSymbols[ScalarMassDiag]
+symbolsFromDict[equationSymbols]
