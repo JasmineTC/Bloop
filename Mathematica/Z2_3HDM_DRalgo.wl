@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Import DRalgo and Group Math*)
 
 
@@ -461,8 +461,8 @@ equationSymbols={
 		"Out" -> extractSymbols[allSoftScaleParamsSqrtSuffixFree]["LHS"],
 		"In" -> extractSymbols[allSoftScaleParamsSqrtSuffixFree]["RHS"]},
 	"softScaleRGE"->{
-		"Out" -> extractSymbols[running3D]["LHS"],
-		"In" -> extractSymbols[running3D]["RHS"]},	
+		"Out" -> extractSymbols[running3DSoft]["LHS"],
+		"In" -> extractSymbols[running3DSoft]["RHS"]},	
 	"ultraSoftScaleParams"->{
 		"Out" -> extractSymbols[allUltrasoftScaleParamsSqrt]["LHS"],
 		"In" -> extractSymbols[allUltrasoftScaleParamsSqrt]["RHS"]},
@@ -470,10 +470,10 @@ equationSymbols={
 		"Out" -> extractSymbols[runningUS]["LHS"],
 		"In" -> extractSymbols[runningUS]["RHS"]},	
 	"upperLeftMMDefinitions"->{
-		"Out" -> extractSymbols[upperLeftMMDefinitions]["LHS"],
+		"Out" -> extractSymbols[ScalarMassDiag],
 		"In" -> extractSymbols[upperLeftMMDefinitions]["RHS"]},
 	"bottomRightMMDefinitions"->{
-		"Out" -> extractSymbols[bottomRightMMDefinitions]["LHS"],
+		"Out" -> extractSymbols[ScalarMassDiag],
 		"In" -> extractSymbols[bottomRightMMDefinitions]["RHS"]},
 	"vectorMasses"->{
 		"Out" -> extractSymbols[VectorMassDiagSimple],
@@ -495,3 +495,6 @@ exportUTF8[variables<>"/EquationSymbols.json", equationSymbols];
 
 
 exportUTF8[variables<>"/allSymbols.json",symbolsFromDict[equationSymbols]];
+
+
+extractSymbols[ScalarMassDiag]
