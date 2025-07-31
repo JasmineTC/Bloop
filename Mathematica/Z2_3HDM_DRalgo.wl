@@ -13,25 +13,24 @@ pathToDRalgo = "/home/jasmine/.Mathematica/Applications/DRalgo/DRalgo.m"
 Get[pathToDRalgo]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Import helper functions *)
 
 
 Get["MathematicaToPythonHelper.m"]
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Specify file paths for exporting*)
 
 
-(** All file paths are relative to the working directory (set above). **)
-hardToSoftDirectory = "DRalgoOutput/Data/HardToSoft";
-softToUltrasoftDirectory = "DRalgoOutput/Data/SoftToUltrasoft";
-effectivePotentialDirectory = "DRalgoOutput/Data/EffectivePotential";
-variables = "DRalgoOutput/Variables";
+hardToSoftDirectory = "DRalgoOutput/Z2_3HDM/HardToSoft";
+softToUltrasoftDirectory = "DRalgoOutput/Z2_3HDM/SoftToUltrasoft";
+effectivePotentialDirectory = "DRalgoOutput/Z2_3HDM/EffectivePotential";
+variables = "DRalgoOutput/Z2_3HDM/Variables";
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Model*)
 
 
@@ -184,6 +183,9 @@ allSoftScaleParams = Join[couplingsSoft, temporalScalarCouplings, debyeMasses, s
 (*We want to do in place updating of parameters in the python code i.e. \[Lambda]14D gets updated to \[Lambda]13D which gets updated to \[Lambda]13DUS,
 it's easier to do this if we remove the suffices so its the same variable name throughout*)
 allSoftScaleParamsSqrtSuffixFree = RemoveSuffixes[sqrtSubRules[allSoftScaleParams], {"3d"}];
+(*Sometimes compute these equations and put the results into a np.zeros,
+without T->T etc we would lose what T is *)
+allSoftScaleParamsSqrtSuffixFree = Join[allSoftScaleParamsSqrtSuffixFree, {T->T,RGScale->RGScale}];
 exportUTF8[hardToSoftDirectory<>"/softScaleParams_NLO.txt", allSoftScaleParamsSqrtSuffixFree];
 
 
@@ -195,13 +197,14 @@ SolveRunning3D[betaFunctions_] := Block[{exprList},
 	exprList = {#[[1]], #[[2]]} & /@ betaFunctions;
 
 	(* Make new list with RGE solution on RHS *)
-	newRulesList = (#1 -> #1 + #2*Log[goalScale/startScale]) & @@@ exprList;
+	newRulesList = (#1 -> #1 + #2*Log[T/RGScale]) & @@@ exprList;
 	Return[newRulesList];
 ];
 
-running3D = RemoveSuffixes[SolveRunning3D[BetaFunctions3DS[]],{"3d"}];
 
-exportUTF8[hardToSoftDirectory<>"/softScaleRGE.txt", running3D];
+running3DSoft = RemoveSuffixes[SolveRunning3D[BetaFunctions3DS[]],{"3d"}];
+running3DSoft= Join[running3DSoft, {RGScale->T}];
+exportUTF8[hardToSoftDirectory<>"/softScaleRGE.txt", running3DSoft];
 
 
 (* ::Subsection:: *)
@@ -217,6 +220,7 @@ allUltrasoftScaleParams = Join[couplingsUS, scalarMassesUS] /. \[Mu]3->RGScale;
 
 
 allUltrasoftScaleParamsSqrt = RemoveSuffixes[sqrtSubRules[allUltrasoftScaleParams], {"US", "3d"}];(*Some reduant sqrt operations here? e.g. g13dUS*)
+allUltrasoftScaleParamsSqrt= Join[allUltrasoftScaleParamsSqrt, {\[Mu]3US -> T}];
 
 
 exportUTF8[softToUltrasoftDirectory<>"/ultrasoftScaleParams_NLO.txt", allUltrasoftScaleParamsSqrt];
@@ -299,7 +303,7 @@ scalarPermutationMatrix = {
 {0,1,0,0,0,0,0,0,0,0,0,0},
 {0,0,0,0,0,0,0,0,0,0,0,1}};
 If[!OrthogonalMatrixQ[scalarPermutationMatrix], Print["Error, permutation matrix is not orthogonal"]];
-ExportUTF8[effectivePotentialDirectory<>"/scalarPermutationMatrix.txt", StringReplace[ToString[scalarPermutationMatrix],{"{"->"[","}"->"]"}]];
+exportUTF8[effectivePotentialDirectory<>"/scalarPermutationMatrix.txt", StringReplace[ToString[scalarPermutationMatrix],{"{"->"[","}"->"]"}]];
 
 
 (*Our casescalarPermutationMatrix is symmetric but taking transpose anyway for consistency/future proofing*)
@@ -428,9 +432,14 @@ veffLO = PrintEffectivePotential["LO"]//Simplify; (* Simplify to get rid of poss
 veffNLO = PrintEffectivePotential["NLO"]//Simplify; (* Simplify to factor 1/pi division for tiny speed up *)
 veffNNLO = PrintEffectivePotential["NNLO"]; (* NOT simplified as seems to change numerical result for unknown reasons *)
 
-exportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", veffLO];
-exportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", veffNLO];
-exportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", veffNNLO];
+
+(*Done for consistent in out structure for python*)
+veffLOR = {LO -> veffLO};
+veffNLOR = {NLO -> veffNLO};
+veffNNLOR = {NNLO -> veffNNLO};
+exportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", veffLOR];
+exportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", veffNLOR];
+exportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", veffNNLOR];
 
 
 exportUTF8[
@@ -452,8 +461,8 @@ equationSymbols={
 		"Out" -> extractSymbols[allSoftScaleParamsSqrtSuffixFree]["LHS"],
 		"In" -> extractSymbols[allSoftScaleParamsSqrtSuffixFree]["RHS"]},
 	"softScaleRGE"->{
-		"Out" -> extractSymbols[running3D]["LHS"],
-		"In" -> extractSymbols[running3D]["RHS"]},	
+		"Out" -> extractSymbols[running3DSoft]["LHS"],
+		"In" -> extractSymbols[running3DSoft]["RHS"]},	
 	"ultraSoftScaleParams"->{
 		"Out" -> extractSymbols[allUltrasoftScaleParamsSqrt]["LHS"],
 		"In" -> extractSymbols[allUltrasoftScaleParamsSqrt]["RHS"]},
@@ -469,11 +478,23 @@ equationSymbols={
 	"vectorMasses"->{
 		"Out" -> extractSymbols[VectorMassDiagSimple],
 		"In" -> extractSymbols[VectorMassExpressions]["RHS"]},
+	"LO"->{
+		"Out" -> extractSymbols[veffLOR]["LHS"],
+		"In" -> extractSymbols[veffLOR]["RHS"]},
+	"NLO"->{
+		"Out" -> extractSymbols[veffNLOR]["LHS"],
+		"In" -> extractSymbols[veffNLOR]["RHS"]},
+	"NNLO"->{
+		"Out" -> extractSymbols[veffNNLOR]["LHS"],
+		"In" -> extractSymbols[veffNNLOR]["RHS"]},
 	"rotationSymbols"->extractSymbols[DSRot],
-	"LOPotential"->extractSymbols[veffLO],
-	"NLOPotential"->extractSymbols[veffNLO],
-	"NNLOPotential"->extractSymbols[veffNNLO]};
+	"scalarMassNames"->extractSymbols[ScalarMassDiag]};
 
 
 exportUTF8[variables<>"/EquationSymbols.json", equationSymbols];
-exportUTF8[variables<>"/allSymbols.json",symbolsFromDict[equationSymbols]]
+
+
+exportUTF8[variables<>"/allSymbols.json",symbolsFromDict[equationSymbols]];
+
+
+symbolsFromDict[equationSymbols]

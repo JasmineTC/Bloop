@@ -28,9 +28,6 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--verbose', action = 'store_true', default = False, dest = 'verbose',
                           help = 'Bool: If activated code will print as it progresses and do consistency checks')
         
-        self.add_argument('--bNumba', action = 'store_true', default = False, dest = 'bNumba',
-                          help = 'Bool: If activated parts of the code will be compiled using Numba')
-        
         self.add_argument('--bPool', action = 'store_true', default = False, dest = 'bPool', 
                           help = "Bool: Specify if pool should be used to compute benchmarks in parellel")
         self.add_argument('--cores', action = 'store', default = 1, dest = 'cores', type = int, choices = list(range(1, multiprocessing.cpu_count() + 1)),
@@ -212,10 +209,10 @@ class UserInput(argparse.ArgumentParser):
                           dest = 'scalarMassMatrixBottomRightDefinitionsFile',
                           metavar='')
 
-        self.add_argument('--parsedExpressionsFile', 
+        self.add_argument('--pythonisedExpressionsFile', 
                           action = 'store', 
-                          default = "parsedExpressions.json",
-                          dest = 'parsedExpressionsFile',
+                          default = "pythonisedExpressionsFile.json",
+                          dest = 'pythonisedExpressionsFile',
                           metavar='')
         
         self.add_argument('--lagranianVariables', 

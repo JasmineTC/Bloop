@@ -8,5 +8,7 @@ def getLines(relativePathToResource, mode = "default"):
     path = files(packageName) / relativePathToResource
     
     if mode == "json":
-        return load(open(path, "r"))
-    return open(path, "r" , encoding = "utf-8").readlines()
+        with open(path, "r") as fp:
+            return load(fp)
+    with open(path, "r" , encoding = "utf-8") as fp:
+        return fp.readlines()

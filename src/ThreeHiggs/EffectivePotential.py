@@ -13,82 +13,56 @@ def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
          subEigenValues[idx], subRotationMatrix[idx] = np.linalg.eigh(matrix)
     return subEigenValues*T**2, subRotationMatrix
 
-def compFieldDepParams(fields: list[float], 
-                       T:float, 
-                       params3D, 
-                       fieldNames, 
-                       scalarPermutationMatrix,
-                       scalarMassMatrices,
-                       scalarRotationMatrix,
-                       vectorShortHands,
-                       vectorMassesSquared,
-                       bNumba,
-                       verbose) -> dict[str, float]:
-
+def compFieldDepParams(
+    fields: list[float], 
+    T:float, 
+    params3D, 
+    allSymbols,
+    fieldNames, 
+    scalarPermutationMatrix,
+    scalarMassMatrices,
+    scalarRotationMatrix,
+    vectorShortHands,
+    vectorMassesSquared,
+    verbose
+) :
     for i, value in enumerate(fields):
-        params3D[fieldNames[i]] = value
+        params3D[allSymbols.index(fieldNames[i])] = value
 
-    return params3D | (vectorShortHands.evaluate(params3D, 
-                                                 bReturnDict = True) | 
-                       
-                       vectorMassesSquared.evaluate(params3D, 
-                                                    bReturnDict = True) | 
-                       
-                       diagonalizeScalars(params3D, 
-                                          T,
-                                          scalarPermutationMatrix,
-                                          scalarMassMatrices,
-                                          scalarRotationMatrix,
-                                          bNumba,
-                                          verbose))
+    params3D = vectorShortHands.evaluate(params3D)
+    params3D = vectorMassesSquared.evaluate(params3D)
+    params3D = {key: value for (key, value) in zip(allSymbols, params3D) }
 
-from itertools import chain
-def diagonalizeScalars(params: dict[str, float], 
-                       T: float,  
-                       scalarPermutationMatrix,
-                       scalarMassMatrices,
-                       scalarRotationMatrix,
-                       bNumba,
-                       verbose) -> dict[str, float]:
+    return diagonalizeScalars(
+        params3D, 
+        T,
+        scalarPermutationMatrix,
+        scalarMassMatrices,
+        scalarRotationMatrix,
+        verbose
+    )
+
+def diagonalizeScalars(
+    params, 
+    T,  
+    scalarPermutationMatrix,
+    scalarMassMatrices,
+    scalarRotationMatrix,
+    verbose
+):
     """Finds a rotation matrix that diagonalizes the scalar mass matrix
     and returns a dict with diagonalization-specific params"""
-    
     subMassMatrix = np.array( [matrix.evaluate(params) for matrix in scalarMassMatrices ]).real / T**2
 
-    if bNumba:
-        subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, subMassMatrix.shape[0], subMassMatrix.shape[1], T)
-
-    else:
-        subRotationMatrix = []
-        subEigenValues = []
-        for matrix in subMassMatrix:
-            eigenValue, vects = np.linalg.eigh(matrix)
-            eigenValue *=T**2
-            
-            subEigenValues.append(eigenValue)                    
-            subRotationMatrix.append(vects)
-            
-            ## NOTE: vects has the eigenvectors on columns => D = V^T . M . V, such that D is diagonal
-            ## 'Quick' check that the numerical mass matrix is within tol after being rotated by vects
-            if not verbose:
-                continue
-            
-            diagonalBlock = np.transpose(vects) @ matrix @ vects
-            offDiagonalIndex = np.where(~np.eye(diagonalBlock.shape[0],dtype=bool))
-            
-            if not np.any(diagonalBlock[offDiagonalIndex] > 1e-8):
-                continue
-            print (f"Detected off diagonal element larger than 1e-8 tol,  'diagonal' mass matrix is: {diagonalBlock}")
+    subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, subMassMatrix.shape[0], subMassMatrix.shape[1], T)
 
     """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
     so we need to undo the permutatation"""
-    outDict = scalarRotationMatrix.evaluate(scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix))
-
+    params |= scalarRotationMatrix.evaluate(scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix))
     ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
     ##But should probably be handled by a file given from mathematica (such a list is already made in mathematica)
     massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
-
-    return outDict | {name: float(msq) for name, msq in zip(massNames, chain(*subEigenValues))}
+    return params | {name: float(msq) for name, msq in zip(massNames, chain(*subEigenValues))}
 
 @dataclass(frozen=True)
 class cNlopt:
@@ -136,7 +110,6 @@ class EffectivePotential:
     def __init__(self,
                  fieldNames, 
                  loopOrder,
-                 bNumba,
                  verbose,
                  nloptInst,
                  vectorMassesSquared, 
@@ -144,13 +117,13 @@ class EffectivePotential:
                  scalarPermutationMatrix,
                  scalarMassMatrices, 
                  scalarRotationMatrix,
-                 veff):
+                 veffArray,
+                 allSymbols):
         
         self.fieldNames = fieldNames
         
         self.loopOrder = loopOrder
         
-        self.bNumba = bNumba
         self.verbose = verbose
         
         self.nloptInst = nloptInst
@@ -164,22 +137,25 @@ class EffectivePotential:
         ##TODO improve this
         self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
         self.scalarRotationMatrix = scalarRotationMatrix
-        self.expressions = veff
+        self.expressionsArray = veffArray
+        self.allSymbols = allSymbols
 
     def evaluatePotential(self, fields: list[float], T:float, params3D) -> complex:
-        ## This has masses, angles, all shorthand symbols etc. Everything we need to evaluate loop corrections
-        ## Sum because the result is a list of tree, 1loop etc 
-        return sum(self.expressions.evaluate(compFieldDepParams(fields,
-                                                                T,
-                                                                params3D,
-                                                                self.fieldNames,
-                                                                self.scalarPermutationMatrix, 
-                                                                self.scalarMassMatrices, 
-                                                                self.scalarRotationMatrix,
-                                                                self.vectorShortHands,
-                                                                self.vectorMassesSquared,
-                                                                self.bNumba,
-                                                                self.verbose)))
+        array = self.expressionsArray.getParamsArray(compFieldDepParams(
+            fields,
+            T,
+            params3D,
+            self.allSymbols,
+            self.fieldNames,
+            self.scalarPermutationMatrix, 
+            self.scalarMassMatrices, 
+            self.scalarRotationMatrix,
+            self.vectorShortHands,
+            self.vectorMassesSquared,
+            self.verbose
+        ))
+
+        return sum(self.expressionsArray.getParamSubset(self.expressionsArray.evaluate(array)))
 
     def findGlobalMinimum(self,T:float, 
                           params3D,
@@ -234,16 +210,16 @@ class EffectivePotential:
         2) Return true if # of light modes is less than the # of goldstone modes'''
         goldStone = 0 if np.all(np.abs(fields) < 0.1) else 3
         paramDict = compFieldDepParams(fields,
-                                       T,
-                                       params3D,
-                                       self.fieldNames,
-                                       self.scalarPermutationMatrix, 
-                                       self.scalarMassMatrices, 
-                                       self.scalarRotationMatrix,
-                                       self.vectorShortHands,
-                                       self.vectorMassesSquared,
-                                       self.bNumba,
-                                       self.verbose)
+                                T,
+                                params3D,
+                                self.allSymbols,
+                                self.fieldNames,
+                                self.scalarPermutationMatrix, 
+                                self.scalarMassMatrices, 
+                                self.scalarRotationMatrix,
+                                self.vectorShortHands,
+                                self.vectorMassesSquared,
+                                self.verbose)
 
         ## Convert mass into real type to do comparisons 
         massList = np.real([paramDict["MSsq01"], paramDict["MSsq02"],

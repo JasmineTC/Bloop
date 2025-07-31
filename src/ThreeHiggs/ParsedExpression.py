@@ -1,8 +1,5 @@
-from cmath import pi, log, sqrt
-from numpy import euler_gamma
-Glaisher = 1.28242712910062
-
-import copy
+from cmath import log, sqrt
+import numpy as np
 
 class ParsedExpression:
     def __init__(self, parsedExpression, fileName):
@@ -11,15 +8,12 @@ class ParsedExpression:
         self.symbols = parsedExpression["symbols"]
         self.fileName = fileName
 
-        self.lambdaExpression = compile(self.expression, "<string>", mode = "eval")
+        self.lambdaExpression = compile(self.expression, self.identifier, mode = "eval")
 
     def evaluate(self, functionArguments: list[float]) -> float:
         return eval(self.lambdaExpression, 
                     functionArguments | {"log": log, 
-                                         "sqrt": sqrt, 
-                                         "pi": pi, 
-                                         "EulerGamma": euler_gamma,
-                                         "Glaisher": Glaisher})
+                                         "sqrt": sqrt})
 
 class ParsedExpressionSystem:
     def __init__(self, parsedExpressionSystem, fileName):
@@ -49,10 +43,7 @@ class ParsedExpressionArray:
 
     def evaluate(self, params):
         return eval(self.lambdaExpression,  {"log": log, 
-                                             "sqrt": sqrt, 
-                                             "pi": pi, 
-                                             "EulerGamma": euler_gamma,
-                                             "Glaisher": Glaisher,
+                                             "sqrt": sqrt,
                                              "params": params})
 
 class ParsedExpressionSystemArray:
@@ -64,20 +55,21 @@ class ParsedExpressionSystemArray:
         self.allSymbols = allSymbols
         self.fileName = fileName
         
-
     def evaluate(self, params):
-        newParams = copy.deepcopy(params)
-        
+        newParams = np.array(params, dtype="complex")
         for expression in self.parsedExpressions:
             newParams[expression[0]] = expression[1].evaluate(params)
-
+            
         return newParams
 
     def getParamSubset(self, params):
-        return [params[index] for index, symbol in enumerate(self.allSymbols) if symbol in self.getExpressionNames()]
+        return [params[self.allSymbols.index(key)] for key in self.getExpressionNames() ]
 
     def getExpressionNames(self) -> list[str]:
         return [ expr[1].identifier for expr in self.parsedExpressions ]
+    
+    def getParamsArray(self, params):
+        return [params[key] if key in params else 0 for key in self.allSymbols ]
 
 class MassMatrix:
     def __init__(self, massMatrix, fileName):
@@ -88,10 +80,7 @@ class MassMatrix:
     def evaluate(self, arguments):
         arguments |= self.definitions.evaluate(arguments, bReturnDict = True)
         return eval(self.matrix, arguments | {"log": log, 
-                                              "sqrt": sqrt, 
-                                              "pi": pi, 
-                                              "EulerGamma": euler_gamma,
-                                              "Glaisher": Glaisher})
+                                              "sqrt": sqrt})
 
 class RotationMatrix:
     def __init__(self, symbolMap, fileName):
@@ -108,7 +97,8 @@ class RotationMatrix:
 from unittest import TestCase
 class ParsedExpressionUnitTests(TestCase):
     def test_ParsedExpression(self):
-        source = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+        from numpy import pi
+        source = {"expression": f"sqrt(lam)/(4*{pi}) + log(mssq)",
                   "identifier": "Identifier",
                   "symbols": ['lam', 'mssq']}
 
@@ -117,28 +107,25 @@ class ParsedExpressionUnitTests(TestCase):
         self.assertEqual(reference, ParsedExpression(source, None).evaluate({"lam": 100, "mssq": 100}))
 
     def test_ParsedExpressionComplex(self):
-        source = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+        source = {"expression": "sqrt(lam) + log(mssq)",
                   "identifier": "Identifier",
                   "symbols": ['lam', 'mssq']}
 
-        reference = complex(5.826048814042759, 1.1475471676948477)
+        reference = complex(15.938584910946165+5.336296769019722j)
 
         self.assertEqual(reference, 
                          ParsedExpression(source, None).evaluate({"lam": complex(100, 100), 
                                                             "mssq": complex(100, 100)}))
 
     def test_ParsedExpressionSystem(self):
-        source = [{"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+        source = [{"expression": "sqrt(lam) + log(mssq)",
                    "identifier": "Identifier",
                    "symbols": ['lam', 'mssq']},
-                  {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
-                   "identifier": "Identifier",
-                   "symbols": ['lam', 'mssq']},
-                  {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+                  {"expression": "sqrt(2*lam) + log(mssq)",
                    "identifier": "Identifier",
                    "symbols": ['lam', 'mssq']}]
 
-        reference = [5.400944901447568, 5.400944901447568, 5.400944901447568]
+        reference = [(14.605170185988092+0j), (18.747305809719045+0j)] 
 
         self.assertEqual(reference, 
                          ParsedExpressionSystem(source, None).evaluate({"lam": 100, "mssq": 100}))

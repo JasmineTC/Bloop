@@ -21,5 +21,3 @@ if args.firstStage <= Stages.doMinimization <= args.lastStage:
         print("Minimization stage started")
     from ThreeHiggs.DoMinimization import minimization
     minimization(args)
-    
-    

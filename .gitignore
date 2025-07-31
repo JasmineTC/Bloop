@@ -9,4 +9,5 @@ build/
 **/OutputResult/*
 
 *.swp
-
+*.png
+*.pstats

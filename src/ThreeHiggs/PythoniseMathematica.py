@@ -2,11 +2,17 @@ from ThreeHiggs.GetLines import getLines
 from json import dump
 from sympy import Matrix
 from sympy.parsing.mathematica import parse_mathematica
+from numpy import euler_gamma, pi
 
 def replaceGreekSymbols(string: str) -> str:
     ## TODO use unicodedata package here to do magic. 
     # Or bully DRalgo people to removing greek symbols
     return string.replace(u"\u03BB", "lam").replace(u"\u03BC", "mu")
+
+def replaceSymbolsConst(string):
+    return string.replace("Pi", str(pi)) \
+                 .replace("EulerGamma", str(euler_gamma)) \
+                 .replace("Glaisher", "1.28242712910062") 
 
 def removeSuffices(string):
     return string.replace("^2", "sq")
@@ -23,7 +29,7 @@ def pythoniseExpressionArray(line, allSymbols):
     identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
     
     identifier = removeSuffices(replaceGreekSymbols(identifier))
-    expression = parse_mathematica(replaceGreekSymbols(line))
+    expression = parse_mathematica(replaceSymbolsConst(replaceGreekSymbols(line)))
     symbols = [str(symbol) for symbol in expression.free_symbols]
 
     return {"identifier": identifier, 
@@ -34,7 +40,7 @@ def pythoniseExpression(line):
     identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
 
     identifier = removeSuffices(replaceGreekSymbols(identifier))
-    expression = parse_mathematica(replaceGreekSymbols(line))
+    expression = parse_mathematica(replaceSymbolsConst(replaceGreekSymbols(line)))
     symbols = [str(symbol) for symbol in expression.free_symbols]
 
     return {"identifier": identifier, "expression": str(expression), "symbols": sorted(symbols)}
@@ -76,38 +82,78 @@ def pythoniseMathematica(args):
     veffLines += getLines(args.nloFile)
     if (args.loopOrder >= 2):
         veffLines += getLines(args.nnloFile)
-    
+        
     allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")], 
                         reverse = True)
+
     ## Move get lines to the functions? -- Would need to rework veffLines in this case
     ## Not ideal to have nested dicts but is future proof for when we move to arrays
-    dump({"betaFunctions4D": {"expressions": pythoniseExpressionSystemArray(getLines(args.betaFunctions4DFile), allSymbols),
-                              "fileName": args.betaFunctions4DFile},
-          "hardToSoft": {"expressions":  pythoniseExpressionSystem(getLines(args.hardToSoftFile)),
-                         "fileName": args.hardToSoftFile},
-          "softScaleRGE": {"expressions": pythoniseExpressionSystem(getLines(args.softScaleRGEFile)),
-                           "fileName": args.softScaleRGEFile},
-          "softToUltraSoft": {"expressions": pythoniseExpressionSystem(getLines(args.softToUltraSoftFile)),
-                              "fileName": args.softToUltraSoftFile},
-          "vectorMassesSquared": {"expressions": pythoniseExpressionSystem(getLines(args.vectorMassesSquaredFile)),
-                                  "fileName": args.vectorMassesSquaredFile},
-          "vectorShortHands": {"expressions": pythoniseExpressionSystem(getLines(args.vectorShortHandsFile)),
-                               "fileName": args.vectorShortHandsFile},
-          "veff": {"expressions": pythoniseExpressionSystem(veffLines),
-                     "fileName": "Combined Veff files"},
-          "scalarMassMatrixUpperLeft": {"expressions": pythoniseMassMatrix(getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
-                                                                       getLines(args.scalarMassMatrixUpperLeftFile)),
-                                        "fileName": (args.scalarMassMatrixUpperLeftDefinitionsFile,
-                                                     args.scalarMassMatrixBottomRightFile)},
-          "scalarMassMatrixBottomRight": {"expressions": pythoniseMassMatrix(getLines(args.scalarMassMatrixBottomRightDefinitionsFile),
-                                                                         getLines(args.scalarMassMatrixBottomRightFile)),
-                                        "fileName": (args.scalarMassMatrixBottomRightDefinitionsFile,
-                                                     args.scalarMassMatrixBottomRightFile)},
-          "scalarRotationMatrix": {"expressions": pythoniseRotationMatrix(getLines(args.scalarRotationFile)),
-                                   "fileName": args.scalarRotationFile},
-          "scalarPermutationMatrix": getLines(args.scalarPermutationFile, mode="json")},
-         open(args.parsedExpressionsFile, "w"),
-         indent = 4)
+    dump(
+        {
+            "betaFunctions4D": {
+                "expressions": pythoniseExpressionSystemArray(getLines(args.betaFunctions4DFile), allSymbols),
+                "fileName": args.betaFunctions4DFile,
+            },
+            "hardToSoft": {
+                "expressions":  pythoniseExpressionSystemArray(getLines(args.hardToSoftFile), allSymbols),
+                "fileName": args.hardToSoftFile,
+            },
+            "softScaleRGE": {
+                "expressions": pythoniseExpressionSystemArray(getLines(args.softScaleRGEFile), allSymbols),
+                "fileName": args.softScaleRGEFile,
+            },
+            "softToUltraSoft": {
+                "expressions": pythoniseExpressionSystemArray(getLines(args.softToUltraSoftFile), allSymbols),
+                "fileName": args.softToUltraSoftFile,
+            },
+            "vectorMassesSquared": {
+                "expressions": pythoniseExpressionSystemArray(getLines(args.vectorMassesSquaredFile), allSymbols),
+                "fileName": args.vectorMassesSquaredFile,
+            },
+            "vectorShortHands": {
+                "expressions": pythoniseExpressionSystemArray(getLines(args.vectorShortHandsFile), allSymbols),
+                "fileName": args.vectorShortHandsFile,
+            },
+            "veff": {
+                "expressions": pythoniseExpressionSystem(veffLines),
+                "fileName": "Combined Veff files",
+            },
+            "veffArray": {
+                "expressions": pythoniseExpressionSystemArray(veffLines, allSymbols),
+                "fileName": "Combined Veff files",
+            },
+            "scalarMassMatrixUpperLeft": {
+                "expressions": pythoniseMassMatrix(
+                    getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
+                    getLines(args.scalarMassMatrixUpperLeftFile),
+                ),
+                "fileName": (
+                    args.scalarMassMatrixUpperLeftDefinitionsFile,
+                    args.scalarMassMatrixBottomRightFile),
+            },
+            "scalarMassMatrixBottomRight": {
+                "expressions": pythoniseMassMatrix(
+                    getLines(args.scalarMassMatrixBottomRightDefinitionsFile),
+                    getLines(args.scalarMassMatrixBottomRightFile),
+                ),
+                "fileName": (
+                    args.scalarMassMatrixBottomRightDefinitionsFile,
+                    args.scalarMassMatrixBottomRightFile,
+                ),
+            },
+            "scalarRotationMatrix": {
+                "expressions": pythoniseRotationMatrix(getLines(args.scalarRotationFile)),
+                "fileName": args.scalarRotationFile,
+            },
+            "scalarPermutationMatrix": getLines(args.scalarPermutationFile, mode="json"),
+            "allSymbols": {
+                "allSymbols": allSymbols,
+                "fileName": args.allSymbolsFile,
+            },
+        },
+        open(args.pythonisedExpressionsFile, "w"),
+        indent = 4
+    )
 
 from unittest import TestCase
 class PythoniseMathematicaUnitTests(TestCase):
@@ -125,7 +171,7 @@ class PythoniseMathematicaUnitTests(TestCase):
         self.assertEqual(reference, [removeSuffices(sourceString) for sourceString in source])
 
     def test_pythoniseExpression(self):
-        reference = {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+        reference = {"expression": "0.07957747154594767*sqrt(lam) + log(mssq)",
                      "identifier": "Identifier",
                      "symbols": ['lam', 'mssq']}
 
@@ -134,13 +180,13 @@ class PythoniseMathematicaUnitTests(TestCase):
         self.assertEqual(reference, pythoniseExpression(source))
 
     def test_paseExpressionSystem(self):
-        reference = [{"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+        reference = [{"expression": "0.07957747154594767*sqrt(lam) + log(mssq)",
                       "identifier": "Identifier",
                       "symbols": ['lam', 'mssq']},
-                     {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+                     {"expression": "0.07957747154594767*sqrt(lam) + log(mssq)",
                       "identifier": "Identifier",
                       "symbols": ['lam', 'mssq']},
-                     {"expression": "sqrt(lam)/(4*pi) + log(mssq)",
+                     {"expression": "0.07957747154594767*sqrt(lam) + log(mssq)",
                       "identifier": "Identifier",
                       "symbols": ['lam', 'mssq']}]
 

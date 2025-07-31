@@ -1,36 +1,47 @@
 import numpy as np
-from math import sqrt, pi, log, exp
 import scipy
+from math import sqrt, pi, log, exp
+from dataclasses import dataclass, InitVar,field
+from ThreeHiggs.BmGenerator import bIsBounded
 
-def bIsPerturbative(paramDict4D : dict[str, float], pertSymbols: set) -> bool:
+def bIsPerturbative(
+    paramValuesArray, 
+    pertSymbols, 
+    allSymbols
+):
     ## Should actually check vertices but not a feature in DRalgo at time of writting
-    for key, value in paramDict4D.items():
-        if key in pertSymbols and abs(value) > 4*pi:
+    for pertSymbol in pertSymbols:
+        if abs(paramValuesArray[allSymbols.index(pertSymbol)]) > 4*pi:
             return False
+
     return True
 
-def constructSplineDictArray(betaFunction4DExpression, muRange, initialConditions, allSymbolsDict) :
+def constructSplineDictArray(
+    betaFunction4DExpression, 
+    muRange, 
+    initialConditions, 
+    allSymbols
+):
     ## -----BUG------
     ## This updates the RGScale with the value of mu
-    solutionSoft = scipy.integrate.odeint(lambda initialConditions, mu:  np.array(betaFunction4DExpression.evaluate(initialConditions))/mu,
-                                          initialConditions, 
-                                          muRange).transpose()
+    initialConditions = np.array(initialConditions, dtype="complex")
+    solutionSoft = scipy.integrate.solve_ivp(lambda mu, initialConditions:  np.array(betaFunction4DExpression.evaluate(initialConditions))/mu,
+                                             (muRange[0], muRange[-1]), 
+                                             initialConditions, 
+                                             t_eval=muRange).y
 
     interpDict = {}
-    for key, value in allSymbolsDict.items():
-        if key == "RGScale":
+    for idx, ele in enumerate(allSymbols):
+        if ele == "RGScale":
             continue
         
         ## Hack to remove all the const entries in the array
-        if np.all(solutionSoft[value] == solutionSoft[value][0]):
+        if np.all(solutionSoft[idx] == solutionSoft[idx][0]):
             continue
-        
-        interpDict[key] =  scipy.interpolate.CubicSpline(muRange, solutionSoft[value], extrapolate = False)
-        
+        ## Can we find an interpolation method that works with complex muRange??
+        interpDict[ele] =  scipy.interpolate.CubicSpline(muRange, solutionSoft[idx])
     return interpDict
 
-from dataclasses import dataclass, InitVar,field
-from ThreeHiggs.BmGenerator import bIsBounded
 @dataclass(frozen=True)
 class TraceFreeEnergyMinimum:
     TRange: tuple = (0,)
@@ -39,7 +50,7 @@ class TraceFreeEnergyMinimum:
     
     initialGuesses: tuple = (0,)
     
-    ## Hack - idk how to type hint this correctly
+    ## idk how to type hint this correctly
     effectivePotential: str = "effectivePotentialInstance"
     dimensionalReduction: str = "dimensionalReductionInstance"
     betaFunction4DExpression: str = "betaFunction4DExpression" 
@@ -49,7 +60,7 @@ class TraceFreeEnergyMinimum:
     EulerGammaPrime = 2.*(log(4.*pi) - np.euler_gamma)
     Lfconst = 4.*log(2.)
     
-    allSymbolsDict: list = field(default_factory=dict)
+    allSymbols: list = field(default_factory = list)
     
     config: InitVar[dict] = None
     
@@ -72,33 +83,49 @@ class TraceFreeEnergyMinimum:
         matchingScale = 4.*pi*exp(-np.euler_gamma) * T
         Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
         
-        inputArray[self.allSymbolsDict["RGScale"]] = matchingScale
-        inputArray[self.allSymbolsDict["T"]] = T
-        inputArray[self.allSymbolsDict["Lb"]] = Lb
-        inputArray[self.allSymbolsDict["Lf"]] = Lb + self.Lfconst
+        inputArray[self.allSymbols.index("RGScale")] = matchingScale
+        inputArray[self.allSymbols.index("T")] = T
+        inputArray[self.allSymbols.index("Lb")] = Lb
+        inputArray[self.allSymbols.index("Lf")] = Lb + self.Lfconst
         return inputArray
     
-    def updateParams4DRan(self, betaSpline4D: dict, array):
-        muEvaulate = array[self.allSymbolsDict["RGScale"]]
+    def updateParams4DRan(
+            self, 
+            betaSpline4D, 
+            array
+    ):
+        muEvaulate = array[self.allSymbols.index("RGScale")]
         for key, spline in betaSpline4D.items():
-            array[self.allSymbolsDict[key]] = float(spline(muEvaulate))
+            # Taking real part to avoid complex to real cast warning
+            array[self.allSymbols.index(key)] = spline(np.real(muEvaulate))
         return array
     
-    def executeMinimisation(self, T, 
-                            minimumLocation,
-                            betaSpline4D): 
-        paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.allSymbolsDict.keys())))
+    def executeMinimisation(
+        self, 
+        T, 
+        minimumLocation,
+        betaSpline4D
+    ): 
         
-        paramsForMatchingArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
-        paramsForMatchingDict = {key: paramsForMatchingArray[value] for key, value in self.allSymbolsDict.items()}
-        
-        params3D = self.dimensionalReduction.getUltraSoftParams(paramsForMatchingDict, T)
-        return ( *self.effectivePotential.findGlobalMinimum(T, params3D, self.initialGuesses + (minimumLocation, ) ), 
-                bIsPerturbative(paramsForMatchingDict, self.pertSymbols), 
-                bIsBounded(paramsForMatchingDict),
-                params3D)
+        paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.allSymbols), dtype="complex"))
+        paramValuesArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
+        paramValuesArray = self.dimensionalReduction.hardToSoft.evaluate(paramValuesArray)
+        paramValuesArray = self.dimensionalReduction.softScaleRGE.evaluate(paramValuesArray)
+        paramValuesArray = self.dimensionalReduction.softToUltraSoft.evaluate(paramValuesArray)
+        return ( 
+                *self.effectivePotential.findGlobalMinimum(
+                T, 
+                paramValuesArray, 
+                self.initialGuesses + (minimumLocation, )
+            ), 
+            bIsPerturbative(paramValuesArray, self.pertSymbols, self.allSymbols), 
+            True, #bIsBounded(paramsForMatchingDict)
+            list(paramValuesArray),
+        )
     
-    def populateLagranianParams4D(self, inputParams: dict[str, float]) -> np.array:
+    def populateLagranianParams4D(self, 
+        inputParams
+        ):
         higgsVev = 246.22  #Consider using Fermi constant instead
         ## --- SM fermion and gauge boson masses---
         MW = 80.377 
@@ -113,26 +140,28 @@ class TraceFreeEnergyMinimum:
                             **inputParams["massTerms"],
                             **inputParams["couplingValues"]}
         
-        params4D = np.zeros(len(self.allSymbolsDict))
+        params4D = np.zeros(len(self.allSymbols))
         for key, value in langrianParams4D.items():
-            params4D[self.allSymbolsDict[key]] = value
+            params4D[self.allSymbols.index(key)] = value
 
         return params4D
             
-    def traceFreeEnergyMinimum(self, benchmark:  dict[str: float]) -> dict[str: ]:
+    def traceFreeEnergyMinimum(self, 
+        benchmark
+        ):
         lagranianParams4DArray = self.populateLagranianParams4D(benchmark)
                
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
         ## usually a T-dependent scale 4.*pi*exp(-np.euler_gamma)*T 
         ## TODO FIX for when user RGscale < 7T!!!
-        muRange = np.linspace(lagranianParams4DArray[self.allSymbolsDict["RGScale"]], 
+        muRange = np.linspace(lagranianParams4DArray[self.allSymbols.index("RGScale")], 
                               7.3 * self.TRange[-1],
                               len(self.TRange)*10)
         
         betaSpline4D = constructSplineDictArray(self.betaFunction4DExpression, 
                                                 muRange, 
                                                 lagranianParams4DArray, 
-                                                self.allSymbolsDict)
+                                                self.allSymbols)
         
         minimizationResults = {"T": [],
                                "valueVeffReal": [],
@@ -162,8 +191,6 @@ class TraceFreeEnergyMinimum:
             if isBadState:
                 minimizationResults["failureReason"] = isBadState
                 break
-            
-            
             minimizationResults["valueVeffReal"].append(minimumValueReal)
             minimizationResults["valueVeffImag"].append(minimumValueImag)
             minimizationResults["minimumLocation"].append(minimumLocation)
@@ -177,7 +204,7 @@ class TraceFreeEnergyMinimum:
                                                                   params3D): 
                     minimizationResults["UltraSoftTemp"] = T
 
-            if np.all( minimizationResults["minimumLocation"][-1] < 0.5):
+            if np.all( minimumLocation < 0.5):
                 if self.verbose:
                     print (f"Symmetric phase found at temp {T}")
                 if counter == 3:
@@ -186,21 +213,20 @@ class TraceFreeEnergyMinimum:
             
         minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
         
-        
         return minimizationResults
     
     def plotPotential(self, benchmark:  dict[str: float]):
         ## This is just a trimmed version of trace free energy minimum Jasmine uses for plotting
         lagranianParams4DArray = self.populateLagranianParams4D(benchmark)
                
-        muRange = np.linspace(lagranianParams4DArray[self.allSymbolsDict["RGScale"]], 
+        muRange = np.linspace(lagranianParams4DArray[self.allSymbols.index("RGScale")], 
                               7.3 * self.TRange[-1],
                               len(self.TRange)*10)
         
         betaSpline4D = constructSplineDictArray(self.betaFunction4DExpression, 
                                                 muRange, 
                                                 lagranianParams4DArray, 
-                                                self.allSymbolsDict)
+                                                self.allSymbols)
         
         minimumLocation = np.array(self.initialGuesses[0])
         
@@ -241,19 +267,17 @@ from unittest import TestCase
 class TransitionFinderUnitTests(TestCase):
     def test_bIsPerturbativeTrue(self):
         reference = True
-        source = {"lam11": 0.7,
-                  "lam12": -0.8,
-                  "lam12p": 0}
-        symbols = {"lam11", "lam12", "lam12p"}
+        source = [0.7, -0.8, 0]
+        pertSymbols = {"lam11", "lam12", "lam12p"}
+        allSymbols = ["lam11", "lam12", "lam12p"]
 
-        self.assertEqual(reference, bIsPerturbative(source, symbols))
+        self.assertEqual(reference, bIsPerturbative(source, pertSymbols, allSymbols) )
 
     def test_bIsPerturbativeFalse(self):
         reference = False
-        source = {"lam11": -12.57,
-                  "lam12": 0,
-                  "lam12p": 0}
-        symbols = {"lam11", "lam12", "lam12p"}
+        source = [-12.57, 0, 0]
+        pertSymbols = {"lam11", "lam12", "lam12p"}
+        allSymbols = ["lam11", "lam12", "lam12p"]
 
-        self.assertEqual(reference, bIsPerturbative(source, symbols) )
+        self.assertEqual(reference, bIsPerturbative(source, pertSymbols, allSymbols) )
 
