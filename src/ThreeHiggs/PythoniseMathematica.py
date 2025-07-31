@@ -2,6 +2,7 @@ from ThreeHiggs.GetLines import getLines
 from json import dump
 from sympy import Matrix
 from sympy.parsing.mathematica import parse_mathematica
+from numpy import euler_gamma, pi
 
 def replaceGreekSymbols(string: str) -> str:
     ## TODO use unicodedata package here to do magic. 
@@ -10,13 +11,9 @@ def replaceGreekSymbols(string: str) -> str:
 
 def replaceSymbolsConst(string):
     ## Change expressions to use either pi or Pi but not both!!!
-    from numpy import pi
-    from numpy import euler_gamma, pi
-    Glaisher = "1.28242712910062"
-
-    return string.replace("pi", str(pi)).replace("Pi", str(pi)) \
+    return string.replace("Pi", str(pi)) \
                  .replace("EulerGamma", str(euler_gamma)) \
-                 .replace("Glaisher", Glaisher) 
+                 .replace("Glaisher", "1.28242712910062") 
 
 def removeSuffices(string):
     return string.replace("^2", "sq")
