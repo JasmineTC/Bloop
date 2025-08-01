@@ -1,12 +1,16 @@
-FROM ubuntu:24.10
+FROM python:3
 
-RUN apt update
-RUN apt install -y python3
-RUN apt install -y python3-numpy
-RUN apt install -y python3-scipy
-RUN apt install -y python3-ijson
-RUN apt install -y python3-pathos
-RUN apt install -y python3-numba
-RUN apt install -y python3-nlopt
-RUN apt install -y python3-sympy
+ENV PIP_ROOT_USER_ACTION=ignore
+
+RUN pip install --upgrade pip
+
+RUN pip install --no-cache-dir pdg 
+RUN pip install --no-cache-dir numba 
+RUN pip install --no-cache-dir nlopt 
+RUN pip install --no-cache-dir numpy 
+RUN pip install --no-cache-dir scipy 
+RUN pip install --no-cache-dir ijson 
+RUN pip install --no-cache-dir pathos 
+RUN pip install --no-cache-dir sympy 
+RUN pip install --no-cache-dir matplotlib 
 
