@@ -179,8 +179,9 @@ def generate_lo_submodule(name, filename, lo_file):
     if os.path.exists(filename):
         os.remove(filename)
         
-    lines = read_lines(lo_file)
+    lines = read_lines(lo_file)[2]
     params, signs, terms = get_terms(lines)
+    print(params, signs, terms)
     
     with open(filename, 'w') as file:
         # Function imports used by Veff
