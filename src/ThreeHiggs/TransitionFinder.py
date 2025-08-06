@@ -106,7 +106,6 @@ class TraceFreeEnergyMinimum:
         minimumLocation,
         betaSpline4D
     ): 
-        
         paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.allSymbols), dtype="complex"))
         paramValuesArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
         paramValuesArray = self.dimensionalReduction.hardToSoft.evaluate(paramValuesArray)
@@ -116,7 +115,7 @@ class TraceFreeEnergyMinimum:
                 *self.effectivePotential.findGlobalMinimum(
                 T, 
                 paramValuesArray, 
-                self.initialGuesses + (minimumLocation, )
+                self.initialGuesses + [minimumLocation]
             ), 
             bIsPerturbative(paramValuesArray, self.pertSymbols, self.allSymbols), 
             True, #bIsBounded(paramsForMatchingDict)
@@ -184,7 +183,7 @@ class TraceFreeEnergyMinimum:
             minimizationResults["T"].append(T)
             
             minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T,
-                                                                                                           tuple(minimumLocation.round(5)),                      
+                                                                                                           minimumLocation.round(5).tolist(),                      
                                                                                                            betaSpline4D)
             ##Not ideal name or structure imo
             isBadState = self.isBad(T, minimumLocation, status)
