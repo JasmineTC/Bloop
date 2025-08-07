@@ -1,7 +1,6 @@
 {
-    "failureReason": null,
+    "badReason": "",
     "bIsPerturbative": true,
-    "complexMin": false,
     "jumpsv1": [],
     "jumpsv2": [],
     "jumpsv3": [
@@ -27,7 +26,6 @@
         ]
     ],
     "strong": 0.8079724404714201,
-    "UltraSoftTemp": null,
     "bmNumber": 1,
     "bmInput": {
         "thetaCPV": 2.0943951023931953,

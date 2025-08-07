@@ -8,20 +8,15 @@ def jumpFinder(array: np.ndarray[float])-> np.ndarray[int]:
     return np.nonzero(np.abs(array) > 0.3)[0]
 
 def interpretData(result: dict, index: int, bmInput: dict[str, float]):
-    interpResult = {"failureReason": result["failureReason"],
+    interpResult = {"badReason": result["badReason"],
                     "bIsPerturbative": result["bIsPerturbative"],
-                    "complexMin": True if result["complex"] =="complex" else False,
                     "jumpsv1": [],
                     "jumpsv2": [],
                     "jumpsv3": [],
                     "strong": False,
-                    "UltraSoftTemp": result["UltraSoftTemp"],
                     "bmNumber": index,
                     "bmInput": bmInput}
 
-    if result["failureReason"]:
-        return interpResult 
-    
     v1Dimless = makeFieldDimensionless(result["T"], result["minimumLocation"][0])
     v2Dimless = makeFieldDimensionless(result["T"], result["minimumLocation"][1])
     v3Dimless = makeFieldDimensionless(result["T"], result["minimumLocation"][2])

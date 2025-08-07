@@ -16,12 +16,12 @@
         -586980.3405387505
     ],
     "valueVeffImag": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
     ],
     "complex": false,
     "minimumLocation": [
@@ -51,6 +51,5 @@
         ]
     ],
     "bIsPerturbative": true,
-    "UltraSoftTemp": null,
-    "failureReason": null
+    "badReason": ""
 }

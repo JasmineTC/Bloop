@@ -5,7 +5,7 @@ import scipy
 from dataclasses import dataclass, InitVar,field
 
 from ThreeHiggs.BmGenerator import bIsBounded
-from ThreeHiggs.PDGData import mHiggs, mTop, mW, mZ, higgsVEV
+from ThreeHiggs.PDGData import mTop, mW, mZ, higgsVEV
 
 def bIsPerturbative(
     paramValuesArray, 
@@ -41,12 +41,12 @@ def constructSplineDictArray(
         ## Hack to remove all the const entries in the array
         if np.all(solutionSoft[idx] == solutionSoft[idx][0]):
             continue
-        ## Can we find an interpolation method that works with complex muRange??
+        
         interpDict[ele] =  scipy.interpolate.CubicSpline(muRange, solutionSoft[idx])
     return interpDict
 
 @dataclass(frozen=True)
-class TraceFreeEnergyMinimum:
+class TrackVEV:
     TRange: tuple = (0,)
     
     pertSymbols: frozenset = frozenset({1})
@@ -70,85 +70,11 @@ class TraceFreeEnergyMinimum:
     def __post_init__(self, config: dict):
         if config:
             self.__init__(**config)
-            
-    def isBad(self, T, 
-               minimumLocation, 
-               status):
-        ## This is a hack to remove bad benchmark points
-        if T == self.TRange[0] and (minimumLocation[0] > 1 or minimumLocation[1] > 1):
-            return "v3NotGlobalMin"
-        if status == "NaN": 
-            return "MinimisationFailed"
-        return False
     
-    
-    def updateTDependentConsts(self, T, inputArray):
-        matchingScale = 4.*pi*exp(-np.euler_gamma) * T
-        Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
-        
-        inputArray[self.allSymbols.index("RGScale")] = matchingScale
-        inputArray[self.allSymbols.index("T")] = T
-        inputArray[self.allSymbols.index("Lb")] = Lb
-        inputArray[self.allSymbols.index("Lf")] = Lb + self.Lfconst
-        return inputArray
-    
-    def updateParams4DRan(
-            self, 
-            betaSpline4D, 
-            array
-    ):
-        muEvaulate = array[self.allSymbols.index("RGScale")]
-        for key, spline in betaSpline4D.items():
-            # Taking real part to avoid complex to real cast warning
-            array[self.allSymbols.index(key)] = spline(np.real(muEvaulate))
-        return array
-    
-    def executeMinimisation(
-        self, 
-        T, 
-        minimumLocation,
-        betaSpline4D
-    ): 
-        paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.allSymbols), dtype="complex"))
-        paramValuesArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
-        paramValuesArray = self.dimensionalReduction.hardToSoft.evaluate(paramValuesArray)
-        paramValuesArray = self.dimensionalReduction.softScaleRGE.evaluate(paramValuesArray)
-        paramValuesArray = self.dimensionalReduction.softToUltraSoft.evaluate(paramValuesArray)
-        return ( 
-                *self.effectivePotential.findGlobalMinimum(
-                T, 
-                paramValuesArray, 
-                self.initialGuesses + [minimumLocation]
-            ), 
-            bIsPerturbative(paramValuesArray, self.pertSymbols, self.allSymbols), 
-            True, #bIsBounded(paramsForMatchingDict)
-            list(paramValuesArray),
-        )
-    
-    def populateLagranianParams4D(self, 
-        inputParams
-        ):
-        ## --- SM fermion and gauge boson masses---
-        ## How get g3 from PDG??
-        langrianParams4D = {"yt3": sqrt(2.) * mTop/ higgsVEV,
-                            "g1": 2.*sqrt(mZ**2 - mW**2)/ higgsVEV, ## U(1)
-                            "g2": 2.*mW/ higgsVEV,                  ## SU(2)
-                            "g3": sqrt(0.1183 * 4.0 * pi),          ## SU(3)
-                            ## BSM stuff from benchmark
-                            "RGScale":  inputParams["RGScale"],
-                            **inputParams["massTerms"],
-                            **inputParams["couplingValues"]}
-        
-        params4D = np.zeros(len(self.allSymbols))
-        for key, value in langrianParams4D.items():
-            params4D[self.allSymbols.index(key)] = value
-
-        return params4D
-            
-    def traceFreeEnergyMinimum(self, 
+    def trackVEV(self, 
         benchmark
         ):
-        lagranianParams4DArray = self.populateLagranianParams4D(benchmark)
+        lagranianParams4DArray = self.getLagranianParams4D(benchmark)
                
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
         ## usually a T-dependent scale 4.*pi*exp(-np.euler_gamma)*T 
@@ -168,8 +94,7 @@ class TraceFreeEnergyMinimum:
                                "complex": False,
                                "minimumLocation": [], 
                                "bIsPerturbative": True, 
-                               "UltraSoftTemp": None, 
-                               "failureReason": None}
+                               "badReason": None}
 
         counter = 0
         ## Initialise minimumLocation to feed into the minimisation algo so it can
@@ -182,26 +107,20 @@ class TraceFreeEnergyMinimum:
                 print (f'Start of temp = {T} loop')
             minimizationResults["T"].append(T)
             
-            minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T,
-                                                                                                           minimumLocation.round(5).tolist(),                      
-                                                                                                           betaSpline4D)
-            ##Not ideal name or structure imo
-            isBadState = self.isBad(T, minimumLocation, status)
-            if isBadState:
-                minimizationResults["failureReason"] = isBadState
-                break
+            minimumLocation, minimumValueReal, minimumValueImag, isPert, isBounded  = self.computeVEV(
+                T,
+                minimumLocation.round(5).tolist(),                      
+                betaSpline4D
+            )
+
+            if not minimizationResults["badReason"]:
+                minimizationResults["badReason"] = self.isBad(T, minimumLocation, abs(minimumValueImag/minimumValueReal))
+
+
             minimizationResults["valueVeffReal"].append(minimumValueReal)
             minimizationResults["valueVeffImag"].append(minimumValueImag)
             minimizationResults["minimumLocation"].append(minimumLocation)
             
-            if not minimizationResults["complex"]:
-                minimizationResults["complex"] = (status == "complex")
-            
-            if not minimizationResults["UltraSoftTemp"]:
-                if self.effectivePotential.bReachedUltraSoftScale(minimumLocation,
-                                                                  T, 
-                                                                  params3D): 
-                    minimizationResults["UltraSoftTemp"] = T
 
             if np.all( minimumLocation < 0.5):
                 if self.verbose:
@@ -214,6 +133,82 @@ class TraceFreeEnergyMinimum:
         
         return minimizationResults
     
+    def computeVEV(
+        self, 
+        T, 
+        minimumLocation,
+        betaSpline4D
+    ): 
+        paramValuesArray = self.getTConsts(T, np.zeros(len(self.allSymbols), dtype="complex"))
+        paramValuesArray = self.runParams4D(betaSpline4D, paramValuesArray)
+        paramValuesArray = self.dimensionalReduction.hardToSoft.evaluate(paramValuesArray)
+        paramValuesArray = self.dimensionalReduction.softScaleRGE.evaluate(paramValuesArray)
+        paramValuesArray = self.dimensionalReduction.softToUltraSoft.evaluate(paramValuesArray)
+        return ( 
+                *self.effectivePotential.findGlobalMinimum(
+                T, 
+                paramValuesArray, 
+                self.initialGuesses + [minimumLocation]
+            ), 
+            bIsPerturbative(paramValuesArray, self.pertSymbols, self.allSymbols), 
+            True, #bIsBounded(paramsForMatchingDict)
+        )
+    
+    def getLagranianParams4D(self, 
+        inputParams
+        ):
+        ## --- SM fermion and gauge boson masses---
+        ## How get g3 from PDG??
+        langrianParams4D = {"yt3": sqrt(2.) * mTop/ higgsVEV,
+                            "g1": 2.*sqrt(mZ**2 - mW**2)/ higgsVEV, ## U(1)
+                            "g2": 2.*mW/ higgsVEV,                  ## SU(2)
+                            "g3": sqrt(0.1183 * 4.0 * pi),          ## SU(3)
+                            ## BSM stuff from benchmark
+                            "RGScale":  inputParams["RGScale"],
+                            **inputParams["massTerms"],
+                            **inputParams["couplingValues"]}
+        
+        params4D = np.zeros(len(self.allSymbols))
+        for key, value in langrianParams4D.items():
+            params4D[self.allSymbols.index(key)] = value
+
+        return params4D
+    
+    def getTConsts(self, T, inputArray):
+        matchingScale = 4.*pi*exp(-np.euler_gamma) * T
+        Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
+        
+        inputArray[self.allSymbols.index("RGScale")] = matchingScale
+        inputArray[self.allSymbols.index("T")] = T
+        inputArray[self.allSymbols.index("Lb")] = Lb
+        inputArray[self.allSymbols.index("Lf")] = Lb + self.Lfconst
+        return inputArray
+    
+    def runParams4D(
+            self, 
+            betaSpline4D, 
+            array
+    ):
+        muEvaulate = array[self.allSymbols.index("RGScale")]
+        for key, spline in betaSpline4D.items():
+            # Taking real part to avoid complex to real cast warning
+            array[self.allSymbols.index(key)] = spline(np.real(muEvaulate))
+        return array
+    
+    def isBad(self, T, 
+               minimumLocation, 
+               ratio):
+        bad = ""
+        ## This is a hack to remove bad benchmark points
+        if T == self.TRange[0] and (minimumLocation[0] > 1 or minimumLocation[1] > 1):
+            bad+= "v3NotGlobalMin"
+        if ratio > 1e-8:
+            bad+= " complex"
+        return bad
+    
+    
+    
+    ############################
     def plotPotential(self, benchmark:  dict[str: float]):
         ## This is just a trimmed version of trace free energy minimum Jasmine uses for plotting
         lagranianParams4DArray = self.populateLagranianParams4D(benchmark)

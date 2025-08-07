@@ -4,7 +4,7 @@ from pathlib import Path
 from pathos.multiprocessing import Pool
 from ijson import items
 
-from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
+from ThreeHiggs.TransitionFinder import TrackVEV
 from ThreeHiggs.GetLines import getLines
 from ThreeHiggs.EffectivePotential import EffectivePotential, cNlopt
 from ThreeHiggs.PlotResult import plotData
@@ -28,7 +28,7 @@ def _drange(
         start += decimal.Decimal(jump)
 
 def benchmarkDoing(
-    traceFreeEnergyMinimumInst,
+    trackVEV,
     args,
     benchmark
 ):
@@ -41,9 +41,9 @@ def benchmarkDoing(
     
     if False:
         ##THIS IS FOR JASMINE TO MAKE PLOTS - IGNORE
-        traceFreeEnergyMinimumInst.plotPotential(benchmark)
+        trackVEV.plotPotential(benchmark)
         exit()
-    minimizationResult = traceFreeEnergyMinimumInst.traceFreeEnergyMinimum(benchmark)
+    minimizationResult = trackVEV.trackVEV(benchmark)
   
     filename = f"{args.resultsDirectory}/BM_{benchmark['bmNumber']}"
     
@@ -70,16 +70,16 @@ def benchmarkDoing(
 def benchmarkLooping(
     args
 ):
-    traceFreeEnergyMinimumInst = setUpTraceFreeEnergyMinimum(args)
+    trackVEV = setUpTrackVEV(args)
     
     with open(args.benchmarkFile) as benchmarkFile:
         with Pool(args.cores) as pool:
             ## Apply might be better suited to avoid this lambda function side step
-            benchmarkDoingeWrap = lambda benchmark: benchmarkDoing(traceFreeEnergyMinimumInst, args, benchmark)
+            benchmarkDoingeWrap = lambda benchmark: benchmarkDoing(trackVEV, args, benchmark)
             pool.map(benchmarkDoingeWrap, (benchmark for benchmark in items(benchmarkFile, "item", use_float = True)))
 
 
-def setUpTraceFreeEnergyMinimum(
+def setUpTrackVEV(
     args
 ):
     pythonisedExpressions = json.load(open(args.pythonisedExpressionsFile, "r"))
@@ -147,7 +147,7 @@ def setUpTraceFreeEnergyMinimum(
     yukawaSymbols = [replaceGreekSymbols(item) for item in variableSymbols["yukawaSymbols"]]
     gaugeSymbols = [replaceGreekSymbols(item) for item in variableSymbols["gaugeSymbols"]]
     
-    return TraceFreeEnergyMinimum(
+    return TrackVEV(
         config = {"effectivePotential":effectivePotential, 
                 "dimensionalReduction": dimensionalReduction, 
                 "betaFunction4DExpression": ParsedExpressionSystemArray(
