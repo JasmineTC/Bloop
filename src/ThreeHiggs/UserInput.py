@@ -217,7 +217,7 @@ class UserInput(argparse.ArgumentParser):
         
         self.add_argument('--pythonisedExpressionsFile', 
                           action = 'store', 
-                          default = "Data/Z2_3HDM/pythonisedExpressionsFile.json",
+                          default = "ThreeHiggs/Data/Z2_3HDM/pythonisedExpressionsFile.json",
                           dest = 'pythonisedExpressionsFile',
                           metavar='')
     def parse(self):
