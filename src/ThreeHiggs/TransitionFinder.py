@@ -4,7 +4,7 @@ import scipy
 
 from dataclasses import dataclass, InitVar,field
 
-from ThreeHiggs.BmGenerator import bIsBounded
+# from ThreeHiggs.BmGenerator import bIsBounded
 from ThreeHiggs.PDGData import mTop, mW, mZ, higgsVEV
 
 def bIsPerturbative(
@@ -91,7 +91,6 @@ class TrackVEV:
         minimizationResults = {"T": [],
                                "valueVeffReal": [],
                                "valueVeffImag": [],
-                               "complex": False,
                                "minimumLocation": [], 
                                "bIsPerturbative": True, 
                                "badReason": None}
