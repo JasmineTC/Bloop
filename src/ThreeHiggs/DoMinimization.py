@@ -2,6 +2,19 @@ import json
 from typing import Generator
 import decimal
 
+from pathlib import Path
+from ThreeHiggs.ParsedExpression import (ParsedExpressionSystemArray,
+                                         MassMatrix,
+                                         RotationMatrix)
+from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
+from ThreeHiggs.GetLines import getLines
+from ThreeHiggs.EffectivePotential import EffectivePotential, cNlopt
+from ThreeHiggs.PlotResult import plotData
+from ThreeHiggs.ProcessMinimization import interpretData
+from ThreeHiggs.DimensionalReduction import DimensionalReduction
+from ThreeHiggs.PythoniseMathematica import replaceGreekSymbols
+from pathos.multiprocessing import Pool
+
 ## This (sometimes) avoids floating point error in T gotten by np.arange or linspace
 ## However one must be careful as 1 = decimal.Decimal(1.000000000000001) 
 def _drange(start: float, end: float, jump: str) -> Generator:
@@ -19,17 +32,13 @@ def _doMinimization(parameters):
     pertSymbols = parameters["pertSymbols"] 
     args = parameters["args"]
     allSymbols = parameters["allSymbols"]
-    
-
-    if args.verbose:
-        print(f"Starting benchmark: {benchmark['bmNumber']}")
 
     if not args.firstBenchmark <= benchmark['bmNumber'] <= args.lastBenchmark:
-        if args.verbose:
-            print(f"Benchmark {benchmark['bmNumber']} has been rejected as outside benchmark range.")
-
         return
-    from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
+    
+    if args.verbose:
+        print(f"Starting benchmark: {benchmark['bmNumber']}")
+    
     traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
                                                                   "dimensionalReduction": dimensionalReduction, 
                                                                   "betaFunction4DExpression": betaFunction4DExpression,
@@ -48,7 +57,6 @@ def _doMinimization(parameters):
   
     filename = f"{args.resultsDirectory}/BM_{benchmark['bmNumber']}"
     
-    from pathlib import Path
     Path(args.resultsDirectory).mkdir(parents = True, exist_ok = True)
     if args.bSave:
         if args.verbose:
@@ -59,29 +67,23 @@ def _doMinimization(parameters):
         if args.verbose:
             print(f"Plotting {benchmark['bmNumber']}")
 
-        from ThreeHiggs.PlotResult import plotData
+
         plotData(minimizationResult, benchmark['bmNumber'], args.loopOrder, filename)
 
     if args.bProcessMin:
         if args.verbose:
             print(f"Processing {benchmark['bmNumber']} to {filename+'_interp'}")
-        from ThreeHiggs.ProcessMinimization import interpretData
         open(f"{filename}_interp.json", "w").write(json.dumps(interpretData(minimizationResult,
                                                                         benchmark["bmNumber"],
                                                                         benchmark["bmInput"]),
                                                          indent = 4))
-from ThreeHiggs.GetLines import getLines        
+        
 def minimization(args):
     pythonisedExpressions = json.load(open(args.pythonisedExpressionsFile, "r"))
     allSymbols = pythonisedExpressions["allSymbols"]["allSymbols"]
 
-    variableSymbols =  getLines( "Data/Variables/LagranianSymbols.json", mode = "json") 
+    variableSymbols =  getLines(args.lagranianVariables, mode = "json") 
     
-    from ThreeHiggs.ParsedExpression import (ParsedExpressionSystem,
-                                             ParsedExpressionSystemArray,
-                                             MassMatrix,
-                                             RotationMatrix)
-    from ThreeHiggs.EffectivePotential import EffectivePotential, cNlopt
     nloptInst = cNlopt(config = {"nbrVars": len(variableSymbols["fieldSymbols"]), 
                                  "absGlobalTol" : args.absGlobalTolerance,
                                  "relGlobalTol" :args.relGlobalTolerance, 
@@ -116,8 +118,7 @@ def minimization(args):
                                                                         pythonisedExpressions["veffArray"]["fileName"]),
                                             allSymbols) 
 
-    from ThreeHiggs.DimensionalReduction import DimensionalReduction
-    from ThreeHiggs.ParsedExpression import ParsedExpressionSystemArray
+
     dimensionalReduction = DimensionalReduction(config = {
         "hardToSoft": ParsedExpressionSystemArray(
             pythonisedExpressions["hardToSoft"]["expressions"], 
@@ -136,7 +137,6 @@ def minimization(args):
         )
     })
     
-    from ThreeHiggs.PythoniseMathematica import replaceGreekSymbols
     fourPointSymbols = [replaceGreekSymbols(item) for item in variableSymbols["fourPointSymbols"]]
     yukawaSymbols = [replaceGreekSymbols(item) for item in variableSymbols["yukawaSymbols"]]
     gaugeSymbols = [replaceGreekSymbols(item) for item in variableSymbols["gaugeSymbols"]]
@@ -151,7 +151,6 @@ def minimization(args):
                             "args": args,
                             "allSymbols": allSymbols} 
         if args.bPool:
-            from pathos.multiprocessing import Pool
             with Pool(args.cores) as pool:
                 from ijson import items
                 pool.map(_doMinimization, (minimizationDict | {"benchmark": item} for item in items(benchmarkFile, "item", use_float = True)))
