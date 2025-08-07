@@ -93,7 +93,7 @@ class UserInput(argparse.ArgumentParser):
 
         self.add_argument('--benchmarkFile', 
                   action = 'store', 
-                  default = "Benchmarks/handPicked.json",
+                  default = "ThreeHiggs/Data/Z2_3HDM/Benchmarks/handPicked.json",
                   dest = 'benchmarkFile',
                   metavar='')
         
