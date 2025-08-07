@@ -12,11 +12,11 @@ from glob import glob
 
 from ThreeHiggs.ParsedExpression import ParsedExpression, MassMatrix
 from ThreeHiggs.EffectivePotential import cNlopt
-from ThreeHiggs.PDGData import mHiggs, mTop, mW, mZ, higgsVEV
+from ThreeHiggs.PDGData import mHiggs, higgsVEV
 
 def bIsBounded(
-        params
-    ):
+    params
+):
     ## Taking equations 26-31 from the draft that ensure the potential is bounded from below.
     if not params["lam11"] > 0:
         return False
@@ -39,9 +39,11 @@ def bIsBounded(
         return False
     return True
 
-def bPhysicalMinimum(nloptInst,
-                     potential,
-                     params):
+def bPhysicalMinimum(
+    nloptInst,
+    potential,
+    params
+):
     ## Move these to user args or somewhere out of the way
     minimumInitialGuesses = [[0,0,0],
                              [0,0,246],
@@ -67,20 +69,22 @@ def bPhysicalMinimum(nloptInst,
         if minValueTemp < minValue:
             minLocation, minValue =  minLocationTemp, minValueTemp
             
-    return np.all(np.isclose(minLocation, [0,0, 246], atol=1))
+    return np.all(np.isclose(minLocation, [0,0, higgsVEV], atol=1))
       
-def _lagranianParamGen(mS1,
-                       delta12, 
-                       delta1c, 
-                       deltac, 
-                       ghDM, 
-                       thetaCPV, 
-                       darkHieracy, 
-                       bmNumber):
+def _lagranianParamGen(
+        mS1,
+        delta12, 
+        delta1c, 
+        deltac, 
+        ghDM, 
+        thetaCPV, 
+        darkHieracy, 
+        bmNumber
+    ):
     ## SM params
-    vsq = 246.22**2
-    mu3sq = 125**2/2 ## Higgs mass*2/2
-    lam33 = ((125.00)**2 / (2.*vsq)) ## Higgs mass^2 / 2*vev**2
+    vsq = higgsVEV**2
+    mu3sq = mHiggs**2 /2
+    lam33 = mu3sq/ vsq
     
     ## ~~~ USER BSM PHYSICS ~~~
     mS2 = delta12 + mS1
@@ -137,12 +141,12 @@ def _lagranianParamGen(mS1,
     return paramsDict
 
 def checkPhysical(
-        params, 
-        nloptInst, 
-        potential, 
-        chargedMassMatrix, 
-        neutralMassMatrix
-    ):
+    params, 
+    nloptInst, 
+    potential, 
+    chargedMassMatrix, 
+    neutralMassMatrix
+):
     params["v1"] = 0
     params["v2"] = 0
     params["v3"] = 246.22
@@ -175,12 +179,12 @@ def checkPhysical(
     
 
 def _randomBmParam(
-        randomNum, 
-        nloptInst, 
-        potential, 
-        chargedMassMatrix, 
-        neutralMassMatrix
-    ):
+    randomNum, 
+    nloptInst, 
+    potential, 
+    chargedMassMatrix, 
+    neutralMassMatrix
+):
     
     bmdictList = []
     ## TODO put in some upper limit for this while loop
@@ -215,11 +219,11 @@ def _randomBmParam(
     return bmdictList
 
 def _handPickedBm(
-        nloptInst, 
-        potential, 
-        chargedMassMatrix, 
-        neutralMassMatrix
-    ):
+    nloptInst, 
+    potential, 
+    chargedMassMatrix, 
+    neutralMassMatrix
+):
     
     bmdictList = []
     ## Move this to userArg or something
@@ -245,7 +249,9 @@ def _handPickedBm(
 
     return bmdictList
 
-def _strongSubSet(prevResultDir):
+def _strongSubSet(
+    prevResultDir
+):
     bmdictList = []
     
     for fileName in glob(join(prevResultDir, '*.json')):
@@ -264,8 +270,8 @@ def _strongSubSet(prevResultDir):
     return bmdictList
 
 def generateBenchmarks(
-        args
-    ):
+    args
+):
     
     (output_file := Path(args.benchmarkFile)).parent.mkdir(exist_ok=True, 
                                                              parents=True)   
@@ -338,7 +344,6 @@ class BmGeneratorUnitTests(TestCase):
         self.assertEqual(True, bIsBounded(source))
         
     def test_lagranianParamGen(self):
-        reference = {'bmNumber': 0, 'RGScale': 91.1876, 'bmInput': {'thetaCPV': 3.11308902835221, 'ghDM': 0.15520161865427817, 'mS1': 89.15641588128479, 'delta12': 87.17952518246265, 'delta1c': 14.020273320699415, 'deltac': 5.129099092707543, 'darkHieracy': 1}, 'massTerms': {'mu12sqRe': 542.3572917258725, 'mu12sqIm': 0, 'mu2sq': -9572.907910345595, 'mu3sq': 7812.5, 'mu1sq': -9572.907910345595}, 'couplingValues': {'lam1Re': 0.1, 'lam1Im': 0.0, 'lam2Re': -0.08646867756101999, 'lam2Im': 0.0024653384763691356, 'lam11': 0.11, 'lam22': 0.12, 'lam12': 0.13, 'lam12p': 0.14, 'lam23': 0.05327497010465927, 'lam23p': 0.274933662245124, 'lam3Re': -0.08646867756101999, 'lam3Im': 0.0024653384763691356, 'lam31': 0.05327497010465927, 'lam31p': 0.274933662245124, 'lam33': 0.12886749199352251}}
+        reference = {'bmNumber': 0, 'RGScale': 91.1876, 'bmInput': {'thetaCPV': 3.11308902835221, 'ghDM': 0.15520161865427817, 'mS1': 89.15641588128479, 'delta12': 87.17952518246265, 'delta1c': 14.020273320699415, 'deltac': 5.129099092707543, 'darkHieracy': 1}, 'massTerms': {'mu12sqRe': 542.3572917258725, 'mu12sqIm': 0, 'mu2sq': -9572.921658139769, 'mu3sq': 7837.46120740695, 'mu1sq': -9572.921658139769}, 'couplingValues': {'lam1Re': 0.1, 'lam1Im': 0, 'lam2Re': -0.08646893024645114, 'lam2Im': 0.002465345680771162, 'lam11': 0.11, 'lam22': 0.12, 'lam12': 0.13, 'lam12p': 0.14, 'lam23': 0.05327467224675443, 'lam23p': 0.27493446567745283, 'lam3Re': -0.08646893024645114, 'lam3Im': 0.002465345680771162, 'lam31': 0.05327467224675443, 'lam31p': 0.27493446567745283, 'lam33': 0.1292796058722875}}   
         source = (89.15641588128479, 87.17952518246265, 14.020273320699415, 5.129099092707543, 0.15520161865427817, 3.11308902835221, 1, 0)
-        
         self.assertEqual( reference, _lagranianParamGen(*source ) )
