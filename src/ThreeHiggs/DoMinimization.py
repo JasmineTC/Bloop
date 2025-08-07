@@ -27,7 +27,7 @@ def _drange(
         yield float(start)
         start += decimal.Decimal(jump)
 
-def _doMinimization(
+def benchmarkDoing(
     traceFreeEnergyMinimumInst,
     args,
     benchmark
@@ -67,7 +67,19 @@ def _doMinimization(
                                                                         benchmark["bmInput"]),
                                                          indent = 4))
         
-def minimization(
+def benchmarkLooping(
+    args
+):
+    traceFreeEnergyMinimumInst = setUpTraceFreeEnergyMinimum(args)
+    
+    with open(args.benchmarkFile) as benchmarkFile:
+        with Pool(args.cores) as pool:
+            ## Apply might be better suited to avoid this lambda function side step
+            benchmarkDoingeWrap = lambda benchmark: benchmarkDoing(traceFreeEnergyMinimumInst, args, benchmark)
+            pool.map(benchmarkDoingeWrap, (benchmark for benchmark in items(benchmarkFile, "item", use_float = True)))
+
+
+def setUpTraceFreeEnergyMinimum(
     args
 ):
     pythonisedExpressions = json.load(open(args.pythonisedExpressionsFile, "r"))
@@ -135,7 +147,7 @@ def minimization(
     yukawaSymbols = [replaceGreekSymbols(item) for item in variableSymbols["yukawaSymbols"]]
     gaugeSymbols = [replaceGreekSymbols(item) for item in variableSymbols["gaugeSymbols"]]
     
-    traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(
+    return TraceFreeEnergyMinimum(
         config = {"effectivePotential":effectivePotential, 
                 "dimensionalReduction": dimensionalReduction, 
                 "betaFunction4DExpression": ParsedExpressionSystemArray(
@@ -156,9 +168,3 @@ def minimization(
                 }
     )
     
-    with open(args.benchmarkFile) as benchmarkFile:
-        with Pool(args.cores) as pool:
-            ## Apply might be better suited to avoid this lambda function side step
-            doMinimizationWrapper = lambda benchmark: _doMinimization(traceFreeEnergyMinimumInst, args, benchmark)
-            pool.map(doMinimizationWrapper, (benchmark for benchmark in items(benchmarkFile, "item", use_float = True)))
-

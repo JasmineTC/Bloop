@@ -19,5 +19,5 @@ if args.firstStage <= Stages.generateBenchmark <= args.lastStage:
 if args.firstStage <= Stages.doMinimization <= args.lastStage:
     if args.verbose:
         print("Minimization stage started")
-    from ThreeHiggs.DoMinimization import minimization
-    minimization(args)
+    from ThreeHiggs.DoMinimization import benchmarkLooping
+    benchmarkLooping(args)
