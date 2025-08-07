@@ -1,8 +1,11 @@
+from math import sqrt, pi, log, exp
 import numpy as np
 import scipy
-from math import sqrt, pi, log, exp
+
 from dataclasses import dataclass, InitVar,field
+
 from ThreeHiggs.BmGenerator import bIsBounded
+from ThreeHiggs.PDGData import mHiggs, mTop, mW, mZ, higgsVEV
 
 def bIsPerturbative(
     paramValuesArray, 
@@ -125,14 +128,11 @@ class TraceFreeEnergyMinimum:
     def populateLagranianParams4D(self, 
         inputParams
         ):
-        higgsVev = 246.22  #Consider using Fermi constant instead
         ## --- SM fermion and gauge boson masses---
-        MW = 80.377 
-        MZ = 91.1876 
-        MTop = 172.76
-        langrianParams4D = {"yt3": sqrt(2.) * MTop/ higgsVev,
-                            "g1": 2.*sqrt(MZ**2 - MW**2)/ higgsVev, ## U(1)
-                            "g2": 2.*MW/ higgsVev,                  ## SU(2)
+        ## How get g3 from PDG??
+        langrianParams4D = {"yt3": sqrt(2.) * mTop/ higgsVEV,
+                            "g1": 2.*sqrt(mZ**2 - mW**2)/ higgsVEV, ## U(1)
+                            "g2": 2.*mW/ higgsVEV,                  ## SU(2)
                             "g3": sqrt(0.1183 * 4.0 * pi),          ## SU(3)
                             ## BSM stuff from benchmark
                             "RGScale":  inputParams["RGScale"],
