@@ -35,7 +35,7 @@ def bIsBounded(
             params["lam33"]*lamx**2 + params["lam11"]*lamz**2 + params["lam22"]*lamy**2 -params["lam11"]*params["lam22"]*params["lam33"] - 2*lamx*lamy*lamz < 0):
         return False
     return True
-
+#random comment
 def bPhysicalMinimum(nloptInst,
                      potential,
                      params):
