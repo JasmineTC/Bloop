@@ -3,13 +3,16 @@ If the functions return True then the benchmark point is allowed by those constr
 Variables that are bools are denoted with a b prefix'''
 
 import math as m
-from json import load, dump
-from ThreeHiggs.ParsedExpression import ParsedExpression, MassMatrix
-from ThreeHiggs.EffectivePotential import cNlopt
-from pathlib import Path
 import numpy as np
+
+from json import load, dump
+from pathlib import Path
 from os.path import join
 from glob import glob
+
+from ThreeHiggs.ParsedExpression import ParsedExpression, MassMatrix
+from ThreeHiggs.EffectivePotential import cNlopt
+from ThreeHiggs.PDGData import mHiggs, mTop, mW, mZ, higgsVEV
 
 def bIsBounded(
         params
@@ -35,7 +38,7 @@ def bIsBounded(
             params["lam33"]*lamx**2 + params["lam11"]*lamz**2 + params["lam22"]*lamy**2 -params["lam11"]*params["lam22"]*params["lam33"] - 2*lamx*lamy*lamz < 0):
         return False
     return True
-#random comment
+
 def bPhysicalMinimum(nloptInst,
                      potential,
                      params):
