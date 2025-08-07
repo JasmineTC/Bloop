@@ -107,18 +107,17 @@ class TrackVEV:
                 print (f'Start of temp = {T} loop')
             minimizationResults["T"].append(T)
             
-            minimumLocation, minimumValueReal, minimumValueImag, isPert, isBounded  = self.computeVEV(
+            minimumLocation, minimumValue, isPert, isBounded  = self.computeVEV(
                 T,
                 minimumLocation.round(5).tolist(),                      
                 betaSpline4D
             )
-
+            
             if not minimizationResults["badReason"]:
-                minimizationResults["badReason"] = self.isBad(T, minimumLocation, abs(minimumValueImag/minimumValueReal))
+                minimizationResults["badReason"] = self.isBad(T, minimumLocation, abs(minimumValue.imag/minimumValue.real))
 
-
-            minimizationResults["valueVeffReal"].append(minimumValueReal)
-            minimizationResults["valueVeffImag"].append(minimumValueImag)
+            minimizationResults["valueVeffReal"].append(minimumValue.real)
+            minimizationResults["valueVeffImag"].append(minimumValue.imag)
             minimizationResults["minimumLocation"].append(minimumLocation)
             
 

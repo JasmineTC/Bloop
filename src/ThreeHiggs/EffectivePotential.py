@@ -176,12 +176,10 @@ class EffectivePotential:
             if result[1] < bestResult[1]:
                 bestResult = result
                 
-        ## Compute the potential at minimum to check if its complex
-        potentialAtMin = self.evaluatePotential(bestResult[0],
+        ## Potential computed again in case its complex
+        return bestResult[0], self.evaluatePotential(bestResult[0],
                                                 T, 
                                                 params3D) 
-
-        return bestResult[0], potentialAtMin.real, potentialAtMin.imag
     
     
     ##Jasmine plotting tools
