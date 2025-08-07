@@ -4,8 +4,8 @@ import scipy
 
 from dataclasses import dataclass, InitVar,field
 
-from ThreeHiggs.BmGenerator import bIsBounded
-from ThreeHiggs.PDGData import mHiggs, mTop, mW, mZ, higgsVEV
+# from ThreeHiggs.BmGenerator import bIsBounded
+from ThreeHiggs.PDGData import mTop, mW, mZ, higgsVEV
 
 def bIsPerturbative(
     paramValuesArray, 
@@ -41,12 +41,12 @@ def constructSplineDictArray(
         ## Hack to remove all the const entries in the array
         if np.all(solutionSoft[idx] == solutionSoft[idx][0]):
             continue
-        ## Can we find an interpolation method that works with complex muRange??
+        
         interpDict[ele] =  scipy.interpolate.CubicSpline(muRange, solutionSoft[idx])
     return interpDict
 
 @dataclass(frozen=True)
-class TraceFreeEnergyMinimum:
+class TrackVEV:
     TRange: tuple = (0,)
     
     pertSymbols: frozenset = frozenset({1})
@@ -70,47 +70,75 @@ class TraceFreeEnergyMinimum:
     def __post_init__(self, config: dict):
         if config:
             self.__init__(**config)
-            
-    def isBad(self, T, 
-               minimumLocation, 
-               status):
-        ## This is a hack to remove bad benchmark points
-        if T == self.TRange[0] and (minimumLocation[0] > 1 or minimumLocation[1] > 1):
-            return "v3NotGlobalMin"
-        if status == "NaN": 
-            return "MinimisationFailed"
-        return False
     
-    
-    def updateTDependentConsts(self, T, inputArray):
-        matchingScale = 4.*pi*exp(-np.euler_gamma) * T
-        Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
+    def trackVEV(self, 
+        benchmark
+        ):
+        lagranianParams4DArray = self.getLagranianParams4D(benchmark)
+               
+        ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
+        ## usually a T-dependent scale 4.*pi*exp(-np.euler_gamma)*T 
+        ## TODO FIX for when user RGscale < 7T!!!
+        muRange = np.linspace(lagranianParams4DArray[self.allSymbols.index("RGScale")], 
+                              7.3 * self.TRange[-1],
+                              len(self.TRange)*10)
         
-        inputArray[self.allSymbols.index("RGScale")] = matchingScale
-        inputArray[self.allSymbols.index("T")] = T
-        inputArray[self.allSymbols.index("Lb")] = Lb
-        inputArray[self.allSymbols.index("Lf")] = Lb + self.Lfconst
-        return inputArray
+        betaSpline4D = constructSplineDictArray(self.betaFunction4DExpression, 
+                                                muRange, 
+                                                lagranianParams4DArray, 
+                                                self.allSymbols)
+        
+        minimizationResults = {"T": [],
+                               "valueVeffReal": [],
+                               "valueVeffImag": [],
+                               "minimumLocation": [], 
+                               "bIsPerturbative": True, 
+                               "badReason": None}
+
+        counter = 0
+        ## Initialise minimumLocation to feed into the minimisation algo so it can
+        ## use the location of the previous minimum as a guess for the next
+        ## Not ideal as the code has to repeat an initial guess on first T
+        minimumLocation = np.array(self.initialGuesses[0])
+        
+        for T in self.TRange:
+            if self.verbose:
+                print (f'Start of temp = {T} loop')
+            minimizationResults["T"].append(T)
+            
+            minimumLocation, minimumValue, isPert, isBounded  = self.computeVEV(
+                T,
+                minimumLocation.round(5).tolist(),                      
+                betaSpline4D
+            )
+            
+            if not minimizationResults["badReason"]:
+                minimizationResults["badReason"] = self.isBad(T, minimumLocation, abs(minimumValue.imag/minimumValue.real))
+
+            minimizationResults["valueVeffReal"].append(minimumValue.real)
+            minimizationResults["valueVeffImag"].append(minimumValue.imag)
+            minimizationResults["minimumLocation"].append(minimumLocation)
+            
+
+            if np.all( minimumLocation < 0.5):
+                if self.verbose:
+                    print (f"Symmetric phase found at temp {T}")
+                if counter == 3:
+                    break
+                counter += 1
+            
+        minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
+        
+        return minimizationResults
     
-    def updateParams4DRan(
-            self, 
-            betaSpline4D, 
-            array
-    ):
-        muEvaulate = array[self.allSymbols.index("RGScale")]
-        for key, spline in betaSpline4D.items():
-            # Taking real part to avoid complex to real cast warning
-            array[self.allSymbols.index(key)] = spline(np.real(muEvaulate))
-        return array
-    
-    def executeMinimisation(
+    def computeVEV(
         self, 
         T, 
         minimumLocation,
         betaSpline4D
     ): 
-        paramValuesArray = self.updateTDependentConsts(T, np.zeros(len(self.allSymbols), dtype="complex"))
-        paramValuesArray = self.updateParams4DRan(betaSpline4D, paramValuesArray)
+        paramValuesArray = self.getTConsts(T, np.zeros(len(self.allSymbols), dtype="complex"))
+        paramValuesArray = self.runParams4D(betaSpline4D, paramValuesArray)
         paramValuesArray = self.dimensionalReduction.hardToSoft.evaluate(paramValuesArray)
         paramValuesArray = self.dimensionalReduction.softScaleRGE.evaluate(paramValuesArray)
         paramValuesArray = self.dimensionalReduction.softToUltraSoft.evaluate(paramValuesArray)
@@ -122,10 +150,9 @@ class TraceFreeEnergyMinimum:
             ), 
             bIsPerturbative(paramValuesArray, self.pertSymbols, self.allSymbols), 
             True, #bIsBounded(paramsForMatchingDict)
-            list(paramValuesArray),
         )
     
-    def populateLagranianParams4D(self, 
+    def getLagranianParams4D(self, 
         inputParams
         ):
         ## --- SM fermion and gauge boson masses---
@@ -144,76 +171,42 @@ class TraceFreeEnergyMinimum:
             params4D[self.allSymbols.index(key)] = value
 
         return params4D
-            
-    def traceFreeEnergyMinimum(self, 
-        benchmark
-        ):
-        lagranianParams4DArray = self.populateLagranianParams4D(benchmark)
-               
-        ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
-        ## usually a T-dependent scale 4.*pi*exp(-np.euler_gamma)*T 
-        ## TODO FIX for when user RGscale < 7T!!!
-        muRange = np.linspace(lagranianParams4DArray[self.allSymbols.index("RGScale")], 
-                              7.3 * self.TRange[-1],
-                              len(self.TRange)*10)
-        
-        betaSpline4D = constructSplineDictArray(self.betaFunction4DExpression, 
-                                                muRange, 
-                                                lagranianParams4DArray, 
-                                                self.allSymbols)
-        
-        minimizationResults = {"T": [],
-                               "valueVeffReal": [],
-                               "valueVeffImag": [],
-                               "complex": False,
-                               "minimumLocation": [], 
-                               "bIsPerturbative": True, 
-                               "UltraSoftTemp": None, 
-                               "failureReason": None}
-
-        counter = 0
-        ## Initialise minimumLocation to feed into the minimisation algo so it can
-        ## use the location of the previous minimum as a guess for the next
-        ## Not ideal as the code has to repeat an initial guess on first T
-        minimumLocation = np.array(self.initialGuesses[0])
-        
-        for T in self.TRange:
-            if self.verbose:
-                print (f'Start of temp = {T} loop')
-            minimizationResults["T"].append(T)
-            
-            minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T,
-                                                                                                           minimumLocation.round(5).tolist(),                      
-                                                                                                           betaSpline4D)
-            ##Not ideal name or structure imo
-            isBadState = self.isBad(T, minimumLocation, status)
-            if isBadState:
-                minimizationResults["failureReason"] = isBadState
-                break
-            minimizationResults["valueVeffReal"].append(minimumValueReal)
-            minimizationResults["valueVeffImag"].append(minimumValueImag)
-            minimizationResults["minimumLocation"].append(minimumLocation)
-            
-            if not minimizationResults["complex"]:
-                minimizationResults["complex"] = (status == "complex")
-            
-            if not minimizationResults["UltraSoftTemp"]:
-                if self.effectivePotential.bReachedUltraSoftScale(minimumLocation,
-                                                                  T, 
-                                                                  params3D): 
-                    minimizationResults["UltraSoftTemp"] = T
-
-            if np.all( minimumLocation < 0.5):
-                if self.verbose:
-                    print (f"Symmetric phase found at temp {T}")
-                if counter == 3:
-                    break
-                counter += 1
-            
-        minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
-        
-        return minimizationResults
     
+    def getTConsts(self, T, inputArray):
+        matchingScale = 4.*pi*exp(-np.euler_gamma) * T
+        Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
+        
+        inputArray[self.allSymbols.index("RGScale")] = matchingScale
+        inputArray[self.allSymbols.index("T")] = T
+        inputArray[self.allSymbols.index("Lb")] = Lb
+        inputArray[self.allSymbols.index("Lf")] = Lb + self.Lfconst
+        return inputArray
+    
+    def runParams4D(
+            self, 
+            betaSpline4D, 
+            array
+    ):
+        muEvaulate = array[self.allSymbols.index("RGScale")]
+        for key, spline in betaSpline4D.items():
+            # Taking real part to avoid complex to real cast warning
+            array[self.allSymbols.index(key)] = spline(np.real(muEvaulate))
+        return array
+    
+    def isBad(self, T, 
+               minimumLocation, 
+               ratio):
+        bad = ""
+        ## This is a hack to remove bad benchmark points
+        if T == self.TRange[0] and (minimumLocation[0] > 1 or minimumLocation[1] > 1):
+            bad+= "v3NotGlobalMin"
+        if ratio > 1e-8:
+            bad+= " complex"
+        return bad
+    
+    
+    
+    ############################
     def plotPotential(self, benchmark:  dict[str: float]):
         ## This is just a trimmed version of trace free energy minimum Jasmine uses for plotting
         lagranianParams4DArray = self.populateLagranianParams4D(benchmark)

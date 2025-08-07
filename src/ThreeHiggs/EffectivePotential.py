@@ -176,60 +176,11 @@ class EffectivePotential:
             if result[1] < bestResult[1]:
                 bestResult = result
                 
-        ## Compute the potential at minimum to check if its complex
-        potentialAtMin = self.evaluatePotential(bestResult[0],
+        ## Potential computed again in case its complex
+        return bestResult[0], self.evaluatePotential(bestResult[0],
                                                 T, 
                                                 params3D) 
-        if abs(potentialAtMin.imag)/abs(potentialAtMin.real) > 1e-8: 
-            return bestResult[0], potentialAtMin.real, potentialAtMin.imag, "complex" ## Flag minimum with imag > tol
-
-        return bestResult[0], potentialAtMin.real, None, None
     
-     
-    def getUltraSoftScale(self, paramDict, T: float) -> float:
-        '''Given a field input and temperature compute the scale of ultra soft physics 
-        which is g^2 T/ 16 pi, g is taken to be the largest coupling in the 
-        theory to give the tightest constraint'''
-
-        couplings = np.array([paramDict['lam1Re'], paramDict['lam1Im'],
-                              paramDict['lam11'], paramDict['lam22'],
-                              paramDict['lam12'], paramDict['lam12p'],
-                              paramDict['g1'], paramDict['g2'],
-                              paramDict['g3'], paramDict['lam33'],
-                              paramDict['lam2Re'], paramDict['lam2Im'],
-                              paramDict['lam23'], paramDict['lam23p'],
-                              paramDict['lam3Re'], paramDict['lam3Im'],
-                              paramDict['lam31'], paramDict['lam31p']]) 
-        return np.max(np.abs(couplings))**2 * T / (16*np.pi)
-
-    def bReachedUltraSoftScale(self, fields: list[complex], T: float, params3D) -> bool:
-        '''Check if we can trust the results by comparing the masses we find at the minimum to the ultra soft scale i.e.
-        Are all physical masses > g^2 T/16pi, we use the largest coupling in the theory to do the comparrsion 
-        --Note we expect some goldstone bosons from the symmetry breaking so we check the number of light modes = goldstone modes
-        ----Get someone to check the logic of this
-        2) Return true if # of light modes is less than the # of goldstone modes'''
-        goldStone = 0 if np.all(np.abs(fields) < 0.1) else 3
-        paramDict = compFieldDepParams(fields,
-                                T,
-                                params3D,
-                                self.allSymbols,
-                                self.fieldNames,
-                                self.scalarPermutationMatrix, 
-                                self.scalarMassMatrices, 
-                                self.scalarRotationMatrix,
-                                self.vectorShortHands,
-                                self.vectorMassesSquared,
-                                self.verbose)
-
-        ## Convert mass into real type to do comparisons 
-        massList = np.real([paramDict["MSsq01"], paramDict["MSsq02"],
-                            paramDict["MSsq03"], paramDict["MSsq04"],
-                            paramDict["MSsq05"], paramDict["MSsq06"],
-                            paramDict["MSsq07"], paramDict["MSsq08"],
-                            paramDict["MSsq09"], paramDict["MSsq10"],
-                            paramDict["MSsq11"], paramDict["MSsq12"]])
-    
-        return len([lowMass for lowMass in massList if lowMass < self.getUltraSoftScale(paramDict, T)]) > goldStone
     
     ##Jasmine plotting tools
     def plotPot(self, T, params3D, linestyle, v3Min, potMin, v3Max):
