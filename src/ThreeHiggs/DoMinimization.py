@@ -2,10 +2,8 @@ import json
 import decimal
 from pathlib import Path
 from pathos.multiprocessing import Pool
+from ijson import items
 
-from ThreeHiggs.ParsedExpression import (ParsedExpressionSystemArray,
-                                         MassMatrix,
-                                         RotationMatrix)
 from ThreeHiggs.TransitionFinder import TraceFreeEnergyMinimum
 from ThreeHiggs.GetLines import getLines
 from ThreeHiggs.EffectivePotential import EffectivePotential, cNlopt
@@ -13,7 +11,9 @@ from ThreeHiggs.PlotResult import plotData
 from ThreeHiggs.ProcessMinimization import interpretData
 from ThreeHiggs.DimensionalReduction import DimensionalReduction
 from ThreeHiggs.PythoniseMathematica import replaceGreekSymbols
-
+from ThreeHiggs.ParsedExpression import (ParsedExpressionSystemArray,
+                                         MassMatrix,
+                                         RotationMatrix)
 
 ## This (sometimes) avoids floating point error in T gotten by np.arange or linspace
 ## However one must be careful as 1 = decimal.Decimal(1.000000000000001) 
@@ -28,33 +28,17 @@ def _drange(
         start += decimal.Decimal(jump)
 
 def _doMinimization(
-    parameters
+    traceFreeEnergyMinimumInst,
+    args,
+    benchmark
 ):
-    ## This should be doable with **unpacking but difficult with pool (starmap?)
-    benchmark = parameters["benchmark"] 
-    effectivePotential = parameters["effectivePotential"] 
-    betaFunction4DExpression = parameters["betaFunction4DExpression"]
-    dimensionalReduction = parameters["dimensionalReduction"] 
-    pertSymbols = parameters["pertSymbols"] 
-    args = parameters["args"]
-    allSymbols = parameters["allSymbols"]
 
     if not args.firstBenchmark <= benchmark['bmNumber'] <= args.lastBenchmark:
         return
-    
+
     if args.verbose:
         print(f"Starting benchmark: {benchmark['bmNumber']}")
     
-    traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(config = {"effectivePotential":effectivePotential, 
-                                                                  "dimensionalReduction": dimensionalReduction, 
-                                                                  "betaFunction4DExpression": betaFunction4DExpression,
-                                                                  "TRange": tuple(_drange(args.TRangeStart, 
-                                                                       args.TRangeEnd, 
-                                                                       str(args.TRangeStepSize))),
-                                                                  "pertSymbols": pertSymbols,
-                                                                  "verbose": args.verbose,
-                                                                  "initialGuesses": args.initialGuesses,
-                                                                  "allSymbols": allSymbols})
     if False:
         ##THIS IS FOR JASMINE TO MAKE PLOTS - IGNORE
         traceFreeEnergyMinimumInst.plotPotential(benchmark)
@@ -72,7 +56,6 @@ def _doMinimization(
     if args.bPlot:
         if args.verbose:
             print(f"Plotting {benchmark['bmNumber']}")
-
 
         plotData(minimizationResult, benchmark['bmNumber'], args.loopOrder, filename)
 
@@ -92,40 +75,43 @@ def minimization(
 
     variableSymbols =  getLines(args.lagranianVariables, mode = "json") 
     
-    nloptInst = cNlopt(config = {"nbrVars": len(variableSymbols["fieldSymbols"]), 
-                                 "absGlobalTol" : args.absGlobalTolerance,
-                                 "relGlobalTol" :args.relGlobalTolerance, 
-                                 "absLocalTol" : args.absLocalTolerance, 
-                                 "relLocalTol" : args.relLocalTolerance,
-                                 "varLowerBounds" : args.varLowerBounds,
-                                 "varUpperBounds" : args.varUpperBounds})
+    nloptInst = cNlopt(config = 
+                    {"nbrVars": len(variableSymbols["fieldSymbols"]), 
+                     "absGlobalTol" : args.absGlobalTolerance,
+                     "relGlobalTol" :args.relGlobalTolerance, 
+                     "absLocalTol" : args.absLocalTolerance, 
+                     "relLocalTol" : args.relLocalTolerance,
+                     "varLowerBounds" : args.varLowerBounds,
+                     "varUpperBounds" : args.varUpperBounds}
+                )
 
-    effectivePotential = EffectivePotential(variableSymbols["fieldSymbols"],
-                                            args.loopOrder,
-                                            args.verbose,
-                                            nloptInst,
-                                            ParsedExpressionSystemArray(
-                                                pythonisedExpressions["vectorMassesSquared"]["expressions"],
-                                                allSymbols,
-                                                pythonisedExpressions["vectorMassesSquared"]["fileName"],
-                                            ),
-                                            ParsedExpressionSystemArray(
-                                                pythonisedExpressions["vectorShortHands"]["expressions"],
-                                                allSymbols,
-                                                pythonisedExpressions["vectorShortHands"]["fileName"],
-                                            ),
-                                            pythonisedExpressions["scalarPermutationMatrix"],
-                                            (MassMatrix(pythonisedExpressions["scalarMassMatrixUpperLeft"]["expressions"], 
-                                                        pythonisedExpressions["scalarMassMatrixUpperLeft"]["fileName"]), 
-                                             MassMatrix(pythonisedExpressions["scalarMassMatrixBottomRight"]["expressions"],
-                                                        pythonisedExpressions["scalarMassMatrixBottomRight"]["fileName"])),
-                                            RotationMatrix(pythonisedExpressions["scalarRotationMatrix"]["expressions"],
-                                                           pythonisedExpressions["scalarRotationMatrix"]["fileName"]),
-                                            ParsedExpressionSystemArray(pythonisedExpressions["veffArray"]["expressions"], 
-                                                                        allSymbols, 
-                                                                        pythonisedExpressions["veffArray"]["fileName"]),
-                                            allSymbols) 
-
+    effectivePotential = EffectivePotential(
+        variableSymbols["fieldSymbols"],
+        args.loopOrder,
+        args.verbose,
+        nloptInst,
+        ParsedExpressionSystemArray(
+            pythonisedExpressions["vectorMassesSquared"]["expressions"],
+            allSymbols,
+            pythonisedExpressions["vectorMassesSquared"]["fileName"],
+        ),
+        ParsedExpressionSystemArray(
+            pythonisedExpressions["vectorShortHands"]["expressions"],
+            allSymbols,
+            pythonisedExpressions["vectorShortHands"]["fileName"],
+        ),
+        pythonisedExpressions["scalarPermutationMatrix"],
+        (MassMatrix(pythonisedExpressions["scalarMassMatrixUpperLeft"]["expressions"], 
+                    pythonisedExpressions["scalarMassMatrixUpperLeft"]["fileName"]), 
+         MassMatrix(pythonisedExpressions["scalarMassMatrixBottomRight"]["expressions"],
+                    pythonisedExpressions["scalarMassMatrixBottomRight"]["fileName"])),
+        RotationMatrix(pythonisedExpressions["scalarRotationMatrix"]["expressions"],
+                       pythonisedExpressions["scalarRotationMatrix"]["fileName"]),
+        ParsedExpressionSystemArray(pythonisedExpressions["veffArray"]["expressions"], 
+                                    allSymbols, 
+                                    pythonisedExpressions["veffArray"]["fileName"]),
+        allSymbols
+    ) 
 
     dimensionalReduction = DimensionalReduction(config = {
         "hardToSoft": ParsedExpressionSystemArray(
@@ -149,20 +135,35 @@ def minimization(
     yukawaSymbols = [replaceGreekSymbols(item) for item in variableSymbols["yukawaSymbols"]]
     gaugeSymbols = [replaceGreekSymbols(item) for item in variableSymbols["gaugeSymbols"]]
     
+    traceFreeEnergyMinimumInst = TraceFreeEnergyMinimum(
+        config = {"effectivePotential":effectivePotential, 
+                "dimensionalReduction": dimensionalReduction, 
+                "betaFunction4DExpression": ParsedExpressionSystemArray(
+                        pythonisedExpressions["betaFunctions4D"]["expressions"], 
+                        allSymbols, 
+                        pythonisedExpressions["betaFunctions4D"]["fileName"]
+                    ),
+                "TRange": tuple(_drange(
+                        args.TRangeStart, 
+                        args.TRangeEnd, 
+                        str(args.TRangeStepSize)
+                        )
+                    ),
+                "pertSymbols": frozenset(fourPointSymbols + yukawaSymbols + gaugeSymbols),
+                "verbose": args.verbose,
+                "initialGuesses": args.initialGuesses,
+                "allSymbols": allSymbols
+                }
+    )
+    
     with open(args.benchmarkFile) as benchmarkFile:
-        minimizationDict = {"pertSymbols": frozenset(fourPointSymbols + yukawaSymbols + gaugeSymbols), 
-                            "effectivePotential": effectivePotential,
-                            "dimensionalReduction": dimensionalReduction,
-                            "betaFunction4DExpression": ParsedExpressionSystemArray(pythonisedExpressions["betaFunctions4D"]["expressions"], 
-                                                                                    allSymbols, 
-                                                                                    pythonisedExpressions["betaFunctions4D"]["fileName"]),
-                            "args": args,
-                            "allSymbols": allSymbols} 
+
         if args.bPool:
             with Pool(args.cores) as pool:
-                from ijson import items
-                pool.map(_doMinimization, (minimizationDict | {"benchmark": item} for item in items(benchmarkFile, "item", use_float = True)))
+                ## Apply might be better suited to avoid this lambda function side step
+                doMinimizationWrapper = lambda benchmark: _doMinimization(traceFreeEnergyMinimumInst, args, benchmark)
+                pool.map(doMinimizationWrapper, (benchmark for benchmark in items(benchmarkFile, "item", use_float = True)))
 
         else:
-            for parameters in (minimizationDict | {"benchmark": item} for item in json.load(benchmarkFile)):
-                _doMinimization(parameters)
+            for benchmark in json.load(benchmarkFile):
+                _doMinimization(traceFreeEnergyMinimumInst, args, benchmark)
