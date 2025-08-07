@@ -157,13 +157,8 @@ def minimization(
     )
     
     with open(args.benchmarkFile) as benchmarkFile:
+        with Pool(args.cores) as pool:
+            ## Apply might be better suited to avoid this lambda function side step
+            doMinimizationWrapper = lambda benchmark: _doMinimization(traceFreeEnergyMinimumInst, args, benchmark)
+            pool.map(doMinimizationWrapper, (benchmark for benchmark in items(benchmarkFile, "item", use_float = True)))
 
-        if args.bPool:
-            with Pool(args.cores) as pool:
-                ## Apply might be better suited to avoid this lambda function side step
-                doMinimizationWrapper = lambda benchmark: _doMinimization(traceFreeEnergyMinimumInst, args, benchmark)
-                pool.map(doMinimizationWrapper, (benchmark for benchmark in items(benchmarkFile, "item", use_float = True)))
-
-        else:
-            for benchmark in json.load(benchmarkFile):
-                _doMinimization(traceFreeEnergyMinimumInst, args, benchmark)
