@@ -121,19 +121,19 @@ class UserInput(argparse.ArgumentParser):
         
         self.add_argument('--loFile', 
                           action = 'store', 
-                          default = "Data/EffectivePotential_threeFields/Veff_LO.txt",
+                          default = "Data/EffectivePotential/Veff_LO.txt",
                           dest = 'loFile',
                           metavar='')
 
         self.add_argument('--nloFile', 
                           action = 'store', 
-                          default = "Data/EffectivePotential_threeFields/Veff_NLO.txt",
+                          default = "Data/EffectivePotential/Veff_NLO.txt",
                           dest = 'nloFile',
                           metavar='')
 
         self.add_argument('--nnloFile', 
                           action = 'store', 
-                          default = "Data/EffectivePotential_threeFields/Veff_NNLO.txt",
+                          default = "Data/EffectivePotential/Veff_NNLO.txt",
                           dest = 'nnloFile',
                           metavar='')
 
@@ -145,13 +145,13 @@ class UserInput(argparse.ArgumentParser):
 
         self.add_argument('--vectorMassesSquaredFile', 
                           action = 'store', 
-                          default = "Data/EffectivePotential_threeFields/vectorMasses.txt",
+                          default = "Data/EffectivePotential/vectorMasses.txt",
                           dest = 'vectorMassesSquaredFile',
                           metavar='')
 
         self.add_argument('--vectorShortHandsFile', 
                           action = 'store', 
-                          default = "Data/EffectivePotential_threeFields/vectorShorthands.txt",
+                          default = "Data/EffectivePotential/vectorShorthands.txt",
                           dest = 'vectorShortHandsFile',
                           metavar='')
 
@@ -175,37 +175,37 @@ class UserInput(argparse.ArgumentParser):
 
         self.add_argument('--scalarPermutationMatrixFile', 
                           action = 'store', 
-                          default = "Data/EffectivePotential_threeFields/scalarPermutationMatrix.txt",
+                          default = "Data/EffectivePotential/scalarPermutationMatrix.txt",
                           dest = 'scalarPermutationFile',
                           metavar='')
 
         self.add_argument('--scalarRotationMatrixFile', 
                           action = 'store', 
-                          default = "Data/EffectivePotential_threeFields/scalarRotationMatrix.txt",
+                          default = "Data/EffectivePotential/scalarRotationMatrix.txt",
                           dest = 'scalarRotationFile',
                           metavar='')
 
         self.add_argument('--scalarMassMatrixUpperLeftFile', 
                           action = 'store', 
-                          default = "Data/EffectivePotential_threeFields/scalarMassMatrix_upperLeft.txt",
+                          default = "Data/EffectivePotential/scalarMassMatrix_upperLeft.txt",
                           dest = 'scalarMassMatrixUpperLeftFile',
                           metavar='')
 
         self.add_argument('--scalarMassMatrixUpperLeftDefinitionsFile', 
                           action = 'store', 
-                          default = "Data/EffectivePotential_threeFields/scalarMassMatrix_upperLeft_definitions.txt",
+                          default = "Data/EffectivePotential/scalarMassMatrix_upperLeft_definitions.txt",
                           dest = 'scalarMassMatrixUpperLeftDefinitionsFile',
                           metavar='')
 
         self.add_argument('--scalarMassMatrixBottomRightFile', 
                           action = 'store', 
-                          default = "Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight.txt",
+                          default = "Data/EffectivePotential/scalarMassMatrix_bottomRight.txt",
                           dest = 'scalarMassMatrixBottomRightFile',
                           metavar='')
 
         self.add_argument('--scalarMassMatrixBottomRightDefinitionsFile', 
                           action = 'store', 
-                          default = "Data/EffectivePotential_threeFields/scalarMassMatrix_bottomRight_definitions.txt",
+                          default = "Data/EffectivePotential/scalarMassMatrix_bottomRight_definitions.txt",
                           dest = 'scalarMassMatrixBottomRightDefinitionsFile',
                           metavar='')
 
