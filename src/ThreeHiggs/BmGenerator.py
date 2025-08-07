@@ -11,7 +11,9 @@ import numpy as np
 from os.path import join
 from glob import glob
 
-def bIsBounded(params):
+def bIsBounded(
+        params
+    ):
     ## Taking equations 26-31 from the draft that ensure the potential is bounded from below.
     if not params["lam11"] > 0:
         return False
@@ -131,7 +133,13 @@ def _lagranianParamGen(mS1,
                                     "lam33": lam33}}
     return paramsDict
 
-def checkPhysical(params, nloptInst, potential, chargedMassMatrix, neutralMassMatrix):
+def checkPhysical(
+        params, 
+        nloptInst, 
+        potential, 
+        chargedMassMatrix, 
+        neutralMassMatrix
+    ):
     params["v1"] = 0
     params["v2"] = 0
     params["v3"] = 246.22
@@ -163,11 +171,13 @@ def checkPhysical(params, nloptInst, potential, chargedMassMatrix, neutralMassMa
     return True
     
 
-def _randomBmParam(randomNum, 
-                   nloptInst, 
-                   potential, 
-                   chargedMassMatrix, 
-                   neutralMassMatrix):
+def _randomBmParam(
+        randomNum, 
+        nloptInst, 
+        potential, 
+        chargedMassMatrix, 
+        neutralMassMatrix
+    ):
     
     bmdictList = []
     ## TODO put in some upper limit for this while loop
@@ -201,10 +211,12 @@ def _randomBmParam(randomNum,
             
     return bmdictList
 
-def _handPickedBm(nloptInst, 
-                  potential, 
-                  chargedMassMatrix, 
-                  neutralMassMatrix):
+def _handPickedBm(
+        nloptInst, 
+        potential, 
+        chargedMassMatrix, 
+        neutralMassMatrix
+    ):
     
     bmdictList = []
     ## Move this to userArg or something
@@ -248,7 +260,9 @@ def _strongSubSet(prevResultDir):
             
     return bmdictList
 
-def generateBenchmarks(args)-> None:
+def generateBenchmarks(
+        args
+    ):
     
     (output_file := Path(args.benchmarkFile)).parent.mkdir(exist_ok=True, 
                                                              parents=True)   
@@ -287,12 +301,21 @@ def generateBenchmarks(args)-> None:
         return
 
     elif args.benchmarkType == "handPicked":
-        dump(_handPickedBm(nloptInst, potential, chargedMassMatrix, neutralMassMatrix), 
+        dump(_handPickedBm(
+                nloptInst, 
+                potential, 
+                chargedMassMatrix, 
+                neutralMassMatrix), 
              open(output_file, "w"), 
              indent = 4)
     
     elif args.benchmarkType == "random":
-        dump(_randomBmParam(args.randomNum, nloptInst, potential, chargedMassMatrix, neutralMassMatrix), 
+        dump(_randomBmParam(
+            args.randomNum,
+                nloptInst, 
+                potential, 
+                chargedMassMatrix, 
+                neutralMassMatrix), 
              open(output_file, "w"), 
              indent = 4)
     
