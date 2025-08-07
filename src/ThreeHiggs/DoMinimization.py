@@ -1,8 +1,8 @@
 import json
-from typing import Generator
 import decimal
-
 from pathlib import Path
+from pathos.multiprocessing import Pool
+
 from ThreeHiggs.ParsedExpression import (ParsedExpressionSystemArray,
                                          MassMatrix,
                                          RotationMatrix)
@@ -13,17 +13,23 @@ from ThreeHiggs.PlotResult import plotData
 from ThreeHiggs.ProcessMinimization import interpretData
 from ThreeHiggs.DimensionalReduction import DimensionalReduction
 from ThreeHiggs.PythoniseMathematica import replaceGreekSymbols
-from pathos.multiprocessing import Pool
+
 
 ## This (sometimes) avoids floating point error in T gotten by np.arange or linspace
 ## However one must be careful as 1 = decimal.Decimal(1.000000000000001) 
-def _drange(start: float, end: float, jump: str) -> Generator:
+def _drange(
+    start, 
+    end, 
+    jump
+):
     start =  decimal.Decimal(start) 
     while start <= end:
         yield float(start)
         start += decimal.Decimal(jump)
 
-def _doMinimization(parameters):
+def _doMinimization(
+    parameters
+):
     ## This should be doable with **unpacking but difficult with pool (starmap?)
     benchmark = parameters["benchmark"] 
     effectivePotential = parameters["effectivePotential"] 
@@ -78,7 +84,9 @@ def _doMinimization(parameters):
                                                                         benchmark["bmInput"]),
                                                          indent = 4))
         
-def minimization(args):
+def minimization(
+    args
+):
     pythonisedExpressions = json.load(open(args.pythonisedExpressionsFile, "r"))
     allSymbols = pythonisedExpressions["allSymbols"]["allSymbols"]
 
