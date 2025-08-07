@@ -72,15 +72,15 @@ def bPhysicalMinimum(
     return np.all(np.isclose(minLocation, [0,0, higgsVEV], atol=1))
       
 def _lagranianParamGen(
-        mS1,
-        delta12, 
-        delta1c, 
-        deltac, 
-        ghDM, 
-        thetaCPV, 
-        darkHieracy, 
-        bmNumber
-    ):
+    mS1,
+    delta12, 
+    delta1c, 
+    deltac, 
+    ghDM, 
+    thetaCPV, 
+    darkHieracy, 
+    bmNumber
+):
     ## SM params
     vsq = higgsVEV**2
     mu3sq = mHiggs**2 /2
