@@ -3,6 +3,7 @@ from json import dump
 from sympy import Matrix
 from sympy.parsing.mathematica import parse_mathematica
 from numpy import euler_gamma, pi
+from pathlib import Path
 
 def replaceGreekSymbols(string: str) -> str:
     ## TODO use unicodedata package here to do magic. 
@@ -85,7 +86,8 @@ def pythoniseMathematica(args):
         
     allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")], 
                         reverse = True)
-
+    (outputFile := Path(args.pythonisedExpressionsFile)).parent.mkdir(exist_ok=True, 
+                                                             parents=True)  
     ## Move get lines to the functions? -- Would need to rework veffLines in this case
     ## Not ideal to have nested dicts but is future proof for when we move to arrays
     dump(
@@ -151,7 +153,7 @@ def pythoniseMathematica(args):
                 "fileName": args.allSymbolsFile,
             },
         },
-        open(args.pythonisedExpressionsFile, "w"),
+        open(outputFile, "w"),
         indent = 4
     )
 
