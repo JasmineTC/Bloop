@@ -34,3 +34,6 @@ class PDGUnitTests(TestCase):
     
     def test_WMass(self):
         self.assertEqual(80.377, mW)
+
+    def test_Fermi(self):
+        self.assertEqual(1.1663787e-05, constants.physical_constants["Fermi coupling constant"][0])
