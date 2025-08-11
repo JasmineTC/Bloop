@@ -9,6 +9,7 @@ update the PDG module.
 """
 import math as m
 import pdg
+from scipy import constants
 api = pdg.connect()
 ## Should this be a dict to make importing less tedious?
 
@@ -18,7 +19,7 @@ mW = api.get_particle_by_name('W+').mass
 mZ = api.get_particle_by_name('Z0').mass
 
 ## This the higgs vev via the fermi constant
-higgsVEV = 1/m.sqrt((m.sqrt(2)*1.1663788e-5))
+higgsVEV = 1/m.sqrt((m.sqrt(2)*constants.physical_constants["Fermi coupling constant"][0]))
 
 from unittest import TestCase
 class PDGUnitTests(TestCase):
