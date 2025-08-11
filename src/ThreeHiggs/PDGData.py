@@ -18,7 +18,6 @@ mTop = api.get_particle_by_name('t').mass
 mW = api.get_particle_by_name('W+').mass
 mZ = api.get_particle_by_name('Z0').mass
 
-## This the higgs vev via the fermi constant
 higgsVEV = 1/m.sqrt((m.sqrt(2)*constants.physical_constants["Fermi coupling constant"][0]))
 
 from unittest import TestCase
