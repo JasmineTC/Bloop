@@ -13,4 +13,4 @@ RUN pip install --no-cache-dir ijson
 RUN pip install --no-cache-dir pathos 
 RUN pip install --no-cache-dir sympy 
 RUN pip install --no-cache-dir matplotlib 
-
+RUN pip install --no-cache-dir importlib

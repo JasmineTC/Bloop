@@ -110,6 +110,12 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--lastBenchmark', type = int, default = maxsize, dest = 'lastBenchmark',
         metavar='')
 
+        self.add_argument('--BmGeneratorFile', 
+                          action = 'store', 
+                          default = "ThreeHiggs.BmGenerator",
+                          dest = 'bmGenerator',
+                          metavar='')
+ 
         self.add_argument('--allSymbolsFile', 
                           action = 'store', 
                           default = "Data/Z2_3HDM/ModelFiles/Variables/allSymbols.json",
