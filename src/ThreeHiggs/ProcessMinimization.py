@@ -17,9 +17,9 @@ def interpretData(result: dict, index: int, bmInput: dict[str, float]):
                     "bmNumber": index,
                     "bmInput": bmInput}
 
-    v1Dimless = makeFieldDimensionless(result["T"], result["minimumLocation"][0])
-    v2Dimless = makeFieldDimensionless(result["T"], result["minimumLocation"][1])
-    v3Dimless = makeFieldDimensionless(result["T"], result["minimumLocation"][2])
+    v1Dimless = makeFieldDimensionless(result["T"], result["vevLocation"][0])
+    v2Dimless = makeFieldDimensionless(result["T"], result["vevLocation"][1])
+    v3Dimless = makeFieldDimensionless(result["T"], result["vevLocation"][2])
     
     v1DimlessDiff = np.diff( v1Dimless )
     v2DimlessDiff = np.diff( v2Dimless )

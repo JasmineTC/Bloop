@@ -89,68 +89,57 @@ class TrackVEV:
                                                 self.allSymbols)
         
         minimizationResults = {"T": [],
-                               "valueVeffReal": [],
-                               "valueVeffImag": [],
-                               "minimumLocation": [], 
+                               "vevDepthReal": [],
+                               "vevDepthImag": [],
+                               "vevLocation": [], 
                                "bIsPerturbative": True, 
                                "badReason": None}
 
         counter = 0
-        ## Initialise minimumLocation to feed into the minimisation algo so it can
+        ## Initialise vevLocation to feed into the minimisation algo so it can
         ## use the location of the previous minimum as a guess for the next
         ## Not ideal as the code has to repeat an initial guess on first T
-        minimumLocation = np.array(self.initialGuesses[0])
+        vevLocation = np.array(self.initialGuesses[0])
         
         for T in self.TRange:
             if self.verbose:
                 print (f'Start of temp = {T} loop')
             minimizationResults["T"].append(T)
+            params4DRan = self.runParams4D(betaSpline4D, T)
+            bIsPerturbative(params4DRan, self.pertSymbols, self.allSymbols)
+            #bIsBounded(paramsForMatchingDict)
+            paramsUltraSoft = self.dimensionalReduction.softToUltraSoft.evaluate(
+                              self.dimensionalReduction.softScaleRGE.evaluate(
+                              self.dimensionalReduction.hardToSoft.evaluate(
+                              params4DRan
+                        )))
             
-            minimumLocation, minimumValue, isPert, isBounded  = self.computeVEV(
-                T,
-                minimumLocation.round(5).tolist(),                      
-                betaSpline4D
+            vevLocation, vevDepth = self.effectivePotential.findGlobalMinimum(
+               T, 
+               paramsUltraSoft, 
+               self.initialGuesses + [vevLocation]
             )
+
             
             if not minimizationResults["badReason"]:
-                minimizationResults["badReason"] = self.isBad(T, minimumLocation, abs(minimumValue.imag/minimumValue.real))
+                minimizationResults["badReason"] = self.isBad(T, vevLocation, abs(vevDepth.imag/vevDepth.real))
 
-            minimizationResults["valueVeffReal"].append(minimumValue.real)
-            minimizationResults["valueVeffImag"].append(minimumValue.imag)
-            minimizationResults["minimumLocation"].append(minimumLocation)
+            minimizationResults["vevDepthReal"].append(vevDepth.real)
+            minimizationResults["vevDepthImag"].append(vevDepth.imag)
+            minimizationResults["vevLocation"].append(vevLocation)
             
 
-            if np.all( minimumLocation < 0.5):
+            if np.all( vevLocation < 0.5):
                 if self.verbose:
                     print (f"Symmetric phase found at temp {T}")
                 if counter == 3:
                     break
                 counter += 1
             
-        minimizationResults["minimumLocation"] = np.transpose(minimizationResults["minimumLocation"]).tolist()
+        minimizationResults["vevLocation"] = np.transpose(minimizationResults["vevLocation"]).tolist()
         
         return minimizationResults
     
-    def computeVEV(
-        self, 
-        T, 
-        minimumLocation,
-        betaSpline4D
-    ): 
-        paramValuesArray = self.getTConsts(T, np.zeros(len(self.allSymbols), dtype="complex"))
-        paramValuesArray = self.runParams4D(betaSpline4D, paramValuesArray)
-        paramValuesArray = self.dimensionalReduction.hardToSoft.evaluate(paramValuesArray)
-        paramValuesArray = self.dimensionalReduction.softScaleRGE.evaluate(paramValuesArray)
-        paramValuesArray = self.dimensionalReduction.softToUltraSoft.evaluate(paramValuesArray)
-        return ( 
-                *self.effectivePotential.findGlobalMinimum(
-                T, 
-                paramValuesArray, 
-                self.initialGuesses + [minimumLocation]
-            ), 
-            bIsPerturbative(paramValuesArray, self.pertSymbols, self.allSymbols), 
-            True, #bIsBounded(paramsForMatchingDict)
-        )
     
     def getLagranianParams4D(self, 
         inputParams
@@ -185,8 +174,9 @@ class TrackVEV:
     def runParams4D(
             self, 
             betaSpline4D, 
-            array
+            T
     ):
+        array = self.getTConsts(T, np.zeros(len(self.allSymbols), dtype="complex"))
         muEvaulate = array[self.allSymbols.index("RGScale")]
         for key, spline in betaSpline4D.items():
             # Taking real part to avoid complex to real cast warning
@@ -194,11 +184,11 @@ class TrackVEV:
         return array
     
     def isBad(self, T, 
-               minimumLocation, 
+               vevLocation, 
                ratio):
         bad = ""
         ## This is a hack to remove bad benchmark points
-        if T == self.TRange[0] and (minimumLocation[0] > 1 or minimumLocation[1] > 1):
+        if T == self.TRange[0] and (vevLocation[0] > 1 or vevLocation[1] > 1):
             bad+= "v3NotGlobalMin"
         if ratio > 1e-8:
             bad+= " complex"
@@ -220,19 +210,19 @@ class TrackVEV:
                                                 lagranianParams4DArray, 
                                                 self.allSymbols)
         
-        minimumLocation = np.array(self.initialGuesses[0])
+        vevLocation = np.array(self.initialGuesses[0])
         
         linestyle = ["-.", "-", "--"]
         v3Max = 0
         yMin = 0
         yMax = 0
         for idx, T in enumerate(self.TRange):
-            minimumLocation, minimumValueReal, minimumValueImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T,
-                                                                                                           tuple(minimumLocation.round(5)),                      
+            vevLocation, vevDepthReal, vevDepthImag, status, isPert, isBounded, params3D  = self.executeMinimisation(T,
+                                                                                                           tuple(vevLocation.round(5)),                      
                                                                                                            betaSpline4D)
-            # print(minimumLocation)
-            # v3Max = minimumLocation[2] if minimumLocation[2] > v3Max else v3Max
-            # yMinMax = self.effectivePotential.plotPot(T, params3D, linestyle[idx], minimumLocation[2], minimumValueReal, v3Max)
+            # print(vevLocation)
+            # v3Max = vevLocation[2] if vevLocation[2] > v3Max else v3Max
+            # yMinMax = self.effectivePotential.plotPot(T, params3D, linestyle[idx], vevLocation[2], vevDepthReal, v3Max)
             self.effectivePotential.plotPot3D(T, params3D)
             # yMin = yMinMax[0] if yMinMax[0]< yMin else yMin
             # yMax = yMinMax[1] if yMinMax[1]> yMax else yMax
