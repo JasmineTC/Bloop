@@ -112,7 +112,7 @@ class UserInput(argparse.ArgumentParser):
 
         self.add_argument('--BmGeneratorFile', 
                           action = 'store', 
-                          default = "ThreeHiggs.BmGenerator",
+                          default = "ThreeHiggs.Z2_ThreeHiggsBmGenerator",
                           dest = 'bmGenerator',
                           metavar='')
  
