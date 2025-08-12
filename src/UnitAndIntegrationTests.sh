@@ -19,6 +19,7 @@ python3 runStages.py --loopOrder 1 \
                         --TRangeStart 100 \
                         --TRangeEnd 200 \
                         --TRangeStepSize 2 \
+                        --bPool  
 
 diff IntegrationTests/Pool/OutputResult/BM_1.json IntegrationTests/Pool/ReferenceResult/BM_1.json
 
@@ -35,8 +36,8 @@ python3 runStages.py --loopOrder 1 \
                         --TRangeStart 100 \
                         --TRangeEnd 200 \
                         --TRangeStepSize 2 \
-                        --cores 2
-
+                        --cores 2 \
+                        --bPool
 diff IntegrationTests/Pool2/OutputResult/BM_0.json IntegrationTests/Pool2/ReferenceResult/BM_0.json
 diff IntegrationTests/Pool2/OutputResult/BM_1.json IntegrationTests/Pool2/ReferenceResult/BM_1.json
 diff IntegrationTests/Pool2/OutputResult/BM_2.json IntegrationTests/Pool2/ReferenceResult/BM_2.json
