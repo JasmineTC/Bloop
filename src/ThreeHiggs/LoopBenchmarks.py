@@ -30,7 +30,8 @@ def _drange(
 def benchmarkDoing(
     trackVEV,
     args,
-    benchmark
+    benchmark,
+    fieldNames
 ):
 
     if not args.firstBenchmark <= benchmark['bmNumber'] <= args.lastBenchmark:
@@ -62,22 +63,23 @@ def benchmarkDoing(
     if args.bProcessMin:
         if args.verbose:
             print(f"Processing {benchmark['bmNumber']} to {filename+'_interp'}")
+
         open(f"{filename}_interp.json", "w").write(json.dumps(interpretData(minimizationResult,
                                                                         benchmark["bmNumber"],
-                                                                        benchmark["bmInput"]),
+                                                                        benchmark["bmInput"],
+                                                                        fieldNames),
                                                          indent = 4))
         
 def benchmarkLooping(
     args
 ):
-    trackVEV = setUpTrackVEV(args)
+    trackVEV, fieldNames = setUpTrackVEV(args)
     
     with open(args.benchmarkFile) as benchmarkFile:
         with Pool(args.cores) as pool:
             ## Apply might be better suited to avoid this lambda function side step
-            benchmarkDoingeWrap = lambda benchmark: benchmarkDoing(trackVEV, args, benchmark)
-            pool.map(benchmarkDoingeWrap, (benchmark for benchmark in items(benchmarkFile, "item", use_float = True)))
-
+            benchmarkDoingWrap = lambda benchmark: benchmarkDoing(trackVEV, args, benchmark, fieldNames)
+            pool.map(benchmarkDoingWrap, (benchmark for benchmark in items(benchmarkFile, "item", use_float = True)))
 
 def setUpTrackVEV(
     args
@@ -147,7 +149,7 @@ def setUpTrackVEV(
     yukawaSymbols = [replaceGreekSymbols(item) for item in variableSymbols["yukawaSymbols"]]
     gaugeSymbols = [replaceGreekSymbols(item) for item in variableSymbols["gaugeSymbols"]]
     
-    return TrackVEV(
+    return (TrackVEV(
         config = {"effectivePotential":effectivePotential, 
                 "dimensionalReduction": dimensionalReduction, 
                 "betaFunction4DExpression": ParsedExpressionSystemArray(
@@ -166,5 +168,5 @@ def setUpTrackVEV(
                 "initialGuesses": args.initialGuesses,
                 "allSymbols": allSymbols
                 }
-    )
+    ), variableSymbols["fieldSymbols"])
     

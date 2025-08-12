@@ -92,8 +92,8 @@ class TrackVEV:
                                "vevDepthReal": [],
                                "vevDepthImag": [],
                                "vevLocation": [], 
-                               "bIsPerturbative": True, 
-                               "badReason": None}
+                               "bIsPerturbative": [], 
+                               "bIsBounded": []}
 
         counter = 0
         ## Initialise vevLocation to feed into the minimisation algo so it can
@@ -104,30 +104,31 @@ class TrackVEV:
         for T in self.TRange:
             if self.verbose:
                 print (f'Start of temp = {T} loop')
-            minimizationResults["T"].append(T)
+            
             params4DRan = self.runParams4D(betaSpline4D, T)
-            bIsPerturbative(params4DRan, self.pertSymbols, self.allSymbols)
-            #bIsBounded(paramsForMatchingDict)
+            
             paramsUltraSoft = self.dimensionalReduction.softToUltraSoft.evaluate(
                               self.dimensionalReduction.softScaleRGE.evaluate(
                               self.dimensionalReduction.hardToSoft.evaluate(
                               params4DRan
-                        )))
+            )))
             
             vevLocation, vevDepth = self.effectivePotential.findGlobalMinimum(
                T, 
                paramsUltraSoft, 
                self.initialGuesses + [vevLocation]
             )
-
             
-            if not minimizationResults["badReason"]:
-                minimizationResults["badReason"] = self.isBad(T, vevLocation, abs(vevDepth.imag/vevDepth.real))
-
+            minimizationResults["T"].append(T)
             minimizationResults["vevDepthReal"].append(vevDepth.real)
             minimizationResults["vevDepthImag"].append(vevDepth.imag)
             minimizationResults["vevLocation"].append(vevLocation)
-            
+            #bIsBounded(paramsForMatchingDict)
+            minimizationResults["bIsPerturbative"].append(bIsPerturbative(
+                params4DRan, 
+                self.pertSymbols, 
+                self.allSymbols)
+            )
 
             if np.all( vevLocation < 0.5):
                 if self.verbose:
@@ -140,10 +141,9 @@ class TrackVEV:
         
         return minimizationResults
     
-    
     def getLagranianParams4D(self, 
         inputParams
-        ):
+    ):
         ## --- SM fermion and gauge boson masses---
         ## How get g3 from PDG??
         langrianParams4D = {"yt3": sqrt(2.) * mTop/ higgsVEV,
@@ -161,7 +161,10 @@ class TrackVEV:
 
         return params4D
     
-    def getTConsts(self, T, inputArray):
+    def getTConsts(self, 
+        T, 
+        inputArray
+    ):
         matchingScale = 4.*pi*exp(-np.euler_gamma) * T
         Lb = 2. * log(matchingScale / T) - self.EulerGammaPrime
         

@@ -49,6 +49,13 @@
             21.301411200737565
         ]
     ],
-    "bIsPerturbative": true,
-    "badReason": ""
+    "bIsPerturbative": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+    ],
+    "bIsBounded": []
 }
