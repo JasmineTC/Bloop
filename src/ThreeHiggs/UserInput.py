@@ -31,8 +31,6 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument('--bPool', action = 'store_true', default = False, dest = 'bPool',
                           help = 'Bool: If activated code will run in parallel using number of cores set by --cores')
         
-        
-        
         self.add_argument('--cores', action = 'store', default = 1, dest = 'cores', type = int, choices = list(range(1, multiprocessing.cpu_count() + 1)),
                           help = "Int: Specify how many cores pool uses to compute benchmarks",
                           metavar='')
