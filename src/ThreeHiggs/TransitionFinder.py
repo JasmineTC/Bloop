@@ -28,7 +28,8 @@ def constructSplineDictArray(
     ## -----BUG------
     ## This updates the RGScale with the value of mu
     ## Weird FP errors can occur here (e.g. including mu in np.real or not)
-    solutionSoft = scipy.integrate.solve_ivp(lambda mu, initialConditions: np.real(betaFunction4DExpression.evaluate(initialConditions)/mu),
+    betaFunction4DWrapper = lambda mu, initialConditions: np.real(betaFunction4DExpression.evaluate(initialConditions)/mu)
+    solutionSoft = scipy.integrate.solve_ivp(betaFunction4DWrapper,
                                              (muRange[0], muRange[-1]), 
                                              initialConditions, 
                                              t_eval=muRange).y
@@ -106,16 +107,21 @@ class TrackVEV:
             if self.verbose:
                 print (f'Start of temp = {T} loop')
             
-            params4DRan = self.runParams4D(betaSpline4D, T)
-            paramsUltraSoft = self.dimensionalReduction.softToUltraSoft.evaluate(
-                                  self.dimensionalReduction.softScaleRGE.evaluate(
-                                      self.dimensionalReduction.hardToSoft.evaluate(
-                                      params4DRan
-            )))
+            params = self.runParams4D(betaSpline4D, T)
+            
+            isPert = bIsPerturbative(
+                params, 
+                self.pertSymbols, 
+                self.allSymbols
+            )
+            
+            params = self.dimensionalReduction.hardToSoft.evaluate(params)
+            params = self.dimensionalReduction.softScaleRGE.evaluate(params)
+            params = self.dimensionalReduction.softToUltraSoft.evaluate(params)
             
             vevLocation, vevDepth = self.effectivePotential.findGlobalMinimum(
                T, 
-               paramsUltraSoft, 
+               params, 
                self.initialGuesses + [vevLocation]
             )
             
@@ -124,11 +130,7 @@ class TrackVEV:
             minimizationResults["vevDepthImag"].append(vevDepth.imag)
             minimizationResults["vevLocation"].append(vevLocation)
             #bIsBounded(paramsForMatchingDict)
-            minimizationResults["bIsPerturbative"].append(bIsPerturbative(
-                params4DRan, 
-                self.pertSymbols, 
-                self.allSymbols)
-            )
+            minimizationResults["bIsPerturbative"].append(isPert)
 
             if np.all( vevLocation < 0.5):
                 if self.verbose:
@@ -155,7 +157,7 @@ class TrackVEV:
                             **inputParams["massTerms"],
                             **inputParams["couplingValues"]}
         
-        params4D = np.zeros(len(self.allSymbols))
+        params4D = np.zeros(len(self.allSymbols), dtype = "float64")
         for key, value in langrianParams4D.items():
             params4D[self.allSymbols.index(key)] = value
 
