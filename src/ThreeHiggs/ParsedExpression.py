@@ -61,6 +61,9 @@ class ParsedExpressionSystemArray:
             newParams[expression[0]] = expression[1].evaluate(params)
             
         return newParams
+    
+    def evaluateUnordered(self, params):
+        return [ expression[1].evaluate(params) for expression in self.parsedExpressions]
 
     def getParamSubset(self, params):
         return [params[self.allSymbols.index(key)] for key in self.getExpressionNames() ]

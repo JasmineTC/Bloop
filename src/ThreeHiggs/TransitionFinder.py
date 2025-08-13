@@ -57,6 +57,7 @@ class TrackVEV:
     effectivePotential: str = "effectivePotentialInstance"
     dimensionalReduction: str = "dimensionalReductionInstance"
     betaFunction4DExpression: str = "betaFunction4DExpression" 
+    bounded: str = "bounded"
     
     verbose: bool = False
     
@@ -114,7 +115,8 @@ class TrackVEV:
                 self.pertSymbols, 
                 self.allSymbols
             )
-            
+            print(self.bounded.evaluateUnordered(params))
+            exit()
             params = self.dimensionalReduction.hardToSoft.evaluate(params)
             params = self.dimensionalReduction.softScaleRGE.evaluate(params)
             params = self.dimensionalReduction.softToUltraSoft.evaluate(params)

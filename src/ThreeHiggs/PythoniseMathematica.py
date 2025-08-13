@@ -92,6 +92,10 @@ def pythoniseMathematica(args):
     ## Not ideal to have nested dicts but is future proof for when we move to arrays
     dump(
         {
+            "bounded": {
+                "expressions": pythoniseExpressionSystemArray(getLines("../../Mathematica/bounded.txt"), allSymbols),
+                "fileName": "bounded",
+            },
             "betaFunctions4D": {
                 "expressions": pythoniseExpressionSystemArray(getLines(args.betaFunctions4DFile), allSymbols),
                 "fileName": args.betaFunctions4DFile,
