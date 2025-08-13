@@ -185,7 +185,6 @@ class TrackVEV:
         
         muEvaulate = array[self.allSymbols.index("RGScale")]
         for key, spline in betaSpline4D.items():
-            # Taking real part to avoid complex to real cast warning
             array[self.allSymbols.index(key)] = spline(muEvaulate)
         return array
     
