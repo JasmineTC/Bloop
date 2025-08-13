@@ -27,12 +27,11 @@ def constructSplineDictArray(
 ):
     ## -----BUG------
     ## This updates the RGScale with the value of mu
-    initialConditions = np.array(initialConditions, dtype="complex")
-    solutionSoft = scipy.integrate.solve_ivp(lambda mu, initialConditions:  np.array(betaFunction4DExpression.evaluate(initialConditions))/mu,
+    ## Weird FP errors can occur here (e.g. including mu in np.real or not)
+    solutionSoft = scipy.integrate.solve_ivp(lambda mu, initialConditions: np.real(betaFunction4DExpression.evaluate(initialConditions)/mu),
                                              (muRange[0], muRange[-1]), 
                                              initialConditions, 
                                              t_eval=muRange).y
-
     interpDict = {}
     for idx, ele in enumerate(allSymbols):
         if ele == "RGScale":
@@ -67,13 +66,15 @@ class TrackVEV:
     
     config: InitVar[dict] = None
     
-    def __post_init__(self, config: dict):
+    def __post_init__(self, 
+        config
+    ):
         if config:
             self.__init__(**config)
     
     def trackVEV(self, 
         benchmark
-        ):
+    ):
         lagranianParams4DArray = self.getLagranianParams4D(benchmark)
                
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small; 
@@ -106,11 +107,10 @@ class TrackVEV:
                 print (f'Start of temp = {T} loop')
             
             params4DRan = self.runParams4D(betaSpline4D, T)
-            
             paramsUltraSoft = self.dimensionalReduction.softToUltraSoft.evaluate(
-                              self.dimensionalReduction.softScaleRGE.evaluate(
-                              self.dimensionalReduction.hardToSoft.evaluate(
-                              params4DRan
+                                  self.dimensionalReduction.softScaleRGE.evaluate(
+                                      self.dimensionalReduction.hardToSoft.evaluate(
+                                      params4DRan
             )))
             
             vevLocation, vevDepth = self.effectivePotential.findGlobalMinimum(
@@ -175,29 +175,17 @@ class TrackVEV:
         return inputArray
     
     def runParams4D(
-            self, 
-            betaSpline4D, 
-            T
+        self, 
+        betaSpline4D, 
+        T
     ):
-        array = self.getTConsts(T, np.zeros(len(self.allSymbols), dtype="complex"))
+        array = self.getTConsts(T, np.zeros(len(self.allSymbols), dtype="float64"))
+        
         muEvaulate = array[self.allSymbols.index("RGScale")]
         for key, spline in betaSpline4D.items():
             # Taking real part to avoid complex to real cast warning
-            array[self.allSymbols.index(key)] = spline(np.real(muEvaulate))
+            array[self.allSymbols.index(key)] = spline(muEvaulate)
         return array
-    
-    def isBad(self, T, 
-               vevLocation, 
-               ratio):
-        bad = ""
-        ## This is a hack to remove bad benchmark points
-        if T == self.TRange[0] and (vevLocation[0] > 1 or vevLocation[1] > 1):
-            bad+= "v3NotGlobalMin"
-        if ratio > 1e-8:
-            bad+= " complex"
-        return bad
-    
-    
     
     ############################
     def plotPotential(self, benchmark:  dict[str: float]):
