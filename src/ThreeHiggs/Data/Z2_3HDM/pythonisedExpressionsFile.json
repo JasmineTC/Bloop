@@ -1,30 +1,113 @@
 {
+    "bounded": {
+        "expressions": [
+            {
+                "identifier": "missing",
+                "expression": "params[49] > 0",
+                "symbols": [
+                    "lam11"
+                ]
+            },
+            {
+                "identifier": "missing",
+                "expression": "params[44] > 0",
+                "symbols": [
+                    "lam22"
+                ]
+            },
+            {
+                "identifier": "missing",
+                "expression": "params[37] > 0",
+                "symbols": [
+                    "lam33"
+                ]
+            },
+            {
+                "identifier": "missing",
+                "expression": "params[48] + min(0, params[47] - 2*sqrt(params[46]**2 + params[45]**2)) > -2*sqrt(params[49]*params[44])",
+                "symbols": [
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22"
+                ]
+            },
+            {
+                "identifier": "missing",
+                "expression": "params[39] + min(0, params[38] - 2*sqrt(params[36]**2 + params[35]**2)) > -2*sqrt(params[49]*params[37])",
+                "symbols": [
+                    "lam11",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re"
+                ]
+            },
+            {
+                "identifier": "missing",
+                "expression": "params[43] + min(0, params[42] - 2*sqrt(params[41]**2 + params[40]**2)) > -2*sqrt(params[44]*params[37])",
+                "symbols": [
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam33"
+                ]
+            },
+            {
+                "identifier": "missing",
+                "expression": "((params[48] + min(0, params[47] - 2*sqrt(params[46]**2 + params[45]**2)))*sqrt(params[37]) + (params[43] + min(0, params[42] - 2*sqrt(params[41]**2 + params[40]**2)))*sqrt(params[49]) + (params[39] + min(0, params[38] - 2*sqrt(params[36]**2 + params[35]**2)))*sqrt(params[44]) >= 0) | (-params[49]*params[44]*params[37] + params[49]*(params[43] + min(0, params[42] - 2*sqrt(params[41]**2 + params[40]**2)))**2 + params[44]*(params[39] + min(0, params[38] - 2*sqrt(params[36]**2 + params[35]**2)))**2 + params[37]*(params[48] + min(0, params[47] - 2*sqrt(params[46]**2 + params[45]**2)))**2 - 2*(params[48] + min(0, params[47] - 2*sqrt(params[46]**2 + params[45]**2)))*(params[43] + min(0, params[42] - 2*sqrt(params[41]**2 + params[40]**2)))*(params[39] + min(0, params[38] - 2*sqrt(params[36]**2 + params[35]**2))) < 0)",
+                "symbols": [
+                    "lam11",
+                    "lam12",
+                    "lam12p",
+                    "lam1Im",
+                    "lam1Re",
+                    "lam22",
+                    "lam23",
+                    "lam23p",
+                    "lam2Im",
+                    "lam2Re",
+                    "lam31",
+                    "lam31p",
+                    "lam33",
+                    "lam3Im",
+                    "lam3Re"
+                ]
+            }
+        ],
+        "fileName": "bounded"
+    },
     "betaFunctions4D": {
         "expressions": [
             {
                 "identifier": "g1",
-                "expression": "0.04538344683979713*params[51]**3",
+                "expression": "0.04538344683979713*params[52]**3",
                 "symbols": [
                     "g1"
                 ]
             },
             {
                 "identifier": "g2",
-                "expression": "-0.01794229293666398*params[50]**3",
+                "expression": "-0.01794229293666398*params[51]**3",
                 "symbols": [
                     "g2"
                 ]
             },
             {
                 "identifier": "g3",
-                "expression": "-0.04432801784352278*params[49]**3",
+                "expression": "-0.04432801784352278*params[50]**3",
                 "symbols": [
                     "g3"
                 ]
             },
             {
                 "identifier": "lam11",
-                "expression": "0.002374715241617292*params[51]**4 + 0.004749430483234584*params[51]**2*(params[50]**2 - 4*params[48]) + 0.007124145724851876*params[50]**4 - 0.05699316579881501*params[50]**2*params[48] + 0.1519817754635067*params[48]**2 + 0.01266514795529222*params[47]**2 + 0.01266514795529222*params[47]*params[46] + 0.006332573977646112*params[46]**2 + 0.02533029591058445*params[45]**2 + 0.02533029591058445*params[44]**2 + 0.01266514795529222*params[38]**2 + 0.01266514795529222*params[38]*params[37] + 0.006332573977646112*params[37]**2 + 0.02533029591058445*params[35]**2 + 0.02533029591058445*params[34]**2",
+                "expression": "0.002374715241617292*params[52]**4 + 0.004749430483234584*params[52]**2*(params[51]**2 - 4*params[49]) + 0.007124145724851876*params[51]**4 - 0.05699316579881501*params[51]**2*params[49] + 0.1519817754635067*params[49]**2 + 0.01266514795529222*params[48]**2 + 0.01266514795529222*params[48]*params[47] + 0.006332573977646112*params[47]**2 + 0.02533029591058445*params[46]**2 + 0.02533029591058445*params[45]**2 + 0.01266514795529222*params[39]**2 + 0.01266514795529222*params[39]*params[38] + 0.006332573977646112*params[38]**2 + 0.02533029591058445*params[36]**2 + 0.02533029591058445*params[35]**2",
                 "symbols": [
                     "g1",
                     "g2",
@@ -41,7 +124,7 @@
             },
             {
                 "identifier": "lam12p",
-                "expression": "0.01899772193293834*params[51]**2*(params[50]**2 - params[46]) - 0.05699316579881501*params[50]**2*params[46] + 0.02533029591058445*params[46]*(params[48] + 2*params[47] + params[46] + params[43]) + 0.2026423672846756*params[45]**2 + 0.2026423672846756*params[44]**2 + 0.01266514795529222*params[41]*params[37]",
+                "expression": "0.01899772193293834*params[52]**2*(params[51]**2 - params[47]) - 0.05699316579881501*params[51]**2*params[47] + 0.02533029591058445*params[47]*(params[49] + 2*params[48] + params[47] + params[44]) + 0.2026423672846756*params[46]**2 + 0.2026423672846756*params[45]**2 + 0.01266514795529222*params[42]*params[38]",
                 "symbols": [
                     "g1",
                     "g2",
@@ -57,7 +140,7 @@
             },
             {
                 "identifier": "lam12",
-                "expression": "0.004749430483234584*params[51]**4 - 0.009498860966469168*params[51]**2*(params[50]**2 + 2*params[47]) + 0.01424829144970375*params[50]**4 - 0.05699316579881501*params[50]**2*params[47] + 0.07599088773175334*params[48]*params[47] + 0.02533029591058445*params[48]*params[46] + 0.02533029591058445*params[47]**2 + 0.07599088773175334*params[47]*params[43] + 0.01266514795529222*params[46]**2 + 0.02533029591058445*params[46]*params[43] + 0.05066059182116889*params[45]**2 + 0.05066059182116889*params[44]**2 + 0.02533029591058445*params[42]*params[38] + 0.01266514795529222*params[42]*params[37] + 0.01266514795529222*params[41]*params[38]",
+                "expression": "0.004749430483234584*params[52]**4 - 0.009498860966469168*params[52]**2*(params[51]**2 + 2*params[48]) + 0.01424829144970375*params[51]**4 - 0.05699316579881501*params[51]**2*params[48] + 0.07599088773175334*params[49]*params[48] + 0.02533029591058445*params[49]*params[47] + 0.02533029591058445*params[48]**2 + 0.07599088773175334*params[48]*params[44] + 0.01266514795529222*params[47]**2 + 0.02533029591058445*params[47]*params[44] + 0.05066059182116889*params[46]**2 + 0.05066059182116889*params[45]**2 + 0.02533029591058445*params[43]*params[39] + 0.01266514795529222*params[43]*params[38] + 0.01266514795529222*params[42]*params[39]",
                 "symbols": [
                     "g1",
                     "g2",
@@ -75,7 +158,7 @@
             },
             {
                 "identifier": "lam1Im",
-                "expression": "-0.01899772193293834*params[51]**2*params[45] - 0.05699316579881501*params[50]**2*params[45] + 0.02533029591058445*params[45]*(params[48] + 2*params[47] + 3*params[46] + params[43]) - 0.02533029591058445*params[40]*params[34] - 0.02533029591058445*params[39]*params[35]",
+                "expression": "-0.01899772193293834*params[52]**2*params[46] - 0.05699316579881501*params[51]**2*params[46] + 0.02533029591058445*params[46]*(params[49] + 2*params[48] + 3*params[47] + params[44]) - 0.02533029591058445*params[41]*params[35] - 0.02533029591058445*params[40]*params[36]",
                 "symbols": [
                     "g1",
                     "g2",
@@ -92,7 +175,7 @@
             },
             {
                 "identifier": "lam1Re",
-                "expression": "-0.01899772193293834*params[51]**2*params[44] - 0.05699316579881501*params[50]**2*params[44] + 0.02533029591058445*params[44]*(params[48] + 2*params[47] + 3*params[46] + params[43]) - 0.02533029591058445*params[40]*params[35] + 0.02533029591058445*params[39]*params[34]",
+                "expression": "-0.01899772193293834*params[52]**2*params[45] - 0.05699316579881501*params[51]**2*params[45] + 0.02533029591058445*params[45]*(params[49] + 2*params[48] + 3*params[47] + params[44]) - 0.02533029591058445*params[41]*params[36] + 0.02533029591058445*params[40]*params[35]",
                 "symbols": [
                     "g1",
                     "g2",
@@ -109,7 +192,7 @@
             },
             {
                 "identifier": "lam22",
-                "expression": "0.002374715241617292*params[51]**4 + 0.004749430483234584*params[51]**2*(params[50]**2 - 4*params[43]) + 0.007124145724851876*params[50]**4 - 0.05699316579881501*params[50]**2*params[43] + 0.01266514795529222*params[47]**2 + 0.01266514795529222*params[47]*params[46] + 0.006332573977646112*params[46]**2 + 0.02533029591058445*params[45]**2 + 0.02533029591058445*params[44]**2 + 0.1519817754635067*params[43]**2 + 0.01266514795529222*params[42]**2 + 0.01266514795529222*params[42]*params[41] + 0.006332573977646112*params[41]**2 + 0.02533029591058445*params[40]**2 + 0.02533029591058445*params[39]**2",
+                "expression": "0.002374715241617292*params[52]**4 + 0.004749430483234584*params[52]**2*(params[51]**2 - 4*params[44]) + 0.007124145724851876*params[51]**4 - 0.05699316579881501*params[51]**2*params[44] + 0.01266514795529222*params[48]**2 + 0.01266514795529222*params[48]*params[47] + 0.006332573977646112*params[47]**2 + 0.02533029591058445*params[46]**2 + 0.02533029591058445*params[45]**2 + 0.1519817754635067*params[44]**2 + 0.01266514795529222*params[43]**2 + 0.01266514795529222*params[43]*params[42] + 0.006332573977646112*params[42]**2 + 0.02533029591058445*params[41]**2 + 0.02533029591058445*params[40]**2",
                 "symbols": [
                     "g1",
                     "g2",
@@ -126,7 +209,7 @@
             },
             {
                 "identifier": "lam23p",
-                "expression": "0.01899772193293834*params[51]**2*(params[50]**2 - params[41]) - 0.05699316579881501*params[50]**2*params[41] + 0.01266514795529222*params[46]*params[37] + 0.03799544386587667*params[41]*params[0]**2 + 0.02533029591058445*params[41]*(params[43] + 2*params[42] + params[41] + params[36]) + 0.2026423672846756*params[40]**2 + 0.2026423672846756*params[39]**2",
+                "expression": "0.01899772193293834*params[52]**2*(params[51]**2 - params[42]) - 0.05699316579881501*params[51]**2*params[42] + 0.01266514795529222*params[47]*params[38] + 0.03799544386587667*params[42]*params[0]**2 + 0.02533029591058445*params[42]*(params[44] + 2*params[43] + params[42] + params[37]) + 0.2026423672846756*params[41]**2 + 0.2026423672846756*params[40]**2",
                 "symbols": [
                     "g1",
                     "g2",
@@ -143,7 +226,7 @@
             },
             {
                 "identifier": "lam23",
-                "expression": "0.004749430483234584*params[51]**4 - 0.009498860966469168*params[51]**2*(params[50]**2 + 2*params[42]) + 0.01424829144970375*params[50]**4 - 0.05699316579881501*params[50]**2*params[42] + 0.02533029591058445*params[47]*params[38] + 0.01266514795529222*params[47]*params[37] + 0.01266514795529222*params[46]*params[38] + 0.07599088773175334*params[43]*params[42] + 0.02533029591058445*params[43]*params[41] + 0.02533029591058445*params[42]**2 + 0.07599088773175334*params[42]*params[36] + 0.03799544386587667*params[42]*params[0]**2 + 0.01266514795529222*params[41]**2 + 0.02533029591058445*params[41]*params[36] + 0.05066059182116889*params[40]**2 + 0.05066059182116889*params[39]**2",
+                "expression": "0.004749430483234584*params[52]**4 - 0.009498860966469168*params[52]**2*(params[51]**2 + 2*params[43]) + 0.01424829144970375*params[51]**4 - 0.05699316579881501*params[51]**2*params[43] + 0.02533029591058445*params[48]*params[39] + 0.01266514795529222*params[48]*params[38] + 0.01266514795529222*params[47]*params[39] + 0.07599088773175334*params[44]*params[43] + 0.02533029591058445*params[44]*params[42] + 0.02533029591058445*params[43]**2 + 0.07599088773175334*params[43]*params[37] + 0.03799544386587667*params[43]*params[0]**2 + 0.01266514795529222*params[42]**2 + 0.02533029591058445*params[42]*params[37] + 0.05066059182116889*params[41]**2 + 0.05066059182116889*params[40]**2",
                 "symbols": [
                     "g1",
                     "g2",
@@ -162,7 +245,7 @@
             },
             {
                 "identifier": "lam2Im",
-                "expression": "-0.02533029591058445*params[45]*params[34] - 0.02533029591058445*params[44]*params[35] + 0.006332573977646112*params[40]*(-3*params[51]**2 - 9*params[50]**2 + 4*params[43] + 8*params[42] + 12*params[41] + 4*params[36] + 6*params[0]**2)",
+                "expression": "-0.02533029591058445*params[46]*params[35] - 0.02533029591058445*params[45]*params[36] + 0.006332573977646112*params[41]*(-3*params[52]**2 - 9*params[51]**2 + 4*params[44] + 8*params[43] + 12*params[42] + 4*params[37] + 6*params[0]**2)",
                 "symbols": [
                     "g1",
                     "g2",
@@ -180,7 +263,7 @@
             },
             {
                 "identifier": "lam2Re",
-                "expression": "-0.02533029591058445*params[45]*params[35] + 0.02533029591058445*params[44]*params[34] + 0.006332573977646112*params[39]*(-3*params[51]**2 - 9*params[50]**2 + 4*params[43] + 8*params[42] + 12*params[41] + 4*params[36] + 6*params[0]**2)",
+                "expression": "-0.02533029591058445*params[46]*params[36] + 0.02533029591058445*params[45]*params[35] + 0.006332573977646112*params[40]*(-3*params[52]**2 - 9*params[51]**2 + 4*params[44] + 8*params[43] + 12*params[42] + 4*params[37] + 6*params[0]**2)",
                 "symbols": [
                     "g1",
                     "g2",
@@ -198,7 +281,7 @@
             },
             {
                 "identifier": "lam31p",
-                "expression": "0.01899772193293834*params[51]**2*(params[50]**2 - params[37]) + 0.01266514795529222*params[46]*params[41] + 0.006332573977646112*params[37]*(-9*params[50]**2 + 4*params[48] + 8*params[38] + 4*params[37] + 4*params[36] + 6*params[0]**2) + 0.2026423672846756*params[35]**2 + 0.2026423672846756*params[34]**2",
+                "expression": "0.01899772193293834*params[52]**2*(params[51]**2 - params[38]) + 0.01266514795529222*params[47]*params[42] + 0.006332573977646112*params[38]*(-9*params[51]**2 + 4*params[49] + 8*params[39] + 4*params[38] + 4*params[37] + 6*params[0]**2) + 0.2026423672846756*params[36]**2 + 0.2026423672846756*params[35]**2",
                 "symbols": [
                     "g1",
                     "g2",
@@ -215,7 +298,7 @@
             },
             {
                 "identifier": "lam31",
-                "expression": "0.004749430483234584*params[51]**4 - 0.009498860966469168*params[51]**2*(params[50]**2 + 2*params[38]) + 0.01424829144970375*params[50]**4 - 0.05699316579881501*params[50]**2*params[38] + 0.07599088773175334*params[48]*params[38] + 0.02533029591058445*params[48]*params[37] + 0.02533029591058445*params[47]*params[42] + 0.01266514795529222*params[47]*params[41] + 0.01266514795529222*params[46]*params[42] + 0.02533029591058445*params[38]**2 + 0.07599088773175334*params[38]*params[36] + 0.03799544386587667*params[38]*params[0]**2 + 0.01266514795529222*params[37]**2 + 0.02533029591058445*params[37]*params[36] + 0.05066059182116889*params[35]**2 + 0.05066059182116889*params[34]**2",
+                "expression": "0.004749430483234584*params[52]**4 - 0.009498860966469168*params[52]**2*(params[51]**2 + 2*params[39]) + 0.01424829144970375*params[51]**4 - 0.05699316579881501*params[51]**2*params[39] + 0.07599088773175334*params[49]*params[39] + 0.02533029591058445*params[49]*params[38] + 0.02533029591058445*params[48]*params[43] + 0.01266514795529222*params[48]*params[42] + 0.01266514795529222*params[47]*params[43] + 0.02533029591058445*params[39]**2 + 0.07599088773175334*params[39]*params[37] + 0.03799544386587667*params[39]*params[0]**2 + 0.01266514795529222*params[38]**2 + 0.02533029591058445*params[38]*params[37] + 0.05066059182116889*params[36]**2 + 0.05066059182116889*params[35]**2",
                 "symbols": [
                     "g1",
                     "g2",
@@ -234,7 +317,7 @@
             },
             {
                 "identifier": "lam33",
-                "expression": "0.002374715241617292*params[51]**4 + 0.004749430483234584*params[51]**2*(params[50]**2 - 4*params[36]) + 0.007124145724851876*params[50]**4 - 0.05699316579881501*params[50]**2*params[36] + 0.01266514795529222*params[42]**2 + 0.01266514795529222*params[42]*params[41] + 0.006332573977646112*params[41]**2 + 0.02533029591058445*params[40]**2 + 0.02533029591058445*params[39]**2 + 0.01266514795529222*params[38]**2 + 0.01266514795529222*params[38]*params[37] + 0.006332573977646112*params[37]**2 + 0.07599088773175334*params[36]*(2*params[36] + params[0]**2) + 0.02533029591058445*params[35]**2 + 0.02533029591058445*params[34]**2 - 0.03799544386587667*params[0]**4",
+                "expression": "0.002374715241617292*params[52]**4 + 0.004749430483234584*params[52]**2*(params[51]**2 - 4*params[37]) + 0.007124145724851876*params[51]**4 - 0.05699316579881501*params[51]**2*params[37] + 0.01266514795529222*params[43]**2 + 0.01266514795529222*params[43]*params[42] + 0.006332573977646112*params[42]**2 + 0.02533029591058445*params[41]**2 + 0.02533029591058445*params[40]**2 + 0.01266514795529222*params[39]**2 + 0.01266514795529222*params[39]*params[38] + 0.006332573977646112*params[38]**2 + 0.07599088773175334*params[37]*(2*params[37] + params[0]**2) + 0.02533029591058445*params[36]**2 + 0.02533029591058445*params[35]**2 - 0.03799544386587667*params[0]**4",
                 "symbols": [
                     "g1",
                     "g2",
@@ -252,7 +335,7 @@
             },
             {
                 "identifier": "lam3Im",
-                "expression": "-0.02533029591058445*params[45]*params[39] - 0.02533029591058445*params[44]*params[40] + 0.006332573977646112*params[35]*(-3*params[51]**2 - 9*params[50]**2 + 4*params[48] + 8*params[38] + 12*params[37] + 4*params[36] + 6*params[0]**2)",
+                "expression": "-0.02533029591058445*params[46]*params[40] - 0.02533029591058445*params[45]*params[41] + 0.006332573977646112*params[36]*(-3*params[52]**2 - 9*params[51]**2 + 4*params[49] + 8*params[39] + 12*params[38] + 4*params[37] + 6*params[0]**2)",
                 "symbols": [
                     "g1",
                     "g2",
@@ -270,7 +353,7 @@
             },
             {
                 "identifier": "lam3Re",
-                "expression": "-0.02533029591058445*params[45]*params[40] + 0.02533029591058445*params[44]*params[39] + 0.006332573977646112*params[34]*(-3*params[51]**2 - 9*params[50]**2 + 4*params[48] + 8*params[38] + 12*params[37] + 4*params[36] + 6*params[0]**2)",
+                "expression": "-0.02533029591058445*params[46]*params[41] + 0.02533029591058445*params[45]*params[40] + 0.006332573977646112*params[35]*(-3*params[52]**2 - 9*params[51]**2 + 4*params[49] + 8*params[39] + 12*params[38] + 4*params[37] + 6*params[0]**2)",
                 "symbols": [
                     "g1",
                     "g2",
@@ -288,7 +371,7 @@
             },
             {
                 "identifier": "yt3",
-                "expression": "0.000527714498137176*params[0]*(-17*params[51]**2 - 27*params[50]**2 - 96*params[49]**2 + 54*params[0]**2)",
+                "expression": "0.000527714498137176*params[0]*(-17*params[52]**2 - 27*params[51]**2 - 96*params[50]**2 + 54*params[0]**2)",
                 "symbols": [
                     "g1",
                     "g2",
@@ -298,7 +381,7 @@
             },
             {
                 "identifier": "mu12sqIm",
-                "expression": "-0.009498860966469168*params[51]**2*params[13] - 0.0284965828994075*params[50]**2*params[13] + 0.07599088773175334*params[45]*params[12] + 0.01266514795529222*params[13]*(params[47] + 2*params[46] - 6*params[44])",
+                "expression": "-0.009498860966469168*params[52]**2*params[13] - 0.0284965828994075*params[51]**2*params[13] + 0.07599088773175334*params[46]*params[12] + 0.01266514795529222*params[13]*(params[48] + 2*params[47] - 6*params[45])",
                 "symbols": [
                     "g1",
                     "g2",
@@ -312,7 +395,7 @@
             },
             {
                 "identifier": "mu12sqRe",
-                "expression": "0.07599088773175334*params[45]*params[13] + 0.003166286988823056*params[12]*(-3*params[51]**2 - 9*params[50]**2 + 4*params[47] + 8*params[46] + 24*params[44])",
+                "expression": "0.07599088773175334*params[46]*params[13] + 0.003166286988823056*params[12]*(-3*params[52]**2 - 9*params[51]**2 + 4*params[48] + 8*params[47] + 24*params[45])",
                 "symbols": [
                     "g1",
                     "g2",
@@ -326,7 +409,7 @@
             },
             {
                 "identifier": "mu1sq",
-                "expression": "0.02533029591058445*params[47]*params[10] + 0.01266514795529222*params[46]*params[10] - 0.009498860966469168*params[11]*(params[51]**2 + 3*params[50]**2 - 8*params[48]) + 0.01266514795529222*params[8]*(2*params[38] + params[37])",
+                "expression": "0.02533029591058445*params[48]*params[10] + 0.01266514795529222*params[47]*params[10] - 0.009498860966469168*params[11]*(params[52]**2 + 3*params[51]**2 - 8*params[49]) + 0.01266514795529222*params[8]*(2*params[39] + params[38])",
                 "symbols": [
                     "g1",
                     "g2",
@@ -342,7 +425,7 @@
             },
             {
                 "identifier": "mu2sq",
-                "expression": "0.02533029591058445*params[47]*params[11] + 0.01266514795529222*params[46]*params[11] - 0.009498860966469168*params[10]*(params[51]**2 + 3*params[50]**2 - 8*params[43]) + 0.01266514795529222*params[8]*(2*params[42] + params[41])",
+                "expression": "0.02533029591058445*params[48]*params[11] + 0.01266514795529222*params[47]*params[11] - 0.009498860966469168*params[10]*(params[52]**2 + 3*params[51]**2 - 8*params[44]) + 0.01266514795529222*params[8]*(2*params[43] + params[42])",
                 "symbols": [
                     "g1",
                     "g2",
@@ -358,7 +441,7 @@
             },
             {
                 "identifier": "mu3sq",
-                "expression": "0.02533029591058445*params[38]*params[11] + 0.01266514795529222*params[37]*params[11] + 0.01266514795529222*params[10]*(2*params[42] + params[41]) - 0.009498860966469168*params[8]*(params[51]**2 + 3*params[50]**2 - 8*params[36] - 4*params[0]**2)",
+                "expression": "0.02533029591058445*params[39]*params[11] + 0.01266514795529222*params[38]*params[11] + 0.01266514795529222*params[10]*(2*params[43] + params[42]) - 0.009498860966469168*params[8]*(params[52]**2 + 3*params[51]**2 - 8*params[37] - 4*params[0]**2)",
                 "symbols": [
                     "g1",
                     "g2",
@@ -380,7 +463,7 @@
         "expressions": [
             {
                 "identifier": "g1",
-                "expression": "sqrt(-0.001055428996274352*params[53]*params[51]**4*(3*params[142] + 40*params[141]) + params[53]*params[51]**2)",
+                "expression": "sqrt(-0.001055428996274352*params[54]*params[52]**4*(3*params[143] + 40*params[142]) + params[54]*params[52]**2)",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -390,7 +473,7 @@
             },
             {
                 "identifier": "g2",
-                "expression": "sqrt(0.001055428996274352*params[53]*params[50]**4*(41*params[142] - 24*params[141] + 4) + params[53]*params[50]**2)",
+                "expression": "sqrt(0.001055428996274352*params[54]*params[51]**4*(41*params[143] - 24*params[142] + 4) + params[54]*params[51]**2)",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -400,7 +483,7 @@
             },
             {
                 "identifier": "g3",
-                "expression": "sqrt(0.006332573977646112*params[53]*params[49]**4*(11*params[142] - 4*params[141] + 1) + params[53]*params[49]**2)",
+                "expression": "sqrt(0.006332573977646112*params[54]*params[50]**4*(11*params[143] - 4*params[142] + 1) + params[54]*params[50]**2)",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -410,7 +493,7 @@
             },
             {
                 "identifier": "lam11",
-                "expression": "0.000395785873602882*params[53]*(24*params[142]*params[48]*(params[51]**2 + 3*params[50]**2) - 8*params[142]*(24*params[48]**2 + 2*params[47]**2 + 2*params[47]*params[46] + params[46]**2 + 4*params[45]**2 + 4*params[44]**2 + 2*params[38]**2 + 2*params[38]*params[37] + params[37]**2 + 4*params[35]**2 + 4*params[34]**2) + 2526.618726678875*params[48] + (2 - 3*params[142])*(params[51]**4 + 2*params[51]**2*params[50]**2 + 3*params[50]**4))",
+                "expression": "0.000395785873602882*params[54]*(24*params[143]*params[49]*(params[52]**2 + 3*params[51]**2) - 8*params[143]*(24*params[49]**2 + 2*params[48]**2 + 2*params[48]*params[47] + params[47]**2 + 4*params[46]**2 + 4*params[45]**2 + 2*params[39]**2 + 2*params[39]*params[38] + params[38]**2 + 4*params[36]**2 + 4*params[35]**2) + 2526.618726678875*params[49] + (2 - 3*params[143])*(params[52]**4 + 2*params[52]**2*params[51]**2 + 3*params[51]**4))",
                 "symbols": [
                     "Lb",
                     "T",
@@ -429,7 +512,7 @@
             },
             {
                 "identifier": "lam12",
-                "expression": "0.000791571747205764*params[53]*(36*params[142]*params[50]**2*params[47] - 8*params[142]*(2*params[48]*(3*params[47] + params[46]) + 2*params[47]**2 + 6*params[47]*params[43] + params[46]**2 + 2*params[46]*params[43] + 4*params[45]**2 + 4*params[44]**2 + 2*params[42]*params[38] + params[42]*params[37] + params[41]*params[38]) + params[51]**4*(2 - 3*params[142]) + 2*params[51]**2*(6*params[142]*params[47] + params[50]**2*(3*params[142] - 2)) + params[50]**4*(6 - 9*params[142]) + 1263.309363339438*params[47])",
+                "expression": "0.000791571747205764*params[54]*(36*params[143]*params[51]**2*params[48] - 8*params[143]*(2*params[49]*(3*params[48] + params[47]) + 2*params[48]**2 + 6*params[48]*params[44] + params[47]**2 + 2*params[47]*params[44] + 4*params[46]**2 + 4*params[45]**2 + 2*params[43]*params[39] + params[43]*params[38] + params[42]*params[39]) + params[52]**4*(2 - 3*params[143]) + 2*params[52]**2*(6*params[143]*params[48] + params[51]**2*(3*params[143] - 2)) + params[51]**4*(6 - 9*params[143]) + 1263.309363339438*params[48])",
                 "symbols": [
                     "Lb",
                     "T",
@@ -449,7 +532,7 @@
             },
             {
                 "identifier": "lam12p",
-                "expression": "-0.003166286988823056*params[53]*(-9*params[142]*params[50]**2*params[46] + 4*params[142]*params[48]*params[46] + 8*params[142]*params[47]*params[46] + 4*params[142]*params[46]**2 + 4*params[142]*params[46]*params[43] + 32*params[142]*params[45]**2 + 32*params[142]*params[44]**2 + 2*params[142]*params[41]*params[37] + params[51]**2*(-3*params[142]*params[46] + params[50]**2*(3*params[142] - 2)) - 315.8273408348594*params[46])",
+                "expression": "-0.003166286988823056*params[54]*(-9*params[143]*params[51]**2*params[47] + 4*params[143]*params[49]*params[47] + 8*params[143]*params[48]*params[47] + 4*params[143]*params[47]**2 + 4*params[143]*params[47]*params[44] + 32*params[143]*params[46]**2 + 32*params[143]*params[45]**2 + 2*params[143]*params[42]*params[38] + params[52]**2*(-3*params[143]*params[47] + params[51]**2*(3*params[143] - 2)) - 315.8273408348594*params[47])",
                 "symbols": [
                     "Lb",
                     "T",
@@ -467,7 +550,7 @@
             },
             {
                 "identifier": "lam1Im",
-                "expression": "0.003166286988823056*params[53]*(3*params[142]*params[51]**2*params[45] + 9*params[142]*params[50]**2*params[45] + 4*params[142]*(-params[45]*(params[48] + 2*params[47] + 3*params[46] + params[43]) + params[40]*params[34] + params[39]*params[35]) + 315.8273408348594*params[45])",
+                "expression": "0.003166286988823056*params[54]*(3*params[143]*params[52]**2*params[46] + 9*params[143]*params[51]**2*params[46] + 4*params[143]*(-params[46]*(params[49] + 2*params[48] + 3*params[47] + params[44]) + params[41]*params[35] + params[40]*params[36]) + 315.8273408348594*params[46])",
                 "symbols": [
                     "Lb",
                     "T",
@@ -486,7 +569,7 @@
             },
             {
                 "identifier": "lam1Re",
-                "expression": "0.003166286988823056*params[53]*(3*params[142]*params[51]**2*params[44] + 9*params[142]*params[50]**2*params[44] - 4*params[142]*(params[44]*(params[48] + 2*params[47] + 3*params[46] + params[43]) - params[40]*params[35] + params[39]*params[34]) + 315.8273408348594*params[44])",
+                "expression": "0.003166286988823056*params[54]*(3*params[143]*params[52]**2*params[45] + 9*params[143]*params[51]**2*params[45] - 4*params[143]*(params[45]*(params[49] + 2*params[48] + 3*params[47] + params[44]) - params[41]*params[36] + params[40]*params[35]) + 315.8273408348594*params[45])",
                 "symbols": [
                     "Lb",
                     "T",
@@ -505,7 +588,7 @@
             },
             {
                 "identifier": "lam22",
-                "expression": "0.000395785873602882*params[53]*(24*params[142]*params[43]*(params[51]**2 + 3*params[50]**2) - 8*params[142]*(2*params[47]**2 + 2*params[47]*params[46] + params[46]**2 + 4*params[45]**2 + 4*params[44]**2 + 24*params[43]**2 + 2*params[42]**2 + 2*params[42]*params[41] + params[41]**2 + 4*params[40]**2 + 4*params[39]**2) + 2526.618726678875*params[43] + (2 - 3*params[142])*(params[51]**4 + 2*params[51]**2*params[50]**2 + 3*params[50]**4))",
+                "expression": "0.000395785873602882*params[54]*(24*params[143]*params[44]*(params[52]**2 + 3*params[51]**2) - 8*params[143]*(2*params[48]**2 + 2*params[48]*params[47] + params[47]**2 + 4*params[46]**2 + 4*params[45]**2 + 24*params[44]**2 + 2*params[43]**2 + 2*params[43]*params[42] + params[42]**2 + 4*params[41]**2 + 4*params[40]**2) + 2526.618726678875*params[44] + (2 - 3*params[143])*(params[52]**4 + 2*params[52]**2*params[51]**2 + 3*params[51]**4))",
                 "symbols": [
                     "Lb",
                     "T",
@@ -524,7 +607,7 @@
             },
             {
                 "identifier": "lam23",
-                "expression": "-0.000791571747205764*params[53]*(-36*params[142]*params[50]**2*params[42] + 8*params[142]*(2*params[47]*params[38] + params[47]*params[37] + params[46]*params[38] + 6*params[43]*params[42] + 2*params[43]*params[41] + 2*params[42]**2 + 6*params[42]*params[36] + params[41]**2 + 2*params[41]*params[36] + 4*params[40]**2 + 4*params[39]**2) + 24*params[141]*params[42]*params[0]**2 + params[51]**4*(3*params[142] - 2) - 2*params[51]**2*(6*params[142]*params[42] + params[50]**2*(3*params[142] - 2)) + params[50]**4*(9*params[142] - 6) - 1263.309363339438*params[42])",
+                "expression": "-0.000791571747205764*params[54]*(-36*params[143]*params[51]**2*params[43] + 8*params[143]*(2*params[48]*params[39] + params[48]*params[38] + params[47]*params[39] + 6*params[44]*params[43] + 2*params[44]*params[42] + 2*params[43]**2 + 6*params[43]*params[37] + params[42]**2 + 2*params[42]*params[37] + 4*params[41]**2 + 4*params[40]**2) + 24*params[142]*params[43]*params[0]**2 + params[52]**4*(3*params[143] - 2) - 2*params[52]**2*(6*params[143]*params[43] + params[51]**2*(3*params[143] - 2)) + params[51]**4*(9*params[143] - 6) - 1263.309363339438*params[43])",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -546,7 +629,7 @@
             },
             {
                 "identifier": "lam23p",
-                "expression": "-0.003166286988823056*params[53]*(-9*params[142]*params[50]**2*params[41] + 2*params[142]*params[46]*params[37] + 4*params[142]*params[43]*params[41] + 8*params[142]*params[42]*params[41] + 4*params[142]*params[41]**2 + 4*params[142]*params[41]*params[36] + 32*params[142]*params[40]**2 + 32*params[142]*params[39]**2 + 6*params[141]*params[41]*params[0]**2 + params[51]**2*(-3*params[142]*params[41] + params[50]**2*(3*params[142] - 2)) - 315.8273408348594*params[41])",
+                "expression": "-0.003166286988823056*params[54]*(-9*params[143]*params[51]**2*params[42] + 2*params[143]*params[47]*params[38] + 4*params[143]*params[44]*params[42] + 8*params[143]*params[43]*params[42] + 4*params[143]*params[42]**2 + 4*params[143]*params[42]*params[37] + 32*params[143]*params[41]**2 + 32*params[143]*params[40]**2 + 6*params[142]*params[42]*params[0]**2 + params[52]**2*(-3*params[143]*params[42] + params[51]**2*(3*params[143] - 2)) - 315.8273408348594*params[42])",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -566,7 +649,7 @@
             },
             {
                 "identifier": "lam2Im",
-                "expression": "0.003166286988823056*params[53]*(3*params[142]*params[51]**2*params[40] + 9*params[142]*params[50]**2*params[40] + 4*params[142]*params[45]*params[34] + 4*params[142]*params[44]*params[35] - 4*params[142]*params[43]*params[40] - 8*params[142]*params[42]*params[40] - 12*params[142]*params[41]*params[40] - 4*params[142]*params[40]*params[36] - 6*params[141]*params[40]*params[0]**2 + 315.8273408348594*params[40])",
+                "expression": "0.003166286988823056*params[54]*(3*params[143]*params[52]**2*params[41] + 9*params[143]*params[51]**2*params[41] + 4*params[143]*params[46]*params[35] + 4*params[143]*params[45]*params[36] - 4*params[143]*params[44]*params[41] - 8*params[143]*params[43]*params[41] - 12*params[143]*params[42]*params[41] - 4*params[143]*params[41]*params[37] - 6*params[142]*params[41]*params[0]**2 + 315.8273408348594*params[41])",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -587,7 +670,7 @@
             },
             {
                 "identifier": "lam2Re",
-                "expression": "0.003166286988823056*params[53]*(3*params[142]*params[51]**2*params[39] + 9*params[142]*params[50]**2*params[39] + 4*params[142]*params[45]*params[35] - 4*params[142]*params[44]*params[34] - 4*params[142]*params[43]*params[39] - 8*params[142]*params[42]*params[39] - 12*params[142]*params[41]*params[39] - 4*params[142]*params[39]*params[36] - 6*params[141]*params[39]*params[0]**2 + 315.8273408348594*params[39])",
+                "expression": "0.003166286988823056*params[54]*(3*params[143]*params[52]**2*params[40] + 9*params[143]*params[51]**2*params[40] + 4*params[143]*params[46]*params[36] - 4*params[143]*params[45]*params[35] - 4*params[143]*params[44]*params[40] - 8*params[143]*params[43]*params[40] - 12*params[143]*params[42]*params[40] - 4*params[143]*params[40]*params[37] - 6*params[142]*params[40]*params[0]**2 + 315.8273408348594*params[40])",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -608,7 +691,7 @@
             },
             {
                 "identifier": "lam31",
-                "expression": "-0.000791571747205764*params[53]*(-36*params[142]*params[50]**2*params[38] + 8*params[142]*(6*params[48]*params[38] + 2*params[48]*params[37] + 2*params[47]*params[42] + params[47]*params[41] + params[46]*params[42] + 2*params[38]**2 + 6*params[38]*params[36] + params[37]**2 + 2*params[37]*params[36] + 4*params[35]**2 + 4*params[34]**2) + 24*params[141]*params[38]*params[0]**2 + params[51]**4*(3*params[142] - 2) - 2*params[51]**2*(6*params[142]*params[38] + params[50]**2*(3*params[142] - 2)) + params[50]**4*(9*params[142] - 6) - 1263.309363339438*params[38])",
+                "expression": "-0.000791571747205764*params[54]*(-36*params[143]*params[51]**2*params[39] + 8*params[143]*(6*params[49]*params[39] + 2*params[49]*params[38] + 2*params[48]*params[43] + params[48]*params[42] + params[47]*params[43] + 2*params[39]**2 + 6*params[39]*params[37] + params[38]**2 + 2*params[38]*params[37] + 4*params[36]**2 + 4*params[35]**2) + 24*params[142]*params[39]*params[0]**2 + params[52]**4*(3*params[143] - 2) - 2*params[52]**2*(6*params[143]*params[39] + params[51]**2*(3*params[143] - 2)) + params[51]**4*(9*params[143] - 6) - 1263.309363339438*params[39])",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -630,7 +713,7 @@
             },
             {
                 "identifier": "lam31p",
-                "expression": "-0.003166286988823056*params[53]*(params[142]*(-9*params[50]**2*params[37] + 2*params[46]*params[41] + 4*params[37]*(params[48] + 2*params[38] + params[37] + params[36]) + 32*params[35]**2 + 32*params[34]**2) + 6*params[141]*params[37]*params[0]**2 + params[51]**2*(-3*params[142]*params[37] + params[50]**2*(3*params[142] - 2)) - 315.8273408348594*params[37])",
+                "expression": "-0.003166286988823056*params[54]*(params[143]*(-9*params[51]**2*params[38] + 2*params[47]*params[42] + 4*params[38]*(params[49] + 2*params[39] + params[38] + params[37]) + 32*params[36]**2 + 32*params[35]**2) + 6*params[142]*params[38]*params[0]**2 + params[52]**2*(-3*params[143]*params[38] + params[51]**2*(3*params[143] - 2)) - 315.8273408348594*params[38])",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -650,7 +733,7 @@
             },
             {
                 "identifier": "lam33",
-                "expression": "-0.000395785873602882*params[53]*(-72*params[142]*params[50]**2*params[36] + 8*params[142]*(2*params[42]**2 + 2*params[42]*params[41] + params[41]**2 + 4*params[40]**2 + 4*params[39]**2 + 2*params[38]**2 + 2*params[38]*params[37] + params[37]**2 + 24*params[36]**2 + 4*params[35]**2 + 4*params[34]**2) - 48*params[141]*(-2*params[36]*params[0]**2 + params[0]**4) + params[51]**4*(3*params[142] - 2) + params[51]**2*(-24*params[142]*params[36] + params[50]**2*(6*params[142] - 4)) + params[50]**4*(9*params[142] - 6) - 2526.618726678875*params[36])",
+                "expression": "-0.000395785873602882*params[54]*(-72*params[143]*params[51]**2*params[37] + 8*params[143]*(2*params[43]**2 + 2*params[43]*params[42] + params[42]**2 + 4*params[41]**2 + 4*params[40]**2 + 2*params[39]**2 + 2*params[39]*params[38] + params[38]**2 + 24*params[37]**2 + 4*params[36]**2 + 4*params[35]**2) - 48*params[142]*(-2*params[37]*params[0]**2 + params[0]**4) + params[52]**4*(3*params[143] - 2) + params[52]**2*(-24*params[143]*params[37] + params[51]**2*(6*params[143] - 4)) + params[51]**4*(9*params[143] - 6) - 2526.618726678875*params[37])",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -671,7 +754,7 @@
             },
             {
                 "identifier": "lam3Im",
-                "expression": "0.003166286988823056*params[53]*(params[142]*params[35]*(3*params[51]**2 + 9*params[50]**2 - 4*params[48] - 8*params[38] - 12*params[37] - 4*params[36]) + 4*params[142]*(params[45]*params[39] + params[44]*params[40]) - 6*params[141]*params[35]*params[0]**2 + 315.8273408348594*params[35])",
+                "expression": "0.003166286988823056*params[54]*(params[143]*params[36]*(3*params[52]**2 + 9*params[51]**2 - 4*params[49] - 8*params[39] - 12*params[38] - 4*params[37]) + 4*params[143]*(params[46]*params[40] + params[45]*params[41]) - 6*params[142]*params[36]*params[0]**2 + 315.8273408348594*params[36])",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -692,7 +775,7 @@
             },
             {
                 "identifier": "lam3Re",
-                "expression": "0.003166286988823056*params[53]*(params[142]*(4*params[45]*params[40] - 4*params[44]*params[39] + params[34]*(3*params[51]**2 + 9*params[50]**2 - 4*params[48] - 8*params[38] - 12*params[37] - 4*params[36])) - 6*params[141]*params[34]*params[0]**2 + 315.8273408348594*params[34])",
+                "expression": "0.003166286988823056*params[54]*(params[143]*(4*params[46]*params[41] - 4*params[45]*params[40] + params[35]*(3*params[52]**2 + 9*params[51]**2 - 4*params[49] - 8*params[39] - 12*params[38] - 4*params[37])) - 6*params[142]*params[35]*params[0]**2 + 315.8273408348594*params[35])",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -713,7 +796,7 @@
             },
             {
                 "identifier": "lamVLL1",
-                "expression": "-0.496755247579795*params[53]*params[51]**4",
+                "expression": "-0.496755247579795*params[54]*params[52]**4",
                 "symbols": [
                     "T",
                     "g1"
@@ -721,7 +804,7 @@
             },
             {
                 "identifier": "lamVLL2",
-                "expression": "-0.01266514795529222*params[53]*params[51]**2*params[50]**2",
+                "expression": "-0.01266514795529222*params[54]*params[52]**2*params[51]**2",
                 "symbols": [
                     "T",
                     "g1",
@@ -730,7 +813,7 @@
             },
             {
                 "identifier": "lamVLL3",
-                "expression": "0.02955201189568185*params[53]*params[50]**4",
+                "expression": "0.02955201189568185*params[54]*params[51]**4",
                 "symbols": [
                     "T",
                     "g2"
@@ -738,7 +821,7 @@
             },
             {
                 "identifier": "lamVLL4",
-                "expression": "-0.09287775167214297*params[53]*params[51]**2*params[49]**2",
+                "expression": "-0.09287775167214297*params[54]*params[52]**2*params[50]**2",
                 "symbols": [
                     "T",
                     "g1",
@@ -747,7 +830,7 @@
             },
             {
                 "identifier": "lamVLL5",
-                "expression": "-0.07599088773175334*params[53]*params[50]**2*params[49]**2",
+                "expression": "-0.07599088773175334*params[54]*params[51]**2*params[50]**2",
                 "symbols": [
                     "T",
                     "g2",
@@ -756,7 +839,7 @@
             },
             {
                 "identifier": "lamVLL6",
-                "expression": "-0.02533029591058445*params[53]*params[51]*params[49]**3",
+                "expression": "-0.02533029591058445*params[54]*params[52]*params[50]**3",
                 "symbols": [
                     "T",
                     "g1",
@@ -765,7 +848,7 @@
             },
             {
                 "identifier": "lamVLL7",
-                "expression": "0.02533029591058445*params[53]*params[49]**4",
+                "expression": "0.02533029591058445*params[54]*params[50]**4",
                 "symbols": [
                     "T",
                     "g3"
@@ -773,7 +856,7 @@
             },
             {
                 "identifier": "lamVL1",
-                "expression": "-0.02533029591058445*params[53]*params[49]**2*params[0]**2",
+                "expression": "-0.02533029591058445*params[54]*params[50]**2*params[0]**2",
                 "symbols": [
                     "T",
                     "g3",
@@ -782,7 +865,7 @@
             },
             {
                 "identifier": "lamVL2",
-                "expression": "-0.000263857249068588*params[53]*params[51]*params[50]*(params[51]**2*(3*params[142] + 40*params[141] - 40) + params[50]**2*(-41*params[142] + 24*params[141] - 8) - 24*params[46] - 48*params[43] - 24*params[41] - 1894.964045009157)",
+                "expression": "-0.000263857249068588*params[54]*params[52]*params[51]*(params[52]**2*(3*params[143] + 40*params[142] - 40) + params[51]**2*(-41*params[143] + 24*params[142] - 8) - 24*params[47] - 48*params[44] - 24*params[42] - 1894.964045009157)",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -796,7 +879,7 @@
             },
             {
                 "identifier": "lamVL3",
-                "expression": "-0.000527714498137176*params[53]*params[51]**2*(params[51]**2*(3*params[142] + 40*params[141] - 37) - 9*params[50]**2 - 24*params[47] - 12*params[46] - 72*params[43] - 24*params[42] - 12*params[41] - 947.4820225045783)",
+                "expression": "-0.000527714498137176*params[54]*params[52]**2*(params[52]**2*(3*params[143] + 40*params[142] - 37) - 9*params[51]**2 - 24*params[48] - 12*params[47] - 72*params[44] - 24*params[43] - 12*params[42] - 947.4820225045783)",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -812,7 +895,7 @@
             },
             {
                 "identifier": "lamVL4",
-                "expression": "0.000527714498137176*params[53]*params[50]**2*(3*params[51]**2 + params[50]**2*(41*params[142] - 24*params[141] + 71) + 24*params[47] + 12*params[46] + 72*params[43] + 24*params[42] + 12*params[41] + 947.4820225045783)",
+                "expression": "0.000527714498137176*params[54]*params[51]**2*(3*params[52]**2 + params[51]**2*(41*params[143] - 24*params[142] + 71) + 24*params[48] + 12*params[47] + 72*params[44] + 24*params[43] + 12*params[42] + 947.4820225045783)",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -828,7 +911,7 @@
             },
             {
                 "identifier": "lamVL5",
-                "expression": "-0.000263857249068588*params[53]*params[51]*params[50]*(params[51]**2*(3*params[142] + 40*params[141] - 40) + params[50]**2*(-41*params[142] + 24*params[141] - 8) - 48*params[48] - 24*params[46] - 24*params[37] - 1894.964045009157)",
+                "expression": "-0.000263857249068588*params[54]*params[52]*params[51]*(params[52]**2*(3*params[143] + 40*params[142] - 40) + params[51]**2*(-41*params[143] + 24*params[142] - 8) - 48*params[49] - 24*params[47] - 24*params[38] - 1894.964045009157)",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -842,7 +925,7 @@
             },
             {
                 "identifier": "lamVL6",
-                "expression": "-0.000527714498137176*params[53]*params[51]**2*(params[51]**2*(3*params[142] + 40*params[141] - 37) - 9*params[50]**2 - 72*params[48] - 24*params[47] - 12*params[46] - 24*params[38] - 12*params[37] - 947.4820225045783)",
+                "expression": "-0.000527714498137176*params[54]*params[52]**2*(params[52]**2*(3*params[143] + 40*params[142] - 37) - 9*params[51]**2 - 72*params[49] - 24*params[48] - 12*params[47] - 24*params[39] - 12*params[38] - 947.4820225045783)",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -858,7 +941,7 @@
             },
             {
                 "identifier": "lamVL7",
-                "expression": "0.000527714498137176*params[53]*params[50]**2*(3*params[51]**2 + params[50]**2*(41*params[142] - 24*params[141] + 71) + 72*params[48] + 24*params[47] + 12*params[46] + 24*params[38] + 12*params[37] + 947.4820225045783)",
+                "expression": "0.000527714498137176*params[54]*params[51]**2*(3*params[52]**2 + params[51]**2*(41*params[143] - 24*params[142] + 71) + 72*params[49] + 24*params[48] + 12*params[47] + 24*params[39] + 12*params[38] + 947.4820225045783)",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -874,7 +957,7 @@
             },
             {
                 "identifier": "lamVL8",
-                "expression": "-0.000263857249068588*params[53]*params[51]*params[50]*(params[51]**2*(3*params[142] + 40*params[141] - 40) + params[50]**2*(-41*params[142] + 24*params[141] - 8) - 24*params[41] - 24*params[37] - 48*params[36] - 24*params[0]**2 - 1894.964045009157)",
+                "expression": "-0.000263857249068588*params[54]*params[52]*params[51]*(params[52]**2*(3*params[143] + 40*params[142] - 40) + params[51]**2*(-41*params[143] + 24*params[142] - 8) - 24*params[42] - 24*params[38] - 48*params[37] - 24*params[0]**2 - 1894.964045009157)",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -889,7 +972,7 @@
             },
             {
                 "identifier": "lamVL9",
-                "expression": "-0.000527714498137176*params[53]*params[51]**2*(params[51]**2*(3*params[142] + 40*params[141] - 37) - 9*params[50]**2 - 24*params[42] - 12*params[41] - 24*params[38] - 12*params[37] - 72*params[36] + 68*params[0]**2 - 947.4820225045783)",
+                "expression": "-0.000527714498137176*params[54]*params[52]**2*(params[52]**2*(3*params[143] + 40*params[142] - 37) - 9*params[51]**2 - 24*params[43] - 12*params[42] - 24*params[39] - 12*params[38] - 72*params[37] + 68*params[0]**2 - 947.4820225045783)",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -906,7 +989,7 @@
             },
             {
                 "identifier": "lamVL10",
-                "expression": "0.000527714498137176*params[53]*params[50]**2*(3*params[51]**2 + params[50]**2*(41*params[142] - 24*params[141] + 71) + 24*params[42] + 12*params[41] + 24*params[38] + 12*params[37] + 72*params[36] - 36*params[0]**2 + 947.4820225045783)",
+                "expression": "0.000527714498137176*params[54]*params[51]**2*(3*params[52]**2 + params[51]**2*(41*params[143] - 24*params[142] + 71) + 24*params[43] + 12*params[42] + 24*params[39] + 12*params[38] + 72*params[37] - 36*params[0]**2 + 947.4820225045783)",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -923,7 +1006,7 @@
             },
             {
                 "identifier": "musqSU2",
-                "expression": "13*params[53]**2*params[50]**2/6",
+                "expression": "13*params[54]**2*params[51]**2/6",
                 "symbols": [
                     "T",
                     "g2"
@@ -931,7 +1014,7 @@
             },
             {
                 "identifier": "musqSU3",
-                "expression": "2*params[53]**2*params[49]**2",
+                "expression": "2*params[54]**2*params[50]**2",
                 "symbols": [
                     "T",
                     "g3"
@@ -939,7 +1022,7 @@
             },
             {
                 "identifier": "musqU1",
-                "expression": "13*params[53]**2*params[51]**2/6",
+                "expression": "13*params[54]**2*params[52]**2/6",
                 "symbols": [
                     "T",
                     "g1"
@@ -947,7 +1030,7 @@
             },
             {
                 "identifier": "mu12sqIm",
-                "expression": "0.001583143494411528*params[142]*(3*params[51]**2*params[13] + 9*params[50]**2*params[13] - 4*params[47]*params[13] - 8*params[46]*params[13] - 24*params[45]*params[12] + 24*params[44]*params[13]) + params[13]",
+                "expression": "0.001583143494411528*params[143]*(3*params[52]**2*params[13] + 9*params[51]**2*params[13] - 4*params[48]*params[13] - 8*params[47]*params[13] - 24*params[46]*params[12] + 24*params[45]*params[13]) + params[13]",
                 "symbols": [
                     "Lb",
                     "g1",
@@ -962,7 +1045,7 @@
             },
             {
                 "identifier": "mu12sqRe",
-                "expression": "-0.001583143494411528*params[142]*(24*params[45]*params[13] + params[12]*(-3*params[51]**2 - 9*params[50]**2 + 4*params[47] + 8*params[46] + 24*params[44])) + params[12]",
+                "expression": "-0.001583143494411528*params[143]*(24*params[46]*params[13] + params[12]*(-3*params[52]**2 - 9*params[51]**2 + 4*params[48] + 8*params[47] + 24*params[45])) + params[12]",
                 "symbols": [
                     "Lb",
                     "g1",
@@ -977,7 +1060,7 @@
             },
             {
                 "identifier": "mu1sq",
-                "expression": "0.000263857249068588*params[142]*(params[53]**2*(12*params[48]*(2*params[47] + params[46] + 2*params[38] + params[37]) - 4*params[47]**2 + 4*params[47]*(-params[46] + 6*params[43] + 2*params[42] + params[41]) - 10*params[46]**2 + 12*params[46]*params[43] + 4*params[46]*params[42] + 2*params[46]*params[41] - 72*params[45]**2 - 72*params[44]**2 + 8*params[42]*params[38] + 4*params[42]*params[37] + 4*params[41]*params[38] + 2*params[41]*params[37] - 4*params[38]**2 - 4*params[38]*params[37] + 24*params[38]*params[36] + 18*params[38]*params[0]**2 - 10*params[37]**2 + 12*params[37]*params[36] + 9*params[37]*params[0]**2 - 72*params[35]**2 - 72*params[34]**2) - 144*params[48]*params[11] - 48*params[47]*params[10] - 24*params[46]*params[10] - 48*params[38]*params[8] - 24*params[37]*params[8]) + 2.1988104089049e-5*params[53]**2*params[51]**4*(153*params[142] - 60*params[141] - 299.3759678908814) - params[53]**2*params[51]**2/16 - 6.5964312267147e-5*params[53]**2*params[50]**4*(-255*params[142] + 36*params[141] - 287.4224783172976) - 3*params[53]**2*params[50]**2/16 - params[53]**2*(6*params[48] + 2*params[47] + params[46] + 2*params[38] + params[37])/12 + 0.003655260899045145*params[53]**2*(6*params[48]**2 + params[47]**2 + params[47]*params[46] + params[46]**2 + 6*params[45]**2 + 6*params[44]**2 + params[38]**2 + params[38]*params[37] + params[37]**2 + 6*params[35]**2 + 6*params[34]**2) - 0.000791571747205764*params[53]**2*(params[141]*params[0]**2*(2*params[38] + params[37]) + 143.282578771459*params[48]**2 + 23.8804297952431*params[47]**2 + 23.8804297952431*params[47]*params[46] + 23.8804297952431*params[46]**2 + 143.282578771459*params[45]**2 + 143.282578771459*params[44]**2 + 23.8804297952431*params[38]**2 + 23.8804297952431*params[38]*params[37] + 23.8804297952431*params[37]**2 + 143.282578771459*params[35]**2 + 143.282578771459*params[34]**2) + 0.000131928624534294*params[51]**2*(36*params[142]*params[11] + 9*params[53]**2*params[50]**2*(-4*params[142] - 11.03919029751927) - 2*params[53]**2*(-3*params[142] - 13.44702835702312)*(6*params[48] + 2*params[47] + params[46] + 2*params[38] + params[37])) - 0.000791571747205764*params[50]**2*(-18*params[142]*params[11] + params[53]**2*(-3*params[142] - 13.44702835702312)*(6*params[48] + 2*params[47] + params[46] + 2*params[38] + params[37])) + params[11]",
+                "expression": "0.000263857249068588*params[143]*(params[54]**2*(12*params[49]*(2*params[48] + params[47] + 2*params[39] + params[38]) - 4*params[48]**2 + 4*params[48]*(-params[47] + 6*params[44] + 2*params[43] + params[42]) - 10*params[47]**2 + 12*params[47]*params[44] + 4*params[47]*params[43] + 2*params[47]*params[42] - 72*params[46]**2 - 72*params[45]**2 + 8*params[43]*params[39] + 4*params[43]*params[38] + 4*params[42]*params[39] + 2*params[42]*params[38] - 4*params[39]**2 - 4*params[39]*params[38] + 24*params[39]*params[37] + 18*params[39]*params[0]**2 - 10*params[38]**2 + 12*params[38]*params[37] + 9*params[38]*params[0]**2 - 72*params[36]**2 - 72*params[35]**2) - 144*params[49]*params[11] - 48*params[48]*params[10] - 24*params[47]*params[10] - 48*params[39]*params[8] - 24*params[38]*params[8]) + 2.1988104089049e-5*params[54]**2*params[52]**4*(153*params[143] - 60*params[142] - 299.3759678908814) - params[54]**2*params[52]**2/16 - 6.5964312267147e-5*params[54]**2*params[51]**4*(-255*params[143] + 36*params[142] - 287.4224783172976) - 3*params[54]**2*params[51]**2/16 - params[54]**2*(6*params[49] + 2*params[48] + params[47] + 2*params[39] + params[38])/12 + 0.003655260899045145*params[54]**2*(6*params[49]**2 + params[48]**2 + params[48]*params[47] + params[47]**2 + 6*params[46]**2 + 6*params[45]**2 + params[39]**2 + params[39]*params[38] + params[38]**2 + 6*params[36]**2 + 6*params[35]**2) - 0.000791571747205764*params[54]**2*(params[142]*params[0]**2*(2*params[39] + params[38]) + 143.282578771459*params[49]**2 + 23.8804297952431*params[48]**2 + 23.8804297952431*params[48]*params[47] + 23.8804297952431*params[47]**2 + 143.282578771459*params[46]**2 + 143.282578771459*params[45]**2 + 23.8804297952431*params[39]**2 + 23.8804297952431*params[39]*params[38] + 23.8804297952431*params[38]**2 + 143.282578771459*params[36]**2 + 143.282578771459*params[35]**2) + 0.000131928624534294*params[52]**2*(36*params[143]*params[11] + 9*params[54]**2*params[51]**2*(-4*params[143] - 11.03919029751927) - 2*params[54]**2*(-3*params[143] - 13.44702835702312)*(6*params[49] + 2*params[48] + params[47] + 2*params[39] + params[38])) - 0.000791571747205764*params[51]**2*(-18*params[143]*params[11] + params[54]**2*(-3*params[143] - 13.44702835702312)*(6*params[49] + 2*params[48] + params[47] + 2*params[39] + params[38])) + params[11]",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -1005,7 +1088,7 @@
             },
             {
                 "identifier": "mu2sq",
-                "expression": "0.000263857249068588*params[142]*(params[53]**2*(12*params[48]*(2*params[47] + params[46]) - 4*params[47]**2 + 4*params[47]*(-params[46] + 6*params[43] + 2*params[38] + params[37]) - 10*params[46]**2 + 12*params[46]*params[43] + 4*params[46]*params[38] + 2*params[46]*params[37] - 72*params[45]**2 - 72*params[44]**2 + 24*params[43]*params[42] + 12*params[43]*params[41] - 4*params[42]**2 - 4*params[42]*params[41] + 8*params[42]*params[38] + 4*params[42]*params[37] + 24*params[42]*params[36] + 18*params[42]*params[0]**2 - 10*params[41]**2 + 4*params[41]*params[38] + 2*params[41]*params[37] + 12*params[41]*params[36] + 9*params[41]*params[0]**2 - 72*params[40]**2 - 72*params[39]**2) - 48*params[47]*params[11] - 24*params[46]*params[11] - 144*params[43]*params[10] - 48*params[42]*params[8] - 24*params[41]*params[8]) + 2.1988104089049e-5*params[53]**2*params[51]**4*(153*params[142] - 60*params[141] - 299.3759678908814) - params[53]**2*params[51]**2/16 - 6.5964312267147e-5*params[53]**2*params[50]**4*(-255*params[142] + 36*params[141] - 287.4224783172976) - 3*params[53]**2*params[50]**2/16 - params[53]**2*(2*params[47] + params[46] + 6*params[43] + 2*params[42] + params[41])/12 + 0.000791571747205764*params[53]**2*(-params[141]*params[0]**2*(2*params[42] + params[41]) - 19.26270447603083*params[47]**2 - 19.26270447603083*params[47]*params[46] - 19.26270447603083*params[46]**2 - 115.576226856185*params[45]**2 - 115.576226856185*params[44]**2 - 115.576226856185*params[43]**2 - 19.26270447603083*params[42]**2 - 19.26270447603083*params[42]*params[41] - 19.26270447603083*params[41]**2 - 115.576226856185*params[40]**2 - 115.576226856185*params[39]**2) + 0.000131928624534294*params[51]**2*(36*params[142]*params[10] + 9*params[53]**2*params[50]**2*(-4*params[142] - 11.03919029751927) - 2*params[53]**2*(-3*params[142] - 13.44702835702312)*(2*params[47] + params[46] + 6*params[43] + 2*params[42] + params[41])) - 0.000791571747205764*params[50]**2*(-18*params[142]*params[10] + params[53]**2*(-3*params[142] - 13.44702835702312)*(2*params[47] + params[46] + 6*params[43] + 2*params[42] + params[41])) + params[10]",
+                "expression": "0.000263857249068588*params[143]*(params[54]**2*(12*params[49]*(2*params[48] + params[47]) - 4*params[48]**2 + 4*params[48]*(-params[47] + 6*params[44] + 2*params[39] + params[38]) - 10*params[47]**2 + 12*params[47]*params[44] + 4*params[47]*params[39] + 2*params[47]*params[38] - 72*params[46]**2 - 72*params[45]**2 + 24*params[44]*params[43] + 12*params[44]*params[42] - 4*params[43]**2 - 4*params[43]*params[42] + 8*params[43]*params[39] + 4*params[43]*params[38] + 24*params[43]*params[37] + 18*params[43]*params[0]**2 - 10*params[42]**2 + 4*params[42]*params[39] + 2*params[42]*params[38] + 12*params[42]*params[37] + 9*params[42]*params[0]**2 - 72*params[41]**2 - 72*params[40]**2) - 48*params[48]*params[11] - 24*params[47]*params[11] - 144*params[44]*params[10] - 48*params[43]*params[8] - 24*params[42]*params[8]) + 2.1988104089049e-5*params[54]**2*params[52]**4*(153*params[143] - 60*params[142] - 299.3759678908814) - params[54]**2*params[52]**2/16 - 6.5964312267147e-5*params[54]**2*params[51]**4*(-255*params[143] + 36*params[142] - 287.4224783172976) - 3*params[54]**2*params[51]**2/16 - params[54]**2*(2*params[48] + params[47] + 6*params[44] + 2*params[43] + params[42])/12 + 0.000791571747205764*params[54]**2*(-params[142]*params[0]**2*(2*params[43] + params[42]) - 19.26270447603083*params[48]**2 - 19.26270447603083*params[48]*params[47] - 19.26270447603083*params[47]**2 - 115.576226856185*params[46]**2 - 115.576226856185*params[45]**2 - 115.576226856185*params[44]**2 - 19.26270447603083*params[43]**2 - 19.26270447603083*params[43]*params[42] - 19.26270447603083*params[42]**2 - 115.576226856185*params[41]**2 - 115.576226856185*params[40]**2) + 0.000131928624534294*params[52]**2*(36*params[143]*params[10] + 9*params[54]**2*params[51]**2*(-4*params[143] - 11.03919029751927) - 2*params[54]**2*(-3*params[143] - 13.44702835702312)*(2*params[48] + params[47] + 6*params[44] + 2*params[43] + params[42])) - 0.000791571747205764*params[51]**2*(-18*params[143]*params[10] + params[54]**2*(-3*params[143] - 13.44702835702312)*(2*params[48] + params[47] + 6*params[44] + 2*params[43] + params[42])) + params[10]",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -1033,7 +1116,7 @@
             },
             {
                 "identifier": "mu3sq",
-                "expression": "0.000263857249068588*params[142]*params[53]**2*(24*params[48]*params[38] + 12*params[48]*params[37] + 4*params[47]*(2*params[42] + params[41] + 2*params[38] + params[37]) + 2*params[46]*(2*params[42] + params[41] + 2*params[38] + params[37]) + 24*params[43]*params[42] + 12*params[43]*params[41] - 4*params[42]**2 - 4*params[42]*params[41] + 24*params[42]*params[36] - 10*params[41]**2 + 12*params[41]*params[36] - 72*params[40]**2 - 72*params[39]**2 - 4*params[38]**2 - 4*params[38]*params[37] + 24*params[38]*params[36] - 10*params[37]**2 + 12*params[37]*params[36] + 54*params[36]*params[0]**2 - 72*params[35]**2 - 72*params[34]**2 - 9*params[0]**4) - 0.006332573977646112*params[142]*(2*params[42]*params[10] + params[41]*params[10] + 2*params[38]*params[11] + params[37]*params[11] + 6*params[36]*params[8]) + 0.001583143494411528*params[141]*params[0]**2*(params[53]**2*(2*params[42] + params[41] + 2*params[38] + params[37] + 3*params[36]) - 12*params[8]) + 2.1988104089049e-5*params[53]**2*params[51]**4*(153*params[142] - 60*params[141] - 299.3759678908814) - params[53]**2*params[51]**2/16 - 6.5964312267147e-5*params[53]**2*params[50]**4*(-255*params[142] + 36*params[141] - 287.4224783172976) - 3*params[53]**2*params[50]**2/16 + 0.004221715985097408*params[53]**2*params[49]**2*params[0]**2*(params[142] - 4*params[141] + 3) - params[53]**2*(2*params[42] + params[41] + 2*params[38] + params[37] + 6*params[36] + 3*params[0]**2)/12 - 0.01524781263800001*params[53]**2*(params[42]**2 + params[42]*params[41] + params[41]**2 + 6*params[40]**2 + 6*params[39]**2 + params[38]**2 + params[38]*params[37] + params[37]**2 + 6*params[36]**2 + 6*params[35]**2 + 6*params[34]**2) + 2.1988104089049e-5*params[51]**2*(216*params[142]*params[8] + 54*params[53]**2*params[50]**2*(-4*params[142] - 11.03919029751927) + params[53]**2*(params[0]**2*(-47*params[142] - 55*params[141] + 66) - 12*(-3*params[142] - 13.44702835702312)*(2*params[42] + params[41] + 2*params[38] + params[37] + 6*params[36]))) - 0.000197892936801441*params[50]**2*(-72*params[142]*params[8] + params[53]**2*(3*params[0]**2*(7*params[142] - params[141] - 2) + 4*(-3*params[142] - 13.44702835702312)*(2*params[42] + params[41] + 2*params[38] + params[37] + 6*params[36]))) + params[8]",
+                "expression": "0.000263857249068588*params[143]*params[54]**2*(24*params[49]*params[39] + 12*params[49]*params[38] + 4*params[48]*(2*params[43] + params[42] + 2*params[39] + params[38]) + 2*params[47]*(2*params[43] + params[42] + 2*params[39] + params[38]) + 24*params[44]*params[43] + 12*params[44]*params[42] - 4*params[43]**2 - 4*params[43]*params[42] + 24*params[43]*params[37] - 10*params[42]**2 + 12*params[42]*params[37] - 72*params[41]**2 - 72*params[40]**2 - 4*params[39]**2 - 4*params[39]*params[38] + 24*params[39]*params[37] - 10*params[38]**2 + 12*params[38]*params[37] + 54*params[37]*params[0]**2 - 72*params[36]**2 - 72*params[35]**2 - 9*params[0]**4) - 0.006332573977646112*params[143]*(2*params[43]*params[10] + params[42]*params[10] + 2*params[39]*params[11] + params[38]*params[11] + 6*params[37]*params[8]) + 0.001583143494411528*params[142]*params[0]**2*(params[54]**2*(2*params[43] + params[42] + 2*params[39] + params[38] + 3*params[37]) - 12*params[8]) + 2.1988104089049e-5*params[54]**2*params[52]**4*(153*params[143] - 60*params[142] - 299.3759678908814) - params[54]**2*params[52]**2/16 - 6.5964312267147e-5*params[54]**2*params[51]**4*(-255*params[143] + 36*params[142] - 287.4224783172976) - 3*params[54]**2*params[51]**2/16 + 0.004221715985097408*params[54]**2*params[50]**2*params[0]**2*(params[143] - 4*params[142] + 3) - params[54]**2*(2*params[43] + params[42] + 2*params[39] + params[38] + 6*params[37] + 3*params[0]**2)/12 - 0.01524781263800001*params[54]**2*(params[43]**2 + params[43]*params[42] + params[42]**2 + 6*params[41]**2 + 6*params[40]**2 + params[39]**2 + params[39]*params[38] + params[38]**2 + 6*params[37]**2 + 6*params[36]**2 + 6*params[35]**2) + 2.1988104089049e-5*params[52]**2*(216*params[143]*params[8] + 54*params[54]**2*params[51]**2*(-4*params[143] - 11.03919029751927) + params[54]**2*(params[0]**2*(-47*params[143] - 55*params[142] + 66) - 12*(-3*params[143] - 13.44702835702312)*(2*params[43] + params[42] + 2*params[39] + params[38] + 6*params[37]))) - 0.000197892936801441*params[51]**2*(-72*params[143]*params[8] + params[54]**2*(3*params[0]**2*(7*params[143] - params[142] - 2) + 4*(-3*params[143] - 13.44702835702312)*(2*params[43] + params[42] + 2*params[39] + params[38] + 6*params[37]))) + params[8]",
                 "symbols": [
                     "Lb",
                     "Lf",
@@ -1062,14 +1145,14 @@
             },
             {
                 "identifier": "T",
-                "expression": "params[53]",
+                "expression": "params[54]",
                 "symbols": [
                     "T"
                 ]
             },
             {
                 "identifier": "RGScale",
-                "expression": "params[90]",
+                "expression": "params[91]",
                 "symbols": [
                     "RGScale"
                 ]
@@ -1095,7 +1178,7 @@
             },
             {
                 "identifier": "mu1sq",
-                "expression": "params[11] - 0.000395785873602882*(9*params[51]**4 + 2*params[51]**2*(9*params[50]**2 - 24*params[48] - 8*params[47] - 4*params[46] - 8*params[38] - 4*params[37]) - 27*params[50]**4 - 24*params[50]**2*(6*params[48] + 2*params[47] + params[46] + 2*params[38] + params[37] + 4*params[26]) + 192*params[48]**2 + 32*params[47]**2 + 32*params[47]*params[46] + 32*params[46]**2 + 192*params[45]**2 + 192*params[44]**2 + 32*params[38]**2 + 32*params[38]*params[37] + 32*params[37]**2 + 192*params[35]**2 + 192*params[34]**2 + 48*params[28]**2 + 8*params[27]**2 + 24*params[26]**2)*log(params[53]/params[90])",
+                "expression": "params[11] - 0.000395785873602882*(9*params[52]**4 + 2*params[52]**2*(9*params[51]**2 - 24*params[49] - 8*params[48] - 4*params[47] - 8*params[39] - 4*params[38]) - 27*params[51]**4 - 24*params[51]**2*(6*params[49] + 2*params[48] + params[47] + 2*params[39] + params[38] + 4*params[27]) + 192*params[49]**2 + 32*params[48]**2 + 32*params[48]*params[47] + 32*params[47]**2 + 192*params[46]**2 + 192*params[45]**2 + 32*params[39]**2 + 32*params[39]*params[38] + 32*params[38]**2 + 192*params[36]**2 + 192*params[35]**2 + 48*params[29]**2 + 8*params[28]**2 + 24*params[27]**2)*log(params[54]/params[91])",
                 "symbols": [
                     "RGScale",
                     "T",
@@ -1118,7 +1201,7 @@
             },
             {
                 "identifier": "mu2sq",
-                "expression": "params[10] - 0.000395785873602882*(9*params[51]**4 + 2*params[51]**2*(9*params[50]**2 - 8*params[47] - 4*params[46] - 24*params[43] - 8*params[42] - 4*params[41]) - 27*params[50]**4 - 24*params[50]**2*(2*params[47] + params[46] + 6*params[43] + 2*params[42] + params[41] + 4*params[29]) + 32*params[47]**2 + 32*params[47]*params[46] + 32*params[46]**2 + 192*params[45]**2 + 192*params[44]**2 + 192*params[43]**2 + 32*params[42]**2 + 32*params[42]*params[41] + 32*params[41]**2 + 192*params[40]**2 + 192*params[39]**2 + 48*params[31]**2 + 8*params[30]**2 + 24*params[29]**2)*log(params[53]/params[90])",
+                "expression": "params[10] - 0.000395785873602882*(9*params[52]**4 + 2*params[52]**2*(9*params[51]**2 - 8*params[48] - 4*params[47] - 24*params[44] - 8*params[43] - 4*params[42]) - 27*params[51]**4 - 24*params[51]**2*(2*params[48] + params[47] + 6*params[44] + 2*params[43] + params[42] + 4*params[30]) + 32*params[48]**2 + 32*params[48]*params[47] + 32*params[47]**2 + 192*params[46]**2 + 192*params[45]**2 + 192*params[44]**2 + 32*params[43]**2 + 32*params[43]*params[42] + 32*params[42]**2 + 192*params[41]**2 + 192*params[40]**2 + 48*params[32]**2 + 8*params[31]**2 + 24*params[30]**2)*log(params[54]/params[91])",
                 "symbols": [
                     "RGScale",
                     "T",
@@ -1141,7 +1224,7 @@
             },
             {
                 "identifier": "mu3sq",
-                "expression": "params[8] + 0.000395785873602882*(-9*params[51]**4 + 2*params[51]**2*(-9*params[50]**2 + 8*params[42] + 4*params[41] + 8*params[38] + 4*params[37] + 24*params[36]) + 27*params[50]**4 + 24*params[50]**2*(2*params[42] + params[41] + 2*params[38] + params[37] + 6*params[36] + 4*params[32]) - 32*params[42]**2 - 32*params[42]*params[41] - 32*params[41]**2 - 192*params[40]**2 - 192*params[39]**2 - 32*params[38]**2 - 32*params[38]*params[37] - 32*params[37]**2 - 192*params[36]**2 - 192*params[35]**2 - 192*params[34]**2 - 64*params[33]*(-6*params[49]**2 + params[33]) - 24*params[32]**2 - 48*params[25]**2 - 8*params[24]**2)*log(params[53]/params[90])",
+                "expression": "params[8] + 0.000395785873602882*(-9*params[52]**4 + 2*params[52]**2*(-9*params[51]**2 + 8*params[43] + 4*params[42] + 8*params[39] + 4*params[38] + 24*params[37]) + 27*params[51]**4 + 24*params[51]**2*(2*params[43] + params[42] + 2*params[39] + params[38] + 6*params[37] + 4*params[33]) - 32*params[43]**2 - 32*params[43]*params[42] - 32*params[42]**2 - 192*params[41]**2 - 192*params[40]**2 - 32*params[39]**2 - 32*params[39]*params[38] - 32*params[38]**2 - 192*params[37]**2 - 192*params[36]**2 - 192*params[35]**2 - 64*params[34]*(-6*params[50]**2 + params[34]) - 24*params[33]**2 - 48*params[26]**2 - 8*params[25]**2)*log(params[54]/params[91])",
                 "symbols": [
                     "RGScale",
                     "T",
@@ -1166,7 +1249,7 @@
             },
             {
                 "identifier": "RGScale",
-                "expression": "params[53]",
+                "expression": "params[54]",
                 "symbols": [
                     "T"
                 ]
@@ -1178,7 +1261,7 @@
         "expressions": [
             {
                 "identifier": "lam11",
-                "expression": "params[48] - 0.03978873577297384*params[28]**2/(sqrt(params[7]) + sqrt(params[5])) - 0.009947183943243459*params[27]**2/sqrt(params[5]) - 0.02984155182973038*params[26]**2/sqrt(params[7])",
+                "expression": "params[49] - 0.03978873577297384*params[29]**2/(sqrt(params[7]) + sqrt(params[5])) - 0.009947183943243459*params[28]**2/sqrt(params[5]) - 0.02984155182973038*params[27]**2/sqrt(params[7])",
                 "symbols": [
                     "lam11",
                     "lamVL5",
@@ -1190,7 +1273,7 @@
             },
             {
                 "identifier": "lam12",
-                "expression": "params[47] + 0.07957747154594767*params[31]*params[28]/(sqrt(params[7]) + sqrt(params[5])) - 0.01989436788648692*params[30]*params[27]/sqrt(params[5]) - 0.05968310365946076*params[29]*params[26]/sqrt(params[7])",
+                "expression": "params[48] + 0.07957747154594767*params[32]*params[29]/(sqrt(params[7]) + sqrt(params[5])) - 0.01989436788648692*params[31]*params[28]/sqrt(params[5]) - 0.05968310365946076*params[30]*params[27]/sqrt(params[7])",
                 "symbols": [
                     "lam12",
                     "lamVL2",
@@ -1205,7 +1288,7 @@
             },
             {
                 "identifier": "lam12p",
-                "expression": "params[46] - params[31]*params[28]/(6.283185307179586*sqrt(params[7]) + 6.283185307179586*sqrt(params[5]))",
+                "expression": "params[47] - params[32]*params[29]/(6.283185307179586*sqrt(params[7]) + 6.283185307179586*sqrt(params[5]))",
                 "symbols": [
                     "lam12p",
                     "lamVL2",
@@ -1216,21 +1299,21 @@
             },
             {
                 "identifier": "lam1Im",
-                "expression": "params[45]",
+                "expression": "params[46]",
                 "symbols": [
                     "lam1Im"
                 ]
             },
             {
                 "identifier": "lam1Re",
-                "expression": "params[44]",
+                "expression": "params[45]",
                 "symbols": [
                     "lam1Re"
                 ]
             },
             {
                 "identifier": "lam22",
-                "expression": "params[43] - 0.03978873577297384*params[31]**2/(sqrt(params[7]) + sqrt(params[5])) - 0.009947183943243459*params[30]**2/sqrt(params[5]) - 0.02984155182973038*params[29]**2/sqrt(params[7])",
+                "expression": "params[44] - 0.03978873577297384*params[32]**2/(sqrt(params[7]) + sqrt(params[5])) - 0.009947183943243459*params[31]**2/sqrt(params[5]) - 0.02984155182973038*params[30]**2/sqrt(params[7])",
                 "symbols": [
                     "lam22",
                     "lamVL2",
@@ -1242,7 +1325,7 @@
             },
             {
                 "identifier": "lam23",
-                "expression": "params[42] - 0.05968310365946076*params[32]*params[29]/sqrt(params[7]) + 0.07957747154594767*params[31]*params[25]/(sqrt(params[7]) + sqrt(params[5])) - 0.01989436788648692*params[30]*params[24]/sqrt(params[5])",
+                "expression": "params[43] - 0.05968310365946076*params[33]*params[30]/sqrt(params[7]) + 0.07957747154594767*params[32]*params[26]/(sqrt(params[7]) + sqrt(params[5])) - 0.01989436788648692*params[31]*params[25]/sqrt(params[5])",
                 "symbols": [
                     "lam23",
                     "lamVL10",
@@ -1257,7 +1340,7 @@
             },
             {
                 "identifier": "lam23p",
-                "expression": "params[41] - params[31]*params[25]/(6.283185307179586*sqrt(params[7]) + 6.283185307179586*sqrt(params[5]))",
+                "expression": "params[42] - params[32]*params[26]/(6.283185307179586*sqrt(params[7]) + 6.283185307179586*sqrt(params[5]))",
                 "symbols": [
                     "lam23p",
                     "lamVL2",
@@ -1268,21 +1351,21 @@
             },
             {
                 "identifier": "lam2Im",
-                "expression": "params[40]",
+                "expression": "params[41]",
                 "symbols": [
                     "lam2Im"
                 ]
             },
             {
                 "identifier": "lam2Re",
-                "expression": "params[39]",
+                "expression": "params[40]",
                 "symbols": [
                     "lam2Re"
                 ]
             },
             {
                 "identifier": "lam31",
-                "expression": "params[38] - 0.05968310365946076*params[32]*params[26]/sqrt(params[7]) + 0.07957747154594767*params[28]*params[25]/(sqrt(params[7]) + sqrt(params[5])) - 0.01989436788648692*params[27]*params[24]/sqrt(params[5])",
+                "expression": "params[39] - 0.05968310365946076*params[33]*params[27]/sqrt(params[7]) + 0.07957747154594767*params[29]*params[26]/(sqrt(params[7]) + sqrt(params[5])) - 0.01989436788648692*params[28]*params[25]/sqrt(params[5])",
                 "symbols": [
                     "lam31",
                     "lamVL10",
@@ -1297,7 +1380,7 @@
             },
             {
                 "identifier": "lam31p",
-                "expression": "params[37] - params[28]*params[25]/(6.283185307179586*sqrt(params[7]) + 6.283185307179586*sqrt(params[5]))",
+                "expression": "params[38] - params[29]*params[26]/(6.283185307179586*sqrt(params[7]) + 6.283185307179586*sqrt(params[5]))",
                 "symbols": [
                     "lam31p",
                     "lamVL5",
@@ -1308,7 +1391,7 @@
             },
             {
                 "identifier": "lam33",
-                "expression": "params[36] - 0.07957747154594767*params[33]**2/sqrt(params[6]) - 0.02984155182973038*params[32]**2/sqrt(params[7]) - 0.03978873577297384*params[25]**2/(sqrt(params[7]) + sqrt(params[5])) - 0.009947183943243459*params[24]**2/sqrt(params[5])",
+                "expression": "params[37] - 0.07957747154594767*params[34]**2/sqrt(params[6]) - 0.02984155182973038*params[33]**2/sqrt(params[7]) - 0.03978873577297384*params[26]**2/(sqrt(params[7]) + sqrt(params[5])) - 0.009947183943243459*params[25]**2/sqrt(params[5])",
                 "symbols": [
                     "lam33",
                     "lamVL1",
@@ -1322,28 +1405,28 @@
             },
             {
                 "identifier": "lam3Im",
-                "expression": "params[35]",
+                "expression": "params[36]",
                 "symbols": [
                     "lam3Im"
                 ]
             },
             {
                 "identifier": "lam3Re",
-                "expression": "params[34]",
+                "expression": "params[35]",
                 "symbols": [
                     "lam3Re"
                 ]
             },
             {
                 "identifier": "g1",
-                "expression": "sqrt(params[51]**2)",
+                "expression": "sqrt(params[52]**2)",
                 "symbols": [
                     "g1"
                 ]
             },
             {
                 "identifier": "g2",
-                "expression": "sqrt(-0.01326291192432461*params[50]**4/sqrt(params[7]) + params[50]**2)",
+                "expression": "sqrt(-0.01326291192432461*params[51]**4/sqrt(params[7]) + params[51]**2)",
                 "symbols": [
                     "g2",
                     "musqSU2"
@@ -1351,7 +1434,7 @@
             },
             {
                 "identifier": "g3",
-                "expression": "sqrt(-0.01989436788648692*params[49]**4/sqrt(params[6]) + params[49]**2)",
+                "expression": "sqrt(-0.01989436788648692*params[50]**4/sqrt(params[6]) + params[50]**2)",
                 "symbols": [
                     "g3",
                     "musqSU3"
@@ -1373,7 +1456,7 @@
             },
             {
                 "identifier": "mu1sq",
-                "expression": "-0.009498860966469168*params[50]**2*params[26] + 0.01899772193293834*params[28]**2*log(params[90]/(sqrt(params[7]) + sqrt(params[5]))) + 0.009498860966469168*params[28]**2 + 0.003166286988823056*params[27]**2*log(params[90]/(2*sqrt(params[5]))) + 0.001583143494411528*params[27]**2 - 0.000791571747205764*params[27]*params[23] - 0.002374715241617292*params[27]*params[22]*sqrt(params[7])/sqrt(params[5]) - 0.006332573977646112*params[27]*params[20]*sqrt(params[6])/sqrt(params[5]) + 0.03978873577297384*params[27]*sqrt(params[5]) + 0.004749430483234584*params[26]**2 - 0.002374715241617292*params[26]*params[22]*sqrt(params[5])/sqrt(params[7]) - 0.01187357620808646*params[26]*params[21] - 0.01899772193293834*params[26]*params[19]*sqrt(params[6])/sqrt(params[7]) + 0.1193662073189215*params[26]*sqrt(params[7]) + params[11] + 0.004749430483234584*(params[50]**4 - 8*params[50]**2*params[26] + 2*params[26]**2)*log(params[90]/(2*sqrt(params[7])))",
+                "expression": "-0.009498860966469168*params[51]**2*params[27] + 0.01899772193293834*params[29]**2*log(params[91]/(sqrt(params[7]) + sqrt(params[5]))) + 0.009498860966469168*params[29]**2 + 0.003166286988823056*params[28]**2*log(params[91]/(2*sqrt(params[5]))) + 0.001583143494411528*params[28]**2 - 0.000791571747205764*params[28]*params[24] - 0.002374715241617292*params[28]*params[23]*sqrt(params[7])/sqrt(params[5]) - 0.006332573977646112*params[28]*params[21]*sqrt(params[6])/sqrt(params[5]) + 0.03978873577297384*params[28]*sqrt(params[5]) + 0.004749430483234584*params[27]**2 - 0.002374715241617292*params[27]*params[23]*sqrt(params[5])/sqrt(params[7]) - 0.01187357620808646*params[27]*params[22] - 0.01899772193293834*params[27]*params[20]*sqrt(params[6])/sqrt(params[7]) + 0.1193662073189215*params[27]*sqrt(params[7]) + params[11] + 0.004749430483234584*(params[51]**4 - 8*params[51]**2*params[27] + 2*params[27]**2)*log(params[91]/(2*sqrt(params[7])))",
                 "symbols": [
                     "RGScale",
                     "g2",
@@ -1393,7 +1476,7 @@
             },
             {
                 "identifier": "mu2sq",
-                "expression": "-0.009498860966469168*params[50]**2*params[29] + 0.01899772193293834*params[31]**2*log(params[90]/(sqrt(params[7]) + sqrt(params[5]))) + 0.009498860966469168*params[31]**2 + 0.003166286988823056*params[30]**2*log(params[90]/(2*sqrt(params[5]))) + 0.001583143494411528*params[30]**2 - 0.000791571747205764*params[30]*params[23] - 0.002374715241617292*params[30]*params[22]*sqrt(params[7])/sqrt(params[5]) - 0.006332573977646112*params[30]*params[20]*sqrt(params[6])/sqrt(params[5]) + 0.03978873577297384*params[30]*sqrt(params[5]) + 0.004749430483234584*params[29]**2 - 0.002374715241617292*params[29]*params[22]*sqrt(params[5])/sqrt(params[7]) - 0.01187357620808646*params[29]*params[21] - 0.01899772193293834*params[29]*params[19]*sqrt(params[6])/sqrt(params[7]) + 0.1193662073189215*params[29]*sqrt(params[7]) + params[10] + 0.004749430483234584*(params[50]**4 - 8*params[50]**2*params[29] + 2*params[29]**2)*log(params[90]/(2*sqrt(params[7])))",
+                "expression": "-0.009498860966469168*params[51]**2*params[30] + 0.01899772193293834*params[32]**2*log(params[91]/(sqrt(params[7]) + sqrt(params[5]))) + 0.009498860966469168*params[32]**2 + 0.003166286988823056*params[31]**2*log(params[91]/(2*sqrt(params[5]))) + 0.001583143494411528*params[31]**2 - 0.000791571747205764*params[31]*params[24] - 0.002374715241617292*params[31]*params[23]*sqrt(params[7])/sqrt(params[5]) - 0.006332573977646112*params[31]*params[21]*sqrt(params[6])/sqrt(params[5]) + 0.03978873577297384*params[31]*sqrt(params[5]) + 0.004749430483234584*params[30]**2 - 0.002374715241617292*params[30]*params[23]*sqrt(params[5])/sqrt(params[7]) - 0.01187357620808646*params[30]*params[22] - 0.01899772193293834*params[30]*params[20]*sqrt(params[6])/sqrt(params[7]) + 0.1193662073189215*params[30]*sqrt(params[7]) + params[10] + 0.004749430483234584*(params[51]**4 - 8*params[51]**2*params[30] + 2*params[30]**2)*log(params[91]/(2*sqrt(params[7])))",
                 "symbols": [
                     "RGScale",
                     "g2",
@@ -1413,7 +1496,7 @@
             },
             {
                 "identifier": "mu3sq",
-                "expression": "0.004749430483234584*params[50]**4*log(params[90]/(2*sqrt(params[7]))) - 0.009498860966469168*params[50]**2*params[32]*(4*log(params[90]/(2*sqrt(params[7]))) + 1) - 0.03799544386587667*params[49]**2*params[33]*(4*log(params[90]/(2*sqrt(params[6]))) + 1) + 0.01266514795529222*params[33]**2*(2*log(params[90]/(2*sqrt(params[6]))) + 1) + 0.3183098861837907*params[33]*sqrt(params[6]) - 0.006332573977646112*params[33]*(params[20]*sqrt(params[5]) + 3*params[19]*sqrt(params[7]) + 10*params[17]*sqrt(params[6]))/sqrt(params[6]) + 0.004749430483234584*params[32]**2*(2*log(params[90]/(2*sqrt(params[7]))) + 1) + 0.1193662073189215*params[32]*sqrt(params[7]) - 0.002374715241617292*params[32]*(params[22]*sqrt(params[5]) + 5*params[21]*sqrt(params[7]) + 8*params[19]*sqrt(params[6]))/sqrt(params[7]) + 0.009498860966469168*params[25]**2*(2*log(params[90]/(sqrt(params[7]) + sqrt(params[5]))) + 1) + 0.001583143494411528*params[24]**2*(2*log(params[90]/(2*sqrt(params[5]))) + 1) + 0.03978873577297384*params[24]*sqrt(params[5]) - 0.000791571747205764*params[24]*(params[23]*sqrt(params[5]) + 3*params[22]*sqrt(params[7]) + 8*params[20]*sqrt(params[6]))/sqrt(params[5]) + params[8]",
+                "expression": "0.004749430483234584*params[51]**4*log(params[91]/(2*sqrt(params[7]))) - 0.009498860966469168*params[51]**2*params[33]*(4*log(params[91]/(2*sqrt(params[7]))) + 1) - 0.03799544386587667*params[50]**2*params[34]*(4*log(params[91]/(2*sqrt(params[6]))) + 1) + 0.01266514795529222*params[34]**2*(2*log(params[91]/(2*sqrt(params[6]))) + 1) + 0.3183098861837907*params[34]*sqrt(params[6]) - 0.006332573977646112*params[34]*(params[21]*sqrt(params[5]) + 3*params[20]*sqrt(params[7]) + 10*params[18]*sqrt(params[6]))/sqrt(params[6]) + 0.004749430483234584*params[33]**2*(2*log(params[91]/(2*sqrt(params[7]))) + 1) + 0.1193662073189215*params[33]*sqrt(params[7]) - 0.002374715241617292*params[33]*(params[23]*sqrt(params[5]) + 5*params[22]*sqrt(params[7]) + 8*params[20]*sqrt(params[6]))/sqrt(params[7]) + 0.009498860966469168*params[26]**2*(2*log(params[91]/(sqrt(params[7]) + sqrt(params[5]))) + 1) + 0.001583143494411528*params[25]**2*(2*log(params[91]/(2*sqrt(params[5]))) + 1) + 0.03978873577297384*params[25]*sqrt(params[5]) - 0.000791571747205764*params[25]*(params[24]*sqrt(params[5]) + 3*params[23]*sqrt(params[7]) + 8*params[21]*sqrt(params[6]))/sqrt(params[5]) + params[8]",
                 "symbols": [
                     "RGScale",
                     "g2",
@@ -1436,7 +1519,7 @@
             },
             {
                 "identifier": "mu3US",
-                "expression": "params[53]",
+                "expression": "params[54]",
                 "symbols": [
                     "T"
                 ]
@@ -1448,7 +1531,7 @@
         "expressions": [
             {
                 "identifier": "mVsq0",
-                "expression": "params[50]**2*(params[3]**2 + params[2]**2 + params[1]**2)/4",
+                "expression": "params[51]**2*(params[3]**2 + params[2]**2 + params[1]**2)/4",
                 "symbols": [
                     "g2",
                     "v1",
@@ -1458,7 +1541,7 @@
             },
             {
                 "identifier": "mVsq1",
-                "expression": "params[50]**2*(params[3]**2 + params[2]**2 + params[1]**2)/4",
+                "expression": "params[51]**2*(params[3]**2 + params[2]**2 + params[1]**2)/4",
                 "symbols": [
                     "g2",
                     "v1",
@@ -1468,7 +1551,7 @@
             },
             {
                 "identifier": "mVsq2",
-                "expression": "(params[51]**2 + params[50]**2)*(params[3]**2 + params[2]**2 + params[1]**2)/4",
+                "expression": "(params[52]**2 + params[51]**2)*(params[3]**2 + params[2]**2 + params[1]**2)/4",
                 "symbols": [
                     "g1",
                     "g2",
@@ -1484,7 +1567,7 @@
         "expressions": [
             {
                 "identifier": "stW",
-                "expression": "params[51]/sqrt(params[51]**2 + params[50]**2)",
+                "expression": "params[52]/sqrt(params[52]**2 + params[51]**2)",
                 "symbols": [
                     "g1",
                     "g2"
@@ -1492,7 +1575,7 @@
             },
             {
                 "identifier": "ctW",
-                "expression": "params[50]/sqrt(params[51]**2 + params[50]**2)",
+                "expression": "params[51]/sqrt(params[52]**2 + params[51]**2)",
                 "symbols": [
                     "g1",
                     "g2"
@@ -1556,7 +1639,7 @@
         "expressions": [
             {
                 "identifier": "LO",
-                "expression": "params[48]*params[3]**4/4 + params[43]*params[2]**4/4 + params[36]*params[1]**4/4 - params[12]*params[3]*params[2] - params[8]*params[1]**2/2 + params[3]**2*(-2*params[11] + params[2]**2*(params[47] + params[46] + 2*params[44]) + params[1]**2*(params[38] + params[37] + 2*params[34]))/4 + params[2]**2*(-2*params[10] + params[1]**2*(params[42] + params[41] + 2*params[39]))/4",
+                "expression": "params[49]*params[3]**4/4 + params[44]*params[2]**4/4 + params[37]*params[1]**4/4 - params[12]*params[3]*params[2] - params[8]*params[1]**2/2 + params[3]**2*(-2*params[11] + params[2]**2*(params[48] + params[47] + 2*params[45]) + params[1]**2*(params[39] + params[38] + 2*params[35]))/4 + params[2]**2*(-2*params[10] + params[1]**2*(params[43] + params[42] + 2*params[40]))/4",
                 "symbols": [
                     "lam11",
                     "lam12",
@@ -1581,7 +1664,7 @@
             },
             {
                 "identifier": "NLO",
-                "expression": "-0.02652582384864923*params[140]**(3/2) - 0.02652582384864923*params[139]**(3/2) - 0.02652582384864923*params[138]**(3/2) - 0.02652582384864923*params[137]**(3/2) - 0.02652582384864923*params[136]**(3/2) - 0.02652582384864923*params[135]**(3/2) - 0.02652582384864923*params[134]**(3/2) - 0.02652582384864923*params[133]**(3/2) - 0.02652582384864923*params[132]**(3/2) - 0.02652582384864923*params[131]**(3/2) - 0.02652582384864923*params[130]**(3/2) - 0.02652582384864923*params[129]**(3/2) - 0.05305164769729845*params[16]**(3/2) - 0.05305164769729845*params[15]**(3/2) - 0.05305164769729845*params[14]**(3/2)",
+                "expression": "-0.02652582384864923*params[141]**(3/2) - 0.02652582384864923*params[140]**(3/2) - 0.02652582384864923*params[139]**(3/2) - 0.02652582384864923*params[138]**(3/2) - 0.02652582384864923*params[137]**(3/2) - 0.02652582384864923*params[136]**(3/2) - 0.02652582384864923*params[135]**(3/2) - 0.02652582384864923*params[134]**(3/2) - 0.02652582384864923*params[133]**(3/2) - 0.02652582384864923*params[132]**(3/2) - 0.02652582384864923*params[131]**(3/2) - 0.02652582384864923*params[130]**(3/2) - 0.05305164769729845*params[17]**(3/2) - 0.05305164769729845*params[16]**(3/2) - 0.05305164769729845*params[15]**(3/2)",
                 "symbols": [
                     "MSsq01",
                     "MSsq02",
@@ -2552,6 +2635,7 @@
             "mu1sq",
             "mu12sqRe",
             "mu12sqIm",
+            "missing",
             "mVsq2",
             "mVsq1",
             "mVsq0",
