@@ -161,6 +161,11 @@ def setUpTrackVEV(
                         allSymbols, 
                         pythonisedExpressions["betaFunctions4D"]["fileName"]
                     ),
+                "bounded": ParsedExpressionSystemArray(
+                        pythonisedExpressions["bounded"]["expressions"], 
+                        allSymbols, 
+                        pythonisedExpressions["bounded"]["fileName"]
+                    ),
                 "TRange": tuple(_drange(
                         args.TRangeStart, 
                         args.TRangeEnd, 

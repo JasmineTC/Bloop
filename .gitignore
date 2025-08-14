@@ -7,7 +7,10 @@ build/
 *.code-workspace
 
 **/OutputResult/*
-
+Mathematica/DRalgoOutput
+Testing
+Results
+*.spyproject
 *.swp
 *.png
 *.pstats

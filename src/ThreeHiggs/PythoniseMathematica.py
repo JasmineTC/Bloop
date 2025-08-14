@@ -27,7 +27,7 @@ def replaceSymbolsWithIndices(expression, symbols):
     return expression
 
 def pythoniseExpressionArray(line, allSymbols):
-    identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
+    identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("missing", line)
     
     identifier = removeSuffices(replaceGreekSymbols(identifier))
     expression = parse_mathematica(replaceSymbolsConst(replaceGreekSymbols(line)))
@@ -38,7 +38,7 @@ def pythoniseExpressionArray(line, allSymbols):
             "symbols": sorted(symbols)}
 
 def pythoniseExpression(line):
-    identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
+    identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("missing", line)
 
     identifier = removeSuffices(replaceGreekSymbols(identifier))
     expression = parse_mathematica(replaceSymbolsConst(replaceGreekSymbols(line)))
@@ -83,15 +83,21 @@ def pythoniseMathematica(args):
     veffLines += getLines(args.nloFile)
     if (args.loopOrder >= 2):
         veffLines += getLines(args.nnloFile)
-        
-    allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")], 
+    
+    allSymbols = getLines(args.allSymbolsFile, mode = "json") + ["missing"]
+    allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in allSymbols], 
                         reverse = True)
+
     (outputFile := Path(args.pythonisedExpressionsFile)).parent.mkdir(exist_ok=True, 
                                                              parents=True)  
     ## Move get lines to the functions? -- Would need to rework veffLines in this case
     ## Not ideal to have nested dicts but is future proof for when we move to arrays
     dump(
         {
+            "bounded": {
+                "expressions": pythoniseExpressionSystemArray(getLines(args.boundedConditions), allSymbols),
+                "fileName": "bounded",
+            },
             "betaFunctions4D": {
                 "expressions": pythoniseExpressionSystemArray(getLines(args.betaFunctions4DFile), allSymbols),
                 "fileName": args.betaFunctions4DFile,

@@ -57,6 +57,7 @@ class TrackVEV:
     effectivePotential: str = "effectivePotentialInstance"
     dimensionalReduction: str = "dimensionalReductionInstance"
     betaFunction4DExpression: str = "betaFunction4DExpression" 
+    bounded: str = "bounded"
     
     verbose: bool = False
     
@@ -95,7 +96,7 @@ class TrackVEV:
                                "vevDepthImag": [],
                                "vevLocation": [], 
                                "bIsPerturbative": [], 
-                               "bIsBounded": []}
+                               "failureReason": False}
 
         counter = 0
         ## Initialise vevLocation to feed into the minimisation algo so it can
@@ -109,6 +110,11 @@ class TrackVEV:
             
             params = self.runParams4D(betaSpline4D, T)
             
+            ##
+            if not np.all(self.bounded.evaluateUnordered(params)):
+                minimizationResults["failureReason"] = "unBounded"
+                return
+            
             isPert = bIsPerturbative(
                 params, 
                 self.pertSymbols, 
@@ -118,7 +124,7 @@ class TrackVEV:
             params = self.dimensionalReduction.hardToSoft.evaluate(params)
             params = self.dimensionalReduction.softScaleRGE.evaluate(params)
             params = self.dimensionalReduction.softToUltraSoft.evaluate(params)
-            
+
             vevLocation, vevDepth = self.effectivePotential.findGlobalMinimum(
                T, 
                params, 
@@ -129,7 +135,6 @@ class TrackVEV:
             minimizationResults["vevDepthReal"].append(vevDepth.real)
             minimizationResults["vevDepthImag"].append(vevDepth.imag)
             minimizationResults["vevLocation"].append(vevLocation)
-            #bIsBounded(paramsForMatchingDict)
             minimizationResults["bIsPerturbative"].append(isPert)
 
             if np.all( vevLocation < 0.5):
