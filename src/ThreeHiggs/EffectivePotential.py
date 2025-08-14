@@ -141,7 +141,7 @@ class EffectivePotential:
         self.allSymbols = allSymbols
 
     def evaluatePotential(self, fields: list[float], T:float, params3D) -> complex:
-        array = self.expressionsArray.getParamsArray(compFieldDepParams(
+        array = self.expressionsArray.dictToArray(compFieldDepParams(
             fields,
             T,
             params3D,
@@ -155,7 +155,7 @@ class EffectivePotential:
             self.verbose
         ))
 
-        return sum(self.expressionsArray.getParamSubset(self.expressionsArray.evaluate(array)))
+        return sum(self.expressionsArray.evaluateUnordered(array))
 
     def findGlobalMinimum(self,T:float, 
                           params3D,
