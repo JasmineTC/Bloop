@@ -116,11 +116,11 @@ class TrackVEV:
                 self.allSymbols
             )
             print(self.bounded.evaluateUnordered(params))
-            exit()
+
             params = self.dimensionalReduction.hardToSoft.evaluate(params)
             params = self.dimensionalReduction.softScaleRGE.evaluate(params)
             params = self.dimensionalReduction.softToUltraSoft.evaluate(params)
-            
+
             vevLocation, vevDepth = self.effectivePotential.findGlobalMinimum(
                T, 
                params, 
