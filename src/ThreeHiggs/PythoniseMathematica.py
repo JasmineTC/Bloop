@@ -27,7 +27,7 @@ def replaceSymbolsWithIndices(expression, symbols):
     return expression
 
 def pythoniseExpressionArray(line, allSymbols):
-    identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
+    identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("Null", line)
     
     identifier = removeSuffices(replaceGreekSymbols(identifier))
     expression = parse_mathematica(replaceSymbolsConst(replaceGreekSymbols(line)))
@@ -38,7 +38,7 @@ def pythoniseExpressionArray(line, allSymbols):
             "symbols": sorted(symbols)}
 
 def pythoniseExpression(line):
-    identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("anonymous", line)
+    identifier, line = map(str.strip, line.split("->")) if ("->" in line) else ("Null", line)
 
     identifier = removeSuffices(replaceGreekSymbols(identifier))
     expression = parse_mathematica(replaceSymbolsConst(replaceGreekSymbols(line)))
@@ -83,8 +83,9 @@ def pythoniseMathematica(args):
     veffLines += getLines(args.nloFile)
     if (args.loopOrder >= 2):
         veffLines += getLines(args.nnloFile)
-        
-    allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in getLines(args.allSymbolsFile, mode = "json")], 
+    
+    allSymbols = getLines(args.allSymbolsFile, mode = "json") + ["Null"]
+    allSymbols = sorted([replaceGreekSymbols(symbol) for symbol in allSymbols], 
                         reverse = True)
     (outputFile := Path(args.pythonisedExpressionsFile)).parent.mkdir(exist_ok=True, 
                                                              parents=True)  
