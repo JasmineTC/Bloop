@@ -16,13 +16,14 @@ def interpretData(
     bmInput,
     fieldNames
 ):
-    interpResult = {"bmNumber": bmNumber,
+    processedResult = {"bmNumber": bmNumber,
                     "bmInput": bmInput,
                     "strong": False,
+                    "complex": False,
                     "results":{}}
     
     if result["failureReason"]:
-        return interpResult
+        return processedResult | {"failureReason": result["failureReason"]}
     
     PTTemps = set()
     allFieldValues = result["vevLocation"]/np.sqrt(result["T"])
@@ -41,14 +42,16 @@ def interpretData(
                 strengthResults.append([strength, T])
                 PTTemps.add(T)
                 
-                if not interpResult["strong"]:
-                    interpResult["strong"] = strength if strength > 0.6 else False
-                if  interpResult["strong"]:
-                    interpResult["strong"] = strength if strength > interpResult["strong"] else interpResult["strong"]
+                if not processedResult["strong"]:
+                    processedResult["strong"] = strength if strength > 0.6 else False
+                if  processedResult["strong"]:
+                    processedResult["strong"] = strength if strength > processedResult["strong"] else processedResult["strong"]
                     
-            interpResult["results"][f"{fieldNames[idx]}"] = strengthResults
+            processedResult["results"][f"{fieldNames[idx]}"] = strengthResults
             
-    interpResult["steps"] = len(PTTemps)
-    interpResult["bIsPerturbative"] = bool(np.all(result["bIsPerturbative"]))
-    return interpResult 
+    processedResult["steps"] = len(PTTemps)
+    processedResult["bIsPerturbative"] = bool(np.all(result["bIsPerturbative"]))
+    imag2RealRatio = abs(np.array(result["vevDepthImag"])/np.array(result["vevDepthReal"]))
+    processedResult["complex"] = bool(np.any(imag2RealRatio > 1e-8))
+    return processedResult 
 
