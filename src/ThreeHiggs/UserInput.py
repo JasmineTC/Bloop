@@ -118,6 +118,12 @@ class UserInput(argparse.ArgumentParser):
                           default = "ThreeHiggs.Z2_ThreeHiggsBmGenerator",
                           dest = 'bmGenerator',
                           metavar='')
+        
+        self.add_argument('--boundedConditions', 
+                          action = 'store', 
+                          default = "Data/Z2_3HDM/ModelFiles/Misc/bounded.txt",
+                          dest = 'boundedConditions',
+                          metavar='')
  
         self.add_argument('--allSymbolsFile', 
                           action = 'store', 
