@@ -20,6 +20,10 @@ def interpretData(
                     "bmInput": bmInput,
                     "strong": False,
                     "results":{}}
+    
+    if result["failureReason"]:
+        return interpResult
+    
     PTTemps = set()
     allFieldValues = result["vevLocation"]/np.sqrt(result["T"])
     for idx, fieldValues in enumerate(allFieldValues):
@@ -48,4 +52,3 @@ def interpretData(
     interpResult["bIsPerturbative"] = bool(np.all(result["bIsPerturbative"]))
     return interpResult 
 
-    
