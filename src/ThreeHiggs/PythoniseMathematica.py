@@ -95,7 +95,7 @@ def pythoniseMathematica(args):
     dump(
         {
             "bounded": {
-                "expressions": pythoniseExpressionSystemArray(getLines("../../Mathematica/bounded.txt"), allSymbols),
+                "expressions": pythoniseExpressionSystemArray(getLines("Data/Z2_3HDM/ModelFiles/Misc/bounded.txt"), allSymbols),
                 "fileName": "bounded",
             },
             "betaFunctions4D": {
