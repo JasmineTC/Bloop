@@ -13,7 +13,7 @@ pathToDRalgo = "/home/jasmine/.Mathematica/Applications/DRalgo/DRalgo.m"
 Get[pathToDRalgo]
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Import helper functions *)
 
 
@@ -28,10 +28,23 @@ hardToSoftDirectory = "DRalgoOutput/Z2_3HDM/HardToSoft";
 softToUltrasoftDirectory = "DRalgoOutput/Z2_3HDM/SoftToUltrasoft";
 effectivePotentialDirectory = "DRalgoOutput/Z2_3HDM/EffectivePotential";
 variables = "DRalgoOutput/Z2_3HDM/Variables";
+misc = "DRalgoOutput/Z2_3HDM/Misc";
+
+
+exportUTF8[misc<>"/bounded.txt",
+{\[Lambda]11>0,
+\[Lambda]22>0,
+\[Lambda]33>0,
+\[Lambda]12 + min[0, \[Lambda]12p - 2*Sqrt[\[Lambda]1Re^2 + \[Lambda]1Im^2] ] > -2*sqrt[\[Lambda]11*\[Lambda]22],
+\[Lambda]31 + min[0, \[Lambda]31p - 2*Sqrt[\[Lambda]3Re^2 + \[Lambda]3Im^2] ] > -2*sqrt[\[Lambda]11*\[Lambda]33],
+\[Lambda]23 + min[0, \[Lambda]23p - 2*Sqrt[\[Lambda]2Re^2 + \[Lambda]2Im^2] ] > -2*sqrt[\[Lambda]22*\[Lambda]33],
+sqrt[lam33]*(\[Lambda]12 + min[0, \[Lambda]12p - 2*Sqrt[\[Lambda]1Re^2 + \[Lambda]1Im^2] ]) + sqrt[lam11]*(\[Lambda]23 + min[0, \[Lambda]23p - 2*Sqrt[\[Lambda]2Re^2 + \[Lambda]2Im^2] ]) + sqrt[lam22]*(\[Lambda]31 + min[0, \[Lambda]31p - 2*Sqrt[\[Lambda]3Re^2 + \[Lambda]3Im^2] ]) >= 0 ||
+lam33*(\[Lambda]12 + min[0, \[Lambda]12p - 2*Sqrt[\[Lambda]1Re^2 + \[Lambda]1Im^2] ])^2 + lam11*(\[Lambda]23 + min[0, \[Lambda]23p - 2*Sqrt[\[Lambda]2Re^2 + \[Lambda]2Im^2] ])^2 + lam22*(\[Lambda]31 + min[0, \[Lambda]31p - 2*Sqrt[\[Lambda]3Re^2 + \[Lambda]3Im^2] ])^2 - lam11*lam22*lam33 - 2*(\[Lambda]12 + min[0, \[Lambda]12p - 2*Sqrt[\[Lambda]1Re^2 + \[Lambda]1Im^2] ])*(\[Lambda]31 + min[0, \[Lambda]31p - 2*Sqrt[\[Lambda]3Re^2 + \[Lambda]3Im^2] ])*(\[Lambda]23 + min[0, \[Lambda]23p - 2*Sqrt[\[Lambda]2Re^2 + \[Lambda]2Im^2] ]) < 0
+}];
 
 
 (* ::Section::Closed:: *)
-(*Model*)
+(*Model\[AliasDelimiter]*)
 
 
 (*See 1909.09234 [hep-ph], eq (1) *)
