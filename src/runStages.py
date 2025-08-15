@@ -15,11 +15,6 @@ if args.firstStage <= Stages.convertMathematica <= args.lastStage:
     from ThreeHiggs.PythoniseMathematica import pythoniseMathematica
     pythoniseMathematica(args)
 
-    from ThreeHiggs.ConvertMathematica import convertMathematica
-    generate_veff_module(args)
-    compile_veff_submodule()
-    convertMathematica(args)
-
 if args.firstStage <= Stages.generateBenchmark <= args.lastStage:
     if args.verbose:
         print("Benchmark generation stage started")
