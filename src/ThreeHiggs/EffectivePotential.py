@@ -4,7 +4,7 @@ from numba import njit
 from itertools import chain
 import nlopt
 from dataclasses import dataclass, InitVar
-
+from .Veff import Veff
 @njit
 def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
     subEigenValues = np.empty( (matrixNumber, matrixSize) ) 
@@ -156,7 +156,6 @@ class EffectivePotential:
         ))
 
 
-        from .Veff import Veff
         return sum(Veff(*array[::-1]))
 
     def findGlobalMinimum(self,T:float, 

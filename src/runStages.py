@@ -1,6 +1,4 @@
-
 from ThreeHiggs.UserInput import UserInput, Stages
-from Veff_generation import generate_veff_module, compile_veff_submodule
 from importlib import import_module
 import sys
 sys.path.append("../src/")
