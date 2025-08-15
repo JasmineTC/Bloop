@@ -436,7 +436,7 @@ exportUTF8[effectivePotentialDirectory<>"/vectorShorthands.txt", vectorShorthand
 It's because our scalar rotation matrix is so large. **)
 AbsoluteTiming[
 	(** Tell DRalgo to rotate the fields to mass diagonal basis **)
-	RotateTensorsCustomMass[DSRot,DVRot,ScalarMassDiag,VectorMassDiagSimple];
+	RotateTensorsCustomMass[DSRot,DVRot,ScalarMassDiag,VectorMassDiagSimple, FastRotation-> True];
 	CalculatePotentialUS[]
 ]
 
@@ -447,12 +447,9 @@ veffNNLO = PrintEffectivePotential["NNLO"]; (* NOT simplified as seems to change
 
 
 (*Done for consistent in out structure for python*)
-veffLOR = {LO -> veffLO};
-veffNLOR = {NLO -> veffNLO};
-veffNNLOR = {NNLO -> veffNNLO};
-exportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", veffLOR];
-exportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", veffNLOR];
-exportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", veffNNLOR];
+exportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", veffLO];
+exportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", veffNLO];
+exportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", veffNNLO];
 
 
 exportUTF8[
@@ -491,15 +488,9 @@ equationSymbols={
 	"vectorMasses"->{
 		"Out" -> extractSymbols[VectorMassDiagSimple],
 		"In" -> extractSymbols[VectorMassExpressions]["RHS"]},
-	"LO"->{
-		"Out" -> extractSymbols[veffLOR]["LHS"],
-		"In" -> extractSymbols[veffLOR]["RHS"]},
-	"NLO"->{
-		"Out" -> extractSymbols[veffNLOR]["LHS"],
-		"In" -> extractSymbols[veffNLOR]["RHS"]},
-	"NNLO"->{
-		"Out" -> extractSymbols[veffNNLOR]["LHS"],
-		"In" -> extractSymbols[veffNNLOR]["RHS"]},
+	"LO"->extractSymbols[veffLO],
+	"NLO"-> extractSymbols[veffNLO],
+	"NNLO"-> extractSymbols[veffNNLO],
 	"rotationSymbols"->extractSymbols[DSRot],
 	"scalarMassNames"->extractSymbols[ScalarMassDiag]};
 
@@ -508,6 +499,3 @@ exportUTF8[variables<>"/EquationSymbols.json", equationSymbols];
 
 
 exportUTF8[variables<>"/allSymbols.json",symbolsFromDict[equationSymbols]];
-
-
-symbolsFromDict[equationSymbols]
