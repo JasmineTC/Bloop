@@ -156,7 +156,7 @@ class EffectivePotential:
         ))
 
 
-        return sum(Veff(*array[::-1]))
+        return sum(Veff(*array))
 
     def findGlobalMinimum(self,T:float, 
                           params3D,

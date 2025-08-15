@@ -194,20 +194,20 @@ def generate_lo_submodule(name, filename, lo_file, allSymbols):
         # Function declaration and inputs
         file.write(f'cpdef double complex {name}(\n')
         
-        for param in allSymbols:
+        for param in allSymbols[::-1]:
             param = convert_to_cython_syntax(param)
             file.write(f'    double complex {param},\n')
         
         file.write('    ):\n')
         file.write(f'    return _{name}(\n')
-        for param in allSymbols:
+        for param in allSymbols[::-1]:
             param = convert_to_cython_syntax(param)
             file.write(f'        {param},\n')
         file.write('    )\n\n\n')
         
         file.write(f'cdef double complex _{name}(\n')
         
-        for param in allSymbols:
+        for param in allSymbols[::-1]:
             param = convert_to_cython_syntax(param)
             file.write(f'    double complex {param},\n')
         
