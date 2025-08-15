@@ -163,6 +163,10 @@ def pythoniseMathematica(args):
         indent = 4
     )
 
+    from Veff_generation import generate_veff_module, compile_veff_submodule
+    generate_veff_module(args, allSymbols)
+    compile_veff_submodule()
+
 from unittest import TestCase
 class PythoniseMathematicaUnitTests(TestCase):
     def test_replaceGreekSymbols(self):

@@ -105,6 +105,8 @@ class TrackVEV:
         vevLocation = np.array(self.initialGuesses[0])
         
         for T in self.TRange:
+            #from pdb import set_trace
+            #set_trace()
             if self.verbose:
                 print (f'Start of temp = {T} loop')
             

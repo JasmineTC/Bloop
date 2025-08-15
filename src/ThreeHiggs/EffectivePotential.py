@@ -155,7 +155,9 @@ class EffectivePotential:
             self.verbose
         ))
 
-        return sum(self.expressionsArray.evaluateUnordered(array))
+
+        from .Veff import Veff
+        return sum(Veff(*array[::-1]))
 
     def findGlobalMinimum(self,T:float, 
                           params3D,

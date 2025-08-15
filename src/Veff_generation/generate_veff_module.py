@@ -15,7 +15,7 @@ from .mathematica_parsing import read_lines, get_terms
 
 
 
-def generate_veff_module(args):
+def generate_veff_module(args, allSymbols):
     """Creates the Veff module.
     """
     parent_dir = os.path.dirname(os.getcwd())
@@ -29,19 +29,19 @@ def generate_veff_module(args):
     name = 'lo'
     lo_file  = os.path.join(data_dir, args.loFile)
     filename = os.path.join(module_dir, 'lo.pyx')
-    lo_params = generate_lo_submodule(name, filename, lo_file)
+    lo_params = generate_lo_submodule(name, filename, lo_file, allSymbols)
     
     #================================== nlo ==================================#
     name     = 'nlo'
     nlo_file = os.path.join(data_dir, args.nloFile)
     filename = os.path.join(module_dir, 'nlo.pyx')
-    nlo_params = generate_lo_submodule(name, filename, nlo_file) if args.loopOrder > 0 else None
+    nlo_params = generate_lo_submodule(name, filename, nlo_file, allSymbols) if args.loopOrder > 0 else None
     
     #================================== nnlo =================================#
     name = 'nnlo'
     nnlo_file = os.path.join(data_dir, args.nnloFile)
     filename  = os.path.join(module_dir, 'nnlo.pyx')
-    nnlo_params = generate_lo_submodule(name, filename, nnlo_file) if args.loopOrder > 1 else None
+    nnlo_params = generate_lo_submodule(name, filename, nnlo_file, allSymbols) if args.loopOrder > 1 else None
     
     #================================== Veff =================================#
     filename = os.path.join(module_dir, 'veff.py')
@@ -168,7 +168,7 @@ def write_veff_params_function(file, lo_params, nlo_params, nnlo_params):
         file.write(f'        params["{param}"],\n')
     file.write('    )\n')
 
-def generate_lo_submodule(name, filename, lo_file):
+def generate_lo_submodule(name, filename, lo_file, allSymbols):
     """Creates a cython module with a function that evaluates an expression for
     Veff. 
     
@@ -179,13 +179,13 @@ def generate_lo_submodule(name, filename, lo_file):
     if os.path.exists(filename):
         os.remove(filename)
         
-    lines = read_lines(lo_file)[2]
+    lines = read_lines(lo_file)
     params, signs, terms = get_terms(lines)
     print(params, signs, terms)
     
     with open(filename, 'w') as file:
         # Function imports used by Veff
-        file.write('# cython: cdivision=True\n')
+        #file.write('# cython: cdivision=True\n')
         file.write('from libc.complex cimport csqrt\n')
         file.write('from libc.complex cimport clog\n')
         file.write('from libc.math cimport M_PI\n')
@@ -194,20 +194,23 @@ def generate_lo_submodule(name, filename, lo_file):
         # Function declaration and inputs
         file.write(f'cpdef double complex {name}(\n')
         
-        for param in params:
+        for param in allSymbols:
             param = convert_to_cython_syntax(param)
             file.write(f'    double complex {param},\n')
         
         file.write('    ):\n')
         file.write(f'    return _{name}(\n')
-        for param in params:
+        for param in allSymbols:
             param = convert_to_cython_syntax(param)
             file.write(f'        {param},\n')
         file.write('    )\n\n\n')
         
         file.write(f'cdef double complex _{name}(\n')
+
+        #from pdb import set_trace
+        #set_trace()
         
-        for param in params:
+        for param in allSymbols:
             param = convert_to_cython_syntax(param)
             file.write(f'    double complex {param},\n')
         
@@ -228,7 +231,7 @@ def generate_lo_submodule(name, filename, lo_file):
         
         file.write('    return a\n')
         
-    return params
+    return allSymbols
         
 
 
