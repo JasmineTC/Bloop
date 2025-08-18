@@ -75,7 +75,7 @@ class UserInput(argparse.ArgumentParser):
                                      [-40,40,40], 
                                      [59,59,59], 
                                      [-59,59,59]], 
-                          type = tuple, dest = 'initialGuesses',
+                          type = list, dest = 'initialGuesses',
         metavar='')
         
         self.add_argument('--TRangeStart', action = 'store', default = 50, type = float, dest = 'TRangeStart',
