@@ -196,7 +196,27 @@ class UserInput(argparse.ArgumentParser):
                           default = "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarRotationMatrix.txt",
                           dest = 'scalarRotationFile',
                           metavar='')
-
+        
+        
+        self.add_argument('--scalarMassMatricesFiles', 
+                          nargs = "*", 
+                          action = 'store', 
+                          default = ["Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft.txt",
+                                     "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight.txt"], 
+                          type = list, 
+                          dest = 'scalarMassMatricesFiles',
+                          metavar='')
+        
+        self.add_argument('--scalarMassMatricesDefinitionsFiles', 
+                          nargs = "*", 
+                          action = 'store', 
+                          default = ["Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft_definitions.txt",
+                                     "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight_definitions.txt"], 
+                          type = list, 
+                          dest = 'scalarMassMatricesDefinitionsFiles',
+                          metavar='')
+        
+        
         self.add_argument('--scalarMassMatrixUpperLeftFile', 
                           action = 'store', 
                           default = "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft.txt",

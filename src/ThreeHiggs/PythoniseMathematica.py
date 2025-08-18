@@ -90,6 +90,7 @@ def pythoniseMathematica(args):
 
     (outputFile := Path(args.pythonisedExpressionsFile)).parent.mkdir(exist_ok=True, 
                                                              parents=True)  
+    
     ## Move get lines to the functions? -- Would need to rework veffLines in this case
     ## Not ideal to have nested dicts but is future proof for when we move to arrays
     dump(
@@ -130,6 +131,18 @@ def pythoniseMathematica(args):
                 "expressions": pythoniseExpressionSystemArray(veffLines, allSymbols),
                 "fileName": "Combined Veff files",
             },
+            
+            "scalarMassMatrices":{
+                "expressions":[
+                    pythoniseMassMatrix(getLines(deff), getLines(args.scalarMassMatricesFiles[idx])) 
+                    for idx, deff in enumerate(args.scalarMassMatricesDefinitionsFiles)
+                    ],
+                    
+                    "fileName": [[deff, args.scalarMassMatricesFiles[idx]] 
+                                                         for idx, deff in 
+                                                         enumerate(args.scalarMassMatricesDefinitionsFiles)]},
+            
+            
             "scalarMassMatrixUpperLeft": {
                 "expressions": pythoniseMassMatrix(
                     getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),

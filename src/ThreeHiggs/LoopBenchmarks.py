@@ -90,7 +90,6 @@ def setUpTrackVEV(
 ):
     pythonisedExpressions = json.load(open(args.pythonisedExpressionsFile, "r"))
     allSymbols = pythonisedExpressions["allSymbols"]["allSymbols"]
-
     variableSymbols =  getLines(args.lagranianVariables, mode = "json") 
     
     nloptInst = cNlopt(config = 
@@ -119,10 +118,8 @@ def setUpTrackVEV(
             pythonisedExpressions["vectorShortHands"]["fileName"],
         ),
         pythonisedExpressions["scalarPermutationMatrix"],
-        (MassMatrix(pythonisedExpressions["scalarMassMatrixUpperLeft"]["expressions"], 
-                    pythonisedExpressions["scalarMassMatrixUpperLeft"]["fileName"]), 
-         MassMatrix(pythonisedExpressions["scalarMassMatrixBottomRight"]["expressions"],
-                    pythonisedExpressions["scalarMassMatrixBottomRight"]["fileName"])),
+        [MassMatrix(massMatrix, pythonisedExpressions["scalarMassMatrices"]["fileName"][idx]) 
+         for idx, massMatrix in  enumerate(pythonisedExpressions["scalarMassMatrices"]["expressions"])],
         RotationMatrix(pythonisedExpressions["scalarRotationMatrix"]["expressions"],
                        pythonisedExpressions["scalarRotationMatrix"]["fileName"]),
         ParsedExpressionSystemArray(pythonisedExpressions["veffArray"]["expressions"], 

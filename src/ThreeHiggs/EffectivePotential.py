@@ -72,21 +72,19 @@ class EffectivePotential:
         self.fieldNames = fieldNames
         
         self.loopOrder = loopOrder
-        
         self.verbose = verbose
         
         self.nloptInst = nloptInst
-
+        
+        self.scalarPermutationMatrix = np.asarray(scalarPermutationMatrix, dtype = int)
+        
         self.vectorMassesSquared = vectorMassesSquared
         self.vectorShortHands = vectorShortHands
-
-        self.scalarPermutationMatrix = np.asarray(scalarPermutationMatrix, dtype = int)
-        ## can have many matrices if we've block-diagonalized already
-        ## ASSUME: the blocks are given in order: upper left to lower right. 
-        ##TODO improve this
-        self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
+        self.scalarMassMatrices = scalarMassMatrices
         self.scalarRotationMatrix = scalarRotationMatrix
+        
         self.expressionsArray = veffArray
+        
         self.allSymbols = allSymbols
 
     def findGlobalMinimum(self,
@@ -139,7 +137,7 @@ class EffectivePotential:
 
         params3D = self.vectorShortHands.evaluate(params3D)
         params3D = self.vectorMassesSquared.evaluate(params3D)
-        ## Scalar masses doesn't take array (yet) so convert to dict
+        ## diagonalizeScalars doesn't take array (yet) so convert to dict
         params3D = {key: value for (key, value) in zip(self.allSymbols, params3D) }
 
         return self.diagonalizeScalars(
