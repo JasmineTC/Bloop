@@ -13,57 +13,6 @@ def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
          subEigenValues[idx], subRotationMatrix[idx] = np.linalg.eigh(matrix)
     return subEigenValues*T**2, subRotationMatrix
 
-def compFieldDepParams(
-    fields: list[float], 
-    T:float, 
-    params3D, 
-    allSymbols,
-    fieldNames, 
-    scalarPermutationMatrix,
-    scalarMassMatrices,
-    scalarRotationMatrix,
-    vectorShortHands,
-    vectorMassesSquared,
-    verbose
-) :
-    for i, value in enumerate(fields):
-        params3D[allSymbols.index(fieldNames[i])] = value
-
-    params3D = vectorShortHands.evaluate(params3D)
-    params3D = vectorMassesSquared.evaluate(params3D)
-    params3D = {key: value for (key, value) in zip(allSymbols, params3D) }
-
-    return diagonalizeScalars(
-        params3D, 
-        T,
-        scalarPermutationMatrix,
-        scalarMassMatrices,
-        scalarRotationMatrix,
-        verbose
-    )
-
-def diagonalizeScalars(
-    params, 
-    T,  
-    scalarPermutationMatrix,
-    scalarMassMatrices,
-    scalarRotationMatrix,
-    verbose
-):
-    """Finds a rotation matrix that diagonalizes the scalar mass matrix
-    and returns a dict with diagonalization-specific params"""
-    subMassMatrix = np.array( [matrix.evaluate(params) for matrix in scalarMassMatrices ]).real / T**2
-
-    subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, subMassMatrix.shape[0], subMassMatrix.shape[1], T)
-
-    """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
-    so we need to undo the permutatation"""
-    params |= scalarRotationMatrix.evaluate(scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix))
-    ##TODO this could be automated better if mass names were MSsq{i}, i.e. remove the 0 at the begining.
-    ##But should probably be handled by a file given from mathematica (such a list is already made in mathematica)
-    massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
-    return params | {name: float(msq) for name, msq in zip(massNames, chain(*subEigenValues))}
-
 @dataclass(frozen=True)
 class cNlopt:
     nbrVars: int = 0
@@ -108,58 +57,41 @@ This is assumed to be using 3D EFT, so the params are temperature dependent.
 """
 class EffectivePotential:
     def __init__(self,
-                 fieldNames, 
-                 loopOrder,
-                 verbose,
-                 nloptInst,
-                 vectorMassesSquared, 
-                 vectorShortHands, 
-                 scalarPermutationMatrix,
-                 scalarMassMatrices, 
-                 scalarRotationMatrix,
-                 veffArray,
-                 allSymbols):
-        
+        fieldNames, 
+        loopOrder,
+        verbose,
+        nloptInst,
+        vectorMassesSquared, 
+        vectorShortHands, 
+        scalarPermutationMatrix,
+        scalarMassMatrices, 
+        scalarRotationMatrix,
+        veffArray,
+        allSymbols
+    ):
         self.fieldNames = fieldNames
         
         self.loopOrder = loopOrder
-        
         self.verbose = verbose
         
         self.nloptInst = nloptInst
-
+        
+        self.scalarPermutationMatrix = [] if len(scalarPermutationMatrix) == 0 else np.asarray(scalarPermutationMatrix, dtype = bool)
+        
         self.vectorMassesSquared = vectorMassesSquared
         self.vectorShortHands = vectorShortHands
-
-        self.scalarPermutationMatrix = np.asarray(scalarPermutationMatrix, dtype = int)
-        ## can have many matrices if we've block-diagonalized already
-        ## ASSUME: the blocks are given in order: upper left to lower right. 
-        ##TODO improve this
-        self.scalarMassMatrices = [matrix for matrix in scalarMassMatrices]
+        self.scalarMassMatrices = scalarMassMatrices
         self.scalarRotationMatrix = scalarRotationMatrix
+        
         self.expressionsArray = veffArray
+        
         self.allSymbols = allSymbols
 
-    def evaluatePotential(self, fields: list[float], T:float, params3D) -> complex:
-        array = self.expressionsArray.dictToArray(compFieldDepParams(
-            fields,
-            T,
-            params3D,
-            self.allSymbols,
-            self.fieldNames,
-            self.scalarPermutationMatrix, 
-            self.scalarMassMatrices, 
-            self.scalarRotationMatrix,
-            self.vectorShortHands,
-            self.vectorMassesSquared,
-            self.verbose
-        ))
-
-        return sum(self.expressionsArray.evaluateUnordered(array))
-
-    def findGlobalMinimum(self,T:float, 
-                          params3D,
-                          minimumCandidates: list = None) -> tuple:
+    def findGlobalMinimum(self,
+          T, 
+          params3D,
+          minimumCandidates
+    ):
         
         """For physics reasons we only minimise the real part,
         for nlopt reasons we need to give a redunant grad arg"""
@@ -181,6 +113,55 @@ class EffectivePotential:
                                                 T, 
                                                 params3D) 
     
+    def evaluatePotential(self, 
+          fields, 
+          T, 
+          params3D
+    ):
+        array = self.expressionsArray.dictToArray(self.computeMasses(
+            fields,
+            T,
+            params3D
+        ))
+
+        return sum(self.expressionsArray.evaluateUnordered(array))
+    
+    
+    def computeMasses(self,
+        fields, 
+        T, 
+        params3D
+    ) :
+        for i, value in enumerate(fields):
+            params3D[self.allSymbols.index(self.fieldNames[i])] = value
+
+        params3D = self.vectorShortHands.evaluate(params3D)
+        params3D = self.vectorMassesSquared.evaluate(params3D)
+        ## diagonalizeScalars doesn't take array (yet) so convert to dict
+        params3D = {key: value for (key, value) in zip(self.allSymbols, params3D) }
+
+        return self.diagonalizeScalars(
+            params3D, 
+            T
+        )
+
+    def diagonalizeScalars(self,
+        params3D, 
+        T
+    ):
+        """Finds a rotation matrix that diagonalizes the scalar mass matrix
+        and returns a dict with diagonalization-specific params"""
+        subMassMatrix = np.array( [matrix.evaluate(params3D) for matrix in self.scalarMassMatrices ]).real / T**2
+
+        subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, subMassMatrix.shape[0], subMassMatrix.shape[1], T)
+
+        ## If the user permutted the mass matrix in DRalgo we have to unpermute it 
+        if len(self.scalarPermutationMatrix) > 0:
+            subRotationMatrix = self.scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix)
+        params3D |= self.scalarRotationMatrix.evaluate(subRotationMatrix)
+        ##TODO load names from mathematica
+        massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
+        return params3D | {name: float(msq) for name, msq in zip(massNames, chain(*subEigenValues))}
     
     ##Jasmine plotting tools
     def plotPot(self, T, params3D, linestyle, v3Min, potMin, v3Max):

@@ -75,7 +75,7 @@ class UserInput(argparse.ArgumentParser):
                                      [-40,40,40], 
                                      [59,59,59], 
                                      [-59,59,59]], 
-                          type = tuple, dest = 'initialGuesses',
+                          type = list, dest = 'initialGuesses',
         metavar='')
         
         self.add_argument('--TRangeStart', action = 'store', default = 50, type = float, dest = 'TRangeStart',
@@ -196,29 +196,24 @@ class UserInput(argparse.ArgumentParser):
                           default = "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarRotationMatrix.txt",
                           dest = 'scalarRotationFile',
                           metavar='')
-
-        self.add_argument('--scalarMassMatrixUpperLeftFile', 
+        
+        
+        self.add_argument('--scalarMassMatricesFiles', 
+                          nargs = "*", 
                           action = 'store', 
-                          default = "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft.txt",
-                          dest = 'scalarMassMatrixUpperLeftFile',
+                          default = ["Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft.txt",
+                                     "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight.txt"], 
+                          type = list, 
+                          dest = 'scalarMassMatricesFiles',
                           metavar='')
-
-        self.add_argument('--scalarMassMatrixUpperLeftDefinitionsFile', 
+        
+        self.add_argument('--scalarMassMatricesDefinitionsFiles', 
+                          nargs = "*", 
                           action = 'store', 
-                          default = "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft_definitions.txt",
-                          dest = 'scalarMassMatrixUpperLeftDefinitionsFile',
-                          metavar='')
-
-        self.add_argument('--scalarMassMatrixBottomRightFile', 
-                          action = 'store', 
-                          default = "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight.txt",
-                          dest = 'scalarMassMatrixBottomRightFile',
-                          metavar='')
-
-        self.add_argument('--scalarMassMatrixBottomRightDefinitionsFile', 
-                          action = 'store', 
-                          default = "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight_definitions.txt",
-                          dest = 'scalarMassMatrixBottomRightDefinitionsFile',
+                          default = ["Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft_definitions.txt",
+                                     "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight_definitions.txt"], 
+                          type = list, 
+                          dest = 'scalarMassMatricesDefinitionsFiles',
                           metavar='')
         
         self.add_argument('--lagranianVariablesFile', 
