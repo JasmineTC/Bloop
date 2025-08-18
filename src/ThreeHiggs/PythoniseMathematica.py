@@ -153,7 +153,7 @@ def pythoniseMathematica(args):
     }
     
 
-    expressionDict["scalarPermutationMatrix"] = [] if args.scalarPermutationFile =="None" else getLines(args.scalarPermutationFile, mode="json")
+    expressionDict["scalarPermutationMatrix"] = [] if args.scalarPermutationFile.lower() =="none" else getLines(args.scalarPermutationFile, mode="json")
     
     dump(expressionDict
        ,
