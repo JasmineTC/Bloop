@@ -4,16 +4,11 @@
 (*Import DRalgo and Group Math*)
 
 
-ClearAll[]
 SetDirectory[NotebookDirectory[]];
-$LoadGroupMath=True;
-(* This is pointing to my DRalgo repo for easier updating *)
-(*pathToDRalgo = "/home/lani/repos/DRalgo/DRalgo.m"*)
-pathToDRalgo = "/home/jasmine/.Mathematica/Applications/DRalgo/DRalgo.m"
-Get[pathToDRalgo]
+<<DRalgo`DRalgo`
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Import helper functions *)
 
 
@@ -24,27 +19,14 @@ Get["MathematicaToPythonHelper.m"]
 (*Specify file paths for exporting*)
 
 
-hardToSoftDirectory = "DRalgoOutput/Z2_3HDM/HardToSoft";
-softToUltrasoftDirectory = "DRalgoOutput/Z2_3HDM/SoftToUltrasoft";
-effectivePotentialDirectory = "DRalgoOutput/Z2_3HDM/EffectivePotential";
-variables = "DRalgoOutput/Z2_3HDM/Variables";
-misc = "DRalgoOutput/Z2_3HDM/Misc";
-
-
-exportUTF8[misc<>"/bounded.txt",
-{\[Lambda]11>0,
-\[Lambda]22>0,
-\[Lambda]33>0,
-\[Lambda]12 + min[0, \[Lambda]12p - 2*Sqrt[\[Lambda]1Re^2 + \[Lambda]1Im^2] ] > -2*sqrt[\[Lambda]11*\[Lambda]22],
-\[Lambda]31 + min[0, \[Lambda]31p - 2*Sqrt[\[Lambda]3Re^2 + \[Lambda]3Im^2] ] > -2*sqrt[\[Lambda]11*\[Lambda]33],
-\[Lambda]23 + min[0, \[Lambda]23p - 2*Sqrt[\[Lambda]2Re^2 + \[Lambda]2Im^2] ] > -2*sqrt[\[Lambda]22*\[Lambda]33],
-sqrt[lam33]*(\[Lambda]12 + min[0, \[Lambda]12p - 2*Sqrt[\[Lambda]1Re^2 + \[Lambda]1Im^2] ]) + sqrt[lam11]*(\[Lambda]23 + min[0, \[Lambda]23p - 2*Sqrt[\[Lambda]2Re^2 + \[Lambda]2Im^2] ]) + sqrt[lam22]*(\[Lambda]31 + min[0, \[Lambda]31p - 2*Sqrt[\[Lambda]3Re^2 + \[Lambda]3Im^2] ]) >= 0 ||
-lam33*(\[Lambda]12 + min[0, \[Lambda]12p - 2*Sqrt[\[Lambda]1Re^2 + \[Lambda]1Im^2] ])^2 + lam11*(\[Lambda]23 + min[0, \[Lambda]23p - 2*Sqrt[\[Lambda]2Re^2 + \[Lambda]2Im^2] ])^2 + lam22*(\[Lambda]31 + min[0, \[Lambda]31p - 2*Sqrt[\[Lambda]3Re^2 + \[Lambda]3Im^2] ])^2 - lam11*lam22*lam33 - 2*(\[Lambda]12 + min[0, \[Lambda]12p - 2*Sqrt[\[Lambda]1Re^2 + \[Lambda]1Im^2] ])*(\[Lambda]31 + min[0, \[Lambda]31p - 2*Sqrt[\[Lambda]3Re^2 + \[Lambda]3Im^2] ])*(\[Lambda]23 + min[0, \[Lambda]23p - 2*Sqrt[\[Lambda]2Re^2 + \[Lambda]2Im^2] ]) < 0
-}];
+hardToSoftDirectory = "DRalgoOutput/Z2_3HDMG/HardToSoft";
+softToUltrasoftDirectory = "DRalgoOutput/Z2_3HDMG/SoftToUltrasoft";
+effectivePotentialDirectory = "DRalgoOutput/Z2_3HDMG/EffectivePotential";
+variables = "DRalgoOutput/Z2_3HDMG/Variables";
 
 
 (* ::Section::Closed:: *)
-(*Model\[AliasDelimiter]*)
+(*Model*)
 
 
 (*See 1909.09234 [hep-ph], eq (1) *)
@@ -274,7 +256,7 @@ PrintScalarRepPositions[](** This is supposed to tell which index is which field
 (** DRalgo ordering: real parts go before imag parts, and this is repeated 3 times (because we have 3 complex doublets). 
 So the "usual" place for BG field is second index in each doublet**)
 
-backgroundFieldsFull = {(*\[Phi]1*)0, v1, 0, 0,(*\[Phi]2*)0, v2, 0, 0, (*\[Phi]3*)0, v3, 0, 0}//SparseArray; 
+backgroundFieldsFull = {(*\[Phi]1*)v1CBR, v1, v1CBI, v1CP,(*\[Phi]2*)v2CBR, v2, v2CBI, v2CP, (*\[Phi]3*)0, v3, 0, 0}//SparseArray; 
 DefineVEVS[backgroundFieldsFull];
 
 
@@ -293,6 +275,9 @@ DefineVEVS[backgroundFieldsFull];
 scalarMM = PrintTensorsVEV[1]//Normal//Simplify; (* Scalar mass matrix, simplify to get rid of possible imaginary units *)
 
 
+scalarMM//MatrixForm
+
+
 (* ::Subsubsection:: *)
 (*Permute scalars to make mass matrix block-diagonal *)
 
@@ -304,16 +289,16 @@ Re\[Phi]1, Im\[Phi]3, Im\[Phi]1, Re\[Phi]3, Re\[Phi]2, Im\[Phi]2 (charged dof)
 Re\[Phi]2, Im\[Phi]2, Im\[Phi]1, Re\[Phi]3, Re\[Phi]1, Im\[Phi]3  (neutral dof)*)
 scalarPermutationMatrix = {
 {1,0,0,0,0,0,0,0,0,0,0,0},
-{0,0,0,0,0,0,0,0,0,0,1,0},
-{0,0,1,0,0,0,0,0,0,0,0,0},
-{0,0,0,0,0,0,0,0,1,0,0,0},
-{0,0,0,0,1,0,0,0,0,0,0,0},
-{0,0,0,0,0,0,1,0,0,0,0,0},
-{0,0,0,0,0,1,0,0,0,0,0,0},
-{0,0,0,0,0,0,0,1,0,0,0,0},
-{0,0,0,1,0,0,0,0,0,0,0,0},
-{0,0,0,0,0,0,0,0,0,1,0,0},
 {0,1,0,0,0,0,0,0,0,0,0,0},
+{0,0,1,0,0,0,0,0,0,0,0,0},
+{0,0,0,1,0,0,0,0,0,0,0,0},
+{0,0,0,0,1,0,0,0,0,0,0,0},
+{0,0,0,0,0,1,0,0,0,0,0,0},
+{0,0,0,0,0,0,1,0,0,0,0,0},
+{0,0,0,0,0,0,0,1,0,0,0,0},
+{0,0,0,0,0,0,0,0,1,0,0,0},
+{0,0,0,0,0,0,0,0,0,1,0,0},
+{0,0,0,0,0,0,0,0,0,0,1,0},
 {0,0,0,0,0,0,0,0,0,0,0,1}};
 If[!OrthogonalMatrixQ[scalarPermutationMatrix], Print["Error, permutation matrix is not orthogonal"]];
 exportUTF8[effectivePotentialDirectory<>"/scalarPermutationMatrix.txt", StringReplace[ToString[scalarPermutationMatrix],{"{"->"[","}"->"]"}]];
@@ -336,48 +321,27 @@ If[!SymmetricMatrixQ[upperLeftMM] || !SymmetricMatrixQ[bottomRightMM], Print["Er
 
 
 (* Simplify both blocks by introducing additional symbols, then extract them separately *)
-{upperLeftMMSymbolic, upperLeftMMDefinitions} = toSymbolicMatrix[upperLeftMM, "MMUL", True]//Simplify;
-{bottomRightMMSymbolic, bottomRightMMDefinitions} = toSymbolicMatrix[bottomRightMM, "MMBR", True]//Simplify;
+{MMSymbolic, MMDefinitions} = toSymbolicMatrix[upperLeftMM, "MM", True]//Simplify;
 
 (* Export expressions separately because we have the code to parse that *)
-exportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_upperLeft.txt", upperLeftMMSymbolic];
-exportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_upperLeft_definitions.txt", upperLeftMMDefinitions];
-
-
-exportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_bottomRight.txt", bottomRightMMSymbolic];
-exportUTF8[effectivePotentialDirectory<>"/scalarMassMatrix_bottomRight_definitions.txt", bottomRightMMDefinitions];
+exportUTF8[effectivePotentialDirectory<>"/MassMatrix.txt", MMSymbolic];
+exportUTF8[effectivePotentialDirectory<>"/MassMatrixdefinitions.txt", MMDefinitions];
 
 
 (* ::Subsubsection:: *)
 (*Construct scalar rotation matrix *)
 
 
-blockSize = 6;
+blockSize = 12;
 (** Diagonalizing rotation, this will be SO(N) with N=12. But we know a permutation transformation to reduce it to two SO(6) matrices,
 so we first construct the two SO(6) and apply the inverse permutation. 
 There's no easy way of generating a symbolic orthogonal matrix so just use a generic 6x6
 This was done before DRalgo's fast rotate mode -TODO investigate fast rotate **)
-rotUpperLeft = Table[ toIndexedSymbol2[ "RUL", i, j, Total[DigitCount[blockSize]] ], {i, 1, blockSize}, {j, 1, blockSize}];
-rotBottomRight = Table[ toIndexedSymbol2[ "RBR", i, j, Total[DigitCount[blockSize]] ], {i, 1, blockSize}, {j, 1, blockSize}];
+scalarRotationSymbolic = Table[ toIndexedSymbol2[ "R", i, j, Total[DigitCount[blockSize]] ], {i, 1, blockSize}, {j, 1, blockSize}];
 
-DSRotBlock = ArrayFlatten[{
-{rotUpperLeft, 0},
-{0, rotBottomRight}
-}];
-(* V = \[Phi]^T.M.\[Phi] 
-	 = \[Phi]^T.P.P^T.M.P.P^T.\[Phi] = \[Phi]^T.P.B.P^T.\[Phi], make the mass matrix block diagonal, with some permutation matrix P: P^T.M.P = B
-	 = \[Phi]^T.P.S.S^T.B.S.S^T.P^T.\[Phi] = \[Phi]^T.P.S.B.S^T.P^T.\[Phi], make the block diagonal mass matrix diagonal, with some similarity transform S: S^T.B.P = D'
-Note P = scalarPermutationMatrix, S = DSRotBlock
-Since we give DRalgo an arbitrary diagonal matrix and rotation matrix we have
-V = \[Phi]^T.M.\[Phi]
-  = \[Phi]^T.R.R^T.M.R.R^T.\[Phi] = \[Phi]^T.R.D.R^T.\[Phi]
-We impose D = D' so R = P.S
-We compute D' and S in the python code numerically
-*)
-
-DSRot = scalarPermutationMatrix . DSRotBlock;
+DSRot = scalarRotationSymbolic;
 Print["Scalar diagonalizing rotation:"];
-DSRot//MatrixForm;
+DSRot//MatrixForm
 
 exportUTF8[effectivePotentialDirectory<>"/scalarRotationMatrix.txt", DSRot];
 
@@ -446,7 +410,6 @@ veffNLO = PrintEffectivePotential["NLO"]//Simplify; (* Simplify to factor 1/pi d
 veffNNLO = PrintEffectivePotential["NNLO"]; (* NOT simplified as seems to change numerical result for unknown reasons *)
 
 
-(*Done for consistent in out structure for python*)
 exportUTF8[effectivePotentialDirectory<>"/Veff_LO.txt", veffLO];
 exportUTF8[effectivePotentialDirectory<>"/Veff_NLO.txt", veffNLO];
 exportUTF8[effectivePotentialDirectory<>"/Veff_NNLO.txt", veffNNLO];
@@ -481,16 +444,13 @@ equationSymbols={
 		"In" -> extractSymbols[runningUS]["RHS"]},	
 	"upperLeftMMDefinitions"->{
 		"Out" -> extractSymbols[ScalarMassDiag],
-		"In" -> extractSymbols[upperLeftMMDefinitions]["RHS"]},
-	"bottomRightMMDefinitions"->{
-		"Out" -> extractSymbols[ScalarMassDiag],
-		"In" -> extractSymbols[bottomRightMMDefinitions]["RHS"]},
+		"In" -> extractSymbols[MMDefinitions]["RHS"]},
 	"vectorMasses"->{
 		"Out" -> extractSymbols[VectorMassDiagSimple],
 		"In" -> extractSymbols[VectorMassExpressions]["RHS"]},
 	"LO"->extractSymbols[veffLO],
-	"NLO"-> extractSymbols[veffNLO],
-	"NNLO"-> extractSymbols[veffNNLO],
+	"NLO"->extractSymbols[veffNLO],
+	"NNLO"->extractSymbols[veffNNLO],
 	"rotationSymbols"->extractSymbols[DSRot],
 	"scalarMassNames"->extractSymbols[ScalarMassDiag]};
 
