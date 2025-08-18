@@ -289,9 +289,9 @@ def generateBenchmarks(
     ## Take the pythonised tree level potential we've generated 
     treeLevel = ParsedExpression(parsedExpressions["veff"]["expressions"][0], 
                                  None)
-    chargedMassMatrix = MassMatrix(parsedExpressions["scalarMassMatrixUpperLeft"]["expressions"], 
+    chargedMassMatrix = MassMatrix(parsedExpressions["scalarMassMatrices"]["expressions"][0], 
                                    None)
-    neutralMassMatrix = MassMatrix(parsedExpressions["scalarMassMatrixBottomRight"]["expressions"], 
+    neutralMassMatrix = MassMatrix(parsedExpressions["scalarMassMatrices"]["expressions"][1], 
                                    None)
     
     ## Feels weird to have nested function but not sure how else to go until can
