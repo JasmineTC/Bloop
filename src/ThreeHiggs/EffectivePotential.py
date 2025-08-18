@@ -76,7 +76,7 @@ class EffectivePotential:
         
         self.nloptInst = nloptInst
         
-        self.scalarPermutationMatrix = np.asarray(scalarPermutationMatrix, dtype = int)
+        self.scalarPermutationMatrix = [] if len(scalarPermutationMatrix) == 0 else np.asarray(scalarPermutationMatrix, dtype = bool)
         
         self.vectorMassesSquared = vectorMassesSquared
         self.vectorShortHands = vectorShortHands
@@ -155,9 +155,10 @@ class EffectivePotential:
 
         subEigenValues, subRotationMatrix = diagonalizeNumba(subMassMatrix, subMassMatrix.shape[0], subMassMatrix.shape[1], T)
 
-        """ At the level of DRalgo we permuted the mass matrix to make it block diagonal, 
-        so we need to undo the permutatation"""
-        params3D |= self.scalarRotationMatrix.evaluate(self.scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix))
+        ## If the user permutted the mass matrix in DRalgo we have to unpermute it 
+        if len(self.scalarPermutationMatrix) > 0:
+            subRotationMatrix = self.scalarPermutationMatrix @ linalg.block_diag(*subRotationMatrix)
+        params3D |= self.scalarRotationMatrix.evaluate(subRotationMatrix)
         ##TODO load names from mathematica
         massNames = ["MSsq01", "MSsq02", "MSsq03", "MSsq04", "MSsq05", "MSsq06", "MSsq07", "MSsq08", "MSsq09", "MSsq10", "MSsq11", "MSsq12"]
         return params3D | {name: float(msq) for name, msq in zip(massNames, chain(*subEigenValues))}

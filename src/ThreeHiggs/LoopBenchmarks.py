@@ -101,7 +101,6 @@ def setUpTrackVEV(
                      "varLowerBounds" : args.varLowerBounds,
                      "varUpperBounds" : args.varUpperBounds}
                 )
-
     effectivePotential = EffectivePotential(
         variableSymbols["fieldSymbols"],
         args.loopOrder,
