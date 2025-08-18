@@ -1686,472 +1686,474 @@
         ],
         "fileName": "Combined Veff files"
     },
-    "scalarMassMatrixUpperLeft": {
-        "expressions": {
-            "definitions": [
-                {
-                    "identifier": "MMUL0",
-                    "expression": "lam11*v1**2 + lam12*v2**2/2 + lam31*v3**2/2 - mu1sq",
-                    "symbols": [
-                        "lam11",
-                        "lam12",
-                        "lam31",
-                        "mu1sq",
-                        "v1",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL1",
-                    "expression": "lam3Im*v1*v3",
-                    "symbols": [
-                        "lam3Im",
-                        "v1",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL2",
-                    "expression": "lam23*v2**2/2 + lam31*v1**2/2 + lam33*v3**2 - mu3sq",
-                    "symbols": [
-                        "lam23",
-                        "lam31",
-                        "lam33",
-                        "mu3sq",
-                        "v1",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL3",
-                    "expression": "v1*v3*(lam31p/2 + lam3Re)",
-                    "symbols": [
-                        "lam31p",
-                        "lam3Re",
-                        "v1",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL4",
-                    "expression": "lam11*v1**2 + lam12*v2**2/2 + lam31*v3**2/2 - mu1sq",
-                    "symbols": [
-                        "lam11",
-                        "lam12",
-                        "lam31",
-                        "mu1sq",
-                        "v1",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL5",
-                    "expression": "v1*v3*(lam31p/2 + lam3Re)",
-                    "symbols": [
-                        "lam31p",
-                        "lam3Re",
-                        "v1",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL6",
-                    "expression": "-lam3Im*v1*v3",
-                    "symbols": [
-                        "lam3Im",
-                        "v1",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL7",
-                    "expression": "lam23*v2**2/2 + lam31*v1**2/2 + lam33*v3**2 - mu3sq",
-                    "symbols": [
-                        "lam23",
-                        "lam31",
-                        "lam33",
-                        "mu3sq",
-                        "v1",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL8",
-                    "expression": "-mu12sqRe + v1*v2*(lam12p/2 + lam1Re)",
-                    "symbols": [
-                        "lam12p",
-                        "lam1Re",
-                        "mu12sqRe",
-                        "v1",
-                        "v2"
-                    ]
-                },
-                {
-                    "identifier": "MMUL9",
-                    "expression": "-lam2Im*v2*v3",
-                    "symbols": [
-                        "lam2Im",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL10",
-                    "expression": "lam1Im*v1*v2 - mu12sqIm",
-                    "symbols": [
-                        "lam1Im",
-                        "mu12sqIm",
-                        "v1",
-                        "v2"
-                    ]
-                },
-                {
-                    "identifier": "MMUL11",
-                    "expression": "v2*v3*(lam23p/2 + lam2Re)",
-                    "symbols": [
-                        "lam23p",
-                        "lam2Re",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL12",
-                    "expression": "lam12*v1**2/2 + lam22*v2**2 + lam23*v3**2/2 - mu2sq",
-                    "symbols": [
-                        "lam12",
-                        "lam22",
-                        "lam23",
-                        "mu2sq",
-                        "v1",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL13",
-                    "expression": "-lam1Im*v1*v2 + mu12sqIm",
-                    "symbols": [
-                        "lam1Im",
-                        "mu12sqIm",
-                        "v1",
-                        "v2"
-                    ]
-                },
-                {
-                    "identifier": "MMUL14",
-                    "expression": "v2*v3*(lam23p/2 + lam2Re)",
-                    "symbols": [
-                        "lam23p",
-                        "lam2Re",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL15",
-                    "expression": "-mu12sqRe + v1*v2*(lam12p/2 + lam1Re)",
-                    "symbols": [
-                        "lam12p",
-                        "lam1Re",
-                        "mu12sqRe",
-                        "v1",
-                        "v2"
-                    ]
-                },
-                {
-                    "identifier": "MMUL16",
-                    "expression": "lam2Im*v2*v3",
-                    "symbols": [
-                        "lam2Im",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMUL17",
-                    "expression": "lam12*v1**2/2 + lam22*v2**2 + lam23*v3**2/2 - mu2sq",
-                    "symbols": [
-                        "lam12",
-                        "lam22",
-                        "lam23",
-                        "mu2sq",
-                        "v1",
-                        "v2",
-                        "v3"
-                    ]
-                }
-            ],
-            "matrix": "[[MMUL0, MMUL1, 0, MMUL5, MMUL8, MMUL13], [MMUL1, MMUL2, MMUL3, 0, MMUL9, MMUL14], [0, MMUL3, MMUL4, MMUL6, MMUL10, MMUL15], [MMUL5, 0, MMUL6, MMUL7, MMUL11, MMUL16], [MMUL8, MMUL9, MMUL10, MMUL11, MMUL12, 0], [MMUL13, MMUL14, MMUL15, MMUL16, 0, MMUL17]]"
-        },
+    "scalarMassMatrices": {
+        "expressions": [
+            {
+                "definitions": [
+                    {
+                        "identifier": "MMUL0",
+                        "expression": "lam11*v1**2 + lam12*v2**2/2 + lam31*v3**2/2 - mu1sq",
+                        "symbols": [
+                            "lam11",
+                            "lam12",
+                            "lam31",
+                            "mu1sq",
+                            "v1",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL1",
+                        "expression": "lam3Im*v1*v3",
+                        "symbols": [
+                            "lam3Im",
+                            "v1",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL2",
+                        "expression": "lam23*v2**2/2 + lam31*v1**2/2 + lam33*v3**2 - mu3sq",
+                        "symbols": [
+                            "lam23",
+                            "lam31",
+                            "lam33",
+                            "mu3sq",
+                            "v1",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL3",
+                        "expression": "v1*v3*(lam31p/2 + lam3Re)",
+                        "symbols": [
+                            "lam31p",
+                            "lam3Re",
+                            "v1",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL4",
+                        "expression": "lam11*v1**2 + lam12*v2**2/2 + lam31*v3**2/2 - mu1sq",
+                        "symbols": [
+                            "lam11",
+                            "lam12",
+                            "lam31",
+                            "mu1sq",
+                            "v1",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL5",
+                        "expression": "v1*v3*(lam31p/2 + lam3Re)",
+                        "symbols": [
+                            "lam31p",
+                            "lam3Re",
+                            "v1",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL6",
+                        "expression": "-lam3Im*v1*v3",
+                        "symbols": [
+                            "lam3Im",
+                            "v1",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL7",
+                        "expression": "lam23*v2**2/2 + lam31*v1**2/2 + lam33*v3**2 - mu3sq",
+                        "symbols": [
+                            "lam23",
+                            "lam31",
+                            "lam33",
+                            "mu3sq",
+                            "v1",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL8",
+                        "expression": "-mu12sqRe + v1*v2*(lam12p/2 + lam1Re)",
+                        "symbols": [
+                            "lam12p",
+                            "lam1Re",
+                            "mu12sqRe",
+                            "v1",
+                            "v2"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL9",
+                        "expression": "-lam2Im*v2*v3",
+                        "symbols": [
+                            "lam2Im",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL10",
+                        "expression": "lam1Im*v1*v2 - mu12sqIm",
+                        "symbols": [
+                            "lam1Im",
+                            "mu12sqIm",
+                            "v1",
+                            "v2"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL11",
+                        "expression": "v2*v3*(lam23p/2 + lam2Re)",
+                        "symbols": [
+                            "lam23p",
+                            "lam2Re",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL12",
+                        "expression": "lam12*v1**2/2 + lam22*v2**2 + lam23*v3**2/2 - mu2sq",
+                        "symbols": [
+                            "lam12",
+                            "lam22",
+                            "lam23",
+                            "mu2sq",
+                            "v1",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL13",
+                        "expression": "-lam1Im*v1*v2 + mu12sqIm",
+                        "symbols": [
+                            "lam1Im",
+                            "mu12sqIm",
+                            "v1",
+                            "v2"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL14",
+                        "expression": "v2*v3*(lam23p/2 + lam2Re)",
+                        "symbols": [
+                            "lam23p",
+                            "lam2Re",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL15",
+                        "expression": "-mu12sqRe + v1*v2*(lam12p/2 + lam1Re)",
+                        "symbols": [
+                            "lam12p",
+                            "lam1Re",
+                            "mu12sqRe",
+                            "v1",
+                            "v2"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL16",
+                        "expression": "lam2Im*v2*v3",
+                        "symbols": [
+                            "lam2Im",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMUL17",
+                        "expression": "lam12*v1**2/2 + lam22*v2**2 + lam23*v3**2/2 - mu2sq",
+                        "symbols": [
+                            "lam12",
+                            "lam22",
+                            "lam23",
+                            "mu2sq",
+                            "v1",
+                            "v2",
+                            "v3"
+                        ]
+                    }
+                ],
+                "matrix": "[[MMUL0, MMUL1, 0, MMUL5, MMUL8, MMUL13], [MMUL1, MMUL2, MMUL3, 0, MMUL9, MMUL14], [0, MMUL3, MMUL4, MMUL6, MMUL10, MMUL15], [MMUL5, 0, MMUL6, MMUL7, MMUL11, MMUL16], [MMUL8, MMUL9, MMUL10, MMUL11, MMUL12, 0], [MMUL13, MMUL14, MMUL15, MMUL16, 0, MMUL17]]"
+            },
+            {
+                "definitions": [
+                    {
+                        "identifier": "MMBR0",
+                        "expression": "3*lam22*v2**2 - mu2sq + v1**2*(lam12 + lam12p + 2*lam1Re)/2 + v3**2*(lam23 + lam23p + 2*lam2Re)/2",
+                        "symbols": [
+                            "lam12",
+                            "lam12p",
+                            "lam1Re",
+                            "lam22",
+                            "lam23",
+                            "lam23p",
+                            "lam2Re",
+                            "mu2sq",
+                            "v1",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR1",
+                        "expression": "-lam1Im*v1**2 + lam2Im*v3**2",
+                        "symbols": [
+                            "lam1Im",
+                            "lam2Im",
+                            "v1",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR2",
+                        "expression": "lam22*v2**2 - mu2sq + v1**2*(lam12 + lam12p - 2*lam1Re)/2 + v3**2*(lam23 + lam23p - 2*lam2Re)/2",
+                        "symbols": [
+                            "lam12",
+                            "lam12p",
+                            "lam1Re",
+                            "lam22",
+                            "lam23",
+                            "lam23p",
+                            "lam2Re",
+                            "mu2sq",
+                            "v1",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR3",
+                        "expression": "2*lam1Im*v1*v2 - mu12sqIm",
+                        "symbols": [
+                            "lam1Im",
+                            "mu12sqIm",
+                            "v1",
+                            "v2"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR4",
+                        "expression": "2*lam1Re*v1*v2 - mu12sqRe",
+                        "symbols": [
+                            "lam1Re",
+                            "mu12sqRe",
+                            "v1",
+                            "v2"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR5",
+                        "expression": "lam11*v1**2 - mu1sq + v2**2*(lam12 + lam12p - 2*lam1Re)/2 + v3**2*(lam31 + lam31p - 2*lam3Re)/2",
+                        "symbols": [
+                            "lam11",
+                            "lam12",
+                            "lam12p",
+                            "lam1Re",
+                            "lam31",
+                            "lam31p",
+                            "lam3Re",
+                            "mu1sq",
+                            "v1",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR6",
+                        "expression": "v2*v3*(lam23 + lam23p + 2*lam2Re)",
+                        "symbols": [
+                            "lam23",
+                            "lam23p",
+                            "lam2Re",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR7",
+                        "expression": "2*lam2Im*v2*v3",
+                        "symbols": [
+                            "lam2Im",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR8",
+                        "expression": "-2*lam3Im*v1*v3",
+                        "symbols": [
+                            "lam3Im",
+                            "v1",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR9",
+                        "expression": "3*lam33*v3**2 - mu3sq + v1**2*(lam31 + lam31p + 2*lam3Re)/2 + v2**2*(lam23 + lam23p + 2*lam2Re)/2",
+                        "symbols": [
+                            "lam23",
+                            "lam23p",
+                            "lam2Re",
+                            "lam31",
+                            "lam31p",
+                            "lam33",
+                            "lam3Re",
+                            "mu3sq",
+                            "v1",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR10",
+                        "expression": "-mu12sqRe + v1*v2*(lam12 + lam12p + 2*lam1Re)",
+                        "symbols": [
+                            "lam12",
+                            "lam12p",
+                            "lam1Re",
+                            "mu12sqRe",
+                            "v1",
+                            "v2"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR11",
+                        "expression": "-2*lam1Im*v1*v2 + mu12sqIm",
+                        "symbols": [
+                            "lam1Im",
+                            "mu12sqIm",
+                            "v1",
+                            "v2"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR12",
+                        "expression": "lam1Im*v2**2 - lam3Im*v3**2",
+                        "symbols": [
+                            "lam1Im",
+                            "lam3Im",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR13",
+                        "expression": "v1*v3*(lam31 + lam31p + 2*lam3Re)",
+                        "symbols": [
+                            "lam31",
+                            "lam31p",
+                            "lam3Re",
+                            "v1",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR14",
+                        "expression": "3*lam11*v1**2 - mu1sq + v2**2*(lam12 + lam12p + 2*lam1Re)/2 + v3**2*(lam31 + lam31p + 2*lam3Re)/2",
+                        "symbols": [
+                            "lam11",
+                            "lam12",
+                            "lam12p",
+                            "lam1Re",
+                            "lam31",
+                            "lam31p",
+                            "lam3Re",
+                            "mu1sq",
+                            "v1",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR15",
+                        "expression": "-2*lam2Im*v2*v3",
+                        "symbols": [
+                            "lam2Im",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR16",
+                        "expression": "2*lam2Re*v2*v3",
+                        "symbols": [
+                            "lam2Re",
+                            "v2",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR17",
+                        "expression": "2*lam3Re*v1*v3",
+                        "symbols": [
+                            "lam3Re",
+                            "v1",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR18",
+                        "expression": "-lam2Im*v2**2 + lam3Im*v1**2",
+                        "symbols": [
+                            "lam2Im",
+                            "lam3Im",
+                            "v1",
+                            "v2"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR19",
+                        "expression": "2*lam3Im*v1*v3",
+                        "symbols": [
+                            "lam3Im",
+                            "v1",
+                            "v3"
+                        ]
+                    },
+                    {
+                        "identifier": "MMBR20",
+                        "expression": "lam33*v3**2 - mu3sq + v1**2*(lam31 + lam31p - 2*lam3Re)/2 + v2**2*(lam23 + lam23p - 2*lam2Re)/2",
+                        "symbols": [
+                            "lam23",
+                            "lam23p",
+                            "lam2Re",
+                            "lam31",
+                            "lam31p",
+                            "lam33",
+                            "lam3Re",
+                            "mu3sq",
+                            "v1",
+                            "v2",
+                            "v3"
+                        ]
+                    }
+                ],
+                "matrix": "[[MMBR0, MMBR1, MMBR3, MMBR6, MMBR10, MMBR15], [MMBR1, MMBR2, MMBR4, MMBR7, MMBR11, MMBR16], [MMBR3, MMBR4, MMBR5, MMBR8, MMBR12, MMBR17], [MMBR6, MMBR7, MMBR8, MMBR9, MMBR13, MMBR18], [MMBR10, MMBR11, MMBR12, MMBR13, MMBR14, MMBR19], [MMBR15, MMBR16, MMBR17, MMBR18, MMBR19, MMBR20]]"
+            }
+        ],
         "fileName": [
-            "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft_definitions.txt",
-            "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight.txt"
-        ]
-    },
-    "scalarMassMatrixBottomRight": {
-        "expressions": {
-            "definitions": [
-                {
-                    "identifier": "MMBR0",
-                    "expression": "3*lam22*v2**2 - mu2sq + v1**2*(lam12 + lam12p + 2*lam1Re)/2 + v3**2*(lam23 + lam23p + 2*lam2Re)/2",
-                    "symbols": [
-                        "lam12",
-                        "lam12p",
-                        "lam1Re",
-                        "lam22",
-                        "lam23",
-                        "lam23p",
-                        "lam2Re",
-                        "mu2sq",
-                        "v1",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR1",
-                    "expression": "-lam1Im*v1**2 + lam2Im*v3**2",
-                    "symbols": [
-                        "lam1Im",
-                        "lam2Im",
-                        "v1",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR2",
-                    "expression": "lam22*v2**2 - mu2sq + v1**2*(lam12 + lam12p - 2*lam1Re)/2 + v3**2*(lam23 + lam23p - 2*lam2Re)/2",
-                    "symbols": [
-                        "lam12",
-                        "lam12p",
-                        "lam1Re",
-                        "lam22",
-                        "lam23",
-                        "lam23p",
-                        "lam2Re",
-                        "mu2sq",
-                        "v1",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR3",
-                    "expression": "2*lam1Im*v1*v2 - mu12sqIm",
-                    "symbols": [
-                        "lam1Im",
-                        "mu12sqIm",
-                        "v1",
-                        "v2"
-                    ]
-                },
-                {
-                    "identifier": "MMBR4",
-                    "expression": "2*lam1Re*v1*v2 - mu12sqRe",
-                    "symbols": [
-                        "lam1Re",
-                        "mu12sqRe",
-                        "v1",
-                        "v2"
-                    ]
-                },
-                {
-                    "identifier": "MMBR5",
-                    "expression": "lam11*v1**2 - mu1sq + v2**2*(lam12 + lam12p - 2*lam1Re)/2 + v3**2*(lam31 + lam31p - 2*lam3Re)/2",
-                    "symbols": [
-                        "lam11",
-                        "lam12",
-                        "lam12p",
-                        "lam1Re",
-                        "lam31",
-                        "lam31p",
-                        "lam3Re",
-                        "mu1sq",
-                        "v1",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR6",
-                    "expression": "v2*v3*(lam23 + lam23p + 2*lam2Re)",
-                    "symbols": [
-                        "lam23",
-                        "lam23p",
-                        "lam2Re",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR7",
-                    "expression": "2*lam2Im*v2*v3",
-                    "symbols": [
-                        "lam2Im",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR8",
-                    "expression": "-2*lam3Im*v1*v3",
-                    "symbols": [
-                        "lam3Im",
-                        "v1",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR9",
-                    "expression": "3*lam33*v3**2 - mu3sq + v1**2*(lam31 + lam31p + 2*lam3Re)/2 + v2**2*(lam23 + lam23p + 2*lam2Re)/2",
-                    "symbols": [
-                        "lam23",
-                        "lam23p",
-                        "lam2Re",
-                        "lam31",
-                        "lam31p",
-                        "lam33",
-                        "lam3Re",
-                        "mu3sq",
-                        "v1",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR10",
-                    "expression": "-mu12sqRe + v1*v2*(lam12 + lam12p + 2*lam1Re)",
-                    "symbols": [
-                        "lam12",
-                        "lam12p",
-                        "lam1Re",
-                        "mu12sqRe",
-                        "v1",
-                        "v2"
-                    ]
-                },
-                {
-                    "identifier": "MMBR11",
-                    "expression": "-2*lam1Im*v1*v2 + mu12sqIm",
-                    "symbols": [
-                        "lam1Im",
-                        "mu12sqIm",
-                        "v1",
-                        "v2"
-                    ]
-                },
-                {
-                    "identifier": "MMBR12",
-                    "expression": "lam1Im*v2**2 - lam3Im*v3**2",
-                    "symbols": [
-                        "lam1Im",
-                        "lam3Im",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR13",
-                    "expression": "v1*v3*(lam31 + lam31p + 2*lam3Re)",
-                    "symbols": [
-                        "lam31",
-                        "lam31p",
-                        "lam3Re",
-                        "v1",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR14",
-                    "expression": "3*lam11*v1**2 - mu1sq + v2**2*(lam12 + lam12p + 2*lam1Re)/2 + v3**2*(lam31 + lam31p + 2*lam3Re)/2",
-                    "symbols": [
-                        "lam11",
-                        "lam12",
-                        "lam12p",
-                        "lam1Re",
-                        "lam31",
-                        "lam31p",
-                        "lam3Re",
-                        "mu1sq",
-                        "v1",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR15",
-                    "expression": "-2*lam2Im*v2*v3",
-                    "symbols": [
-                        "lam2Im",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR16",
-                    "expression": "2*lam2Re*v2*v3",
-                    "symbols": [
-                        "lam2Re",
-                        "v2",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR17",
-                    "expression": "2*lam3Re*v1*v3",
-                    "symbols": [
-                        "lam3Re",
-                        "v1",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR18",
-                    "expression": "-lam2Im*v2**2 + lam3Im*v1**2",
-                    "symbols": [
-                        "lam2Im",
-                        "lam3Im",
-                        "v1",
-                        "v2"
-                    ]
-                },
-                {
-                    "identifier": "MMBR19",
-                    "expression": "2*lam3Im*v1*v3",
-                    "symbols": [
-                        "lam3Im",
-                        "v1",
-                        "v3"
-                    ]
-                },
-                {
-                    "identifier": "MMBR20",
-                    "expression": "lam33*v3**2 - mu3sq + v1**2*(lam31 + lam31p - 2*lam3Re)/2 + v2**2*(lam23 + lam23p - 2*lam2Re)/2",
-                    "symbols": [
-                        "lam23",
-                        "lam23p",
-                        "lam2Re",
-                        "lam31",
-                        "lam31p",
-                        "lam33",
-                        "lam3Re",
-                        "mu3sq",
-                        "v1",
-                        "v2",
-                        "v3"
-                    ]
-                }
+            [
+                "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft_definitions.txt",
+                "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft.txt"
             ],
-            "matrix": "[[MMBR0, MMBR1, MMBR3, MMBR6, MMBR10, MMBR15], [MMBR1, MMBR2, MMBR4, MMBR7, MMBR11, MMBR16], [MMBR3, MMBR4, MMBR5, MMBR8, MMBR12, MMBR17], [MMBR6, MMBR7, MMBR8, MMBR9, MMBR13, MMBR18], [MMBR10, MMBR11, MMBR12, MMBR13, MMBR14, MMBR19], [MMBR15, MMBR16, MMBR17, MMBR18, MMBR19, MMBR20]]"
-        },
-        "fileName": [
-            "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight_definitions.txt",
-            "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight.txt"
+            [
+                "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight_definitions.txt",
+                "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight.txt"
+            ]
         ]
     },
     "scalarRotationMatrix": {

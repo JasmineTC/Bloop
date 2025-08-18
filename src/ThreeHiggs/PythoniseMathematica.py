@@ -142,26 +142,6 @@ def pythoniseMathematica(args):
                                                          for idx, deff in 
                                                          enumerate(args.scalarMassMatricesDefinitionsFiles)]},
             
-            
-            "scalarMassMatrixUpperLeft": {
-                "expressions": pythoniseMassMatrix(
-                    getLines(args.scalarMassMatrixUpperLeftDefinitionsFile),
-                    getLines(args.scalarMassMatrixUpperLeftFile),
-                ),
-                "fileName": (
-                    args.scalarMassMatrixUpperLeftDefinitionsFile,
-                    args.scalarMassMatrixBottomRightFile),
-            },
-            "scalarMassMatrixBottomRight": {
-                "expressions": pythoniseMassMatrix(
-                    getLines(args.scalarMassMatrixBottomRightDefinitionsFile),
-                    getLines(args.scalarMassMatrixBottomRightFile),
-                ),
-                "fileName": (
-                    args.scalarMassMatrixBottomRightDefinitionsFile,
-                    args.scalarMassMatrixBottomRightFile,
-                ),
-            },
             "scalarRotationMatrix": {
                 "expressions": pythoniseRotationMatrix(getLines(args.scalarRotationFile)),
                 "fileName": args.scalarRotationFile,

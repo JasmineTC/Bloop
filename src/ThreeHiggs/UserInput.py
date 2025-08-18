@@ -216,31 +216,6 @@ class UserInput(argparse.ArgumentParser):
                           dest = 'scalarMassMatricesDefinitionsFiles',
                           metavar='')
         
-        
-        self.add_argument('--scalarMassMatrixUpperLeftFile', 
-                          action = 'store', 
-                          default = "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft.txt",
-                          dest = 'scalarMassMatrixUpperLeftFile',
-                          metavar='')
-
-        self.add_argument('--scalarMassMatrixUpperLeftDefinitionsFile', 
-                          action = 'store', 
-                          default = "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft_definitions.txt",
-                          dest = 'scalarMassMatrixUpperLeftDefinitionsFile',
-                          metavar='')
-
-        self.add_argument('--scalarMassMatrixBottomRightFile', 
-                          action = 'store', 
-                          default = "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight.txt",
-                          dest = 'scalarMassMatrixBottomRightFile',
-                          metavar='')
-
-        self.add_argument('--scalarMassMatrixBottomRightDefinitionsFile', 
-                          action = 'store', 
-                          default = "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight_definitions.txt",
-                          dest = 'scalarMassMatrixBottomRightDefinitionsFile',
-                          metavar='')
-        
         self.add_argument('--lagranianVariablesFile', 
                           action = 'store', 
                           default = "Data/Z2_3HDM/ModelFiles/Variables/LagranianSymbols.json",
