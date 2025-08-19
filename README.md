@@ -5,10 +5,13 @@ Download the code base with a git clone. From this point forward all commands ar
 
 For easy OS compatibility we run the code inside a container from the command line. This will require podman or docker to be installed on your system. We use podman.
 podman can be installed via:
+
 - Linux/ubuntu
 ```sudo apt install podman```
+
 -Windows
 ``` ??? ```
+
 -Mac
 ```???```
   
