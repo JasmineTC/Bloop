@@ -9,10 +9,10 @@ podman can be installed via:
 - Linux/ubuntu
 ```sudo apt install podman```
 
--Windows
+- Windows
 ``` ??? ```
 
--Mac
+- Mac
 ```???```
   
 ## Using a container:
