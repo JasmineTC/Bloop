@@ -27,10 +27,6 @@ With the container built we can enter the container with:
 This will put you in the src directory inside threeHiggs for convience. In the event of a future release using a new package you will need to rebuild the container.
 
 From this point forward all commands are to be run from inside the threeHiggs/src directory
-## Executing the code:
-The code is excuted via
-
-```python3 runStages.py ```
 
 ## Running unit and integration tests:
 Ensure the code has been installed successfully via
@@ -45,10 +41,13 @@ The flags that control model dependent behaviour are:
 - Data files: --loFile etc 
 - Minimisation control: --initialGuesses --var<Upper/Lower>Bounds 
 - Generate benchmarks: --benchmarkFile (this should be a .py)
+We have an example benchmark generating code in src. The only thing we require from the user is the benchmark generator produces a json which we then load in benchmarkLooping.py.
+## Executing the code:
+The code is excuted via
+
+```python3 runStages.py ```
 
 Generally useful flags:
-- --loopOrder, - --verbose
-
-## Generating benchmarks
-We have an example benchmark generating code in src. The only thing we require from the user is the benchmark generator produces a json which we then load in benchmarkLooping.py.
+- --loopOrder
+- --verbose
 
