@@ -195,7 +195,7 @@ class UserInput(argparse.ArgumentParser):
                           type = int
                           )
 
-        self.add_argument('--BmGeneratorFile', 
+        self.add_argument('--bmGeneratorFile', 
                           action = 'store', 
                           default = "ThreeHiggs.Z2_ThreeHiggsBmGenerator",
                           )
@@ -265,7 +265,6 @@ class UserInput(argparse.ArgumentParser):
                           default = "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarRotationMatrix.txt"
                           )
         
-        
         self.add_argument('--scalarMassMatricesFiles', 
                           nargs = "*", 
                           action = 'store', 
@@ -291,7 +290,7 @@ class UserInput(argparse.ArgumentParser):
                           action = 'store', 
                           default = "ThreeHiggs/Data/Z2_3HDM/pythonisedExpressionsFile.json"
                           )
-        
+
     noMetaVar = {'store_true', 'store_false', 'help', 'version'} 
     def add_argument(self, *args, **kwargs):
         if (args[0].startswith('-') and 

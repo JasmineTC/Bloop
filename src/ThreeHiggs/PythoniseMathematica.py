@@ -142,8 +142,8 @@ def pythoniseMathematica(args):
                                                      enumerate(args.scalarMassMatricesDefinitionsFiles)]},
         
         "scalarRotationMatrix": {
-            "expressions": pythoniseRotationMatrix(getLines(args.scalarRotationFile)),
-            "fileName": args.scalarRotationFile,
+            "expressions": pythoniseRotationMatrix(getLines(args.scalarRotationMatrixFile)),
+            "fileName": args.scalarRotationMatrixFile,
         },
         "allSymbols": {
             "allSymbols": allSymbols,
@@ -153,7 +153,7 @@ def pythoniseMathematica(args):
     }
     
 
-    expressionDict["scalarPermutationMatrix"] = [] if args.scalarPermutationFile.lower() =="none" else getLines(args.scalarPermutationFile, mode="json")
+    expressionDict["scalarPermutationMatrix"] = [] if args.scalarPermutationMatrixFile.lower() == "none" else getLines(args.scalarPermutationMatrixFile, mode="json")
     
     dump(expressionDict
        ,
