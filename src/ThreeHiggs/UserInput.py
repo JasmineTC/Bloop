@@ -104,21 +104,21 @@ class UserInput(argparse.ArgumentParser):
                           )
         
         self.add_argument('--varLowerBounds', 
-                          nargs = "*", 
+                          nargs = "+", 
                           action = 'store', 
                           default = [-60, 1e-4, 1e-4], 
                           type = float
                           )
         
         self.add_argument('--varUpperBounds', 
-                          nargs = "*", 
+                          nargs = "+", 
                           action = 'store', 
                           default = [60, 60, 60], 
                           type = list
                           )
         
         self.add_argument('--initialGuesses', 
-                          nargs = "*", 
+                          nargs = "+", 
                           action = 'store', 
                           default = [[0.1,0.1,0.1], 
                                      [5,5,5],
@@ -266,7 +266,7 @@ class UserInput(argparse.ArgumentParser):
                           )
         
         self.add_argument('--scalarMassMatricesFiles', 
-                          nargs = "*", 
+                          nargs = "+", 
                           action = 'store', 
                           default = ["Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft.txt",
                                      "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight.txt"], 
@@ -274,7 +274,7 @@ class UserInput(argparse.ArgumentParser):
                           )
         
         self.add_argument('--scalarMassMatricesDefinitionsFiles', 
-                          nargs = "*", 
+                          nargs = "+", 
                           action = 'store', 
                           default = ["Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_upperLeft_definitions.txt",
                                      "Data/Z2_3HDM/ModelFiles/EffectivePotential/scalarMassMatrix_bottomRight_definitions.txt"], 
