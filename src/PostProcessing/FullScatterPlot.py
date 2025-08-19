@@ -1,8 +1,7 @@
-from os.path import join
 from glob import glob  ## I think glob lets you do the * thingy
-from json import load, dump
+from json import load
 from matplotlib import pylab as plt
-from numpy import transpose, unique, asarray
+from numpy import transpose
 
 passedBm = []
 v3NotGlobalMinBm = []
@@ -18,7 +17,7 @@ for fileName in glob("Results/*.json"):
         nonPertCount += 1
     if resultDic["complexMin"]:
         complexCount += 1
-    if resultDic["failureReason"] == None:
+    if resultDic["failureReason"] is None:
         passedBm.append((list(resultDic["bmInput"].values())))
 
     elif resultDic["failureReason"] == "v3NotGlobalMin":
@@ -31,7 +30,7 @@ for fileName in glob("Results/*.json"):
         v3NotGlobalMinBm.append((list(resultDic["bmInput"].values())))
 
     elif resultDic["failureReason"] == "MinimisationFailed":
-        minFailed.append((list(resultDic["bmInput"].values())))
+        minFailedBm.append((list(resultDic["bmInput"].values())))
 
     else:
         print(resultDic["failureReason"])

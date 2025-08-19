@@ -46,7 +46,7 @@ print(
     f"Number of benchmarks that become weaker at 1 loop: {len(pdDifM) + becomeWeakCount}"
 )
 print(f"Mean percentage difference of benchmarks that become stronger: {mean(pdDifP)}")
-print(f"--- THE BELOW IS AN UNDER ESTIMATE AS I DON'T TRACK STRENGTHS BELOW 0.3 ---")
+print("--- THE BELOW IS AN UNDER ESTIMATE AS I DON'T TRACK STRENGTHS BELOW 0.3 ---")
 print(f"Mean percentage difference of benchmarks that become weaker: {mean(pdDifM)}")
 print(f"Mean percentage difference overall: {mean(pdDifM + pdDifP)}")
 meanTc1Loop = mean(Tc1Loop)

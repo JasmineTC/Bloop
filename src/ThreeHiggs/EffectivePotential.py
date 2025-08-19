@@ -98,9 +98,10 @@ class EffectivePotential:
     def findGlobalMinimum(self, T, params3D, minimumCandidates):
         """For physics reasons we only minimise the real part,
         for nlopt reasons we need to give a redunant grad arg"""
-        VeffWrapper = lambda fields, grad: np.real(
-            self.evaluatePotential(fields, T, params3D)
-        )
+        def VeffWrapper(fields, grad):
+            return np.real(
+                    self.evaluatePotential(fields, T, params3D)
+                )
 
         bestResult = self.nloptInst.nloptGlobal(VeffWrapper, minimumCandidates[0])
 
@@ -171,9 +172,10 @@ class EffectivePotential:
 
     ##Jasmine plotting tools
     def plotPot(self, T, params3D, linestyle, v3Min, potMin, v3Max):
-        VeffWrapper = lambda fields, grad: np.real(
-            self.evaluatePotential(fields, T, params3D)
-        )
+        def VeffWrapper(fields, grad):
+            return np.real(
+                    self.evaluatePotential(fields, T, params3D)
+                )
 
         v3Range = np.linspace(1e-4, v3Max * 1.1, 80)
         potArray = np.zeros(len(v3Range))
@@ -196,9 +198,10 @@ class EffectivePotential:
         from matplotlib import cm
         from matplotlib.ticker import LinearLocator
 
-        VeffWrapper = lambda fields, grad: np.real(
-            self.evaluatePotential(fields, T, params3D)
-        )
+        def VeffWrapper(fields, grad):
+            return np.real(
+                    self.evaluatePotential(fields, T, params3D)
+                )
         n = 100
         v3Range = np.linspace(-1.5, 13, n)
         v2Range = np.linspace(-1.5, 5, n)

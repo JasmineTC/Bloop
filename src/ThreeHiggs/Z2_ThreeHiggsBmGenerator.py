@@ -70,7 +70,8 @@ def bPhysicalMinimum(nloptInst, potential, params):
     ## I don't like having the function wrapped here,
     ## should be defined once at a higher level, not every func call but params
     ## makes that non-trivial
-    potentialWrapped = lambda fields, _: potential(fields, params)
+    def potentialWrapped(fields, _):
+        return potential(fields, params)
 
     minValue = nloptInst.nloptGlobal(potentialWrapped, minimumInitialGuesses[0])[1]
 

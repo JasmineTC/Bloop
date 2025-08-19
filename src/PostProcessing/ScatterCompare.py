@@ -1,10 +1,8 @@
-from os.path import join
 from glob import glob  ## I think glob lets you do the * thingy
-from json import load, dump
+from json import load
 from matplotlib import pylab as plt
-from numpy import transpose, unique, asarray
-from matplotlib.cm import ScalarMappable
-
+from numpy import transpose
+from pathlib import Path
 
 def loadData(directoryList):
     strength, bmInput, Tc, bmNumber = [], [], [], []
@@ -59,7 +57,6 @@ strength1Loop, bmInput1Loop, Tc1Loop, bmNumber1Loop = loadData(
 strongest = max(strength1Loop + strength2Loop)
 weakest = 0.6
 norm = plt.Normalize(weakest, strongest)
-from numpy import pi
 
 # for index, theta in enumerate(theta2Loop):
 #    if theta < 1.08*pi/2 and strength2Loop[index] > 0.8:
@@ -90,8 +87,6 @@ inputData = (
         strength1Loop,
     ),
 )
-
-from pathlib import Path
 
 ylabels = [
     "$m_{s1}$ (GeV)",

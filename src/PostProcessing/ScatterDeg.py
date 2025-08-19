@@ -1,8 +1,7 @@
-from os.path import join
 from glob import glob  ## I think glob lets you do the * thingy
-from json import load, dump
+from json import load
 from matplotlib import pylab as plt
-from numpy import transpose, unique, asarray
+from numpy import transpose, unique
 
 
 def shape(x: float) -> str:

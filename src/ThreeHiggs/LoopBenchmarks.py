@@ -9,7 +9,6 @@ from ThreeHiggs.GetLines import getLines
 from ThreeHiggs.EffectivePotential import EffectivePotential, cNlopt
 from ThreeHiggs.PlotResult import plotData
 from ThreeHiggs.ProcessMinimization import interpretData
-from ThreeHiggs.DimensionalReduction import DimensionalReduction
 from ThreeHiggs.PythoniseMathematica import replaceGreekSymbols
 from ThreeHiggs.ParsedExpression import (
     ParsedExpressionSystemArray,
@@ -78,9 +77,10 @@ def benchmarkLooping(args):
         if args.bPool:
             with Pool(args.cores) as pool:
                 ## Apply might be better suited to avoid this lambda function side step
-                benchmarkDoingWrap = lambda benchmark: benchmarkDoing(
-                    trackVEV, args, benchmark, fieldNames
-                )
+                def benchmarkDoingWrap(benchmark):
+                    return benchmarkDoing(
+                                    trackVEV, args, benchmark, fieldNames
+                                )
                 pool.map(
                     benchmarkDoingWrap,
                     (
@@ -145,26 +145,6 @@ def setUpTrackVEV(args):
         allSymbols,
     )
 
-    dimensionalReduction = DimensionalReduction(
-        config={
-            "hardToSoft": ParsedExpressionSystemArray(
-                pythonisedExpressions["hardToSoft"]["expressions"],
-                allSymbols,
-                pythonisedExpressions["hardToSoft"]["fileName"],
-            ),
-            "softScaleRGE": ParsedExpressionSystemArray(
-                pythonisedExpressions["softScaleRGE"]["expressions"],
-                allSymbols,
-                pythonisedExpressions["softScaleRGE"]["fileName"],
-            ),
-            "softToUltraSoft": ParsedExpressionSystemArray(
-                pythonisedExpressions["softToUltraSoft"]["expressions"],
-                allSymbols,
-                pythonisedExpressions["softToUltraSoft"]["fileName"],
-            ),
-        }
-    )
-
     fourPointSymbols = [
         replaceGreekSymbols(item) for item in variableSymbols["fourPointSymbols"]
     ]
@@ -179,7 +159,21 @@ def setUpTrackVEV(args):
         TrackVEV(
             config={
                 "effectivePotential": effectivePotential,
-                "dimensionalReduction": dimensionalReduction,
+                "hardToSoft": ParsedExpressionSystemArray(
+                    pythonisedExpressions["hardToSoft"]["expressions"],
+                    allSymbols,
+                    pythonisedExpressions["hardToSoft"]["fileName"],
+                ),
+                "softScaleRGE": ParsedExpressionSystemArray(
+                    pythonisedExpressions["softScaleRGE"]["expressions"],
+                    allSymbols,
+                    pythonisedExpressions["softScaleRGE"]["fileName"],
+                ),
+                "softToUltraSoft": ParsedExpressionSystemArray(
+                    pythonisedExpressions["softToUltraSoft"]["expressions"],
+                    allSymbols,
+                    pythonisedExpressions["softToUltraSoft"]["fileName"],
+                ),
                 "betaFunction4DExpression": ParsedExpressionSystemArray(
                     pythonisedExpressions["betaFunctions4D"]["expressions"],
                     allSymbols,
