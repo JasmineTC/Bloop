@@ -39,7 +39,7 @@ Before we can get started with this code you need to first implement your own mo
 Now we need to point the code to these generated text files this can be done via the command line (python3 runStages --help to see all the command line options). However, **we strongly recommend the use of a bash script or config file** for easily excuting the code in a repeatable manner. As an example we have a config file for the default Z2 case which can be found in src. 
 The flags that control model dependent behaviour are: 
 - Data files: --loFile etc 
-- Minimisation control: --initialGuesses --var<Upper/Lower>Bounds 
+- Minimisation control: --initialGuesses, --var<Upper/Lower>Bounds, --absLocalTolerance etc 
 - Generate benchmarks: --benchmarkFile (this should be a .py)
 We have an example benchmark generating code in src. The only thing we require from the user is the benchmark generator produces a json which we then load in benchmarkLooping.py.
 ## Executing the code:
