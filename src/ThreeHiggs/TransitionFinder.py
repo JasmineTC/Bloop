@@ -8,10 +8,10 @@ from dataclasses import dataclass, InitVar, field
 from ThreeHiggs.PDGData import mTop, mW, mZ, higgsVEV
 
 
-def bIsPerturbative(paramValuesArray, pertSymbols, allSymbols):
+def bIsPerturbative(params, pertSymbols, allSymbols):
     ## Should actually check vertices but not a feature in DRalgo at time of writting
     for pertSymbol in pertSymbols:
-        if abs(paramValuesArray[allSymbols.index(pertSymbol)]) > 4 * pi:
+        if abs(params[allSymbols.index(pertSymbol)]) > 4 * pi:
             return False
 
     return True
@@ -23,27 +23,19 @@ def constructSplineDictArray(
     ## -----BUG------
     ## This updates the RGScale with the value of mu
     ## Weird FP errors can occur here (e.g. including mu in np.real or not)
-    betaFunction4DWrapper = lambda mu, initialConditions: np.real(
-        betaFunction4DExpression.evaluate(initialConditions) / mu
-    )
     solutionSoft = scipy.integrate.solve_ivp(
-        betaFunction4DWrapper,
+        lambda mu, initialConditions: np.real(betaFunction4DExpression.evaluate(initialConditions) / mu),
         (muRange[0], muRange[-1]),
         initialConditions,
         t_eval=muRange,
     ).y
-    interpDict = {}
-    for idx, ele in enumerate(allSymbols):
-        if ele == "RGScale":
-            continue
 
-        ## Hack to remove all the const entries in the array
-        if np.all(solutionSoft[idx] == solutionSoft[idx][0]):
-            continue
-
-        interpDict[ele] = scipy.interpolate.CubicSpline(muRange, solutionSoft[idx])
-    return interpDict
-
+    return {
+        ele: scipy.interpolate.CubicSpline(muRange, solutionSoft[idx])
+        for idx, ele in enumerate(allSymbols)
+        if ele != "RGScale"
+        if np.any(solutionSoft[idx] != solutionSoft[idx][0])
+    }
 
 @dataclass(frozen=True)
 class TrackVEV:
@@ -55,7 +47,9 @@ class TrackVEV:
 
     ## idk how to type hint this correctly
     effectivePotential: str = "effectivePotentialInstance"
-    dimensionalReduction: str = "dimensionalReductionInstance"
+    hardToSoft: callable = 0
+    softScaleRGE: callable = 0
+    softToUltraSoft: callable = 0
     betaFunction4DExpression: str = "betaFunction4DExpression"
     bounded: str = "bounded"
 
@@ -73,13 +67,13 @@ class TrackVEV:
             self.__init__(**config)
 
     def trackVEV(self, benchmark):
-        lagranianParams4DArray = self.getLagranianParams4D(benchmark)
+        params = self.getLagranianParams4D(benchmark)
 
         ## RG running. We want to do 4D -> 3D matching at a scale where logs are small;
         ## usually a T-dependent scale 4.*pi*exp(-np.euler_gamma)*T
         ## TODO FIX for when user RGscale < 7T!!!
         muRange = np.linspace(
-            lagranianParams4DArray[self.allSymbols.index("RGScale")],
+            params[self.allSymbols.index("RGScale")],
             7.3 * self.TRange[-1],
             len(self.TRange) * 10,
         )
@@ -87,7 +81,7 @@ class TrackVEV:
         betaSpline4D = constructSplineDictArray(
             self.betaFunction4DExpression,
             muRange,
-            lagranianParams4DArray,
+            params,
             self.allSymbols,
         )
 
@@ -114,14 +108,13 @@ class TrackVEV:
 
             ##
             if not np.all(self.bounded.evaluateUnordered(params)):
-                minimizationResults["failureReason"] = "unBounded"
-                return
+                return minimizationResults | {"failureReason": "unBounded"}
 
             isPert = bIsPerturbative(params, self.pertSymbols, self.allSymbols)
 
-            params = self.dimensionalReduction.hardToSoft.evaluate(params)
-            params = self.dimensionalReduction.softScaleRGE.evaluate(params)
-            params = self.dimensionalReduction.softToUltraSoft.evaluate(params)
+            params = self.hardToSoft.evaluate(params)
+            params = self.softScaleRGE.evaluate(params)
+            params = self.softToUltraSoft.evaluate(params)
 
             vevLocation, vevDepth = self.effectivePotential.findGlobalMinimum(
                 T, params, self.initialGuesses + [vevLocation]
@@ -136,8 +129,10 @@ class TrackVEV:
             if np.all(vevLocation < 0.5):
                 if self.verbose:
                     print(f"Symmetric phase found at temp {T}")
+
                 if counter == 3:
                     break
+
                 counter += 1
 
         minimizationResults["vevLocation"] = np.transpose(
@@ -146,43 +141,46 @@ class TrackVEV:
 
         return minimizationResults
 
-    def getLagranianParams4D(self, inputParams):
+    def getLagranianParams4D(self, paramsDict):
         ## --- SM fermion and gauge boson masses---
         ## How get g3 from PDG??
-        langrianParams4D = {
+        paramsDict = {
             "yt3": sqrt(2.0) * mTop / higgsVEV,
             "g1": 2.0 * sqrt(mZ**2 - mW**2) / higgsVEV,  ## U(1)
             "g2": 2.0 * mW / higgsVEV,  ## SU(2)
             "g3": sqrt(0.1183 * 4.0 * pi),  ## SU(3)
+
             ## BSM stuff from benchmark
-            "RGScale": inputParams["RGScale"],
-            **inputParams["massTerms"],
-            **inputParams["couplingValues"],
+            "RGScale": paramsDict["RGScale"],
+            **paramsDict["massTerms"],
+            **paramsDict["couplingValues"],
         }
 
-        params4D = np.zeros(len(self.allSymbols), dtype="float64")
-        for key, value in langrianParams4D.items():
-            params4D[self.allSymbols.index(key)] = value
+        params = np.zeros(len(self.allSymbols), dtype="float64")
+        for key, value in paramsDict.items():
+            params[self.allSymbols.index(key)] = value
 
-        return params4D
+        return params
 
-    def getTConsts(self, T, inputArray):
+    def getTConsts(self, T, params):
         matchingScale = 4.0 * pi * exp(-np.euler_gamma) * T
         Lb = 2.0 * log(matchingScale / T) - self.EulerGammaPrime
 
-        inputArray[self.allSymbols.index("RGScale")] = matchingScale
-        inputArray[self.allSymbols.index("T")] = T
-        inputArray[self.allSymbols.index("Lb")] = Lb
-        inputArray[self.allSymbols.index("Lf")] = Lb + self.Lfconst
-        return inputArray
+        params[self.allSymbols.index("RGScale")] = matchingScale
+        params[self.allSymbols.index("T")] = T
+        params[self.allSymbols.index("Lb")] = Lb
+        params[self.allSymbols.index("Lf")] = Lb + self.Lfconst
 
-    def runParams4D(self, betaSpline4D, T):
-        array = self.getTConsts(T, np.zeros(len(self.allSymbols), dtype="float64"))
+        return params
 
-        muEvaulate = array[self.allSymbols.index("RGScale")]
-        for key, spline in betaSpline4D.items():
-            array[self.allSymbols.index(key)] = spline(muEvaulate)
-        return array
+    def runParams4D(self, paramsDict, T):
+        params = self.getTConsts(T, np.zeros(len(self.allSymbols), dtype="float64"))
+
+        muEvaulate = params[self.allSymbols.index("RGScale")]
+        for key, spline in paramsDict.items():
+            params[self.allSymbols.index(key)] = spline(muEvaulate)
+
+        return params
 
     ############################
     def plotPotential(self, benchmark: dict[str:float]):
@@ -204,10 +202,6 @@ class TrackVEV:
 
         vevLocation = np.array(self.initialGuesses[0])
 
-        linestyle = ["-.", "-", "--"]
-        v3Max = 0
-        yMin = 0
-        yMax = 0
         for idx, T in enumerate(self.TRange):
             (
                 vevLocation,
