@@ -1,5 +1,6 @@
 from ThreeHiggs.UserInput import UserInput, Stages
 from importlib import import_module
+
 args = UserInput().parse()
 
 if args.firstStage <= Stages.convertMathematica <= args.lastStage:
@@ -7,6 +8,7 @@ if args.firstStage <= Stages.convertMathematica <= args.lastStage:
         print("Convert Mathematica stage started")
 
     from ThreeHiggs.PythoniseMathematica import pythoniseMathematica
+
     pythoniseMathematica(args)
 
 if args.firstStage <= Stages.generateBenchmark <= args.lastStage:
@@ -19,5 +21,5 @@ if args.firstStage <= Stages.doMinimization <= args.lastStage:
         print("Minimization stage started")
 
     from ThreeHiggs.LoopBenchmarks import benchmarkLooping
-    benchmarkLooping(args)
 
+    benchmarkLooping(args)

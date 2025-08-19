@@ -6,5 +6,5 @@ if __name__ == "__main__":
     from ThreeHiggs.DimensionalReduction import DimensionalReductionUnitTest
     from ThreeHiggs.PDGData import PDGUnitTests
     from unittest import main
-    main()
 
+    main()
