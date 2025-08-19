@@ -17,9 +17,11 @@ podman can be installed via:
   
 ## Using a container:
 On first installisation you will need to do:
+
 ```podman build . -t threehiggs ```
 
 With the container built we can enter the container with:
+
 ```podman run --mount type=bind,src=$PWD,target=/ThreeHiggs -it threehiggs /bin/bash -c "cd /ThreeHiggs/src && exec /bin/bash"```
 
 This will put you in the src directory inside threeHiggs for convience. In the event of a future release using a new package you will need to rebuild the container.
@@ -27,10 +29,12 @@ This will put you in the src directory inside threeHiggs for convience. In the e
 From this point forward all commands are to be run from inside the threeHiggs/src directory
 ## Executing the code:
 The code is excuted via
+
 ```python3 runStages.py ```
 
 ## Running unit and integration tests:
 Ensure the code has been installed successfully via
+
 ```./UnitAndIntegrationTests.sh```
 
 ## Implementing new models:
