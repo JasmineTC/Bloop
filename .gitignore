@@ -14,3 +14,8 @@ Results
 *.swp
 *.png
 *.pstats
+
+src/Benchmarks/**
+src/ThreeHiggs/Veff/**
+**/*.json
+
