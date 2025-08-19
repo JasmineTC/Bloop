@@ -12,7 +12,7 @@ if args.firstStage <= Stages.convertMathematica <= args.lastStage:
 if args.firstStage <= Stages.generateBenchmark <= args.lastStage:
     if args.verbose:
         print("Benchmark generation stage started")
-    import_module(args.bmGenerator).generateBenchmarks(args)
+    import_module(args.bmGeneratorFile).generateBenchmarks(args)
 
 if args.firstStage <= Stages.doMinimization <= args.lastStage:
     if args.verbose:

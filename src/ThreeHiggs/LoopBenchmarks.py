@@ -90,7 +90,7 @@ def setUpTrackVEV(
 ):
     pythonisedExpressions = json.load(open(args.pythonisedExpressionsFile, "r"))
     allSymbols = pythonisedExpressions["allSymbols"]["allSymbols"]
-    variableSymbols =  getLines(args.lagranianVariables, mode = "json") 
+    variableSymbols =  getLines(args.lagranianVariablesFile, mode = "json") 
     
     nloptInst = cNlopt(config = 
                     {"nbrVars": len(variableSymbols["fieldSymbols"]), 
