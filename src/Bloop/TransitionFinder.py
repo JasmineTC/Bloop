@@ -4,8 +4,7 @@ import scipy
 
 from dataclasses import dataclass, InitVar, field
 
-# from ThreeHiggs.BmGenerator import bIsBounded
-from ThreeHiggs.PDGData import mTop, mW, mZ, higgsVEV
+from Bloop.PDGData import mTop, mW, mZ, higgsVEV
 
 
 def bIsPerturbative(params, pertSymbols, allSymbols):

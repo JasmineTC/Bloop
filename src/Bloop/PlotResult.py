@@ -1,10 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 def makeFieldDimensionless(temp: list[float], field: list[float]) -> list[float]:
     return field / np.sqrt(temp)
-
 
 def plotData(result: dict, index: int, loopOrder: int, filename: str):  # ->png
     if result["failureReason"]:

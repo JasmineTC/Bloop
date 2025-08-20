@@ -1,13 +1,11 @@
 import numpy as np
 
-
 def PTStrength(idx, fields):
     store = np.zeros(2)
     for i in range(2):
         for field in fields:
             store[i] += field[idx + i] ** 2
     return np.sqrt(store[0] - store[1])
-
 
 def interpretData(result, bmNumber, bmInput, fieldNames):
     processedResult = {

@@ -190,7 +190,7 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument(
             "--bmGeneratorFile",
             action="store",
-            default="ThreeHiggs.Z2_ThreeHiggsBmGenerator",
+            default="Bloop.Z2_ThreeHiggsBmGenerator",
         )
 
         self.add_argument(
@@ -302,7 +302,7 @@ class UserInput(argparse.ArgumentParser):
         self.add_argument(
             "--pythonisedExpressionsFile",
             action="store",
-            default="ThreeHiggs/Data/Z2_3HDM/pythonisedExpressionsFile.json",
+            default="Bloop/Data/Z2_3HDM/pythonisedExpressionsFile.json",
         )
 
     noMetaVar = {"store_true", "store_false", "help", "version"}

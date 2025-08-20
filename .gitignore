@@ -16,6 +16,6 @@ Results
 *.pstats
 
 src/Benchmarks/**
-src/ThreeHiggs/Veff/**
+src/Bloop/Veff/**
 **/*.json
 

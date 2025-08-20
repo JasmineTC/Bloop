@@ -4,13 +4,13 @@ from pathlib import Path
 from pathos.multiprocessing import Pool
 from ijson import items
 
-from ThreeHiggs.TransitionFinder import TrackVEV
-from ThreeHiggs.GetLines import getLines
-from ThreeHiggs.EffectivePotential import EffectivePotential, cNlopt
-from ThreeHiggs.PlotResult import plotData
-from ThreeHiggs.ProcessMinimization import interpretData
-from ThreeHiggs.PythoniseMathematica import replaceGreekSymbols
-from ThreeHiggs.ParsedExpression import (
+from Bloop.TransitionFinder import TrackVEV
+from Bloop.GetLines import getLines
+from Bloop.EffectivePotential import EffectivePotential, cNlopt
+from Bloop.PlotResult import plotData
+from Bloop.ProcessMinimization import interpretData
+from Bloop.PythoniseMathematica import replaceGreekSymbols
+from Bloop.ParsedExpression import (
     ParsedExpressionSystemArray,
     MassMatrix,
     RotationMatrix,

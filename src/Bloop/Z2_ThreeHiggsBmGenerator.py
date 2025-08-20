@@ -10,9 +10,9 @@ from pathlib import Path
 from os.path import join
 from glob import glob
 
-from ThreeHiggs.ParsedExpression import ParsedExpression, MassMatrix
-from ThreeHiggs.EffectivePotential import cNlopt
-from ThreeHiggs.PDGData import mHiggs, higgsVEV
+from Bloop.ParsedExpression import ParsedExpression, MassMatrix
+from Bloop.EffectivePotential import cNlopt
+from Bloop.PDGData import mHiggs, higgsVEV
 
 
 def bIsBounded(params):

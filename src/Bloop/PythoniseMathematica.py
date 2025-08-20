@@ -1,10 +1,9 @@
-from ThreeHiggs.GetLines import getLines
 from json import dump
 from sympy import Matrix
 from sympy.parsing.mathematica import parse_mathematica
 from numpy import euler_gamma, pi
 from pathlib import Path
-
+from Bloop.GetLines import getLines
 
 def replaceGreekSymbols(string: str) -> str:
     ## TODO use unicodedata package here to do magic.
