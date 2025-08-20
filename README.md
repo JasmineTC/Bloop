@@ -18,11 +18,11 @@ podman can be installed via:
 ## Using a container:
 On first installisation you will need to do:
 
-```podman build . -t threehiggs ```
+```podman build . -t bloop ```
 
 With the container built we can enter the container with:
 
-```podman run --mount type=bind,src=$PWD,target=/ThreeHiggs -it threehiggs /bin/bash -c "cd /ThreeHiggs/src && exec /bin/bash"```
+```podman run --mount type=bind,src=$PWD,target=/Bloop -it bloop /bin/bash -c "cd /Bloop/src && exec /bin/bash"```
 
 This will put you in the src directory inside threeHiggs for convience. In the event of a future release using a new package you will need to rebuild the container.
 
