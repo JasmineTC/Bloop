@@ -14,3 +14,4 @@ RUN pip install --no-cache-dir pathos
 RUN pip install --no-cache-dir sympy 
 RUN pip install --no-cache-dir matplotlib 
 RUN pip install --no-cache-dir importlib
+RUN pip install --no-cache-dir line_profiler

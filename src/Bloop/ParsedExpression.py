@@ -88,8 +88,7 @@ class MassMatrix:
         self.fileName = fileName
 
     def evaluate(self, arguments):
-        arguments |= self.definitions.evaluate(arguments, bReturnDict=True)
-        return eval(self.matrix, arguments | {"log": log, "sqrt": sqrt})
+        return eval(self.matrix, arguments )
 
 
 class RotationMatrix:

@@ -4,7 +4,7 @@ from numba import njit
 from itertools import chain
 import nlopt
 from dataclasses import dataclass, InitVar
-
+from line_profiler import profile
 
 @njit
 def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
@@ -130,7 +130,7 @@ class EffectivePotential:
         params3D = {key: value for (key, value) in zip(self.allSymbols, params3D)}
 
         return self.diagonalizeScalars(params3D, T)
-
+    @profile
     def diagonalizeScalars(self, params3D, T):
         """Finds a rotation matrix that diagonalizes the scalar mass matrix
         and returns a dict with diagonalization-specific params"""
