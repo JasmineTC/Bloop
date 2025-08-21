@@ -26,7 +26,7 @@ def _drange(start, end, jump):
         start += decimal.Decimal(jump)
 
 
-def benchmarkDoing(trackVEV, args, benchmark, fieldNames):
+def doBenchmark(trackVEV, args, benchmark, fieldNames):
     if not args.firstBenchmark <= benchmark["bmNumber"] <= args.lastBenchmark:
         return
 
@@ -37,6 +37,7 @@ def benchmarkDoing(trackVEV, args, benchmark, fieldNames):
         ##THIS IS FOR JASMINE TO MAKE PLOTS - IGNORE
         trackVEV.plotPotential(benchmark)
         exit()
+        
     minimizationResult = trackVEV.trackVEV(benchmark)
 
     filename = f"{args.resultsDirectory}/BM_{benchmark['bmNumber']}"
@@ -44,8 +45,9 @@ def benchmarkDoing(trackVEV, args, benchmark, fieldNames):
     Path(args.resultsDirectory).mkdir(parents=True, exist_ok=True)
     if args.bSave:
         if args.verbose:
-            print(f"Saving {benchmark['bmNumber']} to {filename}")
-        open(f"{filename}.json", "w").write(json.dumps(minimizationResult, indent=4))
+            print(f"Saving {benchmark['bmNumber']} to {filename}.json")
+            with open(f"{filename}.json", "w") as fp:
+                fp.write(json.dumps(minimizationResult, indent=4))
 
     if args.bPlot:
         if args.verbose:
@@ -55,34 +57,34 @@ def benchmarkDoing(trackVEV, args, benchmark, fieldNames):
 
     if args.bProcessMin:
         if args.verbose:
-            print(f"Processing {benchmark['bmNumber']} to {filename + '_interp'}")
-
-        open(f"{filename}_interp.json", "w").write(
-            json.dumps(
-                interpretData(
-                    minimizationResult,
-                    benchmark["bmNumber"],
-                    benchmark["bmInput"],
-                    fieldNames,
-                ),
-                indent=4,
+            print(f"Processing {benchmark['bmNumber']} to {filename + '_interp'}.json")
+        with open(f"{filename}_interp.json", "w") as fp :
+            fp.write(
+                json.dumps(
+                    interpretData(
+                        minimizationResult,
+                        benchmark["bmNumber"],
+                        benchmark["bmInput"],
+                        fieldNames,
+                    ),
+                    indent=4,
+                )
             )
-        )
 
 
-def benchmarkLooping(args):
+def loopBenchmarks(args):
     trackVEV, fieldNames = setUpTrackVEV(args)
 
     with open(args.benchmarkFile) as benchmarkFile:
         if args.bPool:
             with Pool(args.cores) as pool:
                 ## Apply might be better suited to avoid this lambda function side step
-                def benchmarkDoingWrap(benchmark):
-                    return benchmarkDoing(
+                def doBenchmarkWrap(benchmark):
+                    return doBenchmark(
                                     trackVEV, args, benchmark, fieldNames
                                 )
                 pool.map(
-                    benchmarkDoingWrap,
+                    doBenchmarkWrap,
                     (
                         benchmark
                         for benchmark in items(benchmarkFile, "item", use_float=True)
@@ -90,11 +92,13 @@ def benchmarkLooping(args):
                 )
         else:
             for benchmark in json.load(benchmarkFile):
-                benchmarkDoing(trackVEV, args, benchmark, fieldNames)
+                doBenchmarkWrap(benchmark)
 
 
 def setUpTrackVEV(args):
-    pythonisedExpressions = json.load(open(args.pythonisedExpressionsFile, "r"))
+    with open(args.pythonisedExpressionsFile, "r") as fp:
+        pythonisedExpressions = json.load(fp)
+
     allSymbols = pythonisedExpressions["allSymbols"]["allSymbols"]
     variableSymbols = getLines(args.lagranianVariablesFile, mode="json")
 
