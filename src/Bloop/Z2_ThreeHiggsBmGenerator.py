@@ -5,7 +5,7 @@ Variables that are bools are denoted with a b prefix"""
 import math as m
 import numpy as np
 
-from json import load, dump
+import json
 from pathlib import Path
 from os.path import join
 from glob import glob
@@ -266,7 +266,8 @@ def _strongSubSet(prevResultDir):
     bmdictList = []
 
     for fileName in glob(join(prevResultDir, "*.json")):
-        resultDic = load(open(fileName, "r"))
+        with open(fileName, "r") as fp:
+            resultDic = json.load(fp)
 
         if resultDic["strong"] > 0.6:
             bmdictList.append(
@@ -300,8 +301,8 @@ def generateBenchmarks(args):
             "varUpperBounds": [300, 300, 300],
         }
     )
-
-    parsedExpressions = load(open(args.pythonisedExpressionsFile, "r"))
+    with open(args.pythonisedExpressionsFile, "r") as fp:
+        parsedExpressions = json.load(fp)
     ## Take the pythonised tree level potential we've generated
     treeLevel = ParsedExpression(parsedExpressions["veff"]["expressions"][0], None)
     chargedMassMatrix = MassMatrix(
@@ -320,27 +321,30 @@ def generateBenchmarks(args):
         return treeLevel.evaluate(params)
 
     if args.benchmarkType == "randomSSS":
-        dump(_strongSubSet(args.prevResultDir), open(output_file, "w"), indent=4)
+        with open(output_file, "w") as fp:
+            json.dump(_strongSubSet(args.prevResultDir), fp, indent=4)
         return
 
     elif args.benchmarkType == "handPicked":
-        dump(
-            _handPickedBm(nloptInst, potential, chargedMassMatrix, neutralMassMatrix),
-            open(output_file, "w"),
-            indent=4,
-        )
+        with open(output_file, "w") as fp:
+            json.dump(
+                _handPickedBm(nloptInst, potential, chargedMassMatrix, neutralMassMatrix),
+                fp,
+                indent=4,
+            )
 
     elif args.benchmarkType == "random":
-        dump(
-            _randomBmParam(
-                args.randomNum,
-                nloptInst,
-                potential,
-                chargedMassMatrix,
-                neutralMassMatrix,
-            ),
-            open(output_file, "w"),
-            indent=4,
+        with open(output_file, "w") as fp: 
+            json.dump(
+                _randomBmParam(
+                    args.randomNum,
+                    nloptInst,
+                    potential,
+                    chargedMassMatrix,
+                    neutralMassMatrix,
+                ),
+                fp,
+                indent=4,
         )
 
     return
