@@ -315,7 +315,8 @@ class UserInput(argparse.ArgumentParser):
     def parse(self):
         userArg = super().parse_args()
         if userArg.config:
-            userConfig = json.load(open(super().parse_args().config, "r"))
+            with open(super().parse_args().config, "r") as fp:
+                userConfig = json.load(fp)
             unexpectedKeys = [
                 userKey
                 for userKey in userConfig.keys()
