@@ -1,13 +1,12 @@
-from ThreeHiggs.UserInput import UserInput, Stages
 from importlib import import_module
-
+from Bloop.UserInput import UserInput, Stages
 args = UserInput().parse()
 
 if args.firstStage <= Stages.convertMathematica <= args.lastStage:
     if args.verbose:
         print("Convert Mathematica stage started")
 
-    from ThreeHiggs.PythoniseMathematica import pythoniseMathematica
+    from Bloop.PythoniseMathematica import pythoniseMathematica
 
     pythoniseMathematica(args)
 
@@ -20,6 +19,6 @@ if args.firstStage <= Stages.doMinimization <= args.lastStage:
     if args.verbose:
         print("Minimization stage started")
 
-    from ThreeHiggs.LoopBenchmarks import benchmarkLooping
+    from Bloop.LoopBenchmarks import benchmarkLooping
 
     benchmarkLooping(args)

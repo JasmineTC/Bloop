@@ -1,7 +1,0 @@
-λ11 > 0
-λ22 > 0
-λ33 > 0
-λ12 + min[0, λ12p - 2*Sqrt[λ1Im^2 + λ1Re^2]] > -2*sqrt[λ11*λ22]
-λ31 + min[0, λ31p - 2*Sqrt[λ3Im^2 + λ3Re^2]] > -2*sqrt[λ11*λ33]
-λ23 + min[0, λ23p - 2*Sqrt[λ2Im^2 + λ2Re^2]] > -2*sqrt[λ22*λ33]
-(λ23 + min[0, λ23p - 2*Sqrt[λ2Im^2 + λ2Re^2]])*sqrt[lam11] + (λ31 + min[0, λ31p - 2*Sqrt[λ3Im^2 + λ3Re^2]])*sqrt[lam22] + (λ12 + min[0, λ12p - 2*Sqrt[λ1Im^2 + λ1Re^2]])*sqrt[lam33] >= 0 || -(lam11*lam22*lam33) + lam33*(λ12 + min[0, λ12p - 2*Sqrt[λ1Im^2 + λ1Re^2]])^2 + lam11*(λ23 + min[0, λ23p - 2*Sqrt[λ2Im^2 + λ2Re^2]])^2 - 2*(λ12 + min[0, λ12p - 2*Sqrt[λ1Im^2 + λ1Re^2]])*(λ23 + min[0, λ23p - 2*Sqrt[λ2Im^2 + λ2Re^2]])*(λ31 + min[0, λ31p - 2*Sqrt[λ3Im^2 + λ3Re^2]]) + lam22*(λ31 + min[0, λ31p - 2*Sqrt[λ3Im^2 + λ3Re^2]])^2 < 0
