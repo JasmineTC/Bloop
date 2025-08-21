@@ -171,7 +171,7 @@ class ParsedExpressionUnitTests(TestCase):
         }
 
         reference = [[1, 0], [0, 1]]
-        self.assertEqual(reference, MassMatrix(source, None).evaluate({}))
+        self.assertEqual(reference, MassMatrix(source, None).evaluate({"mssq": 1}))
 
     def test_RotationMatrix(self):
         source = {"matrix": {"mssq00": [0, 0], "mssq11": [1, 1]}}
