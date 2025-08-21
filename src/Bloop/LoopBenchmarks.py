@@ -5,7 +5,6 @@ from pathos.multiprocessing import Pool
 from ijson import items
 
 from Bloop.TransitionFinder import TrackVEV
-from Bloop.GetLines import getLines
 from Bloop.EffectivePotential import EffectivePotential, cNlopt
 from Bloop.PlotResult import plotData
 from Bloop.ProcessMinimization import interpretData
@@ -100,11 +99,11 @@ def setUpTrackVEV(args):
         pythonisedExpressions = json.load(fp)
 
     allSymbols = pythonisedExpressions["allSymbols"]["allSymbols"]
-    variableSymbols = getLines(args.lagranianVariablesFile, mode="json")
+    lagranianVariables = pythonisedExpressions["lagranianVariables"]["lagranianVariables"]
 
     nloptInst = cNlopt(
         config={
-            "nbrVars": len(variableSymbols["fieldSymbols"]),
+            "nbrVars": len(lagranianVariables["fieldSymbols"]),
             "absGlobalTol": args.absGlobalTolerance,
             "relGlobalTol": args.relGlobalTolerance,
             "absLocalTol": args.absLocalTolerance,
@@ -114,7 +113,7 @@ def setUpTrackVEV(args):
         }
     )
     effectivePotential = EffectivePotential(
-        variableSymbols["fieldSymbols"],
+        lagranianVariables["fieldSymbols"],
         args.loopOrder,
         args.verbose,
         nloptInst,
@@ -150,13 +149,13 @@ def setUpTrackVEV(args):
     )
 
     fourPointSymbols = [
-        replaceGreekSymbols(item) for item in variableSymbols["fourPointSymbols"]
+        replaceGreekSymbols(item) for item in lagranianVariables["fourPointSymbols"]
     ]
     yukawaSymbols = [
-        replaceGreekSymbols(item) for item in variableSymbols["yukawaSymbols"]
+        replaceGreekSymbols(item) for item in lagranianVariables["yukawaSymbols"]
     ]
     gaugeSymbols = [
-        replaceGreekSymbols(item) for item in variableSymbols["gaugeSymbols"]
+        replaceGreekSymbols(item) for item in lagranianVariables["gaugeSymbols"]
     ]
 
     return (
@@ -199,5 +198,5 @@ def setUpTrackVEV(args):
                 "allSymbols": allSymbols,
             }
         ),
-        variableSymbols["fieldSymbols"],
+        lagranianVariables["fieldSymbols"],
     )
