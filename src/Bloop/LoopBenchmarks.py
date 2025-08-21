@@ -46,9 +46,9 @@ def doBenchmark(trackVEV, args, benchmark, fieldNames):
     if args.bSave:
         if args.verbose:
             print(f"Saving {benchmark['bmNumber']} to {filename}.json")
-            with open(f"{filename}.json", "w") as fp:
-                fp.write(json.dumps(minimizationResult, indent=4))
-
+        with open(f"{filename}.json", "w") as fp:
+            fp.write(json.dumps(minimizationResult, indent=4))
+            
     if args.bPlot:
         if args.verbose:
             print(f"Plotting {benchmark['bmNumber']}")
@@ -92,7 +92,7 @@ def loopBenchmarks(args):
                 )
         else:
             for benchmark in json.load(benchmarkFile):
-                doBenchmarkWrap(benchmark)
+                doBenchmark(trackVEV, args, benchmark, fieldNames)
 
 
 def setUpTrackVEV(args):
