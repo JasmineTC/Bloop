@@ -19,6 +19,6 @@ if args.firstStage <= Stages.doMinimization <= args.lastStage:
     if args.verbose:
         print("Minimization stage started")
 
-    from Bloop.LoopBenchmarks import benchmarkLooping
+    from Bloop.LoopBenchmarks import loopBenchmarks
 
-    benchmarkLooping(args)
+    loopBenchmarks(args)
