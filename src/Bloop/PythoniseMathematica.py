@@ -1,4 +1,4 @@
-from json import dump
+import json
 from sympy import Matrix
 from sympy.parsing.mathematica import parse_mathematica
 from numpy import euler_gamma, pi
@@ -202,7 +202,8 @@ def pythoniseMathematica(args):
         else getLines(args.scalarPermutationMatrixFile, mode="json")
     )
 
-    dump(expressionDict, open(outputFile, "w"), indent=4)
+    with open(outputFile, "w") as fp:
+        json.dump(expressionDict, fp, indent=4)
 
 
 from unittest import TestCase
