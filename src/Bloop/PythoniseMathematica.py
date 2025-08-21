@@ -95,12 +95,21 @@ def pythoniseMassMatrix(definitionsLines, matrixLines):
     ##Need sympify that the parsed matrix line is ufuncable
     ##Need str to make compatable with json
     definitions = pythoniseExpressionSystem(definitionsLines)
+    print(definitions)
+    print(matrixLines)
     return {
         "definitions": definitions,
-        "matrix": str(sympify( [
-        [definitions[symbol.strip()] for symbol in line.strip().strip("}").strip("{").split(",")]
-        for line in matrixLines
-    ])),
+        "matrix": str(sympify([
+            [
+                list(filter(
+                    lambda definition: definition["identifier"] == symbol.strip(), 
+                    definitions
+                ))[0]["expression"] if symbol.strip() != "0" else 0
+                for symbol in line.strip().strip("}").strip("{").split(",")
+                
+            ]
+            for line in matrixLines
+        ])),
     }
 
 
