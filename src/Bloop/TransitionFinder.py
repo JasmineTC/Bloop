@@ -125,7 +125,7 @@ class TrackVEV:
             minimizationResults["vevLocation"].append(vevLocation)
             minimizationResults["bIsPerturbative"].append(isPert)
 
-            if np.all(vevLocation < 0.5):
+            if np.all(np.abs(vevLocation) < 0.5):
                 if self.verbose:
                     print(f"Symmetric phase found at temp {T}")
 
