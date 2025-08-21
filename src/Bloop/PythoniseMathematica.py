@@ -3,7 +3,17 @@ from sympy import Matrix
 from sympy.parsing.mathematica import parse_mathematica
 from numpy import euler_gamma, pi
 from pathlib import Path
-from Bloop.GetLines import getLines
+
+from importlib.resources import files
+
+def getLines(relativePathToResource):
+    with open(files(__package__) / relativePathToResource, "r", encoding="utf-8") as fp:
+        return fp.readlines()
+
+def getLinesJSON(relativePathToResource):
+    with open(files(__package__) / relativePathToResource, "r") as fp:
+        return json.load(fp)
+
 
 def replaceGreekSymbols(string: str) -> str:
     ## TODO use unicodedata package here to do magic.
@@ -110,7 +120,7 @@ def pythoniseMathematica(args):
     if args.loopOrder >= 2:
         veffLines += getLines(args.nnloFile)
 
-    allSymbols = getLines(args.allSymbolsFile, mode="json") + ["missing"]
+    allSymbols = getLinesJSON(args.allSymbolsFile) + ["missing"]
     allSymbols = sorted(
         [replaceGreekSymbols(symbol) for symbol in allSymbols], reverse=True
     )
@@ -118,7 +128,6 @@ def pythoniseMathematica(args):
     (outputFile := Path(args.pythonisedExpressionsFile)).parent.mkdir(
         exist_ok=True, parents=True
     )
-
     ## Move get lines to the functions? -- Would need to rework veffLines in this case
     ## Not ideal to have nested dicts but is future proof for when we move to arrays
     expressionDict = {
@@ -193,13 +202,17 @@ def pythoniseMathematica(args):
         "allSymbols": {
             "allSymbols": allSymbols,
             "fileName": args.allSymbolsFile,
-        },
+         },
+        "lagranianVariables": {
+            "lagranianVariables": getLinesJSON(args.lagranianVariablesFile),
+            "fileName": args.lagranianVariablesFile 
+            },
     }
 
     expressionDict["scalarPermutationMatrix"] = (
         []
         if args.scalarPermutationMatrixFile.lower() == "none"
-        else getLines(args.scalarPermutationMatrixFile, mode="json")
+        else getLinesJSON(args.scalarPermutationMatrixFile)
     )
 
     with open(outputFile, "w") as fp:
