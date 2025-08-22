@@ -8,7 +8,7 @@ ClearAll[]
 SetDirectory[NotebookDirectory[]];
 $LoadGroupMath=True;
 (* This is pointing to my DRalgo repo for easier updating *)
-(*pathToDRalgo = "/home/lani/repos/DRalgo/DRalgo.m"*)
+(* TODO move to DRalgo 1.3 *)
 pathToDRalgo = "/home/jasmine/.Mathematica/Applications/DRalgo/DRalgo.m"
 Get[pathToDRalgo]
 
