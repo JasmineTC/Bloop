@@ -1,4 +1,9 @@
 from importlib import import_module
+
+import sys
+sys.path.append("../src/")
+
+
 from Bloop.UserInput import UserInput, Stages
 args = UserInput().parse()
 

@@ -3,8 +3,9 @@ from sympy import Matrix
 from sympy.parsing.mathematica import parse_mathematica
 from numpy import euler_gamma, pi
 from pathlib import Path
-
 from importlib.resources import files
+
+from Veff_generation import generate_veff_module, compile_veff_submodule
 
 def getLines(relativePathToResource):
     with open(files(__package__) / relativePathToResource, "r", encoding="utf-8") as fp:
@@ -131,15 +132,12 @@ def pythoniseMathematica(args):
     veffLines += getLines(args.nloFile)
     if args.loopOrder >= 2:
         veffLines += getLines(args.nnloFile)
-
+    
     allSymbols = getLinesJSON(args.allSymbolsFile) + ["missing"]
     allSymbols = sorted(
         [replaceGreekSymbols(symbol) for symbol in allSymbols], reverse=True
     )
 
-    (outputFile := Path(args.pythonisedExpressionsFile)).parent.mkdir(
-        exist_ok=True, parents=True
-    )
     ## Move get lines to the functions? -- Would need to rework veffLines in this case
     ## Not ideal to have nested dicts but is future proof for when we move to arrays
     expressionDict = {
@@ -189,10 +187,7 @@ def pythoniseMathematica(args):
             "expressions": pythoniseExpressionSystem(veffLines),
             "fileName": "Combined Veff files",
         },
-        "veffArray": {
-            "expressions": pythoniseExpressionSystemArray(veffLines, allSymbols),
-            "fileName": "Combined Veff files",
-        },
+        
         "scalarMassMatrices": {
             "expressions": [
                 pythoniseMassMatrix(
@@ -226,9 +221,23 @@ def pythoniseMathematica(args):
         if args.scalarPermutationMatrixFile.lower() == "none"
         else getLinesJSON(args.scalarPermutationMatrixFile)
     )
+    
+    if args.bCython:
+        generate_veff_module(args, allSymbols)
+        compile_veff_submodule(args)    
+    
+    else:
+        expressionDict["veffArray"] = {
+            "expressions": pythoniseExpressionSystemArray(veffLines, allSymbols),
+            "fileName": "Combined Veff files",
+        }
 
+    (outputFile := Path(args.pythonisedExpressionsFile)).parent.mkdir(
+        exist_ok=True, parents=True
+    )   
     with open(outputFile, "w") as fp:
         json.dump(expressionDict, fp, indent=4)
+    
 
 
 from unittest import TestCase

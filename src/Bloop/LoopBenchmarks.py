@@ -112,6 +112,16 @@ def setUpTrackVEV(args):
             "varUpperBounds": args.varUpperBounds,
         }
     )
+    
+    if args.bCython:
+        veffArray = None
+    else:
+        veffArray = ParsedExpressionSystemArray(
+            pythonisedExpressions["veffArray"]["expressions"],
+            allSymbols,
+            pythonisedExpressions["veffArray"]["fileName"],
+        ) 
+    
     effectivePotential = EffectivePotential(
         lagranianVariables["fieldSymbols"],
         args.loopOrder,
@@ -140,12 +150,8 @@ def setUpTrackVEV(args):
             pythonisedExpressions["scalarRotationMatrix"]["expressions"],
             pythonisedExpressions["scalarRotationMatrix"]["fileName"],
         ),
-        ParsedExpressionSystemArray(
-            pythonisedExpressions["veffArray"]["expressions"],
-            allSymbols,
-            pythonisedExpressions["veffArray"]["fileName"],
-        ),
         allSymbols,
+        veffArray
     )
 
     fourPointSymbols = [

@@ -4,7 +4,6 @@ from numba import njit
 from itertools import chain
 import nlopt
 from dataclasses import dataclass, InitVar
-from line_profiler import profile
 
 @njit
 def diagonalizeNumba(matrices, matrixNumber, matrixSize, T):
@@ -70,8 +69,8 @@ class EffectivePotential:
         scalarPermutationMatrix,
         scalarMassMatrices,
         scalarRotationMatrix,
-        veffArray,
         allSymbols,
+        veffArray
     ):
         self.fieldNames = fieldNames
 
@@ -91,10 +90,11 @@ class EffectivePotential:
         self.scalarMassMatrices = scalarMassMatrices
         self.scalarRotationMatrix = scalarRotationMatrix
 
-        self.expressionsArray = veffArray
-
         self.allSymbols = allSymbols
-
+        self.veffArray = veffArray
+        if not veffArray:
+            from .Veff import Veff
+            self.Veff = Veff
     def findGlobalMinimum(self, T, params3D, minimumCandidates):
         """For physics reasons we only minimise the real part,
         for nlopt reasons we need to give a redunant grad arg"""
@@ -114,11 +114,14 @@ class EffectivePotential:
         return bestResult[0], self.evaluatePotential(bestResult[0], T, params3D)
 
     def evaluatePotential(self, fields, T, params3D):
-        array = self.expressionsArray.dictToArray(
-            self.computeMasses(fields, T, params3D)
-        )
+        paramsDict = self.computeMasses(fields, T, params3D)
+        
+        params = [paramsDict[key] if key in paramsDict else 0 for key in self.allSymbols]
 
-        return sum(self.expressionsArray.evaluateUnordered(array))
+        if self.veffArray:
+            return sum(self.veffArray.evaluateUnordered(params))
+        else:
+            return sum(self.Veff(*params))
 
     def computeMasses(self, fields, T, params3D):
         for i, value in enumerate(fields):
@@ -130,7 +133,7 @@ class EffectivePotential:
         params3D = {key: value for (key, value) in zip(self.allSymbols, params3D)}
 
         return self.diagonalizeScalars(params3D, T)
-    @profile
+    
     def diagonalizeScalars(self, params3D, T):
         """Finds a rotation matrix that diagonalizes the scalar mass matrix
         and returns a dict with diagonalization-specific params"""
