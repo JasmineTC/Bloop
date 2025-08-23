@@ -2,6 +2,9 @@ import os
 import numpy as np
 
 from .mathematica_parsing import read_lines, get_terms
+import re
+
+
 
 def generate_veff_module(args, allSymbols):
     parent_dir = os.path.dirname(os.getcwd())
@@ -171,7 +174,7 @@ def generate_lo_submodule(name, filename, lo_file, allSymbols):
     
     with open(filename, 'w') as file:
         # Function imports used by Veff
-        #file.write('# cython: cdivision=True\n')
+        file.write('# cython: cdivision=True\n')
         file.write('from libc.complex cimport csqrt\n')
         file.write('from libc.complex cimport clog\n')
         file.write('from libc.math cimport M_PI\n')
@@ -227,4 +230,5 @@ def convert_to_cython_syntax(term):
     term = term.replace('^', '**')
     term = term.replace('λ', 'lam')
     term = term.replace('μ', 'mu')
-    return term
+
+    return re.sub(r"([0-9]+)(?!\.)/([0-9]+)(?!\.)", "(float(\\1)/float(\\2))", term)
