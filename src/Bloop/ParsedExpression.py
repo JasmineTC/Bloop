@@ -1,0 +1,182 @@
+from cmath import log, sqrt
+import numpy as np
+
+
+class ParsedExpression:
+    def __init__(self, parsedExpression, fileName):
+        self.identifier = parsedExpression["identifier"]
+        self.expression = parsedExpression["expression"]
+        self.symbols = parsedExpression["symbols"]
+        self.fileName = fileName
+
+        self.lambdaExpression = compile(self.expression, self.identifier, mode="eval")
+
+    def evaluate(self, functionArguments: list[float]) -> float:
+        return eval(
+            self.lambdaExpression, functionArguments | {"log": log, "sqrt": sqrt}
+        )
+
+
+class ParsedExpressionSystem:
+    def __init__(self, parsedExpressionSystem, fileName):
+        self.parsedExpressions = [
+            ParsedExpression(parsedExpression, fileName)
+            for parsedExpression in parsedExpressionSystem
+        ]
+        self.fileName = fileName
+
+    def evaluate(self, inputDict: dict[str, float], bReturnDict=False) -> list[float]:
+        """Optional argument is a hack"""
+        outList = [
+            expression.evaluate(inputDict) for expression in self.parsedExpressions
+        ]
+        if bReturnDict:
+            return {
+                self.parsedExpressions[i].identifier: outList[i]
+                for i in range(len(outList))
+            }
+        return outList
+
+    def getExpressionNames(self) -> list[str]:
+        return [expr.identifier for expr in self.parsedExpressions]
+
+
+class ParsedExpressionArray:
+    def __init__(self, parsedExpression, fileName):
+        self.identifier = parsedExpression["identifier"]
+        self.expression = parsedExpression["expression"]
+        self.symbols = parsedExpression["symbols"]
+        self.fileName = fileName
+
+        self.lambdaExpression = compile(self.expression, "<string>", mode="eval")
+
+    def evaluate(self, params):
+        return eval(self.lambdaExpression, {"log": log, "sqrt": sqrt, "params": params})
+
+
+class ParsedExpressionSystemArray:
+    def __init__(self, parsedExpressionSystem, allSymbols, fileName):
+        self.parsedExpressions = [
+            (
+                allSymbols.index(parsedExpression["identifier"]),
+                ParsedExpressionArray(parsedExpression, fileName),
+            )
+            for parsedExpression in parsedExpressionSystem
+        ]
+
+        self.allSymbols = allSymbols
+        self.fileName = fileName
+
+    def evaluate(self, params):
+        newParams = np.array(params, dtype="complex")
+        for expression in self.parsedExpressions:
+            newParams[expression[0]] = expression[1].evaluate(params)
+
+        return newParams
+
+    def evaluateUnordered(self, params):
+        return [expression[1].evaluate(params) for expression in self.parsedExpressions]
+
+    def dictToArray(self, params):
+        return [params[key] if key in params else 0 for key in self.allSymbols]
+
+
+class MassMatrix:
+    def __init__(self, massMatrix, fileName):
+        self.definitions = ParsedExpressionSystem(massMatrix["definitions"], fileName)
+        self.matrix = compile(massMatrix["matrix"], "<string>", mode="eval")
+        self.fileName = fileName
+
+    def evaluate(self, arguments):
+        return eval(self.matrix, arguments )
+
+
+class RotationMatrix:
+    def __init__(self, symbolMap, fileName):
+        self.symbolMap = symbolMap["matrix"]
+        self.fileName = fileName
+
+    def evaluate(self, numericalM):
+        """Evaluates our symbols by plugging in numbers from the input numerical matrix.
+        Returns a dict with symbols names as keys.
+        """
+
+        return {
+            symbol: numericalM[indices[0]][indices[1]]
+            for symbol, indices in self.symbolMap.items()
+        }
+
+
+from unittest import TestCase
+
+
+class ParsedExpressionUnitTests(TestCase):
+    def test_ParsedExpression(self):
+        from numpy import pi
+
+        source = {
+            "expression": f"sqrt(lam)/(4*{pi}) + log(mssq)",
+            "identifier": "Identifier",
+            "symbols": ["lam", "mssq"],
+        }
+
+        reference = 5.400944901447568
+
+        self.assertEqual(
+            reference,
+            ParsedExpression(source, None).evaluate({"lam": 100, "mssq": 100}),
+        )
+
+    def test_ParsedExpressionComplex(self):
+        source = {
+            "expression": "sqrt(lam) + log(mssq)",
+            "identifier": "Identifier",
+            "symbols": ["lam", "mssq"],
+        }
+
+        reference = complex(15.938584910946165 + 5.336296769019722j)
+
+        self.assertEqual(
+            reference,
+            ParsedExpression(source, None).evaluate(
+                {"lam": complex(100, 100), "mssq": complex(100, 100)}
+            ),
+        )
+
+    def test_ParsedExpressionSystem(self):
+        source = [
+            {
+                "expression": "sqrt(lam) + log(mssq)",
+                "identifier": "Identifier",
+                "symbols": ["lam", "mssq"],
+            },
+            {
+                "expression": "sqrt(2*lam) + log(mssq)",
+                "identifier": "Identifier",
+                "symbols": ["lam", "mssq"],
+            },
+        ]
+
+        reference = [(14.605170185988092 + 0j), (18.747305809719045 + 0j)]
+
+        self.assertEqual(
+            reference,
+            ParsedExpressionSystem(source, None).evaluate({"lam": 100, "mssq": 100}),
+        )
+
+    def test_MassMatrix(self):
+        source = {
+            "definitions": [{"expression": "1", "identifier": "mssq", "symbols": []}],
+            "matrix": "[[1, 0], [0, mssq]]",
+        }
+
+        reference = [[1, 0], [0, 1]]
+        self.assertEqual(reference, MassMatrix(source, None).evaluate({"mssq": 1}))
+
+    def test_RotationMatrix(self):
+        source = {"matrix": {"mssq00": [0, 0], "mssq11": [1, 1]}}
+        reference = {"mssq00": 1, "mssq11": -1}
+
+        self.assertEqual(
+            reference, RotationMatrix(source, None).evaluate([[1, 0], [0, -1]])
+        )
