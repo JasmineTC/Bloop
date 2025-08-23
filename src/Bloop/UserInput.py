@@ -28,6 +28,14 @@ class UserInput(argparse.ArgumentParser):
             type=str,
             help="Str: Load cmd line args from json",
         )
+        
+        self.add_argument(
+            "--bCython",
+            action="store_true",
+            default= False,
+            help="Bool: If activated code will use cython to compile Veff EXPERIMENTAL"
+        )
+
 
         self.add_argument(
             "--loopOrder",
