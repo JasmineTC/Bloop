@@ -1,21 +1,20 @@
 __pycache__/
 build/
-*.pyc
-*.egg-info/
 
 .vscode/
 *.code-workspace
+*.spyproject
 
 **/OutputResult/*
 Mathematica/DRalgoOutput
 Testing
 Results
-*.spyproject
+src/Benchmarks/**
+src/Bloop/Veff/**
+
 *.swp
 *.png
 *.pstats
-
-src/Benchmarks/**
-src/Bloop/Veff/**
 **/*.json
-
+*.egg-info/
+*.pyc
