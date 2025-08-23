@@ -3,8 +3,7 @@ import sys
 import time
 import subprocess
 
-
-def compile_veff_submodule():
+def compile_veff_submodule(args):
     parent_dir = os.path.dirname(os.getcwd())
     module_dir = os.path.join(parent_dir, 'src', 'Bloop', 'Veff')
     setup_path = os.path.join(module_dir, "setup.py")
@@ -27,8 +26,9 @@ def compile_veff_submodule():
         print(result.stderr)
         raise RuntimeError("Cython build failed")
     else:
-        print("Cython compilation succeeded:")
-        print(result.stdout)
-        print(f'Compilation took {tf - ti} seconds.')
+        if args.verbose:        
+            print("Cython compilation succeeded:")
+            print(result.stdout)
+            print(f'Compilation took {tf - ti} seconds.')
         
     # TODO: Add a clean up step to remove any compilation artifacts.

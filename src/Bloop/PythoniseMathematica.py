@@ -224,7 +224,7 @@ def pythoniseMathematica(args):
     
     if args.bCython:
         generate_veff_module(args, allSymbols)
-        compile_veff_submodule()    
+        compile_veff_submodule(args)    
     
     else:
         expressionDict["veffArray"] = {

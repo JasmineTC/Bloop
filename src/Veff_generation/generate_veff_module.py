@@ -9,7 +9,8 @@ def generate_veff_module(args, allSymbols):
     module_dir = os.path.join(parent_dir, 'src', 'Bloop', 'Veff')
     if not os.path.exists(module_dir):
         os.mkdir(module_dir)
-    print("Generating Veff submodule")
+    if args.verbose:
+        print("Generating Veff submodule")
     
     #================================== lo ===================================#
     name = 'lo'
@@ -167,7 +168,6 @@ def generate_lo_submodule(name, filename, lo_file, allSymbols):
         
     lines = read_lines(lo_file)
     params, signs, terms = get_terms(lines)
-    print(params, signs, terms)
     
     with open(filename, 'w') as file:
         # Function imports used by Veff
