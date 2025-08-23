@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Jun 16 17:33:46 2025
-
-@author: john
-"""
-
 import os
 import sys
 import time
@@ -14,7 +6,7 @@ import subprocess
 
 def compile_veff_submodule():
     parent_dir = os.path.dirname(os.getcwd())
-    module_dir = os.path.join(parent_dir, 'src', 'ThreeHiggs', 'Veff')
+    module_dir = os.path.join(parent_dir, 'src', 'Bloop', 'Veff')
     setup_path = os.path.join(module_dir, "setup.py")
     
     if not os.path.isfile(setup_path):

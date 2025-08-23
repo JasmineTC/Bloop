@@ -1,26 +1,12 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jun 12 20:42:29 2025
-
-@author: john
-"""
-
 import os
 import numpy as np
 
 from .mathematica_parsing import read_lines, get_terms
 
-
-
-
-
 def generate_veff_module(args, allSymbols):
-    """Creates the Veff module.
-    """
     parent_dir = os.path.dirname(os.getcwd())
-    data_dir   = os.path.join(parent_dir, 'src', 'ThreeHiggs')
-    module_dir = os.path.join(parent_dir, 'src', 'ThreeHiggs', 'Veff')
+    data_dir   = os.path.join(parent_dir, 'src', 'Bloop')
+    module_dir = os.path.join(parent_dir, 'src', 'Bloop', 'Veff')
     if not os.path.exists(module_dir):
         os.mkdir(module_dir)
     print("Generating Veff submodule")
