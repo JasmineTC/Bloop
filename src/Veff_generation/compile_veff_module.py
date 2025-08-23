@@ -11,7 +11,9 @@ def compile_veff_submodule(args):
     if not os.path.isfile(setup_path):
         raise FileNotFoundError(f"No setup.py found in {module_dir}")
     
-    print("Compiling Veff submodule")
+    if args.verbose:
+        print("Compiling Veff submodule")
+    
     ti = time.time()
     result = subprocess.run(
         [sys.executable, "setup.py", "build_ext", "--inplace"],
