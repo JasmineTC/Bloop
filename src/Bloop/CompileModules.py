@@ -16,7 +16,7 @@ def compile_veff_submodule(args):
     
     ti = time.time()
     result = subprocess.run(
-        [sys.executable, "setup.py", "build_ext", "--inplace"],
+        [sys.executable, "Setup.py", "build_ext", "--inplace"],
         cwd=module_dir,
         capture_output=True,
         text=True,

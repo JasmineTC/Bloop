@@ -70,10 +70,8 @@ def generateModules(
             from Cython.Build import cythonize
             
             extensions = [Extension("lo", ["lo.pyx"], extra_compile_args = {{gccFlags}})]
-            {% if args.loopOrder >= 1 %}
             extensions.append(Extension("nlo", ["nlo.pyx"], extra_compile_args = {{gccFlags}}))
-            {% endif %}
-            {% if args.loopOrder >= 2 %}
+            {% if args.loopOrder > 1 %}
             extensions.append(Extension("nnlo", ["nnlo.pyx"], extra_compile_args = {{gccFlags}}))
             {% endif %}
             extensions.append(Extension("eigen", ["eigen.pyx"], extra_compile_args = {{gccFlags}}))
@@ -97,7 +95,7 @@ def generateVeffModule(filename, loopOrder, allSymbols):
         from Bloop.CythonModules.lo import lo 
         from Bloop.CythonModules.nlo import nlo 
         {%- if loopOrder > 1 %}
-        from Bloop.CythonModules import nnlo 
+        from Bloop.CythonModules.nnlo import nnlo 
         {%- endif %}
 
         def veffTotal(
@@ -177,13 +175,12 @@ def generateDiagonalizeSubModule(
 ):
     with open(scalarMassMatrixFile) as file:
         scalarMassMatrices = [convertMatrixToCythonSyntax(line) for line in file.readlines()]
-        
-    if not scalarPermutationMatrixFile.lower() == "none":
+    if scalarPermutationMatrixFile.lower() == "none":
+        scalarPermutationMatrixFile = scalarPermutationMatrixFile.lower()
+    else:
         with open(scalarPermutationMatrixFile) as file:
             scalarPermutationMatrix = convertMatrixToCythonSyntax(file.read())
-    else:
-        scalarPermutationMatrixFile = scalarPermutationMatrixFile.lower()
-        
+
     with open(scalarRotationMatrixFile) as file:
         scalarRotationMatrix = json.loads(file.read())
 
@@ -239,10 +236,11 @@ def generateDiagonalizeSubModule(
             {%- endfor %}
                 )
                 
-                
-            {%- if not {{scalarPermutationMatrix}} == none %}
+                {%- if not scalarPermutationMatrixFile == none %}
                 eigenVectors = dgemm(1, scalarPermutationMatrix, eigenVectors)
+                {%- endif %}
                 
+
             {%- for symbol, indices in scalarRotationMatrix.items() %}
                 _{{ symbol }}[0] = eigenVectors[{{ indices[0] }}][{{ indices[1] }}]
             {%- endfor %}
@@ -259,6 +257,7 @@ def generateDiagonalizeSubModule(
                 scalarRotationMatrix = scalarRotationMatrix,
                 vectorMasses = vectorMasses,
                 vectorShorthands = vectorShorthands,
+                scalarPermutationMatrixFile = scalarPermutationMatrixFile
             ))
 
 def mutliLineExpression(filePointer):
