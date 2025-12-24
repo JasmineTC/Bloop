@@ -196,6 +196,19 @@ def generateComputeMassesModule(
     with open(scalarRotationMatrixFile) as file:
         scalarRotationMatrix = json.loads(file.read())
         
+    bufferVariables = []
+    
+    for expression in vectorMasses:
+        bufferVariables.append(expression["identifier"])
+    
+    for expression in vectorShorthands:
+        bufferVariables.append(expression["identifier"])
+    
+    for symbol in scalarRotationMatrix.keys():
+        bufferVariables.append(symbol)
+
+    for symbol in scalarMassNames:
+        bufferVariables.append(symbol)
 
     return Environment().from_string(dedent("""\
         from scipy.linalg import lapack, block_diag
@@ -205,6 +218,9 @@ def generateComputeMassesModule(
         cdef void computeMasses(double [:] parameters):
         {%- for symbol in allSymbols %}
             cdef double {{ symbol }} = parameters[{{ loop.index0 }}]
+        {%- endfor %}
+
+        {%- for symbol in bufferSymbols %}
             cdef double _{{ symbol }} = {{symbol}}
         {%- endfor %}
 
@@ -243,8 +259,8 @@ def generateComputeMassesModule(
             _{{ massSymbol }} = eigenValues{{ (loop.index0 / scalarMassMatrixLength) | int }}[{{ (loop.index0 % scalarMassMatrixLength) | int }}]
         {%- endfor %}
 
-         {%- for symbol in allSymbols %}
-            parameters[{{ loop.index0 }}] = _{{symbol}}
+         {%- for symbol in bufferSymbols %}
+            parameters[{{allSymbols.index('symbol')}}] = _{{symbol}}
         {%- endfor %}
 
         """)).render(
@@ -255,6 +271,7 @@ def generateComputeMassesModule(
             scalarRotationMatrix = scalarRotationMatrix,
             vectorMasses = vectorMasses,
             vectorShorthands = vectorShorthands,
+            bufferVariables = bufferVariables,
         )
 
 def mutliLineExpression(filePointer):
