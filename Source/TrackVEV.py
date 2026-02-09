@@ -124,10 +124,11 @@ class TrackVEV:
             len(self.TRange) * 10,
         )
 
-        ## (Maybe) Important note:
+        ## Dev note on solve_ivp numerical instability:
         ## Any none-zero value in initalConditions will be updated even if not
-        ## included in beta function - leads to differences at the level of the tol
-        ## of solve_ivp (default 1e-3%)
+        ## included in beta function 
+        ## The number of symbols in all symbols also affects the result
+        ## These differences are at or below the tol of sol_ivp
         def betaFunction(
                 mu, 
                 initialConditions
@@ -165,7 +166,8 @@ class TrackVEV:
             
             for key, spline in betaSpline4D.items():
                 params[self.allSymbols.index(key)] = spline(self.hardScale.evaluate(params))
-                
+            
+            params = np.loadtxt("old.txt")
             if not np.all(self.bounded.evaluateUnordered(params)):
                 return minimizationResults | {"failureReason": "unBounded"}
             

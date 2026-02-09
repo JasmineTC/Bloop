@@ -214,9 +214,6 @@ allUltrasoftScaleParams = Join[couplingsUS, scalarMassesUS] /. \[Mu]3->softScale
 
 
 allUltrasoftScaleParamsSqrt = RemoveSuffixes[sqrtSubRules[allUltrasoftScaleParams], {"US", "3d"}];
-allUltrasoftScaleParamsSqrt= Join[allUltrasoftScaleParamsSqrt, {\[Mu]3US -> T}];
-
-
 exportUTF8[exportPath<>"/UltrasoftScaleParams_NLO.txt", allUltrasoftScaleParamsSqrt];
 
 
@@ -424,7 +421,7 @@ CalculatePotentialUS[]
 
 veffLO = PrintEffectivePotential["LO"]//Simplify; (* Simplify to get rid of possible imaginaryDetailed units *)
 veffNLO = PrintEffectivePotential["NLO"]//Simplify; (* Simplify to factor 1/pi division for tiny speed up *)
-veffNNLO = PrintEffectivePotential["NNLO"]; (* NOT simplified as seems to change numerical result for unknown reasons *)
+veffNNLO = PrintEffectivePotential["NNLO"]/.\[Mu]3US->ultraSoftScale; (* NOT simplified as seems to change numerical result for unknown reasons *)
 
 
 exportUTF8[exportPath<>"/Veff_LO.txt", veffLO];
@@ -444,7 +441,6 @@ exportUTF8[
 
 exportUTF8[exportPath<>"/AllSymbols.json",
 	Sort[DeleteDuplicates[Join[
-	{"RGScale"},
 	extractSymbols[veffLO],
 	extractSymbols[veffNLO],
 	extractSymbols[veffNNLO],

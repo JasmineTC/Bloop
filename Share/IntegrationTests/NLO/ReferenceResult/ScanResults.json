@@ -11,15 +11,9 @@
       "darkHieracy": 1
     },
     "failureReason": false,
-    "PTData": [
-      {
-        "Tc": 128.0,
-        "strength": 1.0499866955227226,
-        "v3": -1.0499938834155678
-      }
-    ],
-    "strong": true,
-    "steps": 1,
+    "PTData": null,
+    "strong": false,
+    "steps": 0,
     "isPerturbative": true,
     "complex": false
   },
