@@ -347,8 +347,7 @@ def bPhysicalMinimum(params):
         [299, 299, 299],
         [-299, 299, 299],
     ]
-    nloptInst = cNlopt(
-        config={
+    nloptInst = cNlopt({
             "nbrVars": 3,
             "absGlobalTol": 0.5,
             "relGlobalTol": 0.5,
@@ -371,11 +370,11 @@ def bPhysicalMinimum(params):
                         - 2*params["mu2sq"]) 
                 - 4*v1*v2*params["mu12sqRe"] - 2*v3**2*params["mu3sq"])/4
 
-    
-    minLocation, minValue = nloptInst.nloptGlobal(potential, minimumInitialGuesses[0])
+    nloptInst.funcInit(potential) 
+    minLocation, minValue = nloptInst.nloptGlobal(minimumInitialGuesses[0])
 
     for guess in minimumInitialGuesses:
-        minLocationTemp, minValueTemp = nloptInst.nloptLocal(potential, guess)
+        minLocationTemp, minValueTemp = nloptInst.nloptLocal(guess)
 
         if minValueTemp < minValue:
             minLocation, minValue = minLocationTemp, minValueTemp

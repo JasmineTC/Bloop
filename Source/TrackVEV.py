@@ -6,39 +6,33 @@ from dataclasses import dataclass, InitVar
 from PythoniseMathematica import replaceGreekSymbols
 from ParsedExpression import ParsedExpression, ParsedExpressionSystem
 
-@dataclass(frozen=True)
 class cNlopt:
-    nbrVars: int = 0
-    varLowerBounds: tuple[float] = (0,)
-    varUpperBounds: tuple[float] = (0,)
-    absLocalTol: float = 0
-    relLocalTol: float = 0
-    absGlobalTol: float = 0
-    relGlobalTol: float = 0
-    config: InitVar[dict] = None
+    def __init__(self,
+        nloptConfig
+    ):
+        optG = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, nloptConfig["nbrVars"])
+        optG.set_lower_bounds(nloptConfig["varLowerBounds"])
+        optG.set_upper_bounds(nloptConfig["varUpperBounds"])
+        optG.set_xtol_abs(nloptConfig["absGlobalTol"])
+        optG.set_xtol_rel(nloptConfig["relGlobalTol"])
+        self.optG = optG
 
-    def __post_init__(self, config: dict):
-        if config:
-            self.__init__(**config)
+        optL = nlopt.opt(nlopt.LN_BOBYQA, nloptConfig["nbrVars"])
+        optL.set_lower_bounds(nloptConfig["varLowerBounds"])
+        optL.set_upper_bounds(nloptConfig["varUpperBounds"])
+        optL.set_xtol_abs(nloptConfig["absLocalTol"])
+        optL.set_xtol_rel(nloptConfig["relLocalTol"])
+        self.optL = optL
+    
+    def funcInit(self, func):
+        self.optG.set_min_objective(func)
+        self.optL.set_min_objective(func)
+    
+    def nloptGlobal(self, initialGuess: list[float]):
+        return self.nloptLocal(self.optG.optimize(initialGuess))
 
-    def nloptGlobal(self, func: callable, initialGuess: list[float]):
-        opt = nlopt.opt(nlopt.GN_DIRECT_NOSCAL, self.nbrVars)
-        opt.set_min_objective(func)
-        opt.set_lower_bounds(self.varLowerBounds)
-        opt.set_upper_bounds(self.varUpperBounds)
-        opt.set_xtol_abs(self.absGlobalTol)
-        opt.set_xtol_rel(self.relGlobalTol)
-        return self.nloptLocal(func, opt.optimize(initialGuess))
-
-    def nloptLocal(self, func: callable, initialGuess: list[float]):
-        opt = nlopt.opt(nlopt.LN_BOBYQA, self.nbrVars)
-        opt.set_min_objective(func)
-        opt.set_lower_bounds(self.varLowerBounds)
-        opt.set_upper_bounds(self.varUpperBounds)
-        opt.set_xtol_abs(self.absLocalTol)
-        opt.set_xtol_rel(self.relLocalTol)
-        return opt.optimize(initialGuess), opt.last_optimum_value()
-
+    def nloptLocal(self, initialGuess: list[float]):
+        return self.optL.optimize(initialGuess), self.optL.last_optimum_value()
 
 def bIsPerturbative(params, pertSymbols, allSymbols):
     for pertSymbol in pertSymbols:
@@ -58,7 +52,7 @@ class TrackVEV:
         self.verbose = verbose
         self.TRange = TRange
         self.initialGuesses = initialGuesses
-        self.nloptInst = cNlopt( config=nloptConfig )
+        self.nloptInst = cNlopt(nloptConfig)
         self.verbose = verbose
         
         self.allSymbols = pythonisedExpressions["allSymbols"]["allSymbols"]
@@ -210,15 +204,16 @@ class TrackVEV:
         from evaluatePotential  import evaluatePotential
         """For physics reasons we only minimise the real part,
         for nlopt reasons we need to give a redunant grad arg"""
-        def VeffWrapper(fields, grad):
+        def veffWrapper(fields, grad):
             return np.real(
                     evaluatePotential(fields, params)
                 )
 
-        bestResult = self.nloptInst.nloptGlobal(VeffWrapper, minimumCandidates[0])
+        self.nloptInst.funcInit(veffWrapper)     
+        bestResult = self.nloptInst.nloptGlobal(minimumCandidates[0])
 
         for candidate in minimumCandidates:
-            result = self.nloptInst.nloptLocal(VeffWrapper, candidate)
+            result = self.nloptInst.nloptLocal(candidate)
             if result[1] < bestResult[1]:
                 bestResult = result
 
