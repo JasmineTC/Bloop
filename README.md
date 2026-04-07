@@ -1,5 +1,5 @@
 # BLOOP (Beyond one LOOp Phase transition)
-** THIS CODE HAS BEEN MOVED TO https://github.com/MOREHIGGS/Bloop - this page will remain to preserve dev history **
+**THIS CODE HAS BEEN MOVED TO https://github.com/MOREHIGGS/Bloop - this page will remain to preserve dev history**
 
 ## Installing the code:
 Download the code base with a git clone. From this point forward all commands are to be run from inside the Bloop directory
